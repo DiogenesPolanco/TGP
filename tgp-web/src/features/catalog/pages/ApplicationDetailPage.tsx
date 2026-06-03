@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { ApplicationForm } from '../components/ApplicationForm'
 import type { Technology, Vulnerability, Risk, Incident, AuditFinding, SupportStatus } from '@/types/domain'
+import { DeliverablesTab } from '../components/DeliverablesTab'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -36,6 +37,7 @@ export function ApplicationDetailPage() {
   const risks = useLiveQuery(() => db.risks.where('applicationId').equals(id!).toArray(), [id])
   const incidents = useLiveQuery(() => db.incidents.where('applicationId').equals(id!).toArray(), [id])
   const findings = useLiveQuery(() => db.auditFindings.where('applicationId').equals(id!).toArray(), [id])
+  const deliverables = useLiveQuery(() => db.deliverables.where('applicationId').equals(id!).toArray(), [id])
 
   if (!application) {
     return (
@@ -55,6 +57,7 @@ export function ApplicationDetailPage() {
     { id: 'risks', label: `Riesgos (${risks?.length ?? 0})` },
     { id: 'incidents', label: `Incidentes (${incidents?.length ?? 0})` },
     { id: 'audit', label: `Auditoría (${findings?.length ?? 0})` },
+    { id: 'deliverables', label: `Entregables (${deliverables?.length ?? 0})` },
   ]
 
   const getCriticalityColor = (criticality: string) => {
@@ -227,6 +230,10 @@ export function ApplicationDetailPage() {
             renderCells={(f) => [f.title, f.severity, f.status, new Date(f.dueDate).toLocaleDateString('es-ES')]}
             severityColor={(f) => f.severity}
           />
+        )}
+
+        {activeTab === 'deliverables' && (
+          <DeliverablesTab applicationId={id!} />
         )}
       </div>
 

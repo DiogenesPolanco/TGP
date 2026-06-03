@@ -1,0 +1,170 @@
+import { useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/services/db/database'
+import { useAppStore } from '@/stores/appStore'
+import { Plus, Search, Activity, AlertOctagon, Clock } from 'lucide-react'
+import { IncidentForm } from '../components/IncidentForm'
+import type { Incident } from '@/types/domain'
+
+export function IncidentsPage() {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showForm, setShowForm] = useState(false)
+  const [editingIncident, setEditingIncident] = useState<Incident | null>(null)
+  const { addNotification } = useAppStore()
+
+  const incidents = useLiveQuery(() => db.incidents.toArray()) ?? []
+  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
+
+  const filteredIncidents = incidents.filter((i) =>
+    i.title.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const handleDelete = async (id: string) => {
+    if (confirm('¿Eliminar incidente?')) {
+      await db.incidents.delete(id)
+      addNotification({ type: 'success', message: 'Incidente eliminado' })
+    }
+  }
+
+  const stats = {
+    total: incidents.length,
+    open: incidents.filter((i) => i.status !== 'resolved' && i.status !== 'closed').length,
+    p1: incidents.filter((i) => i.severity === 'critical' && i.status !== 'resolved').length,
+    avgMttr: incidents.filter((i) => i.status === 'resolved').length > 0
+      ? Math.round(incidents.filter((i) => i.status === 'resolved').reduce((sum, i) => sum + (i.downtimeMinutes ?? 0), 0) / incidents.filter((i) => i.status === 'resolved').length)
+      : 0,
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Incidentes</h2>
+        <button
+          onClick={() => { setEditingIncident(null); setShowForm(true) }}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+        >
+          <Plus size={18} />
+          Nuevo Incidente
+        </button>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard icon={<Activity size={20} />} label="Total" value={stats.total} color="text-primary" />
+        <StatCard icon={<AlertOctagon size={20} />} label="Abiertos" value={stats.open} color="text-warning" />
+        <StatCard icon={<AlertOctagon size={20} />} label="P1 Abiertos" value={stats.p1} color="text-danger" />
+        <StatCard icon={<Clock size={20} />} label="MTTR Promedio" value={`${stats.avgMttr}m`} color="text-info" />
+      </div>
+
+      <div className="flex items-center gap-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="relative flex-1">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+          <input
+            type="text"
+            placeholder="Buscar incidentes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Severidad</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Detectado</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Downtime</th>
+              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
+            {filteredIncidents.map((incident) => {
+              const app = applications.find((a) => a.id === incident.applicationId)
+              return (
+                <tr key={incident.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{incident.title}</p>
+                    <p className="text-xs text-neutral-50 dark:text-neutral-50">{incident.externalId}</p>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      incident.severity === 'critical' ? 'bg-danger/10 text-danger' :
+                      incident.severity === 'high' ? 'bg-warning/10 text-warning' :
+                      incident.severity === 'medium' ? 'bg-info/10 text-info' :
+                      'bg-success/10 text-success'
+                    }`}>
+                      {incident.severity}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      incident.status === 'resolved' ? 'bg-success/10 text-success' :
+                      incident.status === 'closed' ? 'bg-neutral-10 text-neutral-60' :
+                      'bg-danger/10 text-danger'
+                    }`}>
+                      {incident.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">
+                    {new Date(incident.detectedAt).toLocaleDateString('es-ES')}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">
+                    {incident.downtimeMinutes ? `${incident.downtimeMinutes} min` : '-'}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => { setEditingIncident(incident); setShowForm(true) }}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(incident.id)}
+                        className="text-sm text-danger hover:underline"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        {filteredIncidents.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron incidentes</p>
+          </div>
+        )}
+      </div>
+
+      {showForm && (
+        <IncidentForm
+          incident={editingIncident}
+          onClose={() => setShowForm(false)}
+          onSave={() => {
+            setShowForm(false)
+            setEditingIncident(null)
+            addNotification({ type: 'success', message: editingIncident ? 'Incidente actualizado' : 'Incidente creado' })
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
+  return (
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className={`${color} mb-2`}>{icon}</div>
+      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
+      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+    </div>
+  )
+}

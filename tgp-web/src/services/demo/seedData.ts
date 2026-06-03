@@ -11,6 +11,7 @@ import type {
   Team,
   Objective,
   HealthIndex,
+  Deliverable,
   User,
 } from '@/types/domain'
 
@@ -141,6 +142,16 @@ export async function seedDemoData() {
     { id: 'obj-1', teamId: 'team-1', businessUnitId: 'bu-digital', title: 'Mejorar tiempo de entrega', description: 'Reducir lead time a menos de 24h', type: 'okr', periodStart: new Date('2024-01-01'), periodEnd: new Date('2024-03-31'), progress: 65, status: 'on_track', keyResults: [{ id: 'kr-1', title: 'Reducir lead time a < 24h', measure: 'hours', baseline: 48, target: 24, current: 30, status: 'on_track' }], metadata: {}, createdAt: new Date(), updatedAt: new Date() },
   ]
 
+  const deliverables: Deliverable[] = [
+    { id: 'del-1', applicationId: 'app-1', title: 'Migración a .NET 8', description: 'Actualizar framework del core bancario', dueDate: new Date('2026-08-30'), status: 'in_progress', objectiveId: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-2', applicationId: 'app-1', title: 'Implementar autenticación 2FA', description: 'Añadir segundo factor de autenticación', dueDate: new Date('2026-07-15'), status: 'in_progress', objectiveId: 'obj-1', createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-3', applicationId: 'app-2', title: 'Rediseño del portal', description: 'Nuevo diseño UX del portal clientes', dueDate: new Date('2026-09-01'), status: 'pending', objectiveId: 'obj-1', createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-4', applicationId: 'app-3', title: 'App Móvil versión 2.0', description: 'Nueva versión con soporte offline', dueDate: new Date('2026-12-31'), status: 'pending', objectiveId: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-5', applicationId: 'app-4', title: 'Integración con nuevo proveedor', description: 'Conectar con gateway de pagos alternativo', dueDate: new Date('2026-06-30'), status: 'completed', objectiveId: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-6', applicationId: 'app-5', title: 'Plan de migración CRM', description: 'Documentar estrategia de reemplazo del CRM legacy', dueDate: new Date('2026-05-15'), status: 'completed', objectiveId: 'obj-1', createdAt: new Date(), updatedAt: new Date() },
+    { id: 'del-7', applicationId: null, title: 'Actualización política de seguridad', description: 'Revisar y actualizar políticas de seguridad TI', dueDate: new Date('2026-10-01'), status: 'pending', objectiveId: null, createdAt: new Date(), updatedAt: new Date() },
+  ]
+
   const healthHistory: HealthIndex[] = [
     { id: 'hi-1', businessUnitId: 'all', tenantId: 'tenant-1', deliveryScore: 75, qualityScore: 80, securityScore: 70, availabilityScore: 95, obsolescenceScore: 60, riskScore: 75, complianceScore: 85, overallScore: 78, weights: { delivery: 20, quality: 15, security: 20, availability: 15, obsolescence: 10, risk: 10, compliance: 10 }, calculatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), trend: 'stable' },
     { id: 'hi-2', businessUnitId: 'all', tenantId: 'tenant-1', deliveryScore: 78, qualityScore: 82, securityScore: 72, availabilityScore: 96, obsolescenceScore: 62, riskScore: 76, complianceScore: 86, overallScore: 80, weights: { delivery: 20, quality: 15, security: 20, availability: 15, obsolescence: 10, risk: 10, compliance: 10 }, calculatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), trend: 'improving' },
@@ -160,6 +171,7 @@ export async function seedDemoData() {
   await db.auditFindings.bulkAdd(auditFindings)
   await db.teams.bulkAdd(teams)
   await db.objectives.bulkAdd(objectives)
+  await db.deliverables.bulkAdd(deliverables)
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
 }
