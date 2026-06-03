@@ -4,7 +4,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { Plus, Search, Target, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { ObjectiveForm } from '../components/ObjectiveForm'
-import type { Objective } from '@/types/domain'
+import type { Objective, KeyResult } from '@/types/domain'
 
 export function ObjectivesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -132,15 +132,7 @@ export function ObjectivesPage() {
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Key Results</h4>
                   {objective.keyResults.map((kr) => (
-                    <div key={kr.id} className="flex items-center justify-between p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-                      <span className="text-sm text-neutral-70 dark:text-neutral-30">{kr.title}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-neutral-60 dark:text-neutral-40">{kr.current} / {kr.target} {kr.measure}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(kr.status)}`}>
-                          {kr.status}
-                        </span>
-                      </div>
-                    </div>
+                    <KrRow key={kr.id} objectiveId={objective.id} kr={kr} />
                   ))}
                 </div>
               )}
@@ -181,6 +173,50 @@ export function ObjectivesPage() {
           }}
         />
       )}
+    </div>
+  )
+}
+
+function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
+  const { addNotification } = useAppStore()
+
+  const handleStatusChange = async (newStatus: string) => {
+    const objective = await db.objectives.get(objectiveId)
+    if (!objective) return
+    const updatedKrs = objective.keyResults.map((k) =>
+      k.id === kr.id ? { ...k, status: newStatus as KeyResult['status'] } : k
+    )
+    await db.objectives.update(objectiveId, { keyResults: updatedKrs, updatedAt: new Date() })
+    addNotification({ type: 'success', message: `KR actualizado a "${newStatus}"` })
+  }
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'on_track': return 'bg-success/10 text-success border-success/30'
+      case 'at_risk': return 'bg-warning/10 text-warning border-warning/30'
+      case 'behind': return 'bg-danger/10 text-danger border-danger/30'
+      case 'achieved': return 'bg-success/10 text-success border-success/30'
+      default: return 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60'
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+      <span className="text-sm text-neutral-70 dark:text-neutral-30">{kr.title}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-neutral-60 dark:text-neutral-40">{kr.current} / {kr.target} {kr.measure}</span>
+        <select
+          value={kr.status}
+          onChange={(e) => handleStatusChange(e.target.value)}
+          className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer ${getStatusStyle(kr.status)}`}
+        >
+          <option value="not_started">No iniciado</option>
+          <option value="on_track">On track</option>
+          <option value="at_risk">En riesgo</option>
+          <option value="behind">Atrasado</option>
+          <option value="achieved">Logrado</option>
+        </select>
+      </div>
     </div>
   )
 }
