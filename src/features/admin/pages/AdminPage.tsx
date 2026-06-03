@@ -4,10 +4,12 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Download, Upload, Database, Trash2, FileSpreadsheet, Cpu } from 'lucide-react'
+import { Download, Upload, Database, Trash2, FileSpreadsheet, Cpu, RefreshCw } from 'lucide-react'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
 import type { SeedResult } from '@/services/demo/seedTechnologies'
+import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 
 export function AdminPage() {
   const navigate = useNavigate()
@@ -15,7 +17,9 @@ export function AdminPage() {
   const { confirm } = useConfirm()
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [seedResult, setSeedResult] = useState<SeedResult | null>(null)
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
 
   const stats = useLiveQuery(async () => ({
     applications: await db.applications.count(),
@@ -122,6 +126,23 @@ export function AdminPage() {
     })
   }
 
+  const handleSyncTechnologies = async () => {
+    setIsSyncing(true)
+    setSyncResult(null)
+    try {
+      const result = await syncTechnologies()
+      setSyncResult(result)
+      addNotification({
+        type: 'success',
+        message: `Sincronización completada: ${result.updated} actualizadas, ${result.notFound} sin datos, ${result.errors} errores (${result.duration}ms)`,
+      })
+    } catch {
+      addNotification({ type: 'error', message: 'Error al sincronizar con endoflife.date' })
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Administración</h2>
@@ -200,6 +221,24 @@ export function AdminPage() {
                 {seedResult
                   ? `${seedResult.added} añadidas · ${seedResult.skipped} omitidas`
                   : 'Cargar todas las tecnologías conocidas'}
+              </p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleSyncTechnologies}
+            disabled={isSyncing}
+            className="flex items-center gap-3 p-4 rounded-lg border border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={24} className={`text-info ${isSyncing ? 'animate-spin' : ''}`} />
+            <div className="text-left">
+              <p className="text-sm font-medium text-neutral-90 dark:text-white">
+                {isSyncing ? 'Sincronizando...' : 'Sincronizar con endoflife.date'}
+              </p>
+              <p className="text-xs text-neutral-60 dark:text-neutral-40">
+                {syncResult
+                  ? `${syncResult.updated} actualizadas · ${syncResult.notFound} sin datos · ${syncResult.errors} errores (${syncResult.duration}ms)`
+                  : 'Actualizar EOL y soporte desde API pública'}
               </p>
             </div>
           </button>
