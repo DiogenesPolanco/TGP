@@ -15,6 +15,10 @@ import { ImportPage } from '@/features/admin/pages/ImportPage'
 import { BusinessUnitsPage } from '@/features/admin/pages/BusinessUnitsPage'
 import { ObsolescencePage } from '@/features/obsolescence/pages/ObsolescencePage'
 import { DeliverablesPage } from '@/features/delivery/pages/DeliverablesPage'
+import { DailyPage } from '@/features/execution/pages/DailyPage'
+import { PlansPage } from '@/features/execution/pages/PlansPage'
+import { PlanDetailPage } from '@/features/execution/pages/PlanDetailPage'
+import { CommitmentsPage } from '@/features/execution/pages/CommitmentsPage'
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +41,10 @@ export const router = createBrowserRouter([
       { path: 'admin', element: <AdminPage /> },
       { path: 'admin/import', element: <ImportPage /> },
       { path: 'admin/business-units', element: <BusinessUnitsPage /> },
+      { path: 'execution/daily', element: <DailyPage /> },
+      { path: 'execution/plans', element: <PlansPage /> },
+      { path: 'execution/plans/:id', element: <PlanDetailPage /> },
+      { path: 'execution/commitments', element: <CommitmentsPage /> },
     ],
   },
 ])

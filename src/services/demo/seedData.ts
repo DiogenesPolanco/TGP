@@ -14,6 +14,11 @@ import type {
   Deliverable,
   Microservice,
   User,
+  Plan,
+  Activity,
+  Task,
+  Commitment,
+  Blocker,
 } from '@/types/domain'
 
 const SEEDED_FLAG = 'tgp-seeded'
@@ -206,6 +211,63 @@ export async function seedDemoData() {
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
 
-  // Mark as seeded so it never runs again
+  // ── Execution seed data ──
+  const ds = (daysOffset: number) => {
+    const d = new Date()
+    d.setDate(d.getDate() + daysOffset)
+    d.setHours(12, 0, 0, 0)
+    return d
+  }
+
+  const plans: Plan[] = [
+    { id: 'plan-1', title: 'Q2 2026 — Modernizacion Core', description: 'Actualizacion de frameworks y migracion de BD del core bancario', teamId: 'team-1', businessUnitId: 'bu-core', objectiveId: 'obj-1', status: 'in_progress', health: 'yellow', startDate: ds(-45), endDate: ds(45), metadata: {}, createdAt: ds(-45), updatedAt: ds(-1) },
+    { id: 'plan-2', title: 'Q2 2026 — Seguridad', description: 'Correccion de vulnerabilidades y hardening de aplicaciones', teamId: 'team-2', businessUnitId: 'bu-digital', objectiveId: 'obj-1', status: 'in_progress', health: 'green', startDate: ds(-30), endDate: ds(60), metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
+    { id: 'plan-3', title: 'Migracion CRM — Planificacion', description: 'Plan de reemplazo del CRM legacy', teamId: 'team-2', businessUnitId: 'bu-legacy', objectiveId: null, status: 'planned', health: 'green', startDate: ds(15), endDate: ds(75), metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
+  ]
+
+  const plan1Activities: Activity[] = [
+    { id: 'act-1', planId: 'plan-1', parentActivityId: null, title: 'Migrar Core Banking a .NET 8', description: 'Actualizar el framework del core bancario', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'critical', status: 'in_progress', estimatedHours: 80, actualHours: 45, startDate: ds(-40), dueDate: ds(20), completedAt: null, metadata: {}, createdAt: ds(-40), updatedAt: ds(-1) },
+    { id: 'act-2', planId: 'plan-1', parentActivityId: 'act-1', title: 'Actualizar dependencias NuGet', description: 'Actualizar paquetes a versiones compatibles con .NET 8', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'completed', estimatedHours: 16, actualHours: 14, startDate: ds(-40), dueDate: ds(-15), completedAt: ds(-16), metadata: {}, createdAt: ds(-40), updatedAt: ds(-16) },
+    { id: 'act-3', planId: 'plan-1', parentActivityId: 'act-1', title: 'Migrar controladores MVC', description: 'Migrar todos los controladores a la nueva version', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'in_progress', estimatedHours: 32, actualHours: 20, startDate: ds(-30), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
+    { id: 'act-4', planId: 'plan-1', parentActivityId: null, title: 'Actualizar PostgreSQL 16', description: 'Migracion de base de datos', assigneeId: 'user-2', teamId: 'team-1', applicationId: 'app-1', priority: 'medium', status: 'in_progress', estimatedHours: 40, actualHours: 25, startDate: ds(-35), dueDate: ds(5), completedAt: null, metadata: {}, createdAt: ds(-35), updatedAt: ds(-1) },
+    { id: 'act-5', planId: 'plan-1', parentActivityId: null, title: 'Implementar OAuth2 en Portal', description: 'Migrar autenticacion a OAuth2 con Keycloak', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-2', priority: 'high', status: 'pending', estimatedHours: 24, actualHours: null, startDate: ds(1), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+  ]
+
+  const plan2Activities: Activity[] = [
+    { id: 'act-6', planId: 'plan-2', parentActivityId: null, title: 'Auditoria de vulnerabilidades', description: 'Escaneo completo de vulnerabilidades en todas las apps', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'critical', status: 'completed', estimatedHours: 16, actualHours: 18, startDate: ds(-20), dueDate: ds(-5), completedAt: ds(-6), metadata: {}, createdAt: ds(-20), updatedAt: ds(-6) },
+    { id: 'act-7', planId: 'plan-2', parentActivityId: null, title: 'Corregir XSS en formularios de busqueda', description: 'Sanitizar inputs en el portal clientes', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'high', status: 'in_progress', estimatedHours: 12, actualHours: 6, startDate: ds(-14), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-14), updatedAt: ds(-1) },
+    { id: 'act-8', planId: 'plan-2', parentActivityId: null, title: 'Implementar CSP headers', description: 'Agregar Content Security Policy headers', assigneeId: null, teamId: 'team-2', applicationId: 'app-2', priority: 'medium', status: 'pending', estimatedHours: 8, actualHours: null, startDate: ds(2), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-7), updatedAt: ds(-1) },
+  ]
+
+  const allActivities = [...plan1Activities, ...plan2Activities]
+
+  const tasks: Task[] = [
+    { id: 'task-1', activityId: 'act-1', planId: 'plan-1', title: 'Evaluar cambios de version', description: '', assigneeId: 'user-1', status: 'done', priority: 'medium', estimatedHours: 4, dueDate: ds(-38), completedAt: ds(-39), dependsOn: [], metadata: {}, createdAt: ds(-40), updatedAt: ds(-39) },
+    { id: 'task-2', activityId: 'act-1', planId: 'plan-1', title: 'Actualizar Dockerfile a .NET 8 SDK', description: '', assigneeId: 'user-1', status: 'done', priority: 'high', estimatedHours: 2, dueDate: ds(-35), completedAt: ds(-36), dependsOn: [], metadata: {}, createdAt: ds(-40), updatedAt: ds(-36) },
+    { id: 'task-3', activityId: 'act-1', planId: 'plan-1', title: 'Verificar compatibilidad de paquetes', description: '', assigneeId: 'user-1', status: 'in_progress', priority: 'high', estimatedHours: 8, dueDate: ds(-1), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-30), updatedAt: ds(-2) },
+    { id: 'task-4', activityId: 'act-4', planId: 'plan-1', title: 'Hacer dump de BD actual', description: '', assigneeId: 'user-2', status: 'done', priority: 'critical', estimatedHours: 2, dueDate: ds(-30), completedAt: ds(-31), dependsOn: [], metadata: {}, createdAt: ds(-35), updatedAt: ds(-31) },
+    { id: 'task-5', activityId: 'act-4', planId: 'plan-1', title: 'Ejecutar pg_upgrade', description: '', assigneeId: 'user-2', status: 'todo', priority: 'critical', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-10), updatedAt: ds(-2) },
+    { id: 'task-6', activityId: 'act-7', planId: 'plan-2', title: 'Identificar endpoints vulnerables', description: '', assigneeId: 'user-2', status: 'done', priority: 'high', estimatedHours: 3, dueDate: ds(-10), completedAt: ds(-11), dependsOn: [], metadata: {}, createdAt: ds(-14), updatedAt: ds(-11) },
+    { id: 'task-7', activityId: 'act-7', planId: 'plan-2', title: 'Implementar sanitizacion en backend', description: '', assigneeId: 'user-2', status: 'in_progress', priority: 'high', estimatedHours: 6, dueDate: ds(0), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-10), updatedAt: ds(-2) },
+    { id: 'task-8', activityId: 'act-7', planId: 'plan-2', title: 'Agregar tests de seguridad', description: '', assigneeId: 'user-2', status: 'todo', priority: 'medium', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-7), updatedAt: ds(-2) },
+  ]
+
+  const commitments: Commitment[] = [
+    { id: 'comm-1', title: 'Entregar plan de migracion CRM', description: 'Documento con estrategia y cronograma', ownerId: 'user-4', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-5', objectiveId: null, deliverableId: 'del-6', status: 'active', commitmentDate: ds(3), fulfilledAt: null, metadata: {}, createdAt: ds(-20), updatedAt: ds(-5) },
+    { id: 'comm-2', title: 'Corregir vulnerabilidades criticas', description: 'Todas las vulnerabilidades P1 deben estar corregidas', ownerId: 'user-1', accountableId: 'user-2', teamId: 'team-1', applicationId: 'app-1', objectiveId: 'obj-1', deliverableId: null, status: 'at_risk', commitmentDate: ds(-2), fulfilledAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-3) },
+    { id: 'comm-3', title: 'Certificacion SSL renovada', description: 'Renovar certificados SSL del portal', ownerId: 'user-2', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-2', objectiveId: null, deliverableId: 'del-2', status: 'breached', commitmentDate: ds(-10), fulfilledAt: null, metadata: {}, createdAt: ds(-60), updatedAt: ds(-11) },
+  ]
+
+  const blockers: Blocker[] = [
+    { id: 'blk-1', sourceType: 'activity', sourceId: 'act-5', title: 'Certificado SSL vencido', description: 'El certificado SSL del portal de clientes vencio y debe ser renovado antes de implementar OAuth2', severity: 'high', status: 'open', raisedById: 'user-1', assigneeId: 'user-2', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-2) },
+    { id: 'blk-2', sourceType: 'activity', sourceId: 'act-4', title: 'Dependencia externa proveedor SMS', description: 'El proveedor de SMS no ha entregado las credenciales para el entorno de staging', severity: 'medium', status: 'open', raisedById: 'user-2', assigneeId: 'user-1', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-3), updatedAt: ds(-1) },
+  ]
+
+  await db.plans.bulkAdd(plans)
+  await db.activities.bulkAdd(allActivities)
+  await db.tasks.bulkAdd(tasks)
+  await db.commitments.bulkAdd(commitments)
+  await db.blockers.bulkAdd(blockers)
+
   localStorage.setItem(SEEDED_FLAG, 'true')
 }

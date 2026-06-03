@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Search, FileWarning, CheckCircle, Clock } from 'lucide-react'
 import { AuditForm } from '../components/AuditForm'
 import type { AuditFinding } from '@/types/domain'
@@ -11,6 +12,7 @@ export function AuditPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingFinding, setEditingFinding] = useState<AuditFinding | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const findings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
@@ -20,7 +22,7 @@ export function AuditPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar hallazgo?')) {
+    if (await confirm('¿Eliminar hallazgo?')) {
       await db.auditFindings.delete(id)
       addNotification({ type: 'success', message: 'Hallazgo eliminado' })
     }

@@ -15,10 +15,12 @@ import {
   Shield,
 } from 'lucide-react'
 import { TechnologyForm } from '../components/TechnologyForm'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { Technology, SupportStatus, TechCategory } from '@/types/domain'
 import { computeAppTechMap } from '@/utils/technologyUtils'
 
 export function ObsolescencePage() {
+  const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [editingTech, setEditingTech] = useState<Technology | null>(null)
   const [search, setSearch] = useState('')
@@ -71,7 +73,7 @@ export function ObsolescencePage() {
   }, [technologies, applications, microservices])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Eliminar esta tecnología? Se eliminará de todas las aplicaciones que la usen.')) return
+    if (!(await confirm('¿Eliminar esta tecnología? Se eliminará de todas las aplicaciones que la usen.'))) return
 
     const affectedApps = applications.filter((app) => app.technologies.includes(id))
     for (const app of affectedApps) {

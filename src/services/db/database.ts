@@ -15,6 +15,12 @@ import type {
   Deliverable,
   Microservice,
   User,
+  Plan,
+  Activity,
+  Task,
+  Commitment,
+  Dependency,
+  Blocker,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -34,9 +40,17 @@ export class TGPDatabase extends Dexie {
   microservices!: Table<Microservice, string>
   users!: Table<User, string>
 
+  // Ejecución
+  plans!: Table<Plan, string>
+  activities!: Table<Activity, string>
+  tasks!: Table<Task, string>
+  commitments!: Table<Commitment, string>
+  dependencies!: Table<Dependency, string>
+  blockers!: Table<Blocker, string>
+
   constructor() {
     super('TGPDatabase')
-    this.version(2).stores({
+    this.version(3).stores({
       tenants: 'id, name, slug',
       businessUnits: 'id, tenantId, name',
       applications: 'id, businessUnitId, name, criticality, status, ownerId',
@@ -52,6 +66,12 @@ export class TGPDatabase extends Dexie {
       deliverables: 'id, applicationId, status, dueDate',
       microservices: 'id, applicationId, name',
       users: 'id, email, role',
+      plans: 'id, teamId, businessUnitId, objectiveId, status, startDate, endDate',
+      activities: 'id, planId, parentActivityId, assigneeId, teamId, applicationId, status, dueDate',
+      tasks: 'id, activityId, planId, assigneeId, status, priority, dueDate',
+      commitments: 'id, ownerId, accountableId, teamId, applicationId, objectiveId, status, commitmentDate',
+      dependencies: 'id, sourceType, sourceId, targetType, targetId, status',
+      blockers: 'id, sourceType, sourceId, assigneeId, severity, status',
     })
   }
 }

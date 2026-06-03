@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { NotificationToast } from './NotificationToast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAppStore } from '@/stores/appStore'
 import { useDemoData } from '@/hooks/useDemoData'
 import { useTheme } from '@/hooks/useTheme'
@@ -27,6 +28,7 @@ export function AppShell() {
         </main>
       </div>
       <NotificationToast />
+      <ConfirmDialog />
     </div>
   )
 }

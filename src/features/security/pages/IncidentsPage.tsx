@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Search, Activity, AlertOctagon, Clock } from 'lucide-react'
 import { IncidentForm } from '../components/IncidentForm'
 import type { Incident } from '@/types/domain'
@@ -11,6 +12,7 @@ export function IncidentsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const incidents = useLiveQuery(() => db.incidents.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
@@ -20,7 +22,7 @@ export function IncidentsPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar incidente?')) {
+    if (await confirm('¿Eliminar incidente?')) {
       await db.incidents.delete(id)
       addNotification({ type: 'success', message: 'Incidente eliminado' })
     }

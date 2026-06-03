@@ -51,6 +51,10 @@ export function DashboardPage() {
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
+  const blockers = useLiveQuery(() => db.blockers.toArray()) ?? []
+  const plans = useLiveQuery(() => db.plans.toArray()) ?? []
+  const commitments = useLiveQuery(() => db.commitments.toArray()) ?? []
+  const activities = useLiveQuery(() => db.activities.toArray()) ?? []
 
   const vulnsInPeriod = vulnerabilities.filter((v) => v.createdAt >= periodStart)
   const incidentsInPeriod = incidents.filter((i) => i.createdAt >= periodStart)
@@ -64,6 +68,24 @@ export function DashboardPage() {
   const eliteTeams = teams.filter((t) => {
     if (!t.currentMetrics) return false
     return t.currentMetrics.deploymentFrequency >= 1 && t.currentMetrics.leadTimeHours <= 1
+  }).length
+
+  const activePlans = plans.filter((p) => p.status === 'in_progress' || p.status === 'planned').length
+  const openBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated').length
+  const overdueCommitments = commitments.filter((c) => {
+    if (c.status === 'breached') return true
+    if (c.status === 'active' || c.status === 'at_risk') {
+      return new Date(c.commitmentDate) < new Date()
+    }
+    return false
+  }).length
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const activitiesDueToday = activities.filter((a) => {
+    if (!a.dueDate) return false
+    const due = new Date(a.dueDate)
+    due.setHours(0, 0, 0, 0)
+    return due.getTime() === today.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
   }).length
 
   const eolTechs = technologies.filter((t) => t.supportStatus === 'eol')
@@ -234,6 +256,36 @@ export function DashboardPage() {
             color="danger"
           />
         </div>
+      </div>
+
+      {/* Execution metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <KpiCard
+          title="Planes Activos"
+          value={activePlans}
+          icon={<TrendingUp size={20} />}
+          color="primary"
+        />
+        <KpiCard
+          title="Bloqueos Abiertos"
+          value={openBlockers}
+          trend={openBlockers > 0 ? 'up' : undefined}
+          trendValue={openBlockers > 0 ? 'necesita atencion' : undefined}
+          icon={<AlertTriangle size={20} />}
+          color={openBlockers > 0 ? 'danger' : 'success'}
+        />
+        <KpiCard
+          title="Compromisos Vencidos"
+          value={overdueCommitments}
+          icon={<XCircle size={20} />}
+          color={overdueCommitments > 0 ? 'warning' : 'success'}
+        />
+        <KpiCard
+          title="Actividades Hoy"
+          value={activitiesDueToday}
+          icon={<AlertOctagon size={20} />}
+          color={activitiesDueToday > 0 ? 'warning' : 'success'}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

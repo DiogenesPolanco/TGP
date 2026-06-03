@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Search, Target, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { ObjectiveForm } from '../components/ObjectiveForm'
 import type { Objective, KeyResult } from '@/types/domain'
@@ -11,6 +12,7 @@ export function ObjectivesPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const objectives = useLiveQuery(() => db.objectives.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
@@ -21,7 +23,7 @@ export function ObjectivesPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar objetivo?')) {
+    if (await confirm('¿Eliminar objetivo?')) {
       await db.objectives.delete(id)
       addNotification({ type: 'success', message: 'Objetivo eliminado' })
     }

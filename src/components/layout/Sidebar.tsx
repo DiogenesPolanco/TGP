@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  ClipboardList,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -25,6 +26,15 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+  {
+    label: 'Ejecucion',
+    icon: <ClipboardList size={20} />,
+    children: [
+      { label: 'Seguimiento Diario', path: '/execution/daily' },
+      { label: 'Planes', path: '/execution/plans' },
+      { label: 'Compromisos', path: '/execution/commitments' },
+    ],
+  },
   {
     label: 'Catálogo',
     icon: <FolderKanban size={20} />,

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Search } from 'lucide-react'
 import { RiskForm } from '../components/RiskForm'
 import type { Risk } from '@/types/domain'
@@ -12,6 +13,7 @@ export function RisksPage() {
   const [editingRisk, setEditingRisk] = useState<Risk | null>(null)
   const [selectedCell, setSelectedCell] = useState<{ prob: number; impact: number } | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const risks = useLiveQuery(() => db.risks.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
@@ -22,7 +24,7 @@ export function RisksPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar riesgo?')) {
+    if (await confirm('¿Eliminar riesgo?')) {
       await db.risks.delete(id)
       addNotification({ type: 'success', message: 'Riesgo eliminado' })
     }

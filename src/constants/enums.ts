@@ -24,3 +24,10 @@ export type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
 export type TrendDirection = 'improving' | 'stable' | 'declining' | 'unknown'
 export type DeliverableStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled'
 export type UserRole = 'admin' | 'executive' | 'manager' | 'operator'
+
+/* ─── Ejecución ─── */
+export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done'
+export type CommitmentStatus = 'active' | 'at_risk' | 'breached' | 'fulfilled' | 'cancelled'
+export type BlockerSeverity = 'low' | 'medium' | 'high' | 'critical'
+export type BlockerStatus = 'open' | 'escalated' | 'resolved'
+export type DependencyRelation = 'blocks' | 'depends_on' | 'related_to'

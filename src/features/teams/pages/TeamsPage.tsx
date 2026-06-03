@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Users, TrendingUp, Award } from 'lucide-react'
 import { TeamForm } from '../components/TeamForm'
@@ -12,6 +13,7 @@ export function TeamsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingTeam, setEditingTeam] = useState<Team | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -21,7 +23,7 @@ export function TeamsPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar equipo?')) {
+    if (await confirm('¿Eliminar equipo?')) {
       await db.teams.delete(id)
       addNotification({ type: 'success', message: 'Equipo eliminado' })
     }

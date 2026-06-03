@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, Trash2, Edit, Eye } from 'lucide-react'
 import { ApplicationForm } from '../components/ApplicationForm'
@@ -12,6 +13,7 @@ export function ApplicationsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingApp, setEditingApp] = useState<Application | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -22,7 +24,7 @@ export function ApplicationsPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Está seguro de eliminar esta aplicación?')) {
+    if (await confirm('¿Está seguro de eliminar esta aplicación?')) {
       await db.applications.delete(id)
       addNotification({ type: 'success', message: 'Aplicación eliminada correctamente' })
     }

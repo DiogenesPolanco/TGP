@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
+import { useConfirm } from '@/hooks/useConfirm'
 import {
   Plus, Search, X, Edit, Trash2, Server,
   Layers, ChevronDown, ChevronUp,
@@ -31,12 +32,13 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
     [applicationId],
   ) ?? []
   const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
+  const { confirm } = useConfirm()
 
   const [showForm, setShowForm] = useState(false)
   const [editingMs, setEditingMs] = useState<string | null>(null)
 
   const handleDelete = async (msId: string) => {
-    if (!confirm('¿Eliminar este microservicio?')) return
+    if (!(await confirm('¿Eliminar este microservicio?'))) return
     await db.microservices.delete(msId)
   }
 
@@ -103,7 +105,7 @@ function MicroserviceCard({
   const eolCount = techs.filter((t) => t.supportStatus === 'eol').length
 
   return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70/50">
+    <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70/50 group">
       {/* Header */}
       <div className="flex items-center justify-between p-3">
         <div className="flex items-center gap-3 min-w-0">

@@ -6,11 +6,13 @@ import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
 import { Download, Upload, Database, Trash2, FileSpreadsheet, Cpu } from 'lucide-react'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { SeedResult } from '@/services/demo/seedTechnologies'
 
 export function AdminPage() {
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [seedResult, setSeedResult] = useState<SeedResult | null>(null)
@@ -68,7 +70,7 @@ export function AdminPage() {
       const text = await file.text()
       const data = JSON.parse(text)
 
-      if (confirm('Esto sobrescribirá todos los datos existentes. ¿Continuar?')) {
+      if (await confirm('Esto sobrescribirá todos los datos existentes. ¿Continuar?')) {
         await db.transaction('rw', db.tables, async () => {
           await Promise.all(db.tables.map((table) => table.clear()))
           if (data.tenants) await db.tenants.bulkAdd(data.tenants)
@@ -95,7 +97,7 @@ export function AdminPage() {
   }
 
   const handleClearData = async () => {
-    if (confirm('¿Eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+    if (await confirm('¿Eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
       await Promise.all(db.tables.map((table) => table.clear()))
       addNotification({ type: 'success', message: 'Todos los datos han sido eliminados' })
     }
@@ -104,7 +106,7 @@ export function AdminPage() {
   const handleSeedData = async () => {
     const stats = await Promise.all(db.tables.map((t) => t.count()))
     const hasData = stats.some((c) => c > 0)
-    if (hasData && !confirm('Ya hay datos registrados. ¿Cargar datos demo sobrescribirá TODO. Continuar?')) {
+    if (hasData && !(await confirm('Ya hay datos registrados. ¿Cargar datos demo sobrescribirá TODO. Continuar?'))) {
       return
     }
     await seedDemoData()

@@ -1,4 +1,4 @@
-import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole } from '@/constants/enums'
+import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth } from '@/constants/enums'
 
 export type {
   Criticality,
@@ -317,4 +317,112 @@ export interface User {
   businessUnitIds: string[]
   isActive: boolean
   createdAt: Date
+}
+
+/* ─── Ejecución ─── */
+
+export interface Plan {
+  id: string
+  title: string
+  description: string
+  teamId: string | null
+  businessUnitId: string | null
+  objectiveId: string | null
+  status: ProjectStatus
+  health: ProjectHealth
+  startDate: Date
+  endDate: Date
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Activity {
+  id: string
+  planId: string
+  parentActivityId: string | null
+  title: string
+  description: string
+  assigneeId: string | null
+  teamId: string | null
+  applicationId: string | null
+  priority: Criticality
+  status: DeliverableStatus
+  estimatedHours: number | null
+  actualHours: number | null
+  startDate: Date | null
+  dueDate: Date | null
+  completedAt: Date | null
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Task {
+  id: string
+  activityId: string | null
+  planId: string | null
+  title: string
+  description: string
+  assigneeId: string | null
+  status: TaskStatus
+  priority: Criticality
+  estimatedHours: number | null
+  dueDate: Date | null
+  completedAt: Date | null
+  dependsOn: string[]
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Commitment {
+  id: string
+  title: string
+  description: string
+  ownerId: string
+  accountableId: string
+  teamId: string | null
+  applicationId: string | null
+  objectiveId: string | null
+  deliverableId: string | null
+  status: CommitmentStatus
+  commitmentDate: Date
+  fulfilledAt: Date | null
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Dependency {
+  id: string
+  sourceType: 'task' | 'activity' | 'plan' | 'commitment'
+  sourceId: string
+  targetType: 'task' | 'activity' | 'plan' | 'commitment' | 'deliverable'
+  targetId: string
+  relationType: DependencyRelation
+  description: string
+  status: 'active' | 'resolved' | 'at_risk'
+  expectedResolutionDate: Date | null
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Blocker {
+  id: string
+  sourceType: 'task' | 'activity' | 'plan' | 'commitment'
+  sourceId: string
+  title: string
+  description: string
+  severity: BlockerSeverity
+  status: BlockerStatus
+  raisedById: string
+  assigneeId: string | null
+  escalatedAt: Date | null
+  resolvedAt: Date | null
+  resolutionNotes: string | null
+  metadata: Record<string, unknown>
+  createdAt: Date
+  updatedAt: Date
 }

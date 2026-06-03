@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
 
 export function BusinessUnitsPage() {
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formName, setFormName] = useState('')
@@ -63,7 +65,7 @@ export function BusinessUnitsPage() {
       message = `"${name}" tiene ${appCount} aplicacion(es) y ${teamCount} equipo(s) asociados. Eliminar de todas formas?`
     }
 
-    if (confirm(message)) {
+    if (await confirm(message)) {
       await db.businessUnits.delete(id)
       addNotification({ type: 'success', message: 'Unidad de negocio eliminada' })
     }

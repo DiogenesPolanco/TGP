@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, Search, Shield, AlertTriangle, Clock } from 'lucide-react'
 import { VulnerabilityForm } from '../components/VulnerabilityForm'
 import type { Vulnerability } from '@/types/domain'
@@ -11,6 +12,7 @@ export function VulnerabilitiesPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingVuln, setEditingVuln] = useState<Vulnerability | null>(null)
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const vulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
@@ -20,7 +22,7 @@ export function VulnerabilitiesPage() {
   )
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Eliminar vulnerabilidad?')) {
+    if (await confirm('¿Eliminar vulnerabilidad?')) {
       await db.vulnerabilities.delete(id)
       addNotification({ type: 'success', message: 'Vulnerabilidad eliminada' })
     }
