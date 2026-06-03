@@ -1,7 +1,6 @@
 import * as XLSX from 'xlsx'
 import { db } from '@/services/db/database'
 import type {
-  Application, Technology, Vulnerability, Incident, Risk, AuditFinding,
   Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus,
   Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus,
   AuditCategory, AuditStatus,

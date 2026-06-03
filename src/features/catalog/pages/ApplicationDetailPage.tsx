@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
+import type { Table } from 'dexie'
 import { db } from '@/services/db/database'
 import {
   ArrowLeft, Edit, Shield, AlertTriangle, Activity, FileWarning,
@@ -393,11 +394,13 @@ function EntityList<T extends EntityForList>({
   ) ?? []
 
   const dissociate = async (item: T) => {
-    await (db[entityType] as Table<T, string>).update(item.id, { applicationId: null } as Partial<T>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (db[entityType] as Table<T, string>).update(item.id, { applicationId: null } as any)
   }
 
   const associate = async (item: T) => {
-    await (db[entityType] as Table<T, string>).update(item.id, { applicationId } as Partial<T>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (db[entityType] as Table<T, string>).update(item.id, { applicationId } as any)
     setSearch('')
     setShowDropdown(false)
   }

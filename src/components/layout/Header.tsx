@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { cn } from '@/lib/utils'
@@ -16,7 +16,6 @@ const periodOptions = [
 
 export function Header() {
   const location = useLocation()
-  const navigate = useNavigate()
   const { theme, setTheme } = useAppStore()
   const { selectedPeriod, setPeriod } = useFilterStore()
   const [searchOpen, setSearchOpen] = useState(false)

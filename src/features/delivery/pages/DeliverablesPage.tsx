@@ -9,7 +9,7 @@ import {
   ArrowRight,
   Search,
 } from 'lucide-react'
-import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
+import type { DeliverableStatus } from '@/types/domain'
 
 const statusColors: Record<DeliverableStatus, string> = {
   pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40',

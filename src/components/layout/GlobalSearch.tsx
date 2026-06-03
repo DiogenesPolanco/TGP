@@ -15,17 +15,7 @@ import {
   Building2,
   X,
 } from 'lucide-react'
-import type {
-  Application,
-  Technology,
-  Vulnerability,
-  Incident,
-  Risk,
-  AuditFinding,
-  Team,
-  Objective,
-  BusinessUnit,
-} from '@/types/domain'
+
 
 /* ─── Types ─── */
 
@@ -42,17 +32,6 @@ interface SearchResult {
   subtitle: string
   entity: unknown
 }
-
-type EntityRow =
-  | Application
-  | Technology
-  | Vulnerability
-  | Incident
-  | Risk
-  | AuditFinding
-  | Team
-  | Objective
-  | BusinessUnit
 
 /* ─── Search logic ─── */
 
@@ -71,11 +50,14 @@ function score(query: string, text: string): number {
   return 0
 }
 
-async function searchEntity<T extends EntityRow>(
-  table: { toArray: () => Promise<T[]> },
-  fields: (keyof T)[],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function searchEntity(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  table: { toArray: () => Promise<any[]> },
+  fields: string[],
   query: string,
-  buildResult: (item: T) => SearchResult,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  buildResult: (item: any) => SearchResult,
   minScore = 10,
 ): Promise<SearchResult[]> {
   const all = await table.toArray()
@@ -115,7 +97,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const [groups, setGroups] = useState<SearchGroup[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [loading, setLoading] = useState(false)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const flatResults = useMemo(() => {
     const items: { route: string; group: SearchGroup; result: SearchResult }[] = []

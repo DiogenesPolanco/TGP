@@ -1,6 +1,29 @@
 import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole } from '@/constants/enums'
 
-export type { UserRole }
+export type {
+  Criticality,
+  ArchitectureType,
+  ApplicationStatus,
+  TechCategory,
+  SupportStatus,
+  DependencyType,
+  Severity,
+  VulnSource,
+  VulnStatus,
+  IncidentStatus,
+  RiskCategory,
+  RiskStatus,
+  AuditCategory,
+  AuditStatus,
+  PlanStatus,
+  SourceSystem,
+  ObjectiveType,
+  ObjectiveStatus,
+  KrStatus,
+  TrendDirection,
+  DeliverableStatus,
+  UserRole,
+}
 
 export interface Tenant {
   id: string

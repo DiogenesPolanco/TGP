@@ -11,7 +11,7 @@ import {
 } from '@/services/auth/authService'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
-  const [mode, setMode] = useState<'setup' | 'login'>(
+  const [mode] = useState<'setup' | 'login'>(
     isConfigured() ? 'login' : 'setup',
   )
   const [secret, setSecret] = useState<{ base32: string; uri: string } | null>(

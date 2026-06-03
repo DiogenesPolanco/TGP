@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader, AlertTriangle, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Upload, FileSpreadsheet, CheckCircle, Loader, AlertTriangle, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import { parseExcel, importRows, getImportableEntities } from '@/services/import/importService'
 import type { ParsedRow, ImportResult } from '@/services/import/importService'
 import { useAppStore } from '@/stores/appStore'

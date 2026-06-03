@@ -1,4 +1,4 @@
-import { TOTP, Secret, URI } from 'otpauth'
+import { TOTP, Secret } from 'otpauth'
 
 const STORAGE_KEYS = {
   secret: 'tgp-auth-secret',

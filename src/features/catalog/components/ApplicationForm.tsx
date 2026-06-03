@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X, Plus, Check, AlertTriangle } from 'lucide-react'
+import { X, Plus, AlertTriangle } from 'lucide-react'
 import type { Application, Technology, SupportStatus } from '@/types/domain'
 
 const statusColors: Record<SupportStatus, string> = {

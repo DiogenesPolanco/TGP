@@ -108,10 +108,11 @@ export async function seedDemoData() {
   const vulnerabilities = [vuln_7d, vuln_7d_b, vuln_30d, vuln_90d, vuln_ytd]
 
   // ── Incidents spread across time ──
-  const inc_7d: Incident = { id: 'inc-2', applicationId: 'app-2', externalId: 'INC-002', title: 'Lentitud en portal', description: 'El portal presenta lentitud', severity: 'medium', status: 'resolved', detectedAt: days(3), respondedAt: days(3) - 30 * 60 * 1000, resolvedAt: days(3) - 3 * 60 * 60 * 1000, downtimeMinutes: 0, rca: 'Alto tráfico durante campaña', metadata: {}, createdAt: days(3), updatedAt: days(3) }
-  const inc_30d: Incident = { id: 'inc-1', applicationId: 'app-1', externalId: 'INC-001', title: 'Caída del servicio de pagos', description: 'El servicio de pagos no responde', severity: 'critical', status: 'resolved', detectedAt: days(25), respondedAt: days(25) - 15 * 60 * 1000, resolvedAt: days(25) - 2 * 60 * 60 * 1000, downtimeMinutes: 120, rca: 'Problema de conexión a base de datos', metadata: {}, createdAt: days(25), updatedAt: days(25) }
+  const daysAgo = (n: number, offsetMs = 0) => new Date(now - n * 24 * 60 * 60 * 1000 + offsetMs)
+  const inc_7d: Incident = { id: 'inc-2', applicationId: 'app-2', externalId: 'INC-002', title: 'Lentitud en portal', description: 'El portal presenta lentitud', severity: 'medium', status: 'resolved', detectedAt: daysAgo(3), respondedAt: daysAgo(3, 30 * 60 * 1000), resolvedAt: daysAgo(3, 3 * 60 * 60 * 1000), downtimeMinutes: 0, rca: 'Alto tráfico durante campaña', metadata: {}, createdAt: daysAgo(3), updatedAt: daysAgo(3) }
+  const inc_30d: Incident = { id: 'inc-1', applicationId: 'app-1', externalId: 'INC-001', title: 'Caída del servicio de pagos', description: 'El servicio de pagos no responde', severity: 'critical', status: 'resolved', detectedAt: daysAgo(25), respondedAt: daysAgo(25, 15 * 60 * 1000), resolvedAt: daysAgo(25, 2 * 60 * 60 * 1000), downtimeMinutes: 120, rca: 'Problema de conexión a base de datos', metadata: {}, createdAt: daysAgo(25), updatedAt: daysAgo(25) }
   // Open incident (to show in counters) — 3d ago
-  const inc_open: Incident = { id: 'inc-3', applicationId: 'app-3', externalId: 'INC-003', title: 'Error 500 en carrito de compras', description: 'Error intermitente en endpoint de carrito', severity: 'high', status: 'investigating', detectedAt: days(2), respondedAt: days(2) - 10 * 60 * 1000, resolvedAt: null, downtimeMinutes: 45, rca: null, metadata: {}, createdAt: days(2), updatedAt: days(2) }
+  const inc_open: Incident = { id: 'inc-3', applicationId: 'app-3', externalId: 'INC-003', title: 'Error 500 en carrito de compras', description: 'Error intermitente en endpoint de carrito', severity: 'high', status: 'in_progress', detectedAt: daysAgo(2), respondedAt: daysAgo(2, 10 * 60 * 1000), resolvedAt: null, downtimeMinutes: 45, rca: null, metadata: {}, createdAt: daysAgo(2), updatedAt: daysAgo(2) }
 
   const incidents = [inc_7d, inc_30d, inc_open]
 

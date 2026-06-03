@@ -11,11 +11,8 @@ import {
   AlertOctagon,
   Users,
   FileWarning,
-  Activity,
   TrendingUp,
-  Clock,
   XCircle,
-  Layers,
 } from 'lucide-react'
 import {
   BarChart,
@@ -25,19 +22,18 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
 } from 'recharts'
 
-function getPeriodStartDate(period: '7d' | '30d' | '90d' | 'ytd'): Date {
+function getPeriodStartDate(period: '7d' | '30d' | '90d' | 'ytd' | 'custom'): Date {
   const now = new Date()
   switch (period) {
     case '7d': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     case '90d': return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
     case 'ytd': return new Date(now.getFullYear(), 0, 1)
+    case 'custom': return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     default: return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   }
 }
@@ -76,11 +72,6 @@ export function DashboardPage() {
     (app) => app.technologies.some((tId) => eolTechIds.includes(tId)) &&
       (app.criticality === 'critical' || app.criticality === 'high')
   )
-  const eolByCategory = eolTechs.reduce<Record<string, number>>((acc, t) => {
-    acc[t.category] = (acc[t.category] || 0) + 1
-    return acc
-  }, {})
-
   const techStatusData = [
     { name: 'Activas', value: technologies.filter((t) => t.supportStatus === 'active').length, color: '#36B37E' },
     { name: 'S. Extendido', value: extendedTechs.length, color: '#FFAB00' },
@@ -92,16 +83,6 @@ export function DashboardPage() {
     { name: 'Digital', thi: 88 },
     { name: 'Core', thi: 78 },
     { name: 'Legacy', thi: 55 },
-  ]
-
-  const vulnTrendData = [
-    { day: 'Día 1', critical: 2, high: 5, medium: 8 },
-    { day: 'Día 5', critical: 3, high: 6, medium: 7 },
-    { day: 'Día 10', critical: 2, high: 4, medium: 9 },
-    { day: 'Día 15', critical: 4, high: 7, medium: 6 },
-    { day: 'Día 20', critical: 3, high: 5, medium: 8 },
-    { day: 'Día 25', critical: 2, high: 4, medium: 7 },
-    { day: 'Día 30', critical: 3, high: 6, medium: 9 },
   ]
 
   const alerts = [
