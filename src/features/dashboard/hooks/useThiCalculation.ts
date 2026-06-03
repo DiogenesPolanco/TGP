@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DEFAULT_HEALTH_WEIGHTS } from '@/constants/config'
+import { computeAppTechMap } from '@/utils/technologyUtils'
 import type { HealthIndex, HealthWeights } from '@/types/domain'
 
 export function useThiCalculation(businessUnitId?: string | null) {
@@ -12,6 +13,7 @@ export function useThiCalculation(businessUnitId?: string | null) {
   const auditFindings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
+  const microservices = useLiveQuery(() => db.microservices.toArray()) ?? []
 
   const thi = useMemo(() => {
     const apps = businessUnitId
@@ -26,7 +28,8 @@ export function useThiCalculation(businessUnitId?: string | null) {
     const qualityScore = calculateQualityScore(apps)
     const securityScore = calculateSecurityScore(apps, vulnerabilities)
     const availabilityScore = calculateAvailabilityScore(apps, incidents)
-    const obsolescenceScore = calculateObsolescenceScore(apps, technologies)
+    const appTechMap = computeAppTechMap(apps, microservices)
+    const obsolescenceScore = calculateObsolescenceScore(apps, technologies, appTechMap)
     const riskScore = calculateRiskScore(apps, risks)
     const complianceScore = calculateComplianceScore(auditFindings)
 
@@ -58,7 +61,7 @@ export function useThiCalculation(businessUnitId?: string | null) {
     }
 
     return result
-  }, [applications, vulnerabilities, incidents, risks, auditFindings, teams, technologies, businessUnitId])
+  }, [applications, vulnerabilities, incidents, risks, auditFindings, teams, technologies, microservices, businessUnitId])
 
   return thi
 }
@@ -104,16 +107,18 @@ function calculateAvailabilityScore(
 }
 
 function calculateObsolescenceScore(
-  apps: { technologies: string[] }[],
-  technologies: { id: string; supportStatus: string }[]
+  apps: { id: string; technologies: string[] }[],
+  technologies: { id: string; supportStatus: string }[],
+  appTechMap: Map<string, string[]>,
 ): number {
   if (apps.length === 0) return 100
-  const appsWithEol = apps.filter((app) =>
-    app.technologies.some((techId) => {
+  const appsWithEol = apps.filter((app) => {
+    const allTechIds = appTechMap.get(app.id) ?? app.technologies
+    return allTechIds.some((techId) => {
       const tech = technologies.find((t) => t.id === techId)
       return tech?.supportStatus === 'eol'
     })
-  )
+  })
   return Math.round((1 - appsWithEol.length / apps.length) * 100)
 }
 

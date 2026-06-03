@@ -287,6 +287,16 @@ export interface HealthIndex {
   trend: TrendDirection
 }
 
+export interface Microservice {
+  id: string
+  applicationId: string
+  name: string
+  description: string
+  technologies: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Deliverable {
   id: string
   applicationId: string | null

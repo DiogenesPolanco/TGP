@@ -10,6 +10,7 @@ import {
 import { ApplicationForm } from '../components/ApplicationForm'
 import type { Technology, Vulnerability, Risk, Incident, AuditFinding, SupportStatus } from '@/types/domain'
 import { DeliverablesTab } from '../components/DeliverablesTab'
+import { MicroservicesTab } from '../components/MicroservicesTab'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -39,6 +40,7 @@ export function ApplicationDetailPage() {
   const incidents = useLiveQuery(() => db.incidents.where('applicationId').equals(id!).toArray(), [id])
   const findings = useLiveQuery(() => db.auditFindings.where('applicationId').equals(id!).toArray(), [id])
   const deliverables = useLiveQuery(() => db.deliverables.where('applicationId').equals(id!).toArray(), [id])
+  const microservices = useLiveQuery(() => db.microservices.where('applicationId').equals(id!).toArray(), [id])
 
   if (!application) {
     return (
@@ -54,6 +56,7 @@ export function ApplicationDetailPage() {
   const tabs = [
     { id: 'summary', label: 'Resumen' },
     { id: 'tech', label: `Tech Stack (${appTechnologies.length})` },
+    { id: 'microservices', label: `Microservicios (${microservices?.length ?? 0})` },
     { id: 'vulns', label: `Vulnerabilidades (${vulnerabilities?.length ?? 0})` },
     { id: 'risks', label: `Riesgos (${risks?.length ?? 0})` },
     { id: 'incidents', label: `Incidentes (${incidents?.length ?? 0})` },
@@ -183,6 +186,10 @@ export function ApplicationDetailPage() {
             selectedIds={application.technologies}
             allTechnologies={allTechnologies}
           />
+        )}
+
+        {activeTab === 'microservices' && (
+          <MicroservicesTab applicationId={id!} />
         )}
 
         {activeTab === 'vulns' && (

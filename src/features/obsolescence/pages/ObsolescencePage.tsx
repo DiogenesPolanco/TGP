@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { TechnologyForm } from '../components/TechnologyForm'
 import type { Technology, SupportStatus, TechCategory } from '@/types/domain'
+import { computeAppTechMap } from '@/utils/technologyUtils'
 
 export function ObsolescencePage() {
   const [showForm, setShowForm] = useState(false)
@@ -26,6 +27,7 @@ export function ObsolescencePage() {
 
   const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
+  const microservices = useLiveQuery(() => db.microservices.toArray()) ?? []
 
   const filteredTechs = useMemo(() => {
     return technologies.filter((t) => {
@@ -36,17 +38,28 @@ export function ObsolescencePage() {
     })
   }, [technologies, search, statusFilter, categoryFilter])
 
+  const appTechMap = useMemo(
+    () => computeAppTechMap(applications, microservices),
+    [applications, microservices],
+  )
+
   const stats = useMemo(() => {
     const total = technologies.length
     const eol = technologies.filter((t) => t.supportStatus === 'eol').length
     const extended = technologies.filter((t) => t.supportStatus === 'extended').length
     const active = technologies.filter((t) => t.supportStatus === 'active').length
 
-    const eolTechIds = technologies.filter((t) => t.supportStatus === 'eol').map((t) => t.id)
-    const criticalAppsWithEol = applications.filter(
-      (app) => app.technologies.some((tId) => eolTechIds.includes(tId)) &&
-        (app.criticality === 'critical' || app.criticality === 'high')
+    const eolTechIds = new Set(
+      technologies.filter((t) => t.supportStatus === 'eol').map((t) => t.id),
     )
+
+    // Check app technologies INCLUDING inherited from microservices
+    const appTechMap = computeAppTechMap(applications, microservices)
+    const criticalAppsWithEol = applications.filter((app) => {
+      const allTechIds = appTechMap.get(app.id) ?? app.technologies
+      return allTechIds.some((tId) => eolTechIds.has(tId)) &&
+        (app.criticality === 'critical' || app.criticality === 'high')
+    })
 
     const sixMonthsFromNow = new Date()
     sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
@@ -55,7 +68,7 @@ export function ObsolescencePage() {
     ).length
 
     return { total, eol, extended, active, criticalAppsWithEol: criticalAppsWithEol.length, nearEol }
-  }, [technologies, applications])
+  }, [technologies, applications, microservices])
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta tecnología? Se eliminará de todas las aplicaciones que la usen.')) return
@@ -264,7 +277,10 @@ export function ObsolescencePage() {
             <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
               {filteredTechs.map((tech) => {
                 const urgency = getEolUrgency(tech)
-                const appCount = applications.filter((app) => app.technologies.includes(tech.id)).length
+                const appCount = applications.filter((app) => {
+                  const techIds = appTechMap.get(app.id) ?? app.technologies
+                  return techIds.includes(tech.id)
+                }).length
                 return (
                   <tr key={tech.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
                     <td className="px-4 py-3">

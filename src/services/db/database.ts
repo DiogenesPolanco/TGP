@@ -13,6 +13,7 @@ import type {
   Objective,
   HealthIndex,
   Deliverable,
+  Microservice,
   User,
 } from '@/types/domain'
 
@@ -30,11 +31,12 @@ export class TGPDatabase extends Dexie {
   objectives!: Table<Objective, string>
   healthIndexHistory!: Table<HealthIndex, string>
   deliverables!: Table<Deliverable, string>
+  microservices!: Table<Microservice, string>
   users!: Table<User, string>
 
   constructor() {
     super('TGPDatabase')
-    this.version(1).stores({
+    this.version(2).stores({
       tenants: 'id, name, slug',
       businessUnits: 'id, tenantId, name',
       applications: 'id, businessUnitId, name, criticality, status, ownerId',
@@ -48,6 +50,7 @@ export class TGPDatabase extends Dexie {
       objectives: 'id, teamId, businessUnitId, status, periodStart',
       healthIndexHistory: 'id, businessUnitId, calculatedAt',
       deliverables: 'id, applicationId, status, dueDate',
+      microservices: 'id, applicationId, name',
       users: 'id, email, role',
     })
   }

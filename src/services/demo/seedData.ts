@@ -12,6 +12,7 @@ import type {
   Objective,
   HealthIndex,
   Deliverable,
+  Microservice,
   User,
 } from '@/types/domain'
 
@@ -105,6 +106,22 @@ export async function seedDemoData() {
     { id: 'app-10', businessUnitId: 'bu-legacy', name: 'Legacy ERP', description: 'ERP antiguo sobre MySQL', ownerId: 'user-4', ownerName: 'Ana Martínez', criticality: 'critical', architecture: 'monolith', status: 'deprecated', supportEndDate: new Date('2024-06-30'), technologies: ['tech-12', 'tech-11', 'tech-18'], metadata: {}, createdAt: new Date(), updatedAt: new Date() },
   ]
 
+  const microservices: Microservice[] = [
+    // Core Banking (app-1) microservices
+    { id: 'ms-1', applicationId: 'app-1', name: 'auth-service', description: 'Autenticación y autorización', technologies: ['tech-2', 'tech-4'], createdAt: new Date(), updatedAt: new Date() },
+    { id: 'ms-2', applicationId: 'app-1', name: 'account-service', description: 'Gestión de cuentas bancarias', technologies: ['tech-1', 'tech-5', 'tech-6'], createdAt: new Date(), updatedAt: new Date() },
+    { id: 'ms-3', applicationId: 'app-1', name: 'notification-service', description: 'Notificaciones push y email', technologies: ['tech-7', 'tech-17'], createdAt: new Date(), updatedAt: new Date() },
+    // Portal Clientes (app-2) microservices
+    { id: 'ms-4', applicationId: 'app-2', name: 'api-gateway', description: 'API gateway del portal', technologies: ['tech-7', 'tech-16'], createdAt: new Date(), updatedAt: new Date() },
+    { id: 'ms-5', applicationId: 'app-2', name: 'user-profile-service', description: 'Gestión de perfiles de usuario', technologies: ['tech-8', 'tech-4'], createdAt: new Date(), updatedAt: new Date() },
+    // Payments (app-4) microservices
+    { id: 'ms-6', applicationId: 'app-4', name: 'payment-processor', description: 'Procesador de pagos transaccional', technologies: ['tech-2', 'tech-4', 'tech-17'], createdAt: new Date(), updatedAt: new Date() },
+    { id: 'ms-7', applicationId: 'app-4', name: 'fraud-detection', description: 'Detección de fraudes en tiempo real', technologies: ['tech-8', 'tech-6'], createdAt: new Date(), updatedAt: new Date() },
+    // Data Lake (app-9) microservices
+    { id: 'ms-8', applicationId: 'app-9', name: 'data-ingestion', description: 'Ingesta de datos batch y streaming', technologies: ['tech-8', 'tech-17', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
+    { id: 'ms-9', applicationId: 'app-9', name: 'etl-orchestrator', description: 'Orquestación de pipelines ETL', technologies: ['tech-8', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
+  ]
+
   // ── Vulnerabilities spread across time windows ──
   // 7d ago (shows in 7d, 30d, 90d, ytd)
   const vuln_7d: Vulnerability = { id: 'vuln-1', applicationId: 'app-1', externalId: 'CVE-2024-001', title: 'SQL Injection en módulo de autenticación', description: 'Vulnerabilidad de inyección SQL', cvssScore: 9.8, severity: 'critical', source: 'fluid_attacks', status: 'open', slaDeadline: days(-5), detectedAt: days(2), fixedAt: null, metadata: {}, createdAt: days(2), updatedAt: days(2) }
@@ -185,6 +202,7 @@ export async function seedDemoData() {
   await db.teams.bulkAdd(teams)
   await db.objectives.bulkAdd(objectives)
   await db.deliverables.bulkAdd(deliverables)
+  await db.microservices.bulkAdd(microservices)
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
 
