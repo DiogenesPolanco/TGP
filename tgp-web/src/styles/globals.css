@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary colors */
+  --color-primary: #0052CC;
+  --color-primary-dark: #0747A6;
+  --color-primary-light: #4C9AFF;
+
+  /* Semantic colors */
+  --color-success: #36B37E;
+  --color-warning: #FFAB00;
+  --color-danger: #FF5630;
+  --color-info: #00B8D9;
+
+  /* Severity colors */
+  --color-severity-critical: #FF5630;
+  --color-severity-high: #FF8B00;
+  --color-severity-medium: #FFAB00;
+  --color-severity-low: #36B37E;
+  --color-severity-info: #00B8D9;
+
+  /* Health colors */
+  --color-health-excellent: #36B37E;
+  --color-health-healthy: #57D9A3;
+  --color-health-regular: #FFAB00;
+  --color-health-at-risk: #FF8B00;
+  --color-health-critical: #FF5630;
+
+  /* Neutral colors */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-10: #F4F5F7;
+  --color-neutral-20: #EBECF0;
+  --color-neutral-30: #DFE1E6;
+  --color-neutral-40: #C1C7CD;
+  --color-neutral-50: #A5ADBA;
+  --color-neutral-60: #6B778C;
+  --color-neutral-70: #42526E;
+  --color-neutral-80: #253858;
+  --color-neutral-90: #172B4D;
+
+  /* Font */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-neutral-10);
+    color: var(--color-neutral-90);
+  }
+
+  html.dark body {
+    background-color: var(--color-neutral-90);
+    color: var(--color-neutral-10);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
