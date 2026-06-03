@@ -4,13 +4,16 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Download, Upload, Database, Trash2, FileSpreadsheet } from 'lucide-react'
+import { Download, Upload, Database, Trash2, FileSpreadsheet, Cpu } from 'lucide-react'
+import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import type { SeedResult } from '@/services/demo/seedTechnologies'
 
 export function AdminPage() {
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+  const [seedResult, setSeedResult] = useState<SeedResult | null>(null)
 
   const stats = useLiveQuery(async () => ({
     applications: await db.applications.count(),
@@ -103,6 +106,15 @@ export function AdminPage() {
     addNotification({ type: 'success', message: 'Datos de demo cargados' })
   }
 
+  const handleSeedTechnologies = async () => {
+    const result = await seedTechnologies()
+    setSeedResult(result)
+    addNotification({
+      type: 'success',
+      message: `Tecnologías sembradas: ${result.added} añadidas, ${result.skipped} omitidas`,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Administración</h2>
@@ -167,6 +179,21 @@ export function AdminPage() {
             <div className="text-left">
               <p className="text-sm font-medium text-neutral-90 dark:text-white">Cargar Datos Demo</p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40">Generar datos de ejemplo</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleSeedTechnologies}
+            className="flex items-center gap-3 p-4 rounded-lg border border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Cpu size={24} className="text-warning" />
+            <div className="text-left">
+              <p className="text-sm font-medium text-neutral-90 dark:text-white">Sembrar Catálogo de Tecnologías</p>
+              <p className="text-xs text-neutral-60 dark:text-neutral-40">
+                {seedResult
+                  ? `${seedResult.added} añadidas · ${seedResult.skipped} omitidas`
+                  : 'Cargar todas las tecnologías conocidas'}
+              </p>
             </div>
           </button>
 
