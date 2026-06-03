@@ -1,20 +1,31 @@
-import { StrictMode, useState, useEffect } from 'react'
+import { StrictMode, useState, useEffect, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { getSession } from '@/services/auth/authService'
+import { InactivityGuard } from '@/components/auth/InactivityGuard'
 import './styles/globals.css'
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
   const [checking, setChecking] = useState(true)
+  const [sessionExpired, setSessionExpired] = useState(false)
 
   useEffect(() => {
     const session = getSession()
     if (session) setAuthed(true)
     setChecking(false)
+  }, [sessionExpired])
+
+  const handleInactivityExpired = useCallback(() => {
+    setAuthed(false)
+    setSessionExpired((s) => !s)
+  }, [])
+
+  const handleAuth = useCallback(() => {
+    setAuthed(true)
   }, [])
 
   if (checking) {
@@ -26,10 +37,15 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!authed) {
-    return <LoginPage onAuth={() => setAuthed(true)} />
+    return <LoginPage onAuth={handleAuth} />
   }
 
-  return <>{children}</>
+  return (
+    <>
+      <InactivityGuard onExpired={handleInactivityExpired} />
+      {children}
+    </>
+  )
 }
 
 const queryClient = new QueryClient({
