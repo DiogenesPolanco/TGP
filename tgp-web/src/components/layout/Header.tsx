@@ -1,10 +1,11 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { cn } from '@/lib/utils'
-import { Search, Bell, Moon, Sun, Calendar } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Calendar, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { GlobalSearch } from './GlobalSearch'
+import { clearSession } from '@/services/auth/authService'
 
 const periodOptions = [
   { value: '7d' as const, label: '7 días' },
@@ -15,6 +16,7 @@ const periodOptions = [
 
 export function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, setTheme } = useAppStore()
   const { selectedPeriod, setPeriod } = useFilterStore()
   const [searchOpen, setSearchOpen] = useState(false)
@@ -30,6 +32,11 @@ export function Header() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
+
+  const handleLogout = () => {
+    clearSession()
+    window.location.reload()
+  }
 
   const getPageTitle = () => {
     const path = location.pathname
@@ -116,6 +123,13 @@ export function Header() {
           <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 hidden lg:block">
             Admin
           </span>
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors ml-1"
+            title="Cerrar sesión"
+          >
+            <LogOut size={16} className="text-neutral-50" />
+          </button>
         </div>
       </div>
 

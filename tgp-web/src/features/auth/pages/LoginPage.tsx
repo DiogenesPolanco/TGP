@@ -1,0 +1,249 @@
+import { useState, useEffect, useRef } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
+import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight } from 'lucide-react'
+import {
+  generateSecret,
+  verifyTotp,
+  confirmSetup,
+  createSession,
+  isConfigured,
+  getOtpRemainingMs,
+} from '@/services/auth/authService'
+
+export function LoginPage({ onAuth }: { onAuth: () => void }) {
+  const [mode, setMode] = useState<'setup' | 'login'>(
+    isConfigured() ? 'login' : 'setup',
+  )
+  const [secret, setSecret] = useState<{ base32: string; uri: string } | null>(
+    null,
+  )
+  const [otp, setOtp] = useState('')
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [remaining, setRemaining] = useState(30)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  /* ---- Generate secret on mount (setup mode) ---- */
+
+  useEffect(() => {
+    if (mode === 'setup' && !secret) {
+      setSecret(generateSecret())
+    }
+  }, [mode, secret])
+
+  /* ---- Auto-focus OTP input ---- */
+
+  useEffect(() => {
+    if (mode === 'login') {
+      inputRef.current?.focus()
+    }
+  }, [mode])
+
+  /* ---- OTP countdown timer ---- */
+
+  useEffect(() => {
+    if (error) {
+      const timer = setInterval(() => {
+        const rem = Math.ceil(getOtpRemainingMs() / 1000)
+        setRemaining(rem)
+        if (rem <= 0) setError('')
+      }, 1000)
+      return () => clearInterval(timer)
+    }
+  }, [error])
+
+  /* ---- Handle OTP verification ---- */
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    const storedSecret = isConfigured()
+      ? localStorage.getItem('tgp-auth-secret')
+      : secret?.base32
+
+    if (!storedSecret) return
+
+    if (!verifyTotp(otp, storedSecret)) {
+      setError('Código inválido. Verifica que la hora de tu dispositivo esté sincronizada.')
+      return
+    }
+
+    if (mode === 'setup' && secret) {
+      confirmSetup(secret.base32)
+    } else {
+      createSession()
+    }
+
+    onAuth()
+  }
+
+  const handleCopy = () => {
+    if (secret) {
+      navigator.clipboard.writeText(secret.base32)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleOtpChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 6)
+    setOtp(digits)
+    setError('')
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Shield size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">TGP</h1>
+          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+            Technology Governance Platform
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl p-8">
+          {mode === 'setup' && secret ? (
+            /* ── Setup: QR + verify ── */
+            <div className="space-y-6">
+              <div className="text-center">
+                <ShieldCheck size={40} className="text-success mx-auto mb-2" />
+                <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                  Configurar Autenticación
+                </h2>
+                <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+                  Escanea el código QR con tu app de autenticación
+                </p>
+              </div>
+
+              {/* QR Code */}
+              <div className="flex justify-center">
+                <div className="bg-white p-4 rounded-xl shadow-sm">
+                  <QRCodeSVG value={secret.uri} size={200} level="M" />
+                </div>
+              </div>
+
+              {/* Secret fallback */}
+              <div className="bg-neutral-10 dark:bg-neutral-70 rounded-lg p-3">
+                <p className="text-xs text-neutral-50 mb-1">
+                  Si no puedes escanear el QR, ingresa este código manualmente:
+                </p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs font-mono bg-white dark:bg-neutral-80 px-2 py-1.5 rounded border border-neutral-20 dark:border-neutral-70 select-all">
+                    {secret.base32}
+                  </code>
+                  <button
+                    onClick={handleCopy}
+                    className="p-1.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+                    title="Copiar"
+                  >
+                    {copied ? (
+                      <Check size={16} className="text-success" />
+                    ) : (
+                      <Copy size={16} className="text-neutral-50" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-xs text-neutral-50 text-center">
+                Apps recomendadas: Google Authenticator, Authy, Microsoft Authenticator
+              </p>
+
+              {/* Verify OTP */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+                    Verifica el código de 6 dígitos
+                  </label>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => handleOtpChange(e.target.value)}
+                    placeholder="000000"
+                    className="w-full text-center text-2xl tracking-[0.5em] font-mono px-4 py-3 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    maxLength={6}
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-sm text-danger text-center">{error}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={otp.length !== 6}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+                >
+                  Verificar y Continuar
+                  <ArrowRight size={18} />
+                </button>
+              </form>
+            </div>
+          ) : (
+            /* ── Login: OTP input ── */
+            <div className="space-y-6">
+              <div className="text-center">
+                <Shield size={40} className="text-primary mx-auto mb-2" />
+                <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                  Autenticación OTP
+                </h2>
+                <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+                  Ingresa el código de 6 dígitos de tu app de autenticación
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => handleOtpChange(e.target.value)}
+                    placeholder="000000"
+                    className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    maxLength={6}
+                  />
+                </div>
+
+                {error && (
+                  <div className="text-center">
+                    <p className="text-sm text-danger mb-1">{error}</p>
+                    {remaining < 25 && (
+                      <p className="text-xs text-neutral-50 flex items-center justify-center gap-1">
+                        <Clock size={12} />
+                        Espera al próximo código ({remaining}s)
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={otp.length !== 6}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+                >
+                  Ingresar
+                  <ArrowRight size={18} />
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-neutral-50 mt-6">
+          Almacenamiento local • Sin conexión externa
+        </p>
+      </div>
+    </div>
+  )
+}
