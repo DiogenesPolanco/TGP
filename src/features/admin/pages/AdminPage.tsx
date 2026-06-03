@@ -102,6 +102,11 @@ export function AdminPage() {
   }
 
   const handleSeedData = async () => {
+    const stats = await Promise.all(db.tables.map((t) => t.count()))
+    const hasData = stats.some((c) => c > 0)
+    if (hasData && !confirm('Ya hay datos registrados. ¿Cargar datos demo sobrescribirá TODO. Continuar?')) {
+      return
+    }
     await seedDemoData()
     addNotification({ type: 'success', message: 'Datos de demo cargados' })
   }
@@ -178,7 +183,7 @@ export function AdminPage() {
             <Database size={24} className="text-success" />
             <div className="text-left">
               <p className="text-sm font-medium text-neutral-90 dark:text-white">Cargar Datos Demo</p>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40">Generar datos de ejemplo</p>
+              <p className="text-xs text-warning">Sobrescribe TODOS los datos existentes</p>
             </div>
           </button>
 
