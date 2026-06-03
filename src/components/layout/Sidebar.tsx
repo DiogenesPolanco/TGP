@@ -58,7 +58,14 @@ const navItems: NavItem[] = [
     ],
   },
   { label: 'Equipos', icon: <Users size={20} />, path: '/teams' },
-  { label: 'Administración', icon: <Settings size={20} />, path: '/admin' },
+  {
+    label: 'Administración',
+    icon: <Settings size={20} />,
+    children: [
+      { label: 'General', path: '/admin' },
+      { label: 'Unidades de Negocio', path: '/admin/business-units' },
+    ],
+  },
 ]
 
 export function Sidebar() {

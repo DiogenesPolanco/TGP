@@ -12,6 +12,7 @@ import { TeamDetailPage } from '@/features/teams/pages/TeamDetailPage'
 import { ObjectivesPage } from '@/features/strategy/pages/ObjectivesPage'
 import { AdminPage } from '@/features/admin/pages/AdminPage'
 import { ImportPage } from '@/features/admin/pages/ImportPage'
+import { BusinessUnitsPage } from '@/features/admin/pages/BusinessUnitsPage'
 import { ObsolescencePage } from '@/features/obsolescence/pages/ObsolescencePage'
 import { DeliverablesPage } from '@/features/delivery/pages/DeliverablesPage'
 
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'strategy/objectives', element: <ObjectivesPage /> },
       { path: 'admin', element: <AdminPage /> },
       { path: 'admin/import', element: <ImportPage /> },
+      { path: 'admin/business-units', element: <BusinessUnitsPage /> },
     ],
   },
 ])
