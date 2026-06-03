@@ -136,7 +136,8 @@ export function AdminPage() {
         type: 'success',
         message: `Sincronización completada: ${result.updated} actualizadas, ${result.notFound} sin datos, ${result.errors} errores (${result.duration}ms)`,
       })
-    } catch {
+    } catch (err) {
+      console.error('[AdminPage] Sync failed:', err)
       addNotification({ type: 'error', message: 'Error al sincronizar con endoflife.date' })
     } finally {
       setIsSyncing(false)

@@ -1,15 +1,35 @@
 import { db } from '@/services/db/database'
+import { seedTechnologies } from '@/services/demo/seedTechnologies'
 import type { Technology, SupportStatus } from '@/types/domain'
 
-interface EolCycle {
-  cycle: string
-  releaseDate?: string
-  eol: string | boolean
-  latest?: string
-  latestReleaseDate?: string
-  lts?: string | boolean
-  support?: string | boolean
-  extendedSupport?: boolean
+interface V1Release {
+  name: string
+  codename?: string | null
+  label?: string | null
+  releaseDate?: string | null
+  isLts?: boolean | null
+  ltsFrom?: string | null
+  isEol: boolean
+  eolFrom?: string | null
+  isEoes?: boolean | null
+  eoesFrom?: string | null
+  isMaintained?: boolean | null
+  latest?: { name: string; date?: string; link?: string } | string | null
+  custom?: unknown
+}
+
+interface V1Response {
+  schema_version: string
+  generated_at: string
+  last_modified: string
+  result: {
+    name: string
+    aliases?: string[]
+    label?: string
+    category?: string
+    tags?: string[]
+    releases: V1Release[]
+  }
 }
 
 interface SyncResultItem {
@@ -32,20 +52,15 @@ export interface SyncResult {
   duration: number
 }
 
-/**
- * Name-to-slug mapping for endoflife.date API.
- * Key = normalized technology name, Value = API product slug
- */
 const NAME_TO_SLUG: Record<string, string> = {
-  // Languages
   'java': 'oracle-jdk',
+  'kotlin': 'kotlin',
   'python': 'python',
   'go': 'go',
   'rust': 'rust',
   'php': 'php',
   'ruby': 'ruby',
-
-  // Frameworks
+  '.net': 'dotnet',
   '.net framework': 'dotnetfx',
   'angular': 'angular',
   'react': 'react',
@@ -57,8 +72,6 @@ const NAME_TO_SLUG: Record<string, string> = {
   'laravel': 'laravel',
   'ruby on rails': 'rails',
   'symfony': 'symfony',
-
-  // Databases
   'postgresql': 'postgresql',
   'mysql': 'mysql',
   'mariadb': 'mariadb',
@@ -71,24 +84,16 @@ const NAME_TO_SLUG: Record<string, string> = {
   'redis': 'redis',
   'memcached': 'memcached',
   'sqlite': 'sqlite',
-
-  // Message Brokers
   'rabbitmq': 'rabbitmq',
   'apache kafka': 'apache-kafka',
   'apache activemq': 'apache-activemq',
-
-  // Runtimes
   'node.js': 'nodejs',
   'bun': 'bun',
   'deno': 'deno',
-
-  // Web Servers
   'nginx': 'nginx',
   'apache http server': 'apache-http-server',
   'caddy': 'caddy',
   'tomcat': 'tomcat',
-
-  // Operating Systems
   'ubuntu': 'ubuntu',
   'windows server': 'windows-server',
   'rhel': 'rhel',
@@ -99,31 +104,19 @@ const NAME_TO_SLUG: Record<string, string> = {
   'opensuse': 'opensuse',
   'sles': 'sles',
   'oracle linux': 'oracle-linux',
-
-  // Containers & Orchestration
   'docker engine': 'docker-engine',
   'docker': 'docker-engine',
   'kubernetes': 'kubernetes',
   'podman': 'podman',
   'containerd': 'containerd',
-
-  // Infrastructure as Code
   'terraform': 'terraform',
   'ansible': 'ansible',
-
-  // CI/CD
   'jenkins': 'jenkins',
-
-  // Monitoring
   'prometheus': 'prometheus',
   'grafana': 'grafana',
-
-  // Libraries
   'tailwind css': 'tailwind-css',
   'jquery': 'jquery',
   'jquery ui': 'jquery-ui',
-
-  // Other
   'bootstrap': 'bootstrap',
   'vault': 'hashicorp-vault',
   'consul': 'consul',
@@ -144,114 +137,96 @@ const SAAS_ONLY = new Set([
   'amazon sqs', 'sentry', 'new relic',
 ])
 
-/** Products we know don't have EOL data in endoflife.date */
 const SLUG_BLACKLIST = new Set<string>()
 
-/**
- * Fetch EOL data from endoflife.date for a given product slug.
- * Returns null if the product is not found or fetch fails.
- */
-async function fetchEolData(slug: string): Promise<EolCycle[] | null> {
+async function fetchEolData(slug: string): Promise<V1Release[] | null> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
-
-    const response = await fetch(`https://endoflife.date/api/${encodeURIComponent(slug)}.json`, {
+    const response = await fetch(`https://endoflife.date/api/v1/products/${encodeURIComponent(slug)}`, {
       signal: controller.signal,
     })
     clearTimeout(timeout)
-
-    if (!response.ok) return null
-    return await response.json()
-  } catch {
+    if (!response.ok) {
+      if (response.status === 404) return []
+      return null
+    }
+    const data: V1Response = await response.json()
+    return data.result.releases ?? []
+  } catch (err) {
+    console.error(`[endoflifeSync] Failed to fetch ${slug}:`, err)
     return null
   }
 }
 
-/**
- * Try to match our version string against API cycle versions.
- * Returns the best matching cycle or null.
- */
-function matchCycle(cycles: EolCycle[], version: string): EolCycle | null {
-  const vLower = version.toLowerCase()
-
-  // Exact match first
-  const exact = cycles.find((c) => c.cycle.toLowerCase() === vLower)
-  if (exact) return exact
-
-  // Match if version starts with cycle (e.g., version "22.11.0" matches cycle "22")
-  const startsWith = cycles.find((c) => vLower.startsWith(c.cycle.toLowerCase() + '.') || vLower.startsWith(c.cycle.toLowerCase() + '-'))
-  if (startsWith) return startsWith
-
-  // Match if cycle starts with version (e.g., version "3" matches cycle "3.13")
-  const cycleStartsWith = cycles.find((c) => c.cycle.toLowerCase().startsWith(vLower + '.') || c.cycle.toLowerCase().startsWith(vLower + '-'))
-  if (cycleStartsWith) return cycleStartsWith
-
-  // For versions like "1.x", try to match major version
-  if (vLower.endsWith('.x')) {
-    const major = vLower.replace('.x', '')
-    const majorMatch = cycles.find((c) => c.cycle.toLowerCase().startsWith(major + '.') || c.cycle === major)
-    if (majorMatch) return majorMatch
-  }
-
+function latestString(latest: V1Release['latest']): string | null {
+  if (!latest) return null
+  if (typeof latest === 'string') return latest
+  if (typeof latest === 'object' && 'name' in latest) return latest.name ?? null
   return null
 }
 
-/**
- * Determine support status from API cycle data.
- */
-function computeSupportStatus(cycle: EolCycle): { status: SupportStatus; eolDate: Date | null } {
-  const now = new Date()
-
-  // Check EOL
-  if (cycle.eol === true) {
-    return { status: 'eol', eolDate: null }
+function matchCycle(cycles: V1Release[], version: string): V1Release | null {
+  const vLower = version.toLowerCase()
+  const exact = cycles.find((c) => c.name.toLowerCase() === vLower)
+  if (exact) return exact
+  const startsWith = cycles.find(
+    (c) => vLower.startsWith(c.name.toLowerCase() + '.') || vLower.startsWith(c.name.toLowerCase() + '-'),
+  )
+  if (startsWith) return startsWith
+  const cycleStartsWith = cycles.find(
+    (c) => c.name.toLowerCase().startsWith(vLower + '.') || c.name.toLowerCase().startsWith(vLower + '-'),
+  )
+  if (cycleStartsWith) return cycleStartsWith
+  if (vLower.endsWith('.x')) {
+    const major = vLower.replace('.x', '')
+    const majorMatch = cycles.find(
+      (c) => c.name.toLowerCase().startsWith(major + '.') || c.name === major,
+    )
+    if (majorMatch) return majorMatch
   }
-
-  if (typeof cycle.eol === 'string') {
-    const eolDate = new Date(cycle.eol)
-    if (eolDate < now) {
-      return { status: 'eol', eolDate }
-    }
-  }
-
-  // Check support/maintenance end
-  if (typeof cycle.support === 'string') {
-    const supportDate = new Date(cycle.support)
-    if (supportDate < now) {
-      // Support ended but EOL not yet reached — extended support
-      const eolDate = typeof cycle.eol === 'string' ? new Date(cycle.eol) : null
-      return { status: 'extended', eolDate }
-    }
-  }
-
-  // Check extended support flag
-  if (cycle.extendedSupport === true && typeof cycle.support === 'string') {
-    const now = new Date()
-    const supportDate = new Date(cycle.support)
-    if (supportDate < now) {
-      const eolDate = typeof cycle.eol === 'string' ? new Date(cycle.eol) : null
-      return { status: 'extended', eolDate }
-    }
-  }
-
-  // Active support
-  const eolDate = typeof cycle.eol === 'string' ? new Date(cycle.eol) : null
-  return { status: 'active', eolDate }
+  return null
 }
 
-/**
- * Synchronize technologies with endoflife.date API.
- *
- * For each technology in the DB:
- * - Looks up the corresponding API product
- * - Fetches EOL cycles
- * - Updates eolDate and supportStatus from API data
- *
- * Returns a detailed sync result.
- */
+function computeSupportStatus(release: V1Release): { status: SupportStatus; eolDate: Date | null } {
+  const now = new Date()
+  const eolFrom = release.eolFrom ?? null
+  const eoesFrom = release.eoesFrom ?? null
+  const isMaintained = release.isMaintained ?? false
+
+  if (release.isEol) {
+    if (typeof eoesFrom === 'string') {
+      const extEnd = new Date(eoesFrom)
+      if (extEnd > now) {
+        return { status: 'extended', eolDate: eolFrom ? new Date(eolFrom) : null }
+      }
+    }
+    return { status: 'eol', eolDate: eolFrom ? new Date(eolFrom) : null }
+  }
+
+  if (typeof eolFrom === 'string') {
+    const eolDate = new Date(eolFrom)
+    if (eolDate < now && !isMaintained) {
+      return { status: 'eol', eolDate }
+    }
+    if (eolDate < now && isMaintained && typeof eoesFrom === 'string') {
+      const extEnd = new Date(eoesFrom)
+      if (extEnd > now) {
+        return { status: 'extended', eolDate }
+      }
+    }
+    return { status: 'active', eolDate }
+  }
+
+  return { status: 'active', eolDate: null }
+}
+
 export async function syncTechnologies(): Promise<SyncResult> {
   const startTime = Date.now()
+
+  // Seed any missing technologies from catalog before syncing
+  // seedTechnologies is idempotent — it only adds technologies not already in DB (matched by name+version)
+  await seedTechnologies()
   const technologies = await db.technologies.toArray()
 
   const result: SyncResult = {
@@ -289,17 +264,25 @@ export async function syncTechnologies(): Promise<SyncResult> {
     }
 
     const cycles = await fetchEolData(slug)
-    if (!cycles || cycles.length === 0) {
+    if (cycles === null) {
       for (const t of techs) {
-        result.details.push({ name: t.name, version: t.version, action: 'error', error: `API not found for slug: ${slug}` })
+        result.details.push({ name: t.name, version: t.version, action: 'error', error: `API request failed for slug: ${slug}` })
+        result.errors++
+      }
+      continue
+    }
+
+    if (cycles.length === 0) {
+      for (const t of techs) {
+        result.details.push({ name: t.name, version: t.version, action: 'error', error: `API returned no data for slug: ${slug}` })
         result.errors++
       }
       continue
     }
 
     for (const tech of techs) {
-      const cycle = matchCycle(cycles, tech.version)
-      if (!cycle) {
+      const release = matchCycle(cycles, tech.version)
+      if (!release) {
         result.details.push({
           name: tech.name,
           version: tech.version,
@@ -310,7 +293,7 @@ export async function syncTechnologies(): Promise<SyncResult> {
         continue
       }
 
-      const { status: newStatus, eolDate: newEolDate } = computeSupportStatus(cycle)
+      const { status: newStatus, eolDate: newEolDate } = computeSupportStatus(release)
       const previousStatus = tech.supportStatus
       const previousEol = tech.eolDate?.toISOString().split('T')[0]
 
@@ -321,8 +304,8 @@ export async function syncTechnologies(): Promise<SyncResult> {
           ...tech.metadata,
           lastSyncFromEol: new Date().toISOString(),
           eolApiSlug: slug,
-          eolApiLatest: cycle.latest ?? null,
-          eolApiCycle: cycle.cycle,
+          eolApiLatest: latestString(release.latest),
+          eolApiCycle: release.name,
         },
       })
 
