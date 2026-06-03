@@ -15,7 +15,19 @@ import type {
   User,
 } from '@/types/domain'
 
+const SEEDED_FLAG = 'tgp-seeded'
+
 export async function seedDemoData() {
+  // Only seed once in the lifetime of the app
+  if (localStorage.getItem(SEEDED_FLAG)) return
+
+  // Check if data already exists (e.g. imported data on first visit)
+  const counts = await Promise.all(db.tables.map((t) => t.count()))
+  if (counts.some((c) => c > 0)) {
+    localStorage.setItem(SEEDED_FLAG, 'true')
+    return
+  }
+
   // Clear all existing data first so re-seeding always works
   await Promise.all(db.tables.map((t) => t.clear()))
 
@@ -175,4 +187,7 @@ export async function seedDemoData() {
   await db.deliverables.bulkAdd(deliverables)
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
+
+  // Mark as seeded so it never runs again
+  localStorage.setItem(SEEDED_FLAG, 'true')
 }
