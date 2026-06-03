@@ -6,6 +6,69 @@ import type {
   AuditCategory, AuditStatus,
 } from '@/types/domain'
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const PARSE_TIMEOUT_MS = 30_000 // 30s timeout for ReDoS mitigation
+
+export class ImportFileError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ImportFileError'
+  }
+}
+
+export class ImportParseError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ImportParseError'
+  }
+}
+
+function sanitizeErrorMessage(err: unknown): string {
+  if (err instanceof ImportFileError || err instanceof ImportParseError) {
+    return err.message
+  }
+  // Sanitize unknown errors — strip technical details, stack traces, paths
+  const msg = String(err)
+    .replace(/[\n\r]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return `Error al procesar la fila: ${msg.slice(0, 200)}`
+}
+
+function sanitizeRecordValue(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return value
+      .slice(0, 5000) // limit length to prevent abuse
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '') // strip control chars except tab/newline
+  }
+  return value
+}
+
+function sanitizeRecordKeys(data: Record<string, unknown>): Record<string, unknown> {
+  const dangerousKeys = ['__proto__', 'constructor', 'prototype']
+  const clean: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (dangerousKeys.includes(key)) continue
+    clean[key] = sanitizeRecordValue(value)
+  }
+  return clean
+}
+
+function parseWithTimeout<T>(fn: () => T, timeoutMs: number): T {
+  let timedOut = false
+  const timer = setTimeout(() => { timedOut = true }, timeoutMs)
+
+  try {
+    const result = fn()
+    if (timedOut) {
+      throw new ImportParseError('El archivo es demasiado complejo o está corrupto (timeout)')
+    }
+    return result
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /* ─── Column definitions ─── */
 
 interface ColumnDef {
@@ -286,50 +349,57 @@ function normalizeHeaders(headers: string[]): string[] {
 }
 
 export function parseExcel(file: ArrayBuffer, entityType: string): ParsedRow[] {
-  const config = importConfigs[entityType]
-  if (!config) throw new Error(`Tipo de entidad desconocido: ${entityType}`)
+  if (file.byteLength > MAX_FILE_SIZE) {
+    throw new ImportFileError(
+      `El archivo excede el tamaño máximo de ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+    )
+  }
 
-  const workbook = XLSX.read(file, { type: 'array' })
+  const config = importConfigs[entityType]
+  if (!config) throw new ImportParseError(`Tipo de entidad desconocido: ${entityType}`)
+
+  const workbook = parseWithTimeout(
+    () => XLSX.read(file, { type: 'array', cellDates: true }),
+    PARSE_TIMEOUT_MS,
+  )
   const sheetName = workbook.SheetNames[0]
-  if (!sheetName) throw new Error('El archivo no contiene hojas de cálculo')
+  if (!sheetName) throw new ImportParseError('El archivo no contiene hojas de cálculo')
 
   const sheet = workbook.Sheets[sheetName]
-  const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' })
+  const rawData: unknown[][] = parseWithTimeout(
+    () => XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' }),
+    PARSE_TIMEOUT_MS,
+  )
 
-  if (rawData.length < 2) throw new Error('El archivo debe tener una fila de encabezados y al menos una fila de datos')
+  if (rawData.length < 2) throw new ImportParseError('El archivo debe tener una fila de encabezados y al menos una fila de datos')
 
   const headers = normalizeHeaders(rawData[0] as string[])
   const rows: ParsedRow[] = []
 
-  // Validate headers match expected columns
-  const expectedLabels = config.columns.map((c) => c.label)
-  const missingHeaders = expectedLabels.filter((l) => !headers.some((h) => h.includes(l)))
-  if (missingHeaders.length > 0) {
-    // Allow missing optional columns — only error on required ones
-  }
-
   for (let i = 1; i < rawData.length; i++) {
     const row = rawData[i] as unknown[]
-    if (!row.some((cell) => cell !== '' && cell != null)) continue // skip empty rows
+    if (!row.some((cell) => cell !== '' && cell != null)) continue
 
-    const data: Record<string, unknown> = {}
+    let data: Record<string, unknown> = {}
     const errors: string[] = []
 
     for (let j = 0; j < headers.length; j++) {
       data[headers[j]] = row[j] ?? ''
     }
 
-    // Validate required fields
+    // Sanitize parsed data against prototype pollution
+    data = sanitizeRecordKeys(data)
+
     for (const col of config.columns) {
       const value = data[col.label]
       if (col.required && (value === '' || value == null || value === undefined)) {
-        errors.push(`El campo "${col.label}" es requerido`)
+        errors.push('El campo requerido "' + col.label + '" está vacío')
       }
       if (value && col.type === 'number' && isNaN(Number(value))) {
-        errors.push(`"${col.label}" debe ser un número`)
+        errors.push('"' + col.label + '" debe ser un número')
       }
       if (value && col.type === 'enum' && col.enumValues && !col.enumValues.includes(String(value))) {
-        errors.push(`"${col.label}" tiene un valor inválido: "${value}"`)
+        errors.push('"' + col.label + '" tiene un valor inválido')
       }
     }
 
@@ -389,7 +459,7 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
       }
     } catch (err) {
       result.errorRows++
-      result.errors.push({ row: row.index, message: String(err) })
+      result.errors.push({ row: row.index, message: sanitizeErrorMessage(err) })
     }
   }
 

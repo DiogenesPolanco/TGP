@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react'
 import { Upload, FileSpreadsheet, CheckCircle, Loader, AlertTriangle, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
-import { parseExcel, importRows, getImportableEntities } from '@/services/import/importService'
+import { parseExcel, importRows, getImportableEntities, ImportFileError } from '@/services/import/importService'
 import type { ParsedRow, ImportResult } from '@/services/import/importService'
 import { useAppStore } from '@/stores/appStore'
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -27,6 +29,16 @@ export function ImportPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
     if (!f) return
+
+    if (f.size > MAX_FILE_SIZE) {
+      addNotification({
+        type: 'error',
+        message: `El archivo excede el tamaño máximo de ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+      })
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+
     setFile(f)
     setParsedRows(null)
     setResult(null)
@@ -44,7 +56,11 @@ export function ImportPage() {
         addNotification({ type: 'warning', message: 'El archivo no contiene datos válidos' })
       }
     } catch (err) {
-      addNotification({ type: 'error', message: `Error al leer el archivo: ${err}` })
+      if (err instanceof ImportFileError) {
+        addNotification({ type: 'error', message: err.message })
+      } else {
+        addNotification({ type: 'error', message: 'Error al leer el archivo. Verifica que sea un Excel válido.' })
+      }
     }
   }
 
@@ -63,7 +79,10 @@ export function ImportPage() {
         addNotification({ type: 'warning', message: `${res.successRows} importados, ${res.errorRows} con errores` })
       }
     } catch (err) {
-      addNotification({ type: 'error', message: `Error de importación: ${err}` })
+      const msg = err instanceof ImportFileError
+        ? err.message
+        : 'Error de importación. Revisa los datos e intenta de nuevo.'
+      addNotification({ type: 'error', message: msg })
     } finally {
       setImporting(false)
     }

@@ -1,29 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight } from 'lucide-react'
+import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight, Lock } from 'lucide-react'
 import {
   generateSecret,
   verifyTotp,
   confirmSetup,
   createSession,
   isConfigured,
+  getSecret,
   getOtpRemainingMs,
+  recordFailedAttempt,
+  getLockoutStatus,
+  resetRateLimit,
 } from '@/services/auth/authService'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
-  const [mode] = useState<'setup' | 'login'>(
+  const [mode, setMode] = useState<'setup' | 'login'>(
     isConfigured() ? 'login' : 'setup',
   )
-  const [secret, setSecret] = useState<{ base32: string; uri: string } | null>(
-    null,
-  )
+  const [secret, setSecret] = useState<{ base32: string; uri: string } | null>(null)
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [remaining, setRemaining] = useState(30)
+  const [verifying, setVerifying] = useState(false)
+  const [locked, setLocked] = useState(false)
+  const [lockoutMs, setLockoutMs] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  /* ---- Generate secret on mount (setup mode) ---- */
 
   useEffect(() => {
     if (mode === 'setup' && !secret) {
@@ -31,15 +34,11 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
     }
   }, [mode, secret])
 
-  /* ---- Auto-focus OTP input ---- */
-
   useEffect(() => {
     if (mode === 'login') {
       inputRef.current?.focus()
     }
   }, [mode])
-
-  /* ---- OTP countdown timer ---- */
 
   useEffect(() => {
     if (error) {
@@ -52,30 +51,86 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
     }
   }, [error])
 
-  /* ---- Handle OTP verification ---- */
+  // Lockout countdown
+  useEffect(() => {
+    if (!locked) return
+    const timer = setInterval(() => {
+      const status = getLockoutStatus()
+      if (!status.locked) {
+        setLocked(false)
+        setLockoutMs(0)
+        clearInterval(timer)
+      } else {
+        setLockoutMs(status.remainingMs)
+      }
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [locked])
+
+  // Check lockout on mount when in login mode
+  useEffect(() => {
+    if (mode === 'login') {
+      const status = getLockoutStatus()
+      setLocked(status.locked)
+      setLockoutMs(status.remainingMs)
+    }
+  }, [mode])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    const storedSecret = isConfigured()
-      ? localStorage.getItem('tgp-auth-secret')
-      : secret?.base32
-
-    if (!storedSecret) return
-
-    if (!verifyTotp(otp, storedSecret)) {
-      setError('Código inválido. Verifica que la hora de tu dispositivo esté sincronizada.')
+    // Check lockout first
+    const lockStatus = getLockoutStatus()
+    if (lockStatus.locked) {
+      setLocked(true)
+      setLockoutMs(lockStatus.remainingMs)
       return
     }
 
-    if (mode === 'setup' && secret) {
-      confirmSetup(secret.base32)
-    } else {
-      createSession()
-    }
+    setVerifying(true)
 
-    onAuth()
+    try {
+      let storedSecret: string | null = null
+      if (isConfigured()) {
+        storedSecret = await getSecret()
+      } else {
+        storedSecret = secret?.base32 ?? null
+      }
+
+      if (!storedSecret) {
+        setError('Error de configuración. Re-inicia la app.')
+        setVerifying(false)
+        return
+      }
+
+      if (!verifyTotp(otp, storedSecret)) {
+        const failResult = recordFailedAttempt()
+        if (failResult.locked) {
+          setLocked(true)
+          setLockoutMs(failResult.remainingMs)
+          setError('')
+        } else {
+          setError('Código inválido. Verifica que la hora de tu dispositivo esté sincronizada.')
+        }
+        setVerifying(false)
+        return
+      }
+
+      if (mode === 'setup' && secret) {
+        await confirmSetup(secret.base32)
+        setMode('login')
+      } else {
+        createSession()
+      }
+
+      onAuth()
+    } catch {
+      setError('Error inesperado. Intenta de nuevo.')
+    } finally {
+      setVerifying(false)
+      resetRateLimit()
+    }
   }
 
   const handleCopy = () => {
@@ -92,10 +147,16 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
     setError('')
   }
 
+  function formatLockout(ms: number): string {
+    const totalSec = Math.ceil(ms / 1000)
+    const min = Math.floor(totalSec / 60)
+    const sec = totalSec % 60
+    return min > 0 ? `${min}m ${sec}s` : `${sec}s`
+  }
+
   return (
     <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Shield size={32} className="text-white" />
@@ -107,7 +168,24 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
         </div>
 
         <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl p-8">
-          {mode === 'setup' && secret ? (
+          {locked ? (
+            /* ── Lockout screen ── */
+            <div className="text-center space-y-4">
+              <div className="w-14 h-14 bg-danger/10 rounded-full flex items-center justify-center mx-auto">
+                <Lock size={28} className="text-danger" />
+              </div>
+              <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                Demasiados intentos
+              </h2>
+              <p className="text-sm text-neutral-60 dark:text-neutral-40">
+                Cuenta bloqueada temporalmente por seguridad
+              </p>
+              <div className="flex items-center justify-center gap-2 text-danger font-medium">
+                <Clock size={18} />
+                <span>{formatLockout(lockoutMs)}</span>
+              </div>
+            </div>
+          ) : mode === 'setup' && secret ? (
             /* ── Setup: QR + verify ── */
             <div className="space-y-6">
               <div className="text-center">
@@ -120,14 +198,12 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                 </p>
               </div>
 
-              {/* QR Code */}
               <div className="flex justify-center">
                 <div className="bg-white p-4 rounded-xl shadow-sm">
                   <QRCodeSVG value={secret.uri} size={200} level="M" />
                 </div>
               </div>
 
-              {/* Secret fallback */}
               <div className="bg-neutral-10 dark:bg-neutral-70 rounded-lg p-3">
                 <p className="text-xs text-neutral-50 mb-1">
                   Si no puedes escanear el QR, ingresa este código manualmente:
@@ -154,7 +230,6 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                 Apps recomendadas: Google Authenticator, Authy, Microsoft Authenticator
               </p>
 
-              {/* Verify OTP */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
@@ -179,11 +254,11 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
                 <button
                   type="submit"
-                  disabled={otp.length !== 6}
+                  disabled={otp.length !== 6 || verifying}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
                 >
-                  Verificar y Continuar
-                  <ArrowRight size={18} />
+                  {verifying ? 'Verificando…' : 'Verificar y Continuar'}
+                  {!verifying && <ArrowRight size={18} />}
                 </button>
               </form>
             </div>
@@ -229,11 +304,11 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
                 <button
                   type="submit"
-                  disabled={otp.length !== 6}
+                  disabled={otp.length !== 6 || verifying}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
                 >
-                  Ingresar
-                  <ArrowRight size={18} />
+                  {verifying ? 'Verificando…' : 'Ingresar'}
+                  {!verifying && <ArrowRight size={18} />}
                 </button>
               </form>
             </div>
@@ -241,7 +316,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
         </div>
 
         <p className="text-center text-xs text-neutral-50 mt-6">
-          Almacenamiento local • Sin conexión externa
+          Almacenamiento local encriptado • Sin conexión externa
         </p>
       </div>
     </div>
