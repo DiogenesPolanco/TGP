@@ -50,6 +50,7 @@ export function DashboardPage() {
   const auditFindings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
+  const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
   const vulnsInPeriod = vulnerabilities.filter((v) => v.createdAt >= periodStart)
   const incidentsInPeriod = incidents.filter((i) => i.createdAt >= periodStart)
@@ -79,11 +80,60 @@ export function DashboardPage() {
     { name: 'Desconocido', value: technologies.filter((t) => t.supportStatus === 'unknown').length, color: '#A5ADBA' },
   ].filter((d) => d.value > 0)
 
-  const buData = [
-    { name: 'Digital', thi: 88 },
-    { name: 'Core', thi: 78 },
-    { name: 'Legacy', thi: 55 },
-  ]
+  const buData = businessUnits
+    .map((bu) => {
+      const buApps = applications.filter((a) => a.businessUnitId === bu.id)
+      if (buApps.length === 0) return null
+
+      const buVulns = vulnerabilities.filter(
+        (v) => v.applicationId && buApps.some((a) => a.id === v.applicationId)
+      )
+      const buIncidents = incidents.filter(
+        (i) => i.applicationId && buApps.some((a) => a.id === i.applicationId)
+      )
+      const buRisks = risks.filter(
+        (r) => r.applicationId && buApps.some((a) => a.id === r.applicationId)
+      )
+
+      const securityScore = (() => {
+        const criticalHigh = buVulns.filter(
+          (v) => (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed'
+        )
+        return Math.max(0, 100 - Math.min(criticalHigh.length * 5, 80))
+      })()
+
+      const availabilityScore = (() => {
+        const totalDowntime = buIncidents
+          .filter((i) => i.status === 'resolved')
+          .reduce((sum, i) => sum + (i.downtimeMinutes ?? 0), 0)
+        return Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
+      })()
+
+      const obsolescenceScore = (() => {
+        const appsWithEol = buApps.filter((app) =>
+          app.technologies.some((techId) => {
+            const tech = technologies.find((t) => t.id === techId)
+            return tech?.supportStatus === 'eol'
+          })
+        )
+        return buApps.length > 0
+          ? Math.round((1 - appsWithEol.length / buApps.length) * 100)
+          : 100
+      })()
+
+      const riskScore = (() => {
+        const activeRisks = buRisks.filter((r) => r.status === 'open')
+        const totalScore = activeRisks.reduce((sum, r) => sum + r.riskScore, 0)
+        return Math.max(0, 100 - Math.min(totalScore / 5, 80))
+      })()
+
+      // Average of available dimensions (skip delivery/quality/compliance — they're global)
+      const dimensions = [securityScore, availabilityScore, obsolescenceScore, riskScore]
+      const thi = Math.round(dimensions.reduce((a, b) => a + b, 0) / dimensions.length)
+
+      return { name: bu.name, thi }
+    })
+    .filter((d): d is { name: string; thi: number } => d !== null)
 
   const alerts = [
     { type: 'critical' as const, message: `SLA vulnerabilidad crítica vence en 2 días - App Core Banking` },
@@ -191,15 +241,21 @@ export function DashboardPage() {
           <h3 className="text-base font-semibold text-neutral-90 dark:text-white mb-4">
             THI por Business Unit
           </h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={buData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" />
-              <XAxis type="number" domain={[0, 100]} />
-              <YAxis dataKey="name" type="category" width={80} />
-              <Tooltip />
-              <Bar dataKey="thi" fill="#0052CC" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {buData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={buData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" />
+                <XAxis type="number" domain={[0, 100]} />
+                <YAxis dataKey="name" type="category" width={80} />
+                <Tooltip />
+                <Bar dataKey="thi" fill="#0052CC" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-neutral-50 py-8 text-center">
+              No hay datos de aplicaciones para calcular THI por unidad de negocio
+            </p>
+          )}
         </div>
 
         <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
