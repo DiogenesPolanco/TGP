@@ -73,8 +73,8 @@ const navItems: NavItem[] = [
     label: 'Administración',
     icon: <Settings size={20} />,
     children: [
-      { label: 'General', path: '/admin' },
       { label: 'Unidades de Negocio', path: '/admin/business-units' },
+      { label: 'General', path: '/admin' },
     ],
   },
 ]
@@ -106,9 +106,7 @@ export function Sidebar() {
       <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-20 dark:border-neutral-70">
         {sidebarOpen && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">TGP</span>
-            </div>
+            <img src="/favicon.svg" alt="TGP" className="w-8 h-8" />
             <span className="font-semibold text-neutral-90 dark:text-neutral-0 text-sm">TGP</span>
           </div>
         )}
