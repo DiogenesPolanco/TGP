@@ -21,6 +21,10 @@ import type {
   Commitment,
   Dependency,
   Blocker,
+  MemberProfile,
+  SprintRecord,
+  OneOnOne,
+  Achievement,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -48,6 +52,12 @@ export class TGPDatabase extends Dexie {
   dependencies!: Table<Dependency, string>
   blockers!: Table<Blocker, string>
 
+  // Rendimiento
+  memberProfiles!: Table<MemberProfile, string>
+  sprintRecords!: Table<SprintRecord, string>
+  oneOnOnes!: Table<OneOnOne, string>
+  achievements!: Table<Achievement, string>
+
   constructor() {
     super('TGPDatabase')
     this.version(5).stores({
@@ -72,6 +82,12 @@ export class TGPDatabase extends Dexie {
       commitments: 'id, ownerId, accountableId, teamId, applicationId, objectiveId, status, commitmentDate',
       dependencies: 'id, sourceType, sourceId, targetType, targetId, status',
       blockers: 'id, sourceType, sourceId, assigneeId, severity, status',
+    })
+    this.version(6).stores({
+      memberProfiles: 'id, teamId',
+      sprintRecords: 'id, memberId, year, quarter',
+      oneOnOnes: 'id, memberId, date',
+      achievements: 'id, memberId, type, date',
     })
   }
 }
