@@ -97,3 +97,18 @@ export interface VacationRecord {
   reason: string
   createdAt: Date
 }
+
+export interface TeamSprint {
+  id: string
+  teamId: string
+  sprintName: string
+  quarter: string
+  year: number
+  startDate: Date
+  endDate: Date
+  plannedSP: number
+  completedSP: number
+  notCompletedSP: number
+  createdAt: Date
+  updatedAt: Date
+}

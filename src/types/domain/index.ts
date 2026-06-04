@@ -38,6 +38,7 @@ export type {
   Compromiso,
   Achievement,
   VacationRecord,
+  TeamSprint,
 } from './performance'
 
 export interface Tenant {
