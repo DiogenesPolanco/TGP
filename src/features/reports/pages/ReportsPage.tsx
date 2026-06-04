@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { generateReport, type ReportSection, type ReportColumn } from '@/services/reports/pdfService'
+import { generateReport, type ReportSection } from '@/services/reports/pdfService'
 import { generateExcel } from '@/services/reports/excelService'
 import * as reportData from '@/services/reports/reportDataService'
 import { Loader2, FileText, Download, AlertTriangle, TrendingUp, Bug, ShieldHalf, GitBranch, Goal, ClipboardCheck, Package, FileSpreadsheet } from 'lucide-react'
@@ -11,7 +11,7 @@ interface TabDef {
   fetcher: () => Promise<{
     title: string
     filename: string
-    summary: { label: string; value: string; color?: string }[]
+    summary: { label: string; value: string; color: string }[]
     sections: ReportSection[]
   }>
 }

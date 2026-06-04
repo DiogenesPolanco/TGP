@@ -1,15 +1,5 @@
 import { db } from '@/services/db/database'
-import type { ReportSection, ReportColumn } from './pdfService'
-
-/* ─── Shared helpers ─── */
-
-function severityColor(s: string): string {
-  const map: Record<string, string> = {
-    critical: '#dc2626', high: '#ea580c', medium: '#ca8a04', low: '#16a34a',
-    eol: '#dc2626', extended: '#ca8a04', active: '#16a34a',
-  }
-  return map[s?.toLowerCase()] || '#64748b'
-}
+import type { ReportSection } from './pdfService'
 
 function statusBadge(s: string): string {
   const map: Record<string, string> = {
@@ -168,8 +158,8 @@ export async function getIncidentsReport() {
   ])
 
   const appMap = new Map(apps.map((a) => [a.id, a.name]))
-  const byStatus = { open: 0, in_progress: 0, resolved: 0, closed: 0 }
-  const bySeverity = { critical: 0, high: 0, medium: 0, low: 0 }
+  const byStatus: Record<string, number> = { open: 0, in_progress: 0, resolved: 0, closed: 0 }
+  const bySeverity: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 }
 
   const rows = incidents.map((inc) => {
     byStatus[inc.status] = (byStatus[inc.status] || 0) + 1
