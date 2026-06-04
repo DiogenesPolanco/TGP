@@ -3,11 +3,11 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Download, Upload, Database, Trash2, FileSpreadsheet, RefreshCw, Shield } from 'lucide-react'
+import { Upload, Database, Trash2, FileSpreadsheet, RefreshCw, Shield } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
-import { encryptField, decryptField } from '@/services/crypto/fieldCipher'
+import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 
 export function AdminPage() {

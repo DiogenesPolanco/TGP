@@ -1,5 +1,4 @@
 const STORAGE_SALT = 'tgp-field-cipher-salt'
-const STORAGE_IV = 'tgp-field-cipher-iv'
 
 async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   const fingerprint = [
@@ -17,7 +16,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   )
 
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: salt.buffer as ArrayBuffer, iterations: 100_000, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt: salt.buffer.slice(0), iterations: 100_000, hash: 'SHA-256' },
     keyMaterial,
     { name: 'AES-GCM', length: 256 },
     false,

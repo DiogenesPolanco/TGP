@@ -80,6 +80,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
         applicationId: applicationId || null,
         priority,
         status,
+        estimatedHours: activity?.estimatedHours ?? null,
         actualHours: activity?.actualHours ?? null,
         plannedPoints: plannedPoints ? Number(plannedPoints) : null,
         completedPoints: completedPoints ? Number(completedPoints) : null,
