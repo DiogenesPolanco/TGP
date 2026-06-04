@@ -114,57 +114,75 @@ export function TeamFormPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate('/teams')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{team ? 'Editar Equipo' : 'Nuevo Equipo'}</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-        <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Clasificación DORA</label>
-            <select value={formData.doraClassification} onChange={(e) => setFormData({ ...formData, doraClassification: e.target.value as DoraLevel })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="elite">Elite</option><option value="high">Alto</option><option value="medium">Medio</option><option value="low">Bajo</option>
-            </select></div>
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit</label>
-            <select value={formData.businessUnitId} onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin BU</option>
-              {businessUnits.map((bu) => (<option key={bu.id} value={bu.id}>{bu.name}</option>))}
-            </select></div>
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-5">
+          {/* Left column */}
+          <div className="space-y-5">
+            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Clasificación DORA</label>
+                <select value={formData.doraClassification} onChange={(e) => setFormData({ ...formData, doraClassification: e.target.value as DoraLevel })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                  <option value="elite">Elite</option><option value="high">Alto</option><option value="medium">Medio</option><option value="low">Bajo</option>
+                </select></div>
+              <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit</label>
+                <select value={formData.businessUnitId} onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                  <option value="">Sin BU</option>
+                  {businessUnits.map((bu) => (<option key={bu.id} value={bu.id}>{bu.name}</option>))}
+                </select></div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="space-y-5">
+            <div>
+              <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30 block mb-2">Métricas DORA</label>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as any)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span></div></div>))}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Métricas DORA</label>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as any)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14">{metric.unit}</span></div></div>))}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
+        {/* Members — full width below columns */}
+        <div className="mt-6 pt-6 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center justify-between mb-3">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Miembros</label>
             <button type="button" onClick={addMember} className="flex items-center gap-1 text-sm text-primary hover:underline"><Plus size={14} /> Agregar</button>
           </div>
-          <div className="space-y-2">
-            {members.map((member, index) => (
-              <div key={index} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-                <Users size={14} className="text-neutral-50" />
-                <input type="text" placeholder="Nombre" value={member.name} onChange={(e) => updateMember(index, 'name', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
-                <select value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value as MemberRole)} className="w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm">
-                  {MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}
-                </select>
-                <input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
-                <button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></button>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-neutral-20 dark:border-neutral-70">
+                  <th className="text-left px-3 py-2 font-medium text-neutral-50 w-8"></th>
+                  <th className="text-left px-3 py-2 font-medium text-neutral-50">Nombre</th>
+                  <th className="text-left px-3 py-2 font-medium text-neutral-50">Rol</th>
+                  <th className="text-right px-3 py-2 font-medium text-neutral-50 w-24">Asignación</th>
+                  <th className="w-10 px-3 py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {members.map((member, index) => (
+                  <tr key={index} className="border-b border-neutral-20/50 dark:border-neutral-70/50 last:border-0">
+                    <td className="px-3 py-2.5 text-neutral-50"><Users size={14} /></td>
+                    <td className="px-3 py-2.5"><input type="text" placeholder="Nombre" value={member.name} onChange={(e) => updateMember(index, 'name', e.target.value)} className="w-full min-w-32 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /></td>
+                    <td className="px-3 py-2.5"><select value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value as MemberRole)} className="w-full min-w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm">{MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}</select></td>
+                    <td className="px-3 py-2.5"><div className="flex items-center justify-end gap-1"><input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-right" /><span className="text-xs text-neutral-50">%</span></div></td>
+                    <td className="px-3 py-2.5"><button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 mt-6 pt-4">
           <button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
           <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{team ? 'Actualizar' : 'Crear'}</button>
         </div>

@@ -3,20 +3,21 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { useNavigate } from 'react-router-dom'
 import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import type { MemberStatus } from '@/types/domain'
-import { Search, Filter, Users, Award, TrendingUp, TrendingDown, Star, Loader2, X } from 'lucide-react'
+import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3 } from 'lucide-react'
 import { getGlobalMembersKPIs } from '@/services/performance/performanceService'
+import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
 
 type TeamEntry = { id: string; name: string }
 
 export function MembersPage() {
-  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterTeam, setFilterTeam] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [editMemberId, setEditMemberId] = useState<string | null>(null)
+  const [editMemberName, setEditMemberName] = useState('')
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const [globalData, setGlobalData] = useState<Awaited<ReturnType<typeof getGlobalMembersKPIs>> | null>(null)
@@ -45,6 +46,28 @@ export function MembersPage() {
     [teams]
   )
 
+  const filteredKpis = useMemo(() => {
+    if (!globalData) return null
+    const filtered = filterTeam
+      ? globalData.kpisList.filter((k) => k.team.id === filterTeam)
+      : globalData.kpisList
+    const withSP = filtered.filter((k) => k.kpis.totalSP > 0)
+    return {
+      bestPerformer: withSP.length > 0
+        ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
+        : null,
+      worstPerformer: withSP.length > 0
+        ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
+        : null,
+      topSP: withSP.length > 0
+        ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
+        : null,
+      needsAttention: filtered.length > 0
+        ? filtered.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
+        : null,
+    }
+  }, [globalData, filterTeam])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -53,42 +76,65 @@ export function MembersPage() {
     )
   }
 
-  const kpi = globalData
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Miembros</h2>
+        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento</h2>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           icon={<TrendingUp size={22} />}
           label="Mejor Rendimiento"
-          value={kpi?.bestPerformer ? `${kpi.bestPerformer.kpis.efficiencyPct}%` : '—'}
-          subtitle={kpi?.bestPerformer?.member.displayName}
+          value={filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'}
+          subtitle={filteredKpis?.bestPerformer?.member.displayName}
+          memberId={filteredKpis?.bestPerformer?.member.id}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.bestPerformer?.member.displayName ?? '') }}
           color="text-success"
         />
         <KpiCard
           icon={<TrendingDown size={22} />}
           label="Menor Rendimiento"
-          value={kpi?.worstPerformer ? `${kpi.worstPerformer.kpis.efficiencyPct}%` : '—'}
-          subtitle={kpi?.worstPerformer?.member.displayName}
+          value={filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'}
+          subtitle={filteredKpis?.worstPerformer?.member.displayName}
+          memberId={filteredKpis?.worstPerformer?.member.id}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.worstPerformer?.member.displayName ?? '') }}
           color="text-danger"
         />
         <KpiCard
           icon={<Star size={22} />}
           label="Más Story Points"
-          value={kpi?.topSP ? `${kpi.topSP.kpis.totalSP}` : '—'}
-          subtitle={kpi?.topSP?.member.displayName}
+          value={filteredKpis?.topSP ? `${filteredKpis.topSP.kpis.totalSP}` : '—'}
+          subtitle={filteredKpis?.topSP?.member.displayName}
+          memberId={filteredKpis?.topSP?.member.id}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.topSP?.member.displayName ?? '') }}
           color="text-warning"
         />
         <KpiCard
-          icon={<Award size={22} />}
-          label="Menos Story Points"
-          value={kpi?.bottomSP ? `${kpi.bottomSP.kpis.totalSP}` : '—'}
-          subtitle={kpi?.bottomSP?.member.displayName}
-          color="text-neutral-50"
+          icon={<AlertTriangle size={22} />}
+          label="Requiere Atención"
+          value={filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'}
+          subtitle={filteredKpis?.needsAttention?.member.displayName}
+          memberId={filteredKpis?.needsAttention?.member.id}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.needsAttention?.member.displayName ?? '') }}
+          color="text-danger"
+          info={filteredKpis?.needsAttention ? (() => {
+            const k = filteredKpis.needsAttention!.kpis
+            const eff = Math.round(((100 - k.efficiencyPct) / 100) * 35)
+            const opps = k.openOpportunitiesCount
+            const oppScore = Math.round((Math.min(opps, 5) / 5) * 35)
+            const moodScore = k.oneOnOneCount > 0 ? Math.round(((5 - k.avgMood) / 4) * 20) : 0
+            const achScore = k.achievementCount === 0 ? 10 : 0
+            return (
+              <div className="space-y-2">
+                <p className="font-semibold text-xs mb-1">Composición del puntaje (0–100):</p>
+                <div><span className="text-neutral-30">Eficiencia baja</span><span className="float-right font-mono">{eff}/35</span></div>
+                <div><span className="text-neutral-30">Oportunidades de mejora ({opps})</span><span className="float-right font-mono">{oppScore}/35</span></div>
+                <div><span className="text-neutral-30">Ánimo bajo</span><span className="float-right font-mono">{moodScore}/20</span></div>
+                <div><span className="text-neutral-30">Sin logros</span><span className="float-right font-mono">{achScore}/10</span></div>
+              </div>
+            )
+          })() : undefined}
         />
       </div>
 
@@ -168,52 +214,54 @@ export function MembersPage() {
             <p className="text-neutral-50">No se encontraron miembros</p>
           </div>
         ) : (
-          <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedItems.map(({ member, team, kpis }) => {
-              const statusColors: Record<MemberStatus, string> = {
-                activo: 'bg-success/10 text-success',
-                licencia: 'bg-warning/10 text-warning',
-                vacaciones: 'bg-info/10 text-info',
-                desvinculado: 'bg-danger/10 text-danger',
-              }
-              return (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between px-5 py-3.5 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/teams/${team.id}/performance/${member.id}`)}
-                >
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
-                      {member.displayName.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
-                        {member.displayName}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-neutral-50">
-                        <span>{MEMBER_ROLE_LABELS[member.role] ?? member.role}</span>
-                        <span>·</span>
-                        <span>{team.name}</span>
-                        <span>·</span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${statusColors[member.status]}`}>
-                          {MEMBER_STATUS_LABELS[member.status]}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 shrink-0">
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-neutral-90 dark:text-white">{kpis.totalSP}</p>
-                      <p className="text-xs text-neutral-50">SP</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-neutral-90 dark:text-white">{kpis.efficiencyPct}%</p>
-                      <p className="text-xs text-neutral-50">Efic.</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-neutral-20 dark:border-neutral-70">
+                  <th className="text-left px-4 py-3 font-medium text-neutral-50 w-10"></th>
+                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Nombre</th>
+                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Rol</th>
+                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Equipo</th>
+                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Estado</th>
+                  <th className="text-right px-4 py-3 font-medium text-neutral-50 w-20">SP</th>
+                  <th className="text-right px-4 py-3 font-medium text-neutral-50 w-20">Efic.</th>
+                  <th className="w-10 px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
+                {paginatedItems.map(({ member, team, kpis }) => {
+                  const statusColors: Record<MemberStatus, string> = {
+                    activo: 'bg-success/10 text-success',
+                    licencia: 'bg-warning/10 text-warning',
+                    vacaciones: 'bg-info/10 text-info',
+                    desvinculado: 'bg-danger/10 text-danger',
+                  }
+                  return (
+                    <tr
+                      key={member.id}
+                      onClick={() => {
+                        setEditMemberId(member.id)
+                        setEditMemberName(member.displayName)
+                      }}
+                      className="hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors cursor-pointer"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                          {member.displayName.charAt(0).toUpperCase()}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-neutral-90 dark:text-white">{member.displayName}</td>
+                      <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</td>
+                      <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{team.name}</td>
+                      <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[member.status]}`}>{MEMBER_STATUS_LABELS[member.status]}</span></td>
+                      <td className="px-4 py-3 text-right font-semibold text-neutral-90 dark:text-white">{kpis.totalSP}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-neutral-90 dark:text-white">{kpis.efficiencyPct}%</td>
+                      <td className="px-4 py-3 text-neutral-30"><Edit3 size={16} /></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -225,21 +273,49 @@ export function MembersPage() {
         pageSize={10}
         onPageChange={setPage}
       />
+
+      <MemberEditModal
+        memberId={editMemberId ?? ''}
+        memberName={editMemberName}
+        open={editMemberId !== null}
+        onClose={() => setEditMemberId(null)}
+      />
     </div>
   )
 }
 
-function KpiCard({ icon, label, value, subtitle, color }: {
-  icon: React.ReactNode; label: string; value: string; subtitle?: string; color: string
+function KpiCard({ icon, label, value, subtitle, memberId, onMemberClick, color, info }: {
+  icon: React.ReactNode; label: string; value: string; subtitle?: string; memberId?: string; onMemberClick?: (id: string) => void; color: string; info?: React.ReactNode
 }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm relative">
       <div className="flex items-center justify-between mb-3">
         <div className={color}>{icon}</div>
       </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1">{label}</p>
-      {subtitle && (
+      <div className="flex items-center gap-1.5 mt-1">
+        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        {info && (
+          <div className="relative group">
+            <Info size={13} className="text-neutral-50 cursor-help" />
+            <div className="absolute left-0 bottom-full mb-2 w-56 p-3 rounded-lg bg-neutral-90 dark:bg-neutral-20 text-white dark:text-neutral-90 text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+              {info}
+              <div className="absolute left-3 top-full w-2 h-2 bg-neutral-90 dark:bg-neutral-20 rotate-45 -translate-y-1" />
+            </div>
+          </div>
+        )}
+      </div>
+      {subtitle && memberId && onMemberClick && (
+        <button
+          type="button"
+          onClick={() => onMemberClick(memberId)}
+          className="mt-1.5 text-sm font-semibold text-primary hover:text-primary-dark hover:underline truncate w-full text-left cursor-pointer"
+          title="Editar miembro"
+        >
+          {subtitle}
+        </button>
+      )}
+      {subtitle && !(memberId && onMemberClick) && (
         <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
       )}
     </div>

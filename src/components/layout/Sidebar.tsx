@@ -72,9 +72,8 @@ const navItems: NavItem[] = [
     label: 'Equipos',
     icon: <Users size={20} />,
     children: [
-      { label: 'Equipos', path: '/teams' },
+      { label: 'Rendimiento', path: '/teams' },
       { label: 'Miembros', path: '/teams/members' },
-      { label: 'Rendimiento', path: '/teams/performance' },
     ],
   },
   {
@@ -171,6 +170,7 @@ export function Sidebar() {
                       <NavLink
                         key={child.path}
                         to={child.path}
+                        end
                         className={({ isActive }) =>
                           cn(
                             'block px-3 py-2 rounded-lg text-sm transition-colors',

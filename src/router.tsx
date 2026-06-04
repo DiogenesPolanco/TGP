@@ -33,7 +33,6 @@ import { CommitmentFormPage } from '@/features/execution/pages/CommitmentFormPag
 import { PredictabilityPage } from '@/features/execution/pages/PredictabilityPage'
 import { PerformancePage } from '@/features/performance/pages/PerformancePage'
 import { MemberPerformancePage } from '@/features/performance/pages/MemberPerformancePage'
-import { TeamPerformanceSelectorPage } from '@/features/performance/pages/TeamPerformanceSelectorPage'
 
 export const router = createBrowserRouter([
   {
@@ -63,7 +62,6 @@ export const router = createBrowserRouter([
       { path: 'governance/audit/new', element: <AuditFormPage /> },
       { path: 'governance/audit/:id/edit', element: <AuditFormPage /> },
       { path: 'teams/members', element: <MembersPage /> },
-      { path: 'teams/performance', element: <TeamPerformanceSelectorPage /> },
       { path: 'teams/new', element: <TeamFormPage /> },
       { path: 'teams/:id/edit', element: <TeamFormPage /> },
       { path: 'teams/:id/performance', element: <PerformancePage /> },
