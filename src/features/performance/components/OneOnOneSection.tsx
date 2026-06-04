@@ -137,7 +137,7 @@ export function OneOnOneSection({ memberId }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">One-on-One Meetings</h2>
+        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Reuniones Uno a Uno</h2>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"

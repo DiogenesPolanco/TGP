@@ -96,7 +96,7 @@ export function ObjectivesPage() {
 
       <div className="grid grid-cols-6 gap-4">
         <StatCard icon={<Target size={20} />} label="Total" value={stats.total} color="text-primary" onClick={() => { setStatusFilter('all'); setShowFilters(false) }} />
-        <StatCard icon={<TrendingUp size={20} />} label="On Track" value={stats.onTrack} color="text-success" onClick={() => { setStatusFilter('on_track'); setShowFilters(true) }} />
+        <StatCard icon={<TrendingUp size={20} />} label="Encaminado" value={stats.onTrack} color="text-success" onClick={() => { setStatusFilter('on_track'); setShowFilters(true) }} />
         <StatCard icon={<AlertCircle size={20} />} label="En Riesgo" value={stats.atRisk} color="text-warning" onClick={() => { setStatusFilter('at_risk'); setShowFilters(true) }} />
         <StatCard icon={<AlertCircle size={20} />} label="Atrasado" value={stats.behind} color="text-danger" onClick={() => { setStatusFilter('behind'); setShowFilters(true) }} />
         <StatCard icon={<Target size={16} />} label="No Iniciado" value={stats.notStarted} color="text-neutral-50" onClick={() => { setStatusFilter('not_started'); setShowFilters(true) }} />

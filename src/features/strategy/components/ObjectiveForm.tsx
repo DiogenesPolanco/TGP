@@ -220,14 +220,14 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
                   />
                   <input
                     type="number"
-                    placeholder="Target"
+                    placeholder="Meta"
                     value={kr.target}
                     onChange={(e) => updateKeyResult(index, 'target', parseFloat(e.target.value))}
                     className="w-20 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                   />
                   <input
                     type="number"
-                    placeholder="Current"
+                    placeholder="Actual"
                     value={kr.current}
                     onChange={(e) => updateKeyResult(index, 'current', parseFloat(e.target.value))}
                     className="w-20 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"

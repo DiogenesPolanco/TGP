@@ -40,12 +40,12 @@ export function TeamsPage() {
       return { label: 'Elite', color: 'bg-success/10 text-success' }
     }
     if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 168 && metrics.changeFailureRate <= 10 && metrics.mttrHours <= 24) {
-      return { label: 'High', color: 'bg-info/10 text-info' }
+      return { label: 'Alto', color: 'bg-info/10 text-info' }
     }
     if (metrics.deploymentFrequency >= 0.25 && metrics.leadTimeHours <= 720 && metrics.changeFailureRate <= 15 && metrics.mttrHours <= 168) {
-      return { label: 'Medium', color: 'bg-warning/10 text-warning' }
+      return { label: 'Medio', color: 'bg-warning/10 text-warning' }
     }
-    return { label: 'Low', color: 'bg-danger/10 text-danger' }
+    return { label: 'Bajo', color: 'bg-danger/10 text-danger' }
   }
 
   return (
@@ -73,7 +73,7 @@ export function TeamsPage() {
       <div className="grid grid-cols-3 gap-4">
         <StatCard icon={<Users size={20} />} label="Total Equipos" value={teams.length} color="text-primary" onClick={() => setSearchTerm('')} />
         <StatCard icon={<Award size={20} />} label="Equipos Elite" value={teams.filter((t) => getDoraLevel(t.currentMetrics).label === 'Elite').length} color="text-success" />
-        <StatCard icon={<TrendingUp size={20} />} label="Promedio Velocity" value={teams.length > 0 ? Math.round(teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) / teams.length) : 0} color="text-info" />
+        <StatCard icon={<TrendingUp size={20} />} label="Velocidad Promedio" value={teams.length > 0 ? Math.round(teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) / teams.length) : 0} color="text-info" />
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
@@ -138,7 +138,7 @@ export function TeamsPage() {
           const dora = getDoraLevel(team.currentMetrics)
           return (
             <div key={team.id}
-              onClick={() => navigate(`${team.id}/edit`)}
+              onClick={() => navigate(`/teams/${team.id}`)}
               className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
@@ -155,9 +155,9 @@ export function TeamsPage() {
 
               {team.currentMetrics && (
                 <div className="grid grid-cols-2 gap-3 mt-4">
-                  <MetricItem label="Velocity" value={team.currentMetrics.velocity} />
-                  <MetricItem label="Lead Time" value={`${team.currentMetrics.leadTimeHours}h`} />
-                  <MetricItem label="CFR" value={`${team.currentMetrics.changeFailureRate}%`} />
+                  <MetricItem label="Velocidad" value={team.currentMetrics.velocity} />
+                  <MetricItem label="Tiempo de Entrega" value={`${team.currentMetrics.leadTimeHours}h`} />
+                  <MetricItem label="Tasa de Fallos" value={`${team.currentMetrics.changeFailureRate}%`} />
                   <MetricItem label="MTTR" value={`${team.currentMetrics.mttrHours}h`} />
                 </div>
               )}
