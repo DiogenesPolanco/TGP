@@ -23,6 +23,7 @@ import type {
   SprintRecord,
   OneOnOne,
   Achievement,
+  TeamSprint,
 } from '@/types/domain'
 
 const SEEDED_FLAG = 'tgp-seeded'
@@ -342,42 +343,92 @@ export async function seedDemoData() {
     { id: 'tm-8', teamId: 'team-2', email: 'sofia.torres@tgp.demo', phoneCell: '+56922222225', phoneHome: '', address: 'Valparaíso, Chile', role: 'intern', skills: [{ id: 'sk-21', name: 'JavaScript', level: 'beginner', category: 'Frontend' }, { id: 'sk-22', name: 'HTML/CSS', level: 'beginner', category: 'Frontend' }], technologies: ['tech-13'], microservices: [], avgStoryPoints: 7, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: ds2(-45), updatedAt: ds2(-1) },
   ]
 
-  const sprintRecords: SprintRecord[] = [
-    // Juan Pérez (tm-1) — 4 sprints, alta eficiencia
-    { id: 'sr-1', memberId: 'tm-1', sprintName: 'Sprint 1', quarter: 'Q1', year: 2026, storyPointsCompleted: 40, storyPointsNotCompleted: 5, createdAt: ds2(-90) },
-    { id: 'sr-2', memberId: 'tm-1', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 45, storyPointsNotCompleted: 3, createdAt: ds2(-60) },
-    { id: 'sr-3', memberId: 'tm-1', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 7, createdAt: ds2(-30) },
-    { id: 'sr-4', memberId: 'tm-1', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 42, storyPointsNotCompleted: 4, createdAt: ds2(-1) },
-    // Carlos López (tm-3) — 4 sprints, buena eficiencia
-    { id: 'sr-5', memberId: 'tm-3', sprintName: 'Sprint 1', quarter: 'Q1', year: 2026, storyPointsCompleted: 30, storyPointsNotCompleted: 8, createdAt: ds2(-90) },
-    { id: 'sr-6', memberId: 'tm-3', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 35, storyPointsNotCompleted: 5, createdAt: ds2(-60) },
-    { id: 'sr-7', memberId: 'tm-3', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 28, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
-    { id: 'sr-8', memberId: 'tm-3', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 32, storyPointsNotCompleted: 6, createdAt: ds2(-1) },
-    // Ana Martínez (tm-4) — 3 sprints, eficiencia media
-    { id: 'sr-9', memberId: 'tm-4', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 20, storyPointsNotCompleted: 15, createdAt: ds2(-60) },
-    { id: 'sr-10', memberId: 'tm-4', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 25, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
-    { id: 'sr-11', memberId: 'tm-4', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 18, storyPointsNotCompleted: 12, createdAt: ds2(-1) },
-    // Pedro Sánchez (tm-5) — 3 sprints, baja eficiencia
-    { id: 'sr-12', memberId: 'tm-5', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 10, storyPointsNotCompleted: 20, createdAt: ds2(-60) },
-    { id: 'sr-13', memberId: 'tm-5', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 15, storyPointsNotCompleted: 18, createdAt: ds2(-30) },
-    { id: 'sr-14', memberId: 'tm-5', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 8, storyPointsNotCompleted: 22, createdAt: ds2(-1) },
-    // María García (tm-2) — 4 sprints, buena eficiencia
-    { id: 'sr-15', memberId: 'tm-2', sprintName: 'Sprint A', quarter: 'Q1', year: 2026, storyPointsCompleted: 35, storyPointsNotCompleted: 5, createdAt: ds2(-90) },
-    { id: 'sr-16', memberId: 'tm-2', sprintName: 'Sprint B', quarter: 'Q1', year: 2026, storyPointsCompleted: 32, storyPointsNotCompleted: 8, createdAt: ds2(-60) },
-    { id: 'sr-17', memberId: 'tm-2', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 4, createdAt: ds2(-30) },
-    { id: 'sr-18', memberId: 'tm-2', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 30, storyPointsNotCompleted: 6, createdAt: ds2(-1) },
-    // Laura Rodríguez (tm-6) — 4 sprints, muy alta eficiencia
-    { id: 'sr-19', memberId: 'tm-6', sprintName: 'Sprint A', quarter: 'Q1', year: 2026, storyPointsCompleted: 42, storyPointsNotCompleted: 3, createdAt: ds2(-90) },
-    { id: 'sr-20', memberId: 'tm-6', sprintName: 'Sprint B', quarter: 'Q1', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 5, createdAt: ds2(-60) },
-    { id: 'sr-21', memberId: 'tm-6', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 45, storyPointsNotCompleted: 2, createdAt: ds2(-30) },
-    { id: 'sr-22', memberId: 'tm-6', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 40, storyPointsNotCompleted: 4, createdAt: ds2(-1) },
-    // Diego Fernández (tm-7) — 2 sprints, eficiencia media-baja
-    { id: 'sr-23', memberId: 'tm-7', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 15, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
-    { id: 'sr-24', memberId: 'tm-7', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 12, storyPointsNotCompleted: 8, createdAt: ds2(-1) },
-    // Sofía Torres (tm-8) — 2 sprints, baja eficiencia
-    { id: 'sr-25', memberId: 'tm-8', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 8, storyPointsNotCompleted: 25, createdAt: ds2(-30) },
-    { id: 'sr-26', memberId: 'tm-8', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 5, storyPointsNotCompleted: 20, createdAt: ds2(-1) },
+  // ── Generate sprint records for 12 sprints per team ──
+  // Q1: Sprint 1-6 (Team-1) / Sprint A-F (Team-2)
+  // Q2: Sprint 7-12 (Team-1) / Sprint G-L (Team-2)
+  // Each sprint ~15 days, end-to-end covering ~180 days
+  const sprintsPerTeam = 12
+  const sprintSpanDays = 15
+
+  const team1Names = Array.from({ length: sprintsPerTeam }, (_, i) => `Sprint ${i + 1}`)
+  const team2Names = Array.from({ length: sprintsPerTeam }, (_, i) => `Sprint ${String.fromCharCode(65 + i)}`)
+
+  const getQuarter = (idx: number) => (idx < 6 ? 'Q1' : 'Q2')
+  const getDate = (idx: number, end: boolean) =>
+    ds2(-180 + idx * sprintSpanDays + (end ? sprintSpanDays - 1 : 0))
+
+  // Per-sprint [completedSP, notCompletedSP] patterns per member
+  // Team-1 (Platform Team): Juan(tm-1) + Carlos(tm-3) from sprint 1
+  //   Ana(tm-4) + Pedro(tm-5) from sprint 3
+  // Sprint 3 (index 2): all 4 members have [20,5] → teamTotal = 4×(20+5) = 100
+  const t1Juan: Array<[number, number]> = [
+    [40,5],[45,3],[20,5],[42,4],[41,5],[44,3],
+    [39,6],[43,4],[40,5],[42,3],[45,4],[41,5],
   ]
+  const t1Carlos: Array<[number, number]> = [
+    [30,8],[35,5],[20,5],[32,6],[31,7],[33,5],
+    [29,9],[34,6],[30,8],[32,5],[35,6],[31,7],
+  ]
+  const t1Ana: Array<[number, number] | null> = [
+    null,null,[20,5],[22,12],[19,14],[21,11],
+    [18,16],[23,10],[20,13],[22,11],[25,10],[20,12],
+  ]
+  const t1Pedro: Array<[number, number] | null> = [
+    null,null,[20,5],[12,18],[8,22],[11,19],
+    [9,21],[13,17],[10,20],[12,18],[15,16],[11,19],
+  ]
+
+  // Team-2 (Core Squad): Maria(tm-2) + Laura(tm-6) from sprint A
+  //   Diego(tm-7) + Sofia(tm-8) from sprint G (idx 6)
+  const t2Maria: Array<[number, number]> = [
+    [35,5],[32,8],[38,4],[30,6],[36,5],[33,7],
+    [31,6],[34,4],[37,5],[32,6],[35,4],[30,7],
+  ]
+  const t2Laura: Array<[number, number]> = [
+    [42,3],[38,5],[45,2],[40,4],[43,3],[41,4],
+    [44,3],[39,5],[42,3],[40,4],[43,2],[41,3],
+  ]
+  const t2Diego: Array<[number, number] | null> = [
+    null,null,null,null,null,null,
+    [15,10],[12,8],[14,9],[13,10],[16,7],[12,11],
+  ]
+  const t2Sofia: Array<[number, number] | null> = [
+    null,null,null,null,null,null,
+    [8,25],[5,20],[10,22],[7,23],[9,21],[6,24],
+  ]
+
+  let srId = 0
+  const nextSrId = () => `sr-${++srId}`
+
+  const sprintRecords: SprintRecord[] = []
+
+  for (let i = 0; i < sprintsPerTeam; i++) {
+    const t1Name = team1Names[i]
+    const t2Name = team2Names[i]
+    const quarter = getQuarter(i)
+    const date = getDate(i, true)
+
+    const pushSr = (memberId: string, name: string, pair: [number, number] | null) => {
+      if (!pair) return
+      sprintRecords.push({
+        id: nextSrId(), memberId, sprintName: name,
+        quarter, year: 2026,
+        storyPointsCompleted: pair[0],
+        storyPointsNotCompleted: pair[1],
+        createdAt: date,
+      })
+    }
+
+    pushSr('tm-1', t1Name, t1Juan[i])
+    pushSr('tm-3', t1Name, t1Carlos[i])
+    pushSr('tm-4', t1Name, t1Ana[i])
+    pushSr('tm-5', t1Name, t1Pedro[i])
+
+    pushSr('tm-2', t2Name, t2Maria[i])
+    pushSr('tm-6', t2Name, t2Laura[i])
+    pushSr('tm-7', t2Name, t2Diego[i])
+    pushSr('tm-8', t2Name, t2Sofia[i])
+  }
 
   const oneOnOnes: OneOnOne[] = [
     // Juan Pérez — 3 reuniones, ánimo alto
@@ -436,6 +487,67 @@ export async function seedDemoData() {
   await db.sprintRecords.bulkAdd(sprintRecords)
   await db.oneOnOnes.bulkAdd(oneOnOnes)
   await db.achievements.bulkAdd(achievements)
+
+  // ── Build TeamSprint entries aggregated from SprintRecords ──
+  let tsId = 0
+  const nextTsId = () => `ts-${++tsId}`
+
+  const teamSprints: TeamSprint[] = []
+
+  for (let i = 0; i < sprintsPerTeam; i++) {
+    const t1Name = team1Names[i]
+    const t2Name = team2Names[i]
+    const quarter = getQuarter(i)
+    const start = getDate(i, false)
+    const end = getDate(i, true)
+
+    // Aggregate Team-1 member contributions
+    const t1Cmb = [t1Juan[i], t1Carlos[i], t1Ana[i], t1Pedro[i]]
+      .filter((p): p is [number, number] => p !== null)
+    const t1Done = t1Cmb.reduce((s, p) => s + p[0], 0)
+    const t1NotDone = t1Cmb.reduce((s, p) => s + p[1], 0)
+    const t1Planned = t1Done + t1NotDone + Math.round((t1Done + t1NotDone) * 0.08)
+
+    teamSprints.push({
+      id: nextTsId(), teamId: 'team-1', sprintName: t1Name,
+      quarter, year: 2026,
+      startDate: start, endDate: end,
+      plannedSP: t1Planned,
+      completedSP: t1Done,
+      notCompletedSP: t1NotDone,
+      createdAt: start, updatedAt: end,
+    })
+
+    // Aggregate Team-2 member contributions
+    const t2Cmb = [t2Maria[i], t2Laura[i], t2Diego[i], t2Sofia[i]]
+      .filter((p): p is [number, number] => p !== null)
+    const t2Done = t2Cmb.reduce((s, p) => s + p[0], 0)
+    const t2NotDone = t2Cmb.reduce((s, p) => s + p[1], 0)
+
+    // Sprints A,B,G,H match perfectly; C,D,E,F,I,J,K,L have deviations
+    const isMismatch = (i >= 2 && i <= 5) || (i >= 8)
+    const t2AdjPlanned = isMismatch
+      ? t2Done + t2NotDone + Math.round((t2Done + t2NotDone) * 0.12)
+      : t2Done + t2NotDone + Math.round((t2Done + t2NotDone) * 0.08)
+    const t2AdjDone = isMismatch
+      ? Math.round(t2Done * 0.75)
+      : t2Done
+    const t2AdjNotDone = isMismatch
+      ? t2AdjPlanned - t2AdjDone
+      : t2NotDone
+
+    teamSprints.push({
+      id: nextTsId(), teamId: 'team-2', sprintName: t2Name,
+      quarter, year: 2026,
+      startDate: start, endDate: end,
+      plannedSP: t2AdjPlanned,
+      completedSP: t2AdjDone,
+      notCompletedSP: t2AdjNotDone,
+      createdAt: start, updatedAt: end,
+    })
+  }
+
+  await db.teamSprints.bulkAdd(teamSprints)
 
   localStorage.setItem(SEEDED_FLAG, 'true')
   seedingInProgress = false
