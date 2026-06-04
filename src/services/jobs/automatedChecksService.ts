@@ -2,9 +2,44 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { exportDatabase, saveBackupToStorage } from '@/services/export/exportService'
+import { getAzureConfig, uploadBackupToAzure } from '@/services/backup/azureBackupService'
 import type { DashboardAlert } from '@/stores/appStore'
 
 const STORAGE_KEY = 'tgp-last-automated-check'
+const SCHEDULER_CONFIG_KEY = 'tgp-scheduler-config'
+const SCHEDULER_RESULT_KEY = 'tgp-scheduler-last-result'
+
+export interface SchedulerConfig {
+  time: string   // HH:MM formato 24h, ej: "02:00"
+  enabled: boolean
+}
+
+export interface SchedulerState {
+  config: SchedulerConfig
+  lastRun: number
+  nextRun: number | null
+  isRunning: boolean
+  lastResult: { success: boolean; message: string; timestamp: string } | null
+}
+
+export function getDefaultSchedulerConfig(): SchedulerConfig {
+  return { time: '02:00', enabled: false }
+}
+
+export function getSchedulerConfig(): SchedulerConfig {
+  try {
+    const raw = localStorage.getItem(SCHEDULER_CONFIG_KEY)
+    if (!raw) return getDefaultSchedulerConfig()
+    return JSON.parse(raw) as SchedulerConfig
+  } catch {
+    return getDefaultSchedulerConfig()
+  }
+}
+
+export function saveSchedulerConfig(config: SchedulerConfig): void {
+  localStorage.setItem(SCHEDULER_CONFIG_KEY, JSON.stringify(config))
+  restartScheduler()
+}
 
 function getLastRun(): number {
   try {
@@ -18,6 +53,54 @@ function setLastRun() {
   try {
     localStorage.setItem(STORAGE_KEY, String(Date.now()))
   } catch { /* noop */ }
+}
+
+function setLastResult(success: boolean, message: string) {
+  try {
+    localStorage.setItem(SCHEDULER_RESULT_KEY, JSON.stringify({
+      success,
+      message,
+      timestamp: new Date().toISOString(),
+    }))
+  } catch { /* noop */ }
+}
+
+function getLastResult(): SchedulerState['lastResult'] {
+  try {
+    const raw = localStorage.getItem(SCHEDULER_RESULT_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Calcula el próximo timestamp (epoch ms) en que debería ejecutarse
+ * basado en la hora configurada y el último run.
+ */
+function calcNextRun(config: SchedulerConfig, lastRun: number): number | null {
+  if (!config.enabled) return null
+
+  const now = Date.now()
+  const [hours, minutes] = config.time.split(':').map(Number)
+
+  // Crear fecha para hoy a la hora configurada
+  const today = new Date()
+  today.setHours(hours, minutes, 0, 0)
+  let candidate = today.getTime()
+
+  // Si ya pasó la hora de hoy, candidate es mañana
+  if (candidate <= now) {
+    candidate += 24 * 60 * 60 * 1000
+  }
+
+  // Si el último run fue después del candidate, avanzar 24h
+  if (lastRun > 0 && lastRun >= candidate) {
+    candidate = lastRun + 24 * 60 * 60 * 1000
+  }
+
+  return candidate
 }
 
 function today(): Date {
@@ -185,25 +268,44 @@ async function checkOverdueDeliverables(): Promise<DashboardAlert[]> {
 // ─── Runner ──────────────────────────────────────────────────────────
 
 async function runBackup(): Promise<DashboardAlert[]> {
+  const alerts: DashboardAlert[] = []
   try {
     const backup = await exportDatabase()
     const saved = saveBackupToStorage(backup)
     if (saved) {
-      return [{
+      alerts.push({
         type: 'success',
         message: `Backup automático completado — ${Object.keys(backup.tables).length} tablas, ${Object.values(backup.tables).reduce((s, t) => s + t.length, 0)} registros`,
-      }]
+      })
+    } else {
+      alerts.push({
+        type: 'warning',
+        message: 'Backup automático no pudo guardarse (espacio insuficiente)',
+      })
     }
-    return [{
-      type: 'warning',
-      message: 'Backup automático no pudo guardarse (espacio insuficiente)',
-    }]
   } catch (err) {
-    return [{
+    alerts.push({
       type: 'warning',
       message: `Error en backup automático: ${err instanceof Error ? err.message : String(err)}`,
-    }]
+    })
   }
+
+  if (getAzureConfig()) {
+    try {
+      const { blobName } = await uploadBackupToAzure()
+      alerts.push({
+        type: 'success',
+        message: `Backup subido a Azure: ${blobName}`,
+      })
+    } catch (err) {
+      alerts.push({
+        type: 'warning',
+        message: `Backup a Azure falló: ${err instanceof Error ? err.message : String(err)}`,
+      })
+    }
+  }
+
+  return alerts
 }
 
 export async function runAutomatedChecks(): Promise<{
@@ -248,30 +350,114 @@ export async function runAutomatedChecks(): Promise<{
 
 // ─── Scheduler ────────────────────────────────────────────────────────
 
-const INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
+const POLL_MS = 60_000  // revisar cada minuto si debe ejecutar
+const MIN_INTERVAL_MS = 30 * 60 * 1000 // mínimo 30 min entre ejecuciones
+const INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours default
 
-let intervalId: ReturnType<typeof setInterval> | null = null
+let checkIntervalId: ReturnType<typeof setInterval> | null = null
+let _isRunning = false
+
+export function getSchedulerState(): SchedulerState {
+  const config = getSchedulerConfig()
+  const lastRun = getLastRun()
+  return {
+    config,
+    lastRun,
+    nextRun: calcNextRun(config, lastRun),
+    isRunning: _isRunning,
+    lastResult: getLastResult(),
+  }
+}
+
+export async function executeNow(): Promise<SchedulerState> {
+  if (_isRunning) return getSchedulerState()
+
+  _isRunning = true
+  try {
+    const result = await runAutomatedChecks()
+    const totalAlerts = result.alerts.length
+    const successMsg = `Ejecución completada: ${result.totalChecks} verificaciones, ${totalAlerts} alertas`
+    setLastResult(true, successMsg)
+    return getSchedulerState()
+  } catch (err) {
+    const errMsg = `Error: ${err instanceof Error ? err.message : 'desconocido'}`
+    setLastResult(false, errMsg)
+    return getSchedulerState()
+  } finally {
+    _isRunning = false
+  }
+}
+
+function shouldRunNow(config: SchedulerConfig, lastRun: number): boolean {
+  if (!config.enabled) return false
+
+  const now = Date.now()
+
+  // No ejecutar si ya pasó muy poco tiempo
+  if (lastRun > 0 && (now - lastRun) < MIN_INTERVAL_MS) return false
+
+  const [hours, minutes] = config.time.split(':').map(Number)
+  const currentDate = new Date()
+  const currentMinutes = currentDate.getHours() * 60 + currentDate.getMinutes()
+  const targetMinutes = hours * 60 + minutes
+
+  // Coincide la hora (con tolerancia de 2 min para no saltarse)
+  const diff = Math.abs(currentMinutes - targetMinutes)
+  if (diff > 2) return false
+
+  // Si ya se ejecutó hoy a esta hora, no repetir
+  if (lastRun > 0) {
+    const lastRunDate = new Date(lastRun)
+    const isToday = lastRunDate.toDateString() === currentDate.toDateString()
+    const sameHour = lastRunDate.getHours() === hours
+    if (isToday && sameHour) return false
+  }
+
+  return true
+}
+
+function checkAndRun() {
+  const config = getSchedulerConfig()
+  if (!config.enabled) return
+
+  const lastRun = getLastRun()
+
+  // Legacy: si no hay config de hora, usar el intervalo de 24h
+  if (lastRun > 0 && (Date.now() - lastRun) >= INTERVAL_MS) {
+    runAutomatedChecks().catch(console.error)
+    return
+  }
+
+  // Por hora configurada
+  if (shouldRunNow(config, lastRun)) {
+    runAutomatedChecks().catch(console.error)
+  }
+}
 
 export function startAutomatedChecks() {
-  // Don't start if already running
-  if (intervalId) return
+  if (checkIntervalId) return
 
-  // Check if 24h have passed since last run
+  // Ejecutar inmediatamente si han pasado 24h (legacy)
   const lastRun = getLastRun()
-  const elapsed = Date.now() - lastRun
-  if (elapsed >= INTERVAL_MS) {
+  if (lastRun === 0 || (Date.now() - lastRun) >= INTERVAL_MS) {
     runAutomatedChecks().catch(console.error)
   }
 
-  // Schedule recurring checks
-  intervalId = setInterval(() => {
-    runAutomatedChecks().catch(console.error)
-  }, INTERVAL_MS)
+  // Polling cada minuto para verificar hora programada
+  checkIntervalId = setInterval(checkAndRun, POLL_MS)
+}
+
+function restartScheduler() {
+  if (checkIntervalId) {
+    clearInterval(checkIntervalId)
+    checkIntervalId = null
+  }
+  startAutomatedChecks()
 }
 
 export function stopAutomatedChecks() {
-  if (intervalId) {
-    clearInterval(intervalId)
-    intervalId = null
+  if (checkIntervalId) {
+    clearInterval(checkIntervalId)
+    checkIntervalId = null
   }
 }

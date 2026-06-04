@@ -9,6 +9,8 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
 import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
+import { AzureBackupConfig } from '@/features/admin/components/AzureBackupConfig'
+import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConfig'
 
 export function AdminPage() {
   const navigate = useNavigate()
@@ -261,6 +263,14 @@ export function AdminPage() {
             </div>
           </button>
         </div>
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <JobSchedulerConfig />
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <AzureBackupConfig />
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">

@@ -11,6 +11,7 @@
 | **Ruteo** | React Router v7 (createBrowserRouter) |
 | **Estado** | Zustand 5 (UI + filtros + notificaciones) |
 | **Base de datos** | Dexie.js 4 (IndexedDB) — 20 tablas |
+| **Backup/Nube** | Azure Blob Storage (@azure/storage-blob) |
 | **Estilos** | Tailwind CSS 4 + Design System propio |
 | **Formularios** | React Hook Form + Zod |
 | **Gráficas** | Recharts + ApexCharts |
@@ -47,10 +48,12 @@ src/
 ├── lib/                      # Utilidades (cn, etc.)
 ├── services/                 # Capa de datos
 │   ├── auth/                 # TOTP + sesión + inactividad
+│   ├── backup/               # Azure Blob Storage backup/restore
 │   ├── db/                   # Dexie (20 tablas) + repositorios
 │   ├── demo/                 # Seed de tecnologías (180+) + datos demo
 │   ├── export/               # Exportación a JSON
 │   ├── import/               # Importación Excel con upsert
+│   ├── jobs/                 # Programador automático (checks diarios)
 │   ├── sync/                 # Sincronización endoflife.date API v1
 │   └── thi/                  # Motor de cálculo del THI
 ├── stores/                   # Zustand (app, filtros, usuario, confirmación)
@@ -136,6 +139,15 @@ src/
   - Descarga de plantilla por tipo
   - Resumen de resultados con detalle de errores
 - **Unidades de Negocio** (`/admin/business-units`) — CRUD de BUs
+- **Backup en la Nube** (`/admin`) — Backup de base de datos completa a Azure Blob Storage
+  - Configuración SAS URL + nombre de contenedor
+  - Prueba de conexión
+  - Subida manual de backup
+  - Listado y restauración de backups desde la nube
+- **Programador Automático** (`/admin`) — Ejecución programada de verificaciones del sistema
+  - Configuración de hora de ejecución diaria
+  - Ejecución manual inmediata ("Ejecutar Ahora")
+  - Verificaciones: vacaciones, obsolescencia EOL, compromisos vencidos, planes vencidos, bloqueos abiertos, actividades vencidas, entregables vencidos y backup automático
 - Exportación completa de BD a JSON
 
 ### Búsqueda Global
@@ -198,6 +210,35 @@ THI = Σ(dimensionScore × dimensionWeight) / Σ(weights)
 
 Rangos: **Excelente** (90-100) · **Saludable** (70-89) · **Regular** (50-69) · **En Riesgo** (30-49) · **Crítico** (0-29)
 
+## Backup en la Nube (Azure Blob Storage)
+
+El sistema puede realizar copias de seguridad completas de la base de datos IndexedDB en Azure Blob Storage:
+
+1. **Configuración**: Ingresa una SAS URL a nivel de cuenta y el nombre del contenedor desde la sección "Backup en la Nube" en Administración
+2. **Conexión**: Prueba la conexión antes de guardar la configuración
+3. **Subida**: Exporta toda la base de datos (20 tablas) a un archivo JSON subido a Azure
+4. **Listado**: Visualiza los backups disponibles en el contenedor con tamaño y fecha
+5. **Restauración**: Descarga un backup desde Azure y restaura todos los datos (sobrescribe datos actuales)
+
+> **Nota de Seguridad**: La SAS URL se almacena en localStorage. Se recomienda usar SAS tokens de nivel cuenta con permisos `rwdlacupiytfx` y expiración lejana para operaciones continuas.
+
+## Programador Automático
+
+El sistema incluye un programador de tareas automáticas que ejecuta verificaciones periódicas y genera alertas en el dashboard:
+
+1. **Configuración**: Desde la sección "Programador Automático" en Administración
+2. **Hora de ejecución**: Selecciona la hora del día para la ejecución automática (formato 24h)
+3. **Ejecución manual**: Botón "Ejecutar Ahora" para forzar la ejecución inmediata
+4. **Verificaciones ejecutadas** (8 en total):
+   - Vacaciones del personal — alerta si alguien está de vacaciones
+   - Obsolescencia tecnológica — sincroniza EOL y alerta tecnologías obsoletas en uso
+   - Compromisos vencidos — alerta compromisos más allá de su fecha
+   - Planes vencidos — alerta planes con fecha fin vencida
+   - Bloqueos abiertos — alerta bloqueos sin resolver o escalados
+   - Actividades vencidas — alerta actividades fuera de plazo
+   - Entregables vencidos — alerta entregables no completados
+   - Backup automático — guarda copia local y, si está configurado, sube a Azure
+
 ## Rutas
 
 | Ruta | Página |
@@ -241,6 +282,24 @@ npm run preview
 # Linter
 npm run lint
 ```
+
+### Content Security Policy (CSP)
+
+El sitio configura CSP via `<meta>` tag en `index.html`. Las directrices actuales son:
+
+| Directiva | Orígenes permitidos |
+|-----------|-------------------|
+| `default-src` | `'self'` |
+| `script-src` | `'self'` `'unsafe-inline'` `'unsafe-eval'` |
+| `style-src` | `'self'` `'unsafe-inline'` `https://fonts.googleapis.com` |
+| `font-src` | `'self'` `https://fonts.gstatic.com` |
+| `img-src` | `'self'` `data:` `blob:` |
+| `connect-src` | `'self'` `blob:` `https://endoflife.date` `https://*.blob.core.windows.net` |
+| `frame-src` | `'none'` |
+| `object-src` | `'none'` |
+| `base-uri` | `'self'` |
+
+Si se añaden nuevos servicios externos (APIs, blob storage, etc.), actualizar las directivas correspondientes en `index.html`.
 
 La aplicación funciona completamente **cliente-side** con IndexedDB (Dexie.js). No requiere backend — los datos de demostración se siembran automáticamente al abrir la app (tecnologías) y se puede cargar data demo completa desde la interfaz.
 

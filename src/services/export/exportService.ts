@@ -67,7 +67,7 @@ function isIsoDateString(value: unknown): boolean {
  * (and actual Date objects) with a `{__date: …}` marker so the
  * import side can revive them back to Date instances.
  */
-function dateReviver(_key: string, value: unknown): unknown {
+export function dateReviver(_key: string, value: unknown): unknown {
   if (value instanceof Date) return { __date: value.toISOString() }
   if (DATE_KEYS.has(_key) && isIsoDateString(value)) {
     return { __date: value as string }
