@@ -41,7 +41,7 @@ export function MicroservicesSection({ memberId }: Props) {
     setShowDropdown(false)
 
     const profile = await db.memberProfiles.get(memberId)
-    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], technologies: [], avgStoryPoints: 0, vacationDaysPerYear: 20, vacationUsed: 0, createdAt: new Date() }
+    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], technologies: [], avgStoryPoints: 0, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: new Date() }
     await db.memberProfiles.put({ ...base, microservices: updated, updatedAt: new Date() } as any)
   }
 

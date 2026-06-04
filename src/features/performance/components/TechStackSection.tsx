@@ -49,7 +49,7 @@ export function TechStackSection({ memberId }: Props) {
     setTechSearch('')
     setShowDropdown(false)
     const profile = await db.memberProfiles.get(memberId)
-    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], microservices: [], avgStoryPoints: 0, vacationDaysPerYear: 20, vacationUsed: 0, createdAt: new Date() }
+    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], microservices: [], avgStoryPoints: 0, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: new Date() }
     await db.memberProfiles.put({ ...base, technologies: updated, updatedAt: new Date() })
   }
 

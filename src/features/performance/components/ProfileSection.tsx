@@ -21,7 +21,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
     address: profile?.address ?? '',
     role: profile?.role ?? 'developer',
     status: (profile as any)?.status ?? 'activo',
-    vacationDaysPerYear: profile?.vacationDaysPerYear ?? 20,
+    vacationDaysPerYear: profile?.vacationDaysPerYear ?? 14,
     vacationUsed: profile?.vacationUsed ?? 0,
   })
   const [saving, setSaving] = useState(false)

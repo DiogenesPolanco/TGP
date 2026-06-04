@@ -71,7 +71,7 @@ export function SkillsSection({ memberId }: Props) {
       technologies: (existing as any).technologies ?? [],
       microservices: (existing as any).microservices ?? [] as string[],
       avgStoryPoints: (existing as any).avgStoryPoints ?? 0,
-      vacationDaysPerYear: (existing as any).vacationDaysPerYear ?? 20,
+      vacationDaysPerYear: (existing as any).vacationDaysPerYear ?? 14,
       vacationUsed: (existing as any).vacationUsed ?? 0,
       createdAt: (existing as any).createdAt ?? new Date(),
       updatedAt: new Date(),
