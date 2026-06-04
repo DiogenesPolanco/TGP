@@ -41,6 +41,18 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       role: form.role as MemberProfile['role'],
     }
     await db.memberProfiles.put(data)
+
+    const allTeams = await db.teams.toArray()
+    for (const t of allTeams) {
+      const member = t.members.find((m) => m.id === memberId)
+      if (member && member.role !== data.role) {
+        const updatedMembers = t.members.map((m) =>
+          m.id === memberId ? { ...m, role: data.role as any } : m
+        )
+        await db.teams.update(t.id, { members: updatedMembers })
+      }
+    }
+
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)

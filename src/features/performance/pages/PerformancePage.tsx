@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { getTeamPerformanceIndicators } from '@/services/performance/performanceService'
 import type { Team } from '@/types/domain'
+import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import {
   TrendingUp,
   TrendingDown,
@@ -186,7 +187,7 @@ export function PerformancePage() {
                 </div>
                 <div>
                   <p className="font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                  <p className="text-xs text-neutral-50">{member.role}</p>
+                  <p className="text-xs text-neutral-50">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role}</p>
                 </div>
               </div>
               <ChevronRight size={18} className="text-neutral-30" />

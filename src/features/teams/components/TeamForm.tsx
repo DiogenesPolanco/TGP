@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
 
 interface TeamFormProps {
@@ -44,6 +45,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
 
     if (team) {
       await db.teams.update(team.id, data)
+      for (const m of formData.members) {
+        const profile = await db.memberProfiles.get(m.id)
+        if (profile && profile.role !== m.role) {
+          await db.memberProfiles.put({ ...profile, role: m.role as any, updatedAt: new Date() })
+        }
+      }
     } else {
       await db.teams.add({ ...data, id: crypto.randomUUID() })
     }
@@ -55,7 +62,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
       id: crypto.randomUUID(),
       userPrincipal: '',
       displayName: '',
-      role: 'Developer',
+      role: 'developer',
       allocationPct: 100,
       isActive: true,
     }
@@ -149,13 +156,13 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                     onChange={(e) => updateMember(index, 'displayName', e.target.value)}
                     className="flex-1 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                   />
-                  <input
-                    type="text"
-                    placeholder="Rol"
+                  <select
                     value={member.role}
                     onChange={(e) => updateMember(index, 'role', e.target.value)}
-                    className="w-24 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
-                  />
+                    className="w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
+                  >
+                    {MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}
+                  </select>
                   <input
                     type="number"
                     placeholder="%"

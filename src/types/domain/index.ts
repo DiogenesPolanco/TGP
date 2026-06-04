@@ -241,7 +241,7 @@ export interface TeamMember {
   id: string
   userPrincipal: string
   displayName: string
-  role: string
+  role: MemberRole
   allocationPct: number
   isActive: boolean
 }

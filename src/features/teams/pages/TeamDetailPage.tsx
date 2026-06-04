@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
+import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2 } from 'lucide-react'
 
 export function TeamDetailPage() {
@@ -108,7 +109,7 @@ export function TeamDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                  <p className="text-xs text-neutral-60 dark:text-neutral-40">{member.role}</p>
+                  <p className="text-xs text-neutral-60 dark:text-neutral-40">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

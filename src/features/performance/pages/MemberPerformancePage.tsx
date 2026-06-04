@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
+import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
@@ -81,7 +82,7 @@ export function MemberPerformancePage() {
             <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
               {member.displayName}
             </h1>
-            <p className="text-sm text-neutral-50">{member.role} · {team?.name}</p>
+            <p className="text-sm text-neutral-50">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role} · {team?.name}</p>
           </div>
         </div>
 

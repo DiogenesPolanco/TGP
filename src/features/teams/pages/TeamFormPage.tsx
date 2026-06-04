@@ -5,11 +5,13 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import type { MemberRole } from '@/types/domain'
 type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
 
 interface MemberInput {
   name: string
-  role: string
+  role: MemberRole
   allocation: number
 }
 
@@ -37,7 +39,7 @@ export function TeamFormPage() {
     businessUnitId: '',
     doraMetrics: { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 } as Record<string, number>,
   })
-  const [members, setMembers] = useState<MemberInput[]>([{ name: '', role: '', allocation: 100 }])
+  const [members, setMembers] = useState<MemberInput[]>([{ name: '', role: 'developer', allocation: 100 }])
 
   useEffect(() => {
     if (team) {
@@ -49,7 +51,7 @@ export function TeamFormPage() {
         businessUnitId: team.businessUnitId ?? '',
         doraMetrics: (meta.doraMetrics as Record<string, number>) ?? { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 },
       })
-      setMembers(team.members?.map((m) => ({ name: m.displayName || m.id, role: m.role, allocation: m.allocationPct ?? 100 })) ?? [{ name: '', role: '', allocation: 100 }])
+      setMembers(team.members?.map((m) => ({ name: m.displayName || m.id, role: m.role as MemberRole, allocation: m.allocationPct ?? 100 })) ?? [{ name: '', role: 'developer' as MemberRole, allocation: 100 }])
     }
   }, [team])
 
@@ -57,7 +59,7 @@ export function TeamFormPage() {
 
   const updateMetric = (key: string, value: number) => setFormData({ ...formData, doraMetrics: { ...formData.doraMetrics, [key]: value } })
 
-  const addMember = () => setMembers([...members, { name: '', role: '', allocation: 100 }])
+  const addMember = () => setMembers([...members, { name: '', role: 'developer' as MemberRole, allocation: 100 }])
 
   const updateMember = (index: number, field: keyof MemberInput, value: string | number) => {
     const updated = [...members]; updated[index] = { ...updated[index], [field]: value }; setMembers(updated)
@@ -95,8 +97,19 @@ export function TeamFormPage() {
       createdAt: team?.createdAt ?? new Date(),
       updatedAt: new Date(),
     }
-    if (team) { await db.teams.update(team.id, data); addNotification({ type: 'success', message: 'Equipo actualizado' }) }
-    else { await db.teams.add({ ...data, id: crypto.randomUUID() }); addNotification({ type: 'success', message: 'Equipo creado' }) }
+    if (team) {
+      await db.teams.update(team.id, data);
+      for (const m of teamMembers) {
+        const profile = await db.memberProfiles.get(m.id)
+        if (profile && profile.role !== m.role) {
+          await db.memberProfiles.put({ ...profile, role: m.role as any, updatedAt: new Date() })
+        }
+      }
+      addNotification({ type: 'success', message: 'Equipo actualizado' })
+    } else {
+      await db.teams.add({ ...data, id: crypto.randomUUID() });
+      addNotification({ type: 'success', message: 'Equipo creado' })
+    }
     navigate('/teams')
   }
 
@@ -141,7 +154,9 @@ export function TeamFormPage() {
               <div key={index} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
                 <Users size={14} className="text-neutral-50" />
                 <input type="text" placeholder="Nombre" value={member.name} onChange={(e) => updateMember(index, 'name', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
-                <input type="text" placeholder="Rol" value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value)} className="w-24 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
+                <select value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value as MemberRole)} className="w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm">
+                  {MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}
+                </select>
                 <input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
                 <button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></button>
               </div>
