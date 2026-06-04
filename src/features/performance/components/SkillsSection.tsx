@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Skill } from '@/types/domain'
-import { Plus, X, Search } from 'lucide-react'
+import { Plus, X, Search, Edit3 } from 'lucide-react'
 
 interface Props {
   memberId: string
@@ -28,6 +28,8 @@ export function SkillsSection({ memberId }: Props) {
   const [newCategory, setNewCategory] = useState('')
   const [newLevel, setNewLevel] = useState<Skill['level']>('intermediate')
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editData, setEditData] = useState<{ name: string; category: string; level: Skill['level'] }>({ name: '', category: '', level: 'intermediate' })
 
   useEffect(() => {
     db.memberProfiles.get(memberId).then((p) => {
@@ -101,6 +103,23 @@ export function SkillsSection({ memberId }: Props) {
     await saveSkills(updated)
   }
 
+  const startEdit = (s: Skill) => {
+    setEditingId(s.id)
+    setEditData({ name: s.name, category: s.category, level: s.level })
+  }
+
+  const saveEdit = async () => {
+    if (!editingId || !editData.name.trim()) return
+    const updated = skills.map((s) =>
+      s.id === editingId
+        ? { ...s, name: editData.name.trim(), category: editData.category, level: editData.level }
+        : s
+    )
+    setSkills(updated)
+    await saveSkills(updated)
+    setEditingId(null)
+  }
+
   const grouped = skills.reduce<Record<string, Skill[]>>((acc, s) => {
     const cat = s.category || 'General'
     if (!acc[cat]) acc[cat] = []
@@ -109,7 +128,7 @@ export function SkillsSection({ memberId }: Props) {
   }, {})
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Habilidades</h2>
 
       <div className="relative flex flex-wrap gap-2 mb-6 p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
@@ -174,18 +193,53 @@ export function SkillsSection({ memberId }: Props) {
           <div key={category} className="mb-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{category}</h3>
             <div className="flex flex-wrap gap-2">
-              {catskills.map((s) => (
-                <span
-                  key={s.id}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${levelColors[s.level]}`}
-                >
-                  {s.name}
-                  <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
-                  <button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
+              {catskills.map((s) =>
+                editingId === s.id ? (
+                  <div key={s.id} className="flex items-center gap-2 p-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60 w-full max-w-md">
+                    <input
+                      type="text"
+                      value={editData.name}
+                      onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                      className="flex-1 rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
+                      autoFocus
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
+                    />
+                    <input
+                      type="text"
+                      value={editData.category}
+                      onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                      className="w-[100px] rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
+                      placeholder="Categoría"
+                    />
+                    <select
+                      value={editData.level}
+                      onChange={(e) => setEditData({ ...editData, level: e.target.value as Skill['level'] })}
+                      className="rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
+                    >
+                      <option value="beginner">Principiante</option>
+                      <option value="intermediate">Intermedio</option>
+                      <option value="advanced">Avanzado</option>
+                      <option value="expert">Experto</option>
+                    </select>
+                    <button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</button>
+                    <button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90">X</button>
+                  </div>
+                ) : (
+                  <span
+                    key={s.id}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${levelColors[s.level]} group/skill`}
+                  >
+                    {s.name}
+                    <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
+                    <button onClick={() => startEdit(s)} className="opacity-0 group-hover/skill:opacity-100 hover:opacity-70 transition-opacity ml-0.5">
+                      <Edit3 size={10} />
+                    </button>
+                    <button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )
+              )}
             </div>
           </div>
         ))

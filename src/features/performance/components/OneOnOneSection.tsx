@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { OneOnOne, Oportunidad } from '@/types/domain'
-import { Plus, MessageSquare, Trash2, Target } from 'lucide-react'
+import { Plus, MessageSquare, Trash2, Target, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
@@ -72,6 +72,38 @@ export function OneOnOneSection({ memberId }: Props) {
     setMeetings(meetings.filter((m) => m.id !== id))
   }
 
+  const updateMeeting = async (id: string, data: Partial<OneOnOne>) => {
+    const meeting = meetings.find((m) => m.id === id)
+    if (!meeting) return
+    const updated = { ...meeting, ...data, updatedAt: new Date() }
+    await db.oneOnOnes.put(updated)
+    setMeetings(meetings.map((m) => (m.id === id ? updated : m)))
+  }
+
+  const removeOportunidad = async (meetingId: string, opId: string) => {
+    const meeting = meetings.find((m) => m.id === meetingId)
+    if (!meeting) return
+    const updated = {
+      ...meeting,
+      oportunidades: meeting.oportunidades.filter((o) => o.id !== opId),
+      updatedAt: new Date(),
+    }
+    await db.oneOnOnes.put(updated)
+    setMeetings(meetings.map((m) => (m.id === meetingId ? updated : m)))
+  }
+
+  const updateOportunidad = async (meetingId: string, opId: string, data: Partial<Oportunidad>) => {
+    const meeting = meetings.find((m) => m.id === meetingId)
+    if (!meeting) return
+    const updated = {
+      ...meeting,
+      oportunidades: meeting.oportunidades.map((o) => (o.id === opId ? { ...o, ...data } : o)),
+      updatedAt: new Date(),
+    }
+    await db.oneOnOnes.put(updated)
+    setMeetings(meetings.map((m) => (m.id === meetingId ? updated : m)))
+  }
+
   // For the opportunities/actions inline editing
   const addOportunidad = async (meetingId: string, descripcion: string, tipo: Oportunidad['tipo']) => {
     const meeting = meetings.find((m) => m.id === meetingId)
@@ -116,7 +148,7 @@ export function OneOnOneSection({ memberId }: Props) {
 
       {/* New Meeting Form */}
       {showForm && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
           <div className="grid gap-4 sm:grid-cols-3 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
@@ -194,8 +226,11 @@ export function OneOnOneSection({ memberId }: Props) {
             key={meeting.id}
             meeting={meeting}
             onDelete={removeMeeting}
+            onEdit={updateMeeting}
             onAddOportunidad={addOportunidad}
             onUpdateOportunidadStatus={updateOportunidadStatus}
+            onDeleteOportunidad={removeOportunidad}
+            onUpdateOportunidad={updateOportunidad}
           />
         ))
       )}
@@ -206,17 +241,108 @@ export function OneOnOneSection({ memberId }: Props) {
 function MeetingCard({
   meeting,
   onDelete,
+  onEdit,
   onAddOportunidad,
   onUpdateOportunidadStatus,
+  onDeleteOportunidad,
+  onUpdateOportunidad,
 }: {
   meeting: OneOnOne
   onDelete: (id: string) => void
+  onEdit: (id: string, data: Partial<OneOnOne>) => void
   onAddOportunidad: (meetingId: string, descripcion: string, tipo: Oportunidad['tipo']) => void
   onUpdateOportunidadStatus: (meetingId: string, opId: string, status: Oportunidad['status']) => void
+  onDeleteOportunidad: (meetingId: string, opId: string) => void
+  onUpdateOportunidad: (meetingId: string, opId: string, data: Partial<Oportunidad>) => void
 }) {
   const [expanded, setExpanded] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editData, setEditData] = useState({
+    date: meeting.date.toISOString().split('T')[0],
+    tipo: meeting.tipo,
+    estadoAnimo: meeting.estadoAnimo,
+    feedbackDelLider: meeting.feedbackDelLider,
+    feedbackDelMiembro: meeting.feedbackDelMiembro,
+  })
   const [newOpDesc, setNewOpDesc] = useState('')
   const [newOpTipo, setNewOpTipo] = useState<Oportunidad['tipo']>('mejora')
+  const [editingOpId, setEditingOpId] = useState<string | null>(null)
+  const [editOpData, setEditOpData] = useState({ descripcion: '', tipo: 'mejora' as Oportunidad['tipo'] })
+
+  const startEdit = () => {
+    setEditData({
+    date: new Date(meeting.date).toISOString().split('T')[0],
+      tipo: meeting.tipo,
+      estadoAnimo: meeting.estadoAnimo,
+      feedbackDelLider: meeting.feedbackDelLider,
+      feedbackDelMiembro: meeting.feedbackDelMiembro,
+    })
+    setEditing(true)
+  }
+
+  const saveEdit = () => {
+    onEdit(meeting.id, {
+      date: new Date(editData.date),
+      tipo: editData.tipo,
+      estadoAnimo: editData.estadoAnimo,
+      feedbackDelLider: editData.feedbackDelLider,
+      feedbackDelMiembro: editData.feedbackDelMiembro,
+    })
+    setEditing(false)
+  }
+
+  const startEditOp = (op: Oportunidad) => {
+    setEditingOpId(op.id)
+    setEditOpData({ descripcion: op.descripcion, tipo: op.tipo })
+  }
+
+  const saveEditOp = () => {
+    if (!editingOpId || !editOpData.descripcion.trim()) return
+    onUpdateOportunidad(meeting.id, editingOpId, { descripcion: editOpData.descripcion.trim(), tipo: editOpData.tipo })
+    setEditingOpId(null)
+  }
+
+  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white'
+
+  if (editing) {
+    return (
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+        <h4 className="text-sm font-semibold text-neutral-90 dark:text-white mb-3">Editar Meeting</h4>
+        <div className="grid gap-3 sm:grid-cols-3 mb-3">
+          <div>
+            <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
+            <input type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} className={inputClass} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
+            <select value={editData.tipo} onChange={(e) => setEditData({ ...editData, tipo: e.target.value as OneOnOne['tipo'] })} className={inputClass}>
+              <option value="semanal">Semanal</option>
+              <option value="quincenal">Quincenal</option>
+              <option value="mensual">Mensual</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-neutral-60 mb-1 block">Ánimo (1-10)</label>
+            <input type="number" min={1} max={10} value={editData.estadoAnimo} onChange={(e) => setEditData({ ...editData, estadoAnimo: Number(e.target.value) })} className={inputClass} />
+          </div>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 mb-3">
+          <div>
+            <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Líder</label>
+            <textarea value={editData.feedbackDelLider} onChange={(e) => setEditData({ ...editData, feedbackDelLider: e.target.value })} className={`${inputClass} min-h-[60px]`} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Miembro</label>
+            <textarea value={editData.feedbackDelMiembro} onChange={(e) => setEditData({ ...editData, feedbackDelMiembro: e.target.value })} className={`${inputClass} min-h-[60px]`} />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
+          <button onClick={() => setEditing(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
@@ -230,7 +356,7 @@ function MeetingCard({
           }`} />
           <div>
             <p className="text-sm font-medium text-neutral-90 dark:text-white">
-              {meeting.date.toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(meeting.date).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
             <p className="text-xs text-neutral-50">
               {tipoLabels[meeting.tipo]} · Ánimo: {meeting.estadoAnimo}/10
@@ -243,13 +369,20 @@ function MeetingCard({
               {meeting.oportunidades.length} ops
             </span>
           )}
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(meeting.id) }}
-              className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-              title="Eliminar meeting"
-            >
-              <Trash2 size={14} />
-            </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); startEdit() }}
+            className="p-1.5 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+            title="Editar meeting"
+          >
+            <Edit3 size={14} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(meeting.id) }}
+            className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            title="Eliminar meeting"
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
       </button>
 
@@ -277,24 +410,58 @@ function MeetingCard({
               <p className="text-xs text-neutral-40 mb-2">Sin oportunidades registradas</p>
             ) : (
               <div className="space-y-1.5 mb-2">
-                {meeting.oportunidades.map((op) => (
-                  <div key={op.id} className="flex items-center justify-between p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-                    <div>
-                      <p className="text-sm text-neutral-90 dark:text-white">{op.descripcion}</p>
-                      <p className="text-xs text-neutral-50 capitalize">{op.tipo}</p>
+                {meeting.oportunidades.map((op) =>
+                  editingOpId === op.id ? (
+                    <div key={op.id} className="flex items-center gap-2 p-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
+                      <input
+                        type="text"
+                        value={editOpData.descripcion}
+                        onChange={(e) => setEditOpData({ ...editOpData, descripcion: e.target.value })}
+                        className="flex-1 rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
+                        autoFocus
+                        onKeyDown={(e) => { if (e.key === 'Enter') saveEditOp(); if (e.key === 'Escape') setEditingOpId(null) }}
+                      />
+                      <select
+                        value={editOpData.tipo}
+                        onChange={(e) => setEditOpData({ ...editOpData, tipo: e.target.value as Oportunidad['tipo'] })}
+                        className="rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
+                      >
+                        <option value="mejora">Mejora</option>
+                        <option value="crecimiento">Crecimiento</option>
+                        <option value="capacitacion">Capacitación</option>
+                        <option value="ascenso">Ascenso</option>
+                        <option value="mentoria">Mentoría</option>
+                      </select>
+                      <button onClick={saveEditOp} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg">OK</button>
+                      <button onClick={() => setEditingOpId(null)} className="px-2 py-1 text-xs text-neutral-60">X</button>
                     </div>
-                    <select
-                      value={op.status}
-                      onChange={(e) => onUpdateOportunidadStatus(meeting.id, op.id, e.target.value as Oportunidad['status'])}
-                      className={`text-xs px-2 py-0.5 rounded-full border-0 ${opStatusColors[op.status]}`}
-                    >
-                      <option value="pendiente">Pendiente</option>
-                      <option value="en_progreso">En Progreso</option>
-                      <option value="completada">Completada</option>
-                      <option value="cancelada">Cancelada</option>
-                    </select>
-                  </div>
-                ))}
+                  ) : (
+                    <div key={op.id} className="flex items-center justify-between p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/op">
+                      <div className="flex-1">
+                        <p className="text-sm text-neutral-90 dark:text-white">{op.descripcion}</p>
+                        <p className="text-xs text-neutral-50 capitalize">{op.tipo}</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={op.status}
+                          onChange={(e) => onUpdateOportunidadStatus(meeting.id, op.id, e.target.value as Oportunidad['status'])}
+                          className={`text-xs px-2 py-0.5 rounded-full border-0 ${opStatusColors[op.status]}`}
+                        >
+                          <option value="pendiente">Pendiente</option>
+                          <option value="en_progreso">En Progreso</option>
+                          <option value="completada">Completada</option>
+                          <option value="cancelada">Cancelada</option>
+                        </select>
+                        <button onClick={() => startEditOp(op)} className="p-1 opacity-0 group-hover/op:opacity-100 text-neutral-50 hover:text-primary rounded" title="Editar oportunidad">
+                          <Edit3 size={11} />
+                        </button>
+                        <button onClick={() => onDeleteOportunidad(meeting.id, op.id)} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="Eliminar oportunidad">
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                )}
               </div>
             )}
             <div className="flex gap-2">

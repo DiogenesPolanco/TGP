@@ -51,11 +51,11 @@ export function PerformancePage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-full">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
-          onClick={() => navigate('/teams/performance')}
+          onClick={() => navigate('/teams/members')}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <ArrowLeft size={20} className="text-neutral-60" />

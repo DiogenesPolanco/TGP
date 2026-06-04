@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Achievement } from '@/types/domain'
-import { Plus, Award, Trophy, Star, BookOpen, TrendingUp, Trash2 } from 'lucide-react'
+import { Plus, Award, Trophy, Star, BookOpen, TrendingUp, Trash2, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
@@ -20,6 +20,14 @@ export function AchievementsSection({ memberId }: Props) {
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [showForm, setShowForm] = useState(false)
   const [newAchievement, setNewAchievement] = useState({
+    title: '',
+    description: '',
+    date: new Date().toISOString().split('T')[0],
+    type: 'logro' as Achievement['type'],
+    linkedToPromotion: false,
+  })
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editData, setEditData] = useState({
     title: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
@@ -57,6 +65,30 @@ export function AchievementsSection({ memberId }: Props) {
     if (!ok) return
     await db.achievements.delete(id)
     setAchievements(achievements.filter((a) => a.id !== id))
+  }
+
+  const startEdit = (a: Achievement) => {
+    setEditingId(a.id)
+    setEditData({
+      title: a.title,
+      description: a.description,
+      date: new Date(a.date).toISOString().split('T')[0],
+      type: a.type,
+      linkedToPromotion: a.linkedToPromotion,
+    })
+  }
+
+  const saveEdit = async () => {
+    if (!editingId || !editData.title.trim()) return
+    const updated = achievements.map((a) =>
+      a.id === editingId
+        ? { ...a, ...editData, title: editData.title.trim(), date: new Date(editData.date) }
+        : a
+    )
+    const record = updated.find((a) => a.id === editingId)!
+    await db.achievements.put(record)
+    setAchievements(updated)
+    setEditingId(null)
   }
 
   const sorted = [...achievements].sort((a, b) => b.date.getTime() - a.date.getTime())
@@ -99,7 +131,7 @@ export function AchievementsSection({ memberId }: Props) {
 
       {/* New Achievement Form */}
       {showForm && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
           <div className="grid gap-4 sm:grid-cols-2 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Título</label>
@@ -175,10 +207,71 @@ export function AchievementsSection({ memberId }: Props) {
         <div className="space-y-3">
           {sorted.map((a) => {
             const cfg = typeConfig[a.type]
-            return (
+            return editingId === a.id ? (
+              <div key={a.id} className="p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+                <div className="grid gap-3 sm:grid-cols-2 mb-3">
+                  <div>
+                    <label className="text-xs font-medium text-neutral-60 mb-1 block">Título</label>
+                    <input
+                      type="text"
+                      value={editData.title}
+                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
+                      autoFocus
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
+                    <select
+                      value={editData.type}
+                      onChange={(e) => setEditData({ ...editData, type: e.target.value as Achievement['type'] })}
+                      className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
+                    >
+                      <option value="logro">Logro</option>
+                      <option value="reconocimiento">Reconocimiento</option>
+                      <option value="certificacion">Certificación</option>
+                      <option value="ascenso">Ascenso</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-neutral-60 mb-1 block">Descripción</label>
+                  <textarea
+                    value={editData.description}
+                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm min-h-[50px]"
+                  />
+                </div>
+                <div className="flex items-center gap-4 mb-3">
+                  <div>
+                    <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
+                    <input
+                      type="date"
+                      value={editData.date}
+                      onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                      className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <label className="flex items-center gap-2 mt-4">
+                    <input
+                      type="checkbox"
+                      checked={editData.linkedToPromotion}
+                      onChange={(e) => setEditData({ ...editData, linkedToPromotion: e.target.checked })}
+                      className="rounded border-neutral-30"
+                    />
+                    <span className="text-sm text-neutral-70 dark:text-neutral-30">Ascenso</span>
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
+                  <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</button>
+                </div>
+              </div>
+            ) : (
               <div
                 key={a.id}
-                className="flex items-start justify-between p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70"
+                className="flex items-start justify-between p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 group/ach"
               >
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-lg ${cfg.color}`}>
@@ -198,17 +291,26 @@ export function AchievementsSection({ memberId }: Props) {
                       <p className="text-sm text-neutral-50 mt-0.5">{a.description}</p>
                     )}
                     <p className="text-xs text-neutral-40 mt-1">
-                      {a.date.toLocaleDateString('es-PE')}
+                      {new Date(a.date).toLocaleDateString('es-PE')}
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => removeAchievement(a.id)}
-                  className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors ml-3 shrink-0"
-                  title="Eliminar logro"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div className="flex items-center gap-1 ml-3 shrink-0">
+                  <button
+                    onClick={() => startEdit(a)}
+                    className="p-1.5 opacity-0 group-hover/ach:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                    title="Editar logro"
+                  >
+                    <Edit3 size={14} />
+                  </button>
+                  <button
+                    onClick={() => removeAchievement(a.id)}
+                    className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Eliminar logro"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             )
           })}

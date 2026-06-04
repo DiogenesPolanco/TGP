@@ -13,7 +13,7 @@ export function TeamPerformanceSelectorPage() {
   }, [])
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="max-w-full">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento de Equipos</h1>
         <p className="text-neutral-60 dark:text-neutral-40 mt-1">

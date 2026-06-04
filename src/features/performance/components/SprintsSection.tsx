@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { SprintRecord } from '@/types/domain'
-import { Plus, Trash2, Search } from 'lucide-react'
+import { Plus, Trash2, Search, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
@@ -20,6 +20,14 @@ export function SprintsSection({ memberId }: Props) {
     storyPointsNotCompleted: 0,
   })
   const [showSprintSuggestions, setShowSprintSuggestions] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editData, setEditData] = useState({
+    sprintName: '',
+    quarter: 'Q1',
+    year: new Date().getFullYear(),
+    storyPointsCompleted: 0,
+    storyPointsNotCompleted: 0,
+  })
 
   useEffect(() => {
     db.sprintRecords.where('memberId').equals(memberId).toArray().then(setSprints)
@@ -58,6 +66,30 @@ export function SprintsSection({ memberId }: Props) {
     setNewSprint({ sprintName: '', quarter: 'Q1', year: new Date().getFullYear(), storyPointsCompleted: 0, storyPointsNotCompleted: 0 })
   }
 
+  const startEdit = (sp: SprintRecord) => {
+    setEditingId(sp.id)
+    setEditData({
+      sprintName: sp.sprintName,
+      quarter: sp.quarter,
+      year: sp.year,
+      storyPointsCompleted: sp.storyPointsCompleted,
+      storyPointsNotCompleted: sp.storyPointsNotCompleted,
+    })
+  }
+
+  const saveEdit = async () => {
+    if (!editingId || !editData.sprintName.trim()) return
+    const updated = sprints.map((sp) =>
+      sp.id === editingId
+        ? { ...sp, ...editData, sprintName: editData.sprintName.trim() }
+        : sp
+    )
+    const record = updated.find((sp) => sp.id === editingId)!
+    await db.sprintRecords.put(record)
+    setSprints(updated)
+    setEditingId(null)
+  }
+
   const removeSprint = async (id: string) => {
     const ok = await confirm('¿Estás seguro de eliminar este sprint?')
     if (!ok) return
@@ -79,7 +111,7 @@ export function SprintsSection({ memberId }: Props) {
   const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints</h2>
         <button
@@ -201,29 +233,89 @@ export function SprintsSection({ memberId }: Props) {
           <div key={quarter} className="mb-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{quarter}</h3>
             <div className="space-y-2">
-              {records.map((sp) => (
-                <div
-                  key={sp.id}
-                  className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
-                    <p className="text-xs text-neutral-50">
-                      {sp.storyPointsCompleted} SP done · {sp.storyPointsNotCompleted} SP no completados
-                    </p>
+              {records.map((sp) =>
+                editingId === sp.id ? (
+                  <div key={sp.id} className="p-3 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
+                    <div className="grid gap-2 sm:grid-cols-5 mb-2">
+                      <div className="sm:col-span-2">
+                        <input
+                          type="text"
+                          value={editData.sprintName}
+                          onChange={(e) => setEditData({ ...editData, sprintName: e.target.value })}
+                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          autoFocus
+                          onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
+                        />
+                      </div>
+                      <div>
+                        <select
+                          value={editData.quarter}
+                          onChange={(e) => setEditData({ ...editData, quarter: e.target.value })}
+                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                        >
+                          <option value="Q1">Q1</option>
+                          <option value="Q2">Q2</option>
+                          <option value="Q3">Q3</option>
+                          <option value="Q4">Q4</option>
+                        </select>
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          value={editData.storyPointsCompleted}
+                          onChange={(e) => setEditData({ ...editData, storyPointsCompleted: Number(e.target.value) })}
+                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          placeholder="SP done"
+                          min={0}
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          value={editData.storyPointsNotCompleted}
+                          onChange={(e) => setEditData({ ...editData, storyPointsNotCompleted: Number(e.target.value) })}
+                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          placeholder="SP no done"
+                          min={0}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
+                      <button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
-                    <button
-                      onClick={() => removeSprint(sp.id)}
-                      className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      title="Eliminar sprint"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                ) : (
+                  <div
+                    key={sp.id}
+                    className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/sprint"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
+                      <p className="text-xs text-neutral-50">
+                        {sp.storyPointsCompleted} SP done · {sp.storyPointsNotCompleted} SP no completados
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
+                      <button
+                        onClick={() => startEdit(sp)}
+                        className="p-1.5 opacity-0 group-hover/sprint:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        title="Editar sprint"
+                      >
+                        <Edit3 size={14} />
+                      </button>
+                      <button
+                        onClick={() => removeSprint(sp.id)}
+                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Eliminar sprint"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         ))

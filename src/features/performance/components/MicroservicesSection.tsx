@@ -46,7 +46,7 @@ export function MicroservicesSection({ memberId }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Microservicios</h2>
 
       <div className="space-y-2 mb-4">
