@@ -10,8 +10,9 @@ import { SprintsSection } from '@/features/performance/components/SprintsSection
 import { OneOnOneSection } from '@/features/performance/components/OneOnOneSection'
 import { AchievementsSection } from '@/features/performance/components/AchievementsSection'
 import { TechStackSection } from '@/features/performance/components/TechStackSection'
+import { MicroservicesSection } from '@/features/performance/components/MicroservicesSection'
 
-type Tab = 'perfil' | 'skills' | 'tecnologias' | 'sprints' | 'oneonone' | 'logros'
+type Tab = 'perfil' | 'skills' | 'tecnologias' | 'microservicios' | 'sprints' | 'oneonone' | 'logros'
 
 export function MemberPerformancePage() {
   const { memberId, id: teamId } = useParams<{ memberId: string; id: string }>()
@@ -59,6 +60,7 @@ export function MemberPerformancePage() {
     { key: 'perfil', label: 'Perfil' },
     { key: 'skills', label: 'Skills' },
     { key: 'tecnologias', label: 'Tecnologías' },
+    { key: 'microservicios', label: 'Microservicios' },
     { key: 'sprints', label: 'Sprints' },
     { key: 'oneonone', label: 'One-on-One' },
     { key: 'logros', label: 'Logros' },
@@ -129,6 +131,9 @@ export function MemberPerformancePage() {
         )}
         {activeTab === 'tecnologias' && (
           <TechStackSection memberId={member.id} />
+        )}
+        {activeTab === 'microservicios' && (
+          <MicroservicesSection memberId={member.id} />
         )}
         {activeTab === 'sprints' && (
           <SprintsSection memberId={member.id} />

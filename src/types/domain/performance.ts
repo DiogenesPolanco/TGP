@@ -10,11 +10,19 @@ export interface MemberProfile {
   role: MemberRole
   skills: Skill[]
   technologies: string[]
+  microservices: MemberMicroservice[]
   avgStoryPoints: number
   vacationDaysPerYear: number
   vacationUsed: number
   createdAt: Date
   updatedAt: Date
+}
+
+export interface MemberMicroservice {
+  id: string
+  name: string
+  description: string
+  technologies: string[]
 }
 
 export interface Skill {

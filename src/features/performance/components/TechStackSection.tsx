@@ -1,133 +1,138 @@
 import { useEffect, useState } from 'react'
 import { db } from '@/services/db/database'
-import type { Technology } from '@/types/domain'
+import type { Technology, SupportStatus } from '@/types/domain'
 import { X, Search } from 'lucide-react'
 
 interface Props {
   memberId: string
 }
 
+const statusColors: Record<SupportStatus, string> = {
+  active: 'bg-success/10 text-success',
+  extended: 'bg-warning/10 text-warning',
+  eol: 'bg-danger/10 text-danger',
+  unknown: 'bg-neutral-500/20 text-neutral-600 dark:text-neutral-400',
+}
+
+const statusLabel: Record<SupportStatus, string> = {
+  active: 'Activa',
+  extended: 'S. Extendido',
+  eol: 'EOL',
+  unknown: 'Desconocido',
+}
+
 export function TechStackSection({ memberId }: Props) {
-  const [profile, setProfile] = useState<{ technologies: string[] } | null>(null)
-  const [techs, setTechs] = useState<string[]>([])
-  const [catalog, setCatalog] = useState<Technology[]>([])
-  const [search, setSearch] = useState('')
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [allTechnologies, setAllTechnologies] = useState<Technology[]>([])
+  const [techSearch, setTechSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
 
   useEffect(() => {
     Promise.all([
       db.memberProfiles.get(memberId),
       db.technologies.toArray(),
-    ]).then(([p, techsList]) => {
-      setProfile(p ?? null)
-      setTechs(p?.technologies ?? [])
-      setCatalog(techsList)
+    ]).then(([profile, techs]) => {
+      setAllTechnologies(techs)
+      setSelectedIds(profile?.technologies ?? [])
     })
   }, [memberId])
 
-  const saveTechs = async (updated: string[]) => {
-    const existing = profile ?? { technologies: [] }
-    await db.memberProfiles.put({
-      ...existing,
-      id: memberId,
-      teamId: '',
-      email: (existing as any).email ?? '',
-      phoneCell: (existing as any).phoneCell ?? '',
-      phoneHome: (existing as any).phoneHome ?? '',
-      address: (existing as any).address ?? '',
-      role: (existing as any).role ?? 'developer',
-      skills: (existing as any).skills ?? [],
-      avgStoryPoints: (existing as any).avgStoryPoints ?? 0,
-      vacationDaysPerYear: (existing as any).vacationDaysPerYear ?? 20,
-      vacationUsed: (existing as any).vacationUsed ?? 0,
-      createdAt: (existing as any).createdAt ?? new Date(),
-      updatedAt: new Date(),
-      technologies: updated,
-    } as any)
-  }
-
-  const toggleTech = async (techName: string) => {
-    const updated = techs.includes(techName)
-      ? techs.filter((t) => t !== techName)
-      : [...techs, techName]
-    setTechs(updated)
-    await saveTechs(updated)
-  }
-
-  const filtered = catalog.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) &&
-      !techs.includes(t.name)
+  const selectedTechs = allTechnologies.filter((t) => selectedIds.includes(t.id))
+  const availableTechs = allTechnologies.filter(
+    (t) => !selectedIds.includes(t.id) &&
+      (!techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase()) || t.vendor.toLowerCase().includes(techSearch.toLowerCase()))
   )
+
+  const addTechnology = async (techId: string) => {
+    const updated = [...selectedIds, techId]
+    setSelectedIds(updated)
+    setTechSearch('')
+    setShowDropdown(false)
+    const profile = await db.memberProfiles.get(memberId)
+    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], microservices: [], avgStoryPoints: 0, vacationDaysPerYear: 20, vacationUsed: 0, createdAt: new Date() }
+    await db.memberProfiles.put({ ...base, technologies: updated, updatedAt: new Date() })
+  }
+
+  const removeTechnology = async (techId: string) => {
+    const updated = selectedIds.filter((id) => id !== techId)
+    setSelectedIds(updated)
+    const profile = await db.memberProfiles.get(memberId)
+    if (!profile) return
+    await db.memberProfiles.put({ ...profile, technologies: updated, microservices: profile.microservices ?? [], updatedAt: new Date() })
+  }
 
   return (
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Tecnologías</h2>
 
-      <div className="relative mb-6">
-        <div className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg bg-white dark:bg-neutral-80">
-          <Search size={16} className="text-neutral-40 shrink-0" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setShowDropdown(true) }}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Buscar tecnologías del catálogo..."
-            className="flex-1 bg-transparent text-sm text-neutral-90 dark:text-white focus:outline-none"
-          />
-          {techs.length > 0 && (
-            <span className="text-xs text-neutral-50 shrink-0">{techs.length} seleccionadas</span>
-          )}
+      <div className="space-y-2 mb-4">
+        {selectedTechs.map((tech) => (
+          <div key={tech.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-neutral-90 dark:text-white">{tech.name} {tech.version}</span>
+              <span className="text-xs text-neutral-60 dark:text-neutral-40">({tech.category})</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs px-2 py-1 rounded-full ${statusColors[tech.supportStatus]}`}>
+                {statusLabel[tech.supportStatus]}
+              </span>
+              <button
+                onClick={() => removeTechnology(tech.id)}
+                className="p-1 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        ))}
+        {selectedTechs.length === 0 && (
+          <p className="text-sm text-neutral-50 dark:text-neutral-50">No hay tecnologías asignadas</p>
+        )}
+      </div>
+
+      <div className="relative">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <input
+              type="text"
+              placeholder="Buscar tecnología para agregar..."
+              value={techSearch}
+              onFocus={() => setShowDropdown(true)}
+              onChange={(e) => { setTechSearch(e.target.value); setShowDropdown(true) }}
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
         </div>
 
-        {showDropdown && search.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-            {filtered.length === 0 ? (
-              <p className="px-3 py-4 text-xs text-neutral-40 text-center">
-                {catalog.length === 0
-                  ? 'No hay tecnologías en el catálogo'
-                  : 'No se encontraron tecnologías'}
+        {showDropdown && (
+          <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+            {availableTechs.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-neutral-50">
+                {techSearch ? 'Sin resultados' : 'Todas las tecnologías ya están asignadas'}
               </p>
             ) : (
-              filtered.map((t) => (
+              availableTechs.map((tech) => (
                 <button
-                  key={t.id}
-                  onClick={() => toggleTech(t.name)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                  key={tech.id}
+                  type="button"
+                  onClick={() => addTechnology(tech.id)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                 >
-                  <span className="flex-1 text-neutral-90 dark:text-white">{t.name}</span>
-                  <span className="text-xs text-neutral-50">{t.version}</span>
-                  <span className="text-xs text-neutral-40 capitalize">{t.category}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-neutral-90 dark:text-white">{tech.name}</span>
+                    <span className="text-neutral-50">{tech.version}</span>
+                    <span className="text-xs text-neutral-50">({tech.vendor})</span>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[tech.supportStatus]}`}>
+                    {statusLabel[tech.supportStatus]}
+                  </span>
                 </button>
               ))
             )}
           </div>
         )}
-
-        {showDropdown && (
-          <div className="fixed inset-0 z-0" onClick={() => setShowDropdown(false)} />
-        )}
       </div>
-
-      {techs.length === 0 ? (
-        <p className="text-center py-8 text-neutral-40">
-          Busca y selecciona tecnologías del catálogo
-        </p>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {techs.map((t) => (
-            <span
-              key={t}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
-            >
-              {t}
-              <button onClick={() => toggleTech(t)} className="hover:opacity-70">
-                <X size={12} />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
