@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import type { Table } from 'dexie'
 import { db } from '@/services/db/database'
 import {
-  ArrowLeft, Edit, Shield, AlertTriangle, Activity, FileWarning,
+  ArrowLeft, Pencil, Shield, AlertTriangle, Activity, FileWarning,
   Plus, X, Unlink, Search,
 } from 'lucide-react'
 import type { Technology, Vulnerability, Risk, Incident, AuditFinding, SupportStatus } from '@/types/domain'
@@ -93,8 +93,7 @@ export function ApplicationDetailPage() {
           onClick={() => navigate(`/catalog/applications/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
-          <Edit size={18} />
-          Editar
+          <Pencil size={18} />
         </button>
       </div>
 

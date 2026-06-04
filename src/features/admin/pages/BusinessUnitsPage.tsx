@@ -1,25 +1,38 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
+import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Save, X, Upload, Search, Filter } from 'lucide-react'
+import type { BusinessUnit, BusinessUnitStatus } from '@/types/domain'
 
 export function BusinessUnitsPage() {
+  const navigate = useNavigate()
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formName, setFormName] = useState('')
+  const [formStatus, setFormStatus] = useState<BusinessUnitStatus>('active')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
 
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
-  const { page, setPage, totalPages, paginatedItems: paginatedBUs } = usePagination(businessUnits, 10)
+  const filteredBus = businessUnits.filter((bu) =>
+    bu.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (statusFilter === 'all' || bu.status === statusFilter)
+  )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedBUs } = usePagination(filteredBus, 10)
 
   const resetForm = () => {
     setFormName('')
+    setFormStatus('active')
     setEditingId(null)
     setShowForm(false)
   }
@@ -40,13 +53,14 @@ export function BusinessUnitsPage() {
     }
 
     if (editingId) {
-      await db.businessUnits.update(editingId, { name })
+      await db.businessUnits.update(editingId, { name, status: formStatus })
       addNotification({ type: 'success', message: 'Unidad de negocio actualizada' })
     } else {
       await db.businessUnits.add({
         id: crypto.randomUUID(),
         tenantId: 'default',
         name,
+        status: formStatus,
         createdAt: new Date(),
       })
       addNotification({ type: 'success', message: 'Unidad de negocio creada' })
@@ -54,9 +68,12 @@ export function BusinessUnitsPage() {
     resetForm()
   }
 
-  const handleEdit = (id: string, name: string) => {
+  const handleEdit = (id: string) => {
+    const bu = businessUnits.find((b) => b.id === id)
+    if (!bu) return
     setEditingId(id)
-    setFormName(name)
+    setFormName(bu.name)
+    setFormStatus(bu.status)
     setShowForm(true)
   }
 
@@ -84,13 +101,77 @@ export function BusinessUnitsPage() {
             Gestiona las unidades de negocio para organizar aplicaciones y equipos
           </p>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true) }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nueva Unidad
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => { resetForm(); setShowForm(true) }}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nueva Unidad
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <input
+              type="text"
+              placeholder="Buscar unidades de negocio..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+              showFilters || statusFilter !== 'all'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+            }`}
+          >
+            <Filter size={16} />
+            Filtros
+            {statusFilter !== 'all' && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
+          </button>
+        </div>
+
+        {showFilters && (
+          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+              </select>
+            </div>
+            {statusFilter !== 'all' && (
+              <button
+                onClick={() => setStatusFilter('all')}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+              >
+                <X size={14} />
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {showForm && (
@@ -112,6 +193,19 @@ export function BusinessUnitsPage() {
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 autoFocus
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-1">
+                Estado
+              </label>
+              <select
+                value={formStatus}
+                onChange={(e) => setFormStatus(e.target.value as BusinessUnitStatus)}
+                className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+              </select>
             </div>
             <button
               onClick={handleSave}
@@ -147,6 +241,9 @@ export function BusinessUnitsPage() {
                     Nombre
                   </th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Estado
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
                     Aplicaciones
                   </th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
@@ -174,7 +271,7 @@ export function BusinessUnitsPage() {
             <Pagination
               page={page}
               totalPages={totalPages}
-              totalItems={businessUnits.length}
+              totalItems={filteredBus.length}
               pageSize={10}
               onPageChange={setPage}
             />
@@ -190,8 +287,8 @@ function BusinessUnitRow({
   onEdit,
   onDelete,
 }: {
-  bu: { id: string; name: string; createdAt: Date }
-  onEdit: (id: string, name: string) => void
+  bu: BusinessUnit
+  onEdit: (id: string) => void
   onDelete: (id: string, name: string) => void
 }) {
   const appCount = useLiveQuery(
@@ -207,11 +304,20 @@ function BusinessUnitRow({
 
   return (
     <tr
-      onClick={() => onEdit(bu.id, bu.name)}
+      onClick={() => onEdit(bu.id)}
       className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer"
     >
       <td className="px-6 py-4">
         <span className="text-sm font-medium text-neutral-90 dark:text-white">{bu.name}</span>
+      </td>
+      <td className="px-6 py-4">
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          bu.status === 'active'
+            ? 'bg-success/10 text-success'
+            : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50 dark:text-neutral-40'
+        }`}>
+          {bu.status === 'active' ? 'Activo' : 'Inactivo'}
+        </span>
       </td>
       <td className="px-6 py-4">
         <span className="text-sm text-neutral-60 dark:text-neutral-40">{appCount}</span>
@@ -227,11 +333,11 @@ function BusinessUnitRow({
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
           <button
-            onClick={(e) => { e.stopPropagation(); onEdit(bu.id, bu.name) }}
+            onClick={(e) => { e.stopPropagation(); onEdit(bu.id) }}
             className="p-2 rounded-lg text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
             title="Editar"
           >
-            <Edit2 size={16} />
+            <Pencil size={16} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(bu.id, bu.name) }}

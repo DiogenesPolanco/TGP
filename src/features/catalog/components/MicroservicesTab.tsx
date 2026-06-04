@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import {
-  Plus, Search, X, Edit, Trash2, Server,
+  Plus, Search, X, Pencil, Trash2, Server,
   Layers, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import type { Technology, SupportStatus } from '@/types/domain'
@@ -143,7 +143,7 @@ function MicroserviceCard({
             className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
             title="Editar"
           >
-            <Edit size={14} />
+            <Pencil size={14} />
           </button>
           <button
             onClick={onDelete}

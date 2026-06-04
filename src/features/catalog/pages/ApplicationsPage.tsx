@@ -6,7 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Search, Filter, Download, Upload, Trash2, Edit, Eye, X } from 'lucide-react'
+import { Plus, Search, Filter, Download, Upload, Trash2, Pencil, Eye, X } from 'lucide-react'
 
 export function ApplicationsPage() {
   const navigate = useNavigate()
@@ -92,13 +92,22 @@ export function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Catálogo de Aplicaciones</h2>
-        <button
-          onClick={() => navigate('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nueva Aplicación
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nueva Aplicación
+          </button>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
@@ -126,13 +135,6 @@ export function ApplicationsPage() {
             {(filterCriticality || filterStatus || filterBU) && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
-          <button
-            onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-          >
-            <Upload size={16} />
-            Importar
           </button>
           <button
             onClick={handleExport}
@@ -247,7 +249,7 @@ export function ApplicationsPage() {
                       to={`/catalog/applications/${app.id}/edit`}
                       className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
                     >
-                      <Edit size={16} className="text-neutral-60 dark:text-neutral-40" />
+                      <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
                     </Link>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}

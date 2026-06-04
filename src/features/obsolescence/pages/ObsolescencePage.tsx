@@ -9,8 +9,9 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
-  Edit,
+  Pencil,
   Trash2,
+  Upload,
   Layers,
   Calendar,
   Shield,
@@ -142,17 +143,26 @@ export function ObsolescencePage() {
             Gestión del ciclo de vida de tecnologías
           </p>
         </div>
-        <button
-          onClick={() => navigate('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nueva Tecnología
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nueva Tecnología
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
               <Layers size={18} />
@@ -160,9 +170,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Total Tecnologías</p>
-        </div>
+        </button>
 
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-success/10 text-success">
               <CheckCircle size={18} />
@@ -170,9 +180,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-success">{stats.active}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Activas</p>
-        </div>
+        </button>
 
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('extended')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-warning/10 text-warning">
               <Clock size={18} />
@@ -183,9 +193,9 @@ export function ObsolescencePage() {
           {stats.nearEol > 0 && (
             <p className="text-xs text-severity-high mt-1">{stats.nearEol} próx. a EOL</p>
           )}
-        </div>
+        </button>
 
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('eol')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <XCircle size={18} />
@@ -193,9 +203,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-danger">{stats.eol}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">EOL</p>
-        </div>
+        </button>
 
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => { setStatusFilter('all'); setSearch('') }} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <AlertTriangle size={18} />
@@ -203,9 +213,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-danger">{stats.criticalAppsWithEol}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Apps Críticas Afectadas</p>
-        </div>
+        </button>
 
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-info/10 text-info">
               <Shield size={18} />
@@ -213,7 +223,7 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-info">{stats.total - stats.eol - stats.extended}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Sin EOL / Seguras</p>
-        </div>
+        </button>
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
@@ -338,7 +348,7 @@ export function ObsolescencePage() {
                           className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
                           title="Editar"
                         >
-                          <Edit size={16} />
+                          <Pencil size={16} />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(tech.id) }}
