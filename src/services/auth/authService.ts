@@ -9,6 +9,19 @@ const STORAGE_KEYS = {
   session: 'tgp-auth-session',
 } as const
 
+/* sessionStorage wrapper for session — cleared when tab closes */
+function writeSession(data: AuthSession): void {
+  sessionStorage.setItem(STORAGE_KEYS.session, JSON.stringify(data))
+}
+function readSession(): AuthSession | null {
+  const raw = sessionStorage.getItem(STORAGE_KEYS.session)
+  if (!raw) return null
+  try { return JSON.parse(raw) as AuthSession } catch { return null }
+}
+function removeSession(): void {
+  sessionStorage.removeItem(STORAGE_KEYS.session)
+}
+
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000
 
 /* ─── Rate limiting ─── */
@@ -212,29 +225,23 @@ export function createSession(): AuthSession {
     createdAt: Date.now(),
     expiresAt: Date.now() + SESSION_DURATION_MS,
   }
-  localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(session))
+  writeSession(session)
   return session
 }
 
 export function getSession(): AuthSession | null {
-  const raw = localStorage.getItem(STORAGE_KEYS.session)
-  if (!raw) return null
+  const session = readSession()
+  if (!session) return null
 
-  try {
-    const session = JSON.parse(raw) as AuthSession
-    if (session.expiresAt < Date.now()) {
-      clearSession()
-      return null
-    }
-    return session
-  } catch {
+  if (session.expiresAt < Date.now()) {
     clearSession()
     return null
   }
+  return session
 }
 
 export function clearSession(): void {
-  localStorage.removeItem(STORAGE_KEYS.session)
+  removeSession()
 }
 
 export async function confirmSetup(base32Secret: string): Promise<void> {
