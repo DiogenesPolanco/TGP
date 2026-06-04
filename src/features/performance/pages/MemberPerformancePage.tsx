@@ -63,7 +63,7 @@ export function MemberPerformancePage() {
     { key: 'tecnologias', label: 'Tecnologías' },
     { key: 'microservicios', label: 'Microservicios' },
     { key: 'sprints', label: 'Sprints' },
-    { key: 'oneonone', label: 'One-on-One' },
+    { key: 'oneonone', label: 'Uno a Uno' },
     { key: 'logros', label: 'Logros' },
   ]
 
@@ -137,7 +137,7 @@ export function MemberPerformancePage() {
           <MicroservicesSection memberId={member.id} />
         )}
         {activeTab === 'sprints' && (
-          <SprintsSection memberId={member.id} />
+          <SprintsSection memberId={member.id} teamId={teamId!} />
         )}
         {activeTab === 'oneonone' && (
           <OneOnOneSection memberId={member.id} />

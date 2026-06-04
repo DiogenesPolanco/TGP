@@ -1,25 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
-import type { SprintRecord } from '@/types/domain'
-import { Plus, Trash2, Search, Edit3 } from 'lucide-react'
+import type { SprintRecord, TeamSprint } from '@/types/domain'
+import { Plus, Trash2, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
   memberId: string
+  teamId: string
 }
 
-export function SprintsSection({ memberId }: Props) {
+export function SprintsSection({ memberId, teamId }: Props) {
   const { confirm } = useConfirm()
   const [sprints, setSprints] = useState<SprintRecord[]>([])
+  const [teamSprints, setTeamSprints] = useState<TeamSprint[]>([])
   const [showForm, setShowForm] = useState(false)
   const [newSprint, setNewSprint] = useState({
     sprintName: '',
-    quarter: 'Q1',
+    quarter: 'Q2',
     year: new Date().getFullYear(),
     storyPointsCompleted: 0,
     storyPointsNotCompleted: 0,
   })
-  const [showSprintSuggestions, setShowSprintSuggestions] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editData, setEditData] = useState({
     sprintName: '',
@@ -33,24 +34,19 @@ export function SprintsSection({ memberId }: Props) {
     db.sprintRecords.where('memberId').equals(memberId).toArray().then(setSprints)
   }, [memberId])
 
-  const [allSprintNames, setAllSprintNames] = useState<string[]>([])
   useEffect(() => {
-    db.sprintRecords.toArray().then((records) => {
-      const names = new Set<string>()
-      for (const r of records) {
-        if (r.memberId === memberId) continue
-        if (r.sprintName) names.add(r.sprintName)
-      }
-      setAllSprintNames([...names].sort())
-    })
-  }, [memberId])
+    db.teamSprints.where('teamId').equals(teamId).toArray().then(setTeamSprints)
+  }, [teamId])
 
-  const sprintSuggestions = useMemo(() => {
-    if (!newSprint.sprintName.trim()) return []
-    return allSprintNames.filter((n) =>
-      n.toLowerCase().includes(newSprint.sprintName.toLowerCase())
-    ).slice(0, 8)
-  }, [allSprintNames, newSprint.sprintName])
+  const handleTeamSprintSelect = (sprintName: string, setter: typeof setNewSprint | typeof setEditData, current: typeof newSprint | typeof editData) => {
+    const ts = teamSprints.find((s) => s.sprintName === sprintName)
+    setter({
+      ...current,
+      sprintName,
+      quarter: ts?.quarter ?? current.quarter,
+      year: ts?.year ?? current.year,
+    })
+  }
 
   const addSprint = async () => {
     if (!newSprint.sprintName.trim()) return
@@ -108,6 +104,17 @@ export function SprintsSection({ memberId }: Props) {
     return acc
   }, {})
 
+  const sprintSelectOptions = useMemo(() => {
+    const existing = new Set(sprints.map((s) => s.sprintName))
+    return teamSprints
+      .filter((ts) => !existing.has(ts.sprintName))
+      .sort((a, b) => {
+        const dateA = a.startDate instanceof Date ? a.startDate.getTime() : 0
+        const dateB = b.startDate instanceof Date ? b.startDate.getTime() : 0
+        return dateB - dateA
+      })
+  }, [teamSprints, sprints])
+
   const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   return (
@@ -137,37 +144,30 @@ export function SprintsSection({ memberId }: Props) {
         </div>
       </div>
 
-      {/* Add form */}
       {showForm && (
         <div className="mb-6 p-4 border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-5 mb-3">
-            <div className="sm:col-span-2 relative">
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">Nombre del Sprint</label>
-              <Search size={14} className="absolute left-3 top-8 z-10 text-neutral-50" />
-              <input
-                type="text"
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">Sprint del Equipo</label>
+              <select
                 value={newSprint.sprintName}
-                onChange={(e) => { setNewSprint({ ...newSprint, sprintName: e.target.value }); setShowSprintSuggestions(true) }}
-                onFocus={() => setShowSprintSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSprintSuggestions(false), 200)}
-                className={`${inputClass} pl-8`}
-                placeholder="Sprint 1"
-              />
-              {showSprintSuggestions && sprintSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
-                  {sprintSuggestions.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => { setNewSprint({ ...newSprint, sprintName: name }); setShowSprintSuggestions(false) }}
-                      className="w-full text-left px-3 py-2 text-sm text-neutral-90 dark:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
-              )}
+                onChange={(e) => handleTeamSprintSelect(e.target.value, setNewSprint, newSprint)}
+                className={inputClass}
+              >
+                <option value="">Seleccionar sprint...</option>
+                {sprintSelectOptions.map((ts) => {
+                  const startStr = ts.startDate instanceof Date ? ts.startDate.toLocaleDateString('es-ES') : ''
+                  const endStr = ts.endDate instanceof Date ? ts.endDate.toLocaleDateString('es-ES') : ''
+                  return (
+                    <option key={ts.id} value={ts.sprintName}>
+                      {ts.sprintName} ({startStr} — {endStr}) — Plan: {ts.plannedSP} SP
+                    </option>
+                  )
+                })}
+                {sprintSelectOptions.length === 0 && (
+                  <option value="" disabled>Todos los sprints del equipo ya están registrados</option>
+                )}
+              </select>
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Quarter</label>
@@ -225,7 +225,6 @@ export function SprintsSection({ memberId }: Props) {
         </div>
       )}
 
-      {/* List */}
       {Object.keys(groupedByQuarter).length === 0 ? (
         <p className="text-center py-8 text-neutral-40">Sin sprints registrados</p>
       ) : (
@@ -238,14 +237,16 @@ export function SprintsSection({ memberId }: Props) {
                   <div key={sp.id} className="p-3 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
                     <div className="grid gap-2 sm:grid-cols-5 mb-2">
                       <div className="sm:col-span-2">
-                        <input
-                          type="text"
+                        <select
                           value={editData.sprintName}
-                          onChange={(e) => setEditData({ ...editData, sprintName: e.target.value })}
+                          onChange={(e) => handleTeamSprintSelect(e.target.value, setEditData, editData)}
                           className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          autoFocus
-                          onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
-                        />
+                        >
+                          <option value="">Seleccionar...</option>
+                          {teamSprints.map((ts) => (
+                            <option key={ts.id} value={ts.sprintName}>{ts.sprintName}</option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <select
@@ -265,7 +266,7 @@ export function SprintsSection({ memberId }: Props) {
                           value={editData.storyPointsCompleted}
                           onChange={(e) => setEditData({ ...editData, storyPointsCompleted: Number(e.target.value) })}
                           className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          placeholder="SP done"
+                          placeholder="SP completados"
                           min={0}
                         />
                       </div>
@@ -275,7 +276,7 @@ export function SprintsSection({ memberId }: Props) {
                           value={editData.storyPointsNotCompleted}
                           onChange={(e) => setEditData({ ...editData, storyPointsNotCompleted: Number(e.target.value) })}
                           className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          placeholder="SP no done"
+                          placeholder="SP no completados"
                           min={0}
                         />
                       </div>
@@ -293,7 +294,7 @@ export function SprintsSection({ memberId }: Props) {
                     <div>
                       <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
                       <p className="text-xs text-neutral-50">
-                        {sp.storyPointsCompleted} SP done · {sp.storyPointsNotCompleted} SP no completados
+                        {sp.storyPointsCompleted} SP completados · {sp.storyPointsNotCompleted} SP no completados
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
