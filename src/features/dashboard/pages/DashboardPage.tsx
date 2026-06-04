@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { db } from '@/services/db/database'
 import { useThiCalculation } from '@/features/dashboard/hooks/useThiCalculation'
@@ -44,6 +45,7 @@ function getPeriodStartDate(period: '7d' | '30d' | '90d' | 'ytd' | 'custom'): Da
 }
 
 export function DashboardPage() {
+  const navigate = useNavigate()
   const { selectedBusinessUnitId, selectedPeriod } = useFilterStore()
   const periodStart = getPeriodStartDate(selectedPeriod)
   const thi = useThiCalculation(selectedBusinessUnitId)
@@ -237,6 +239,7 @@ export function DashboardPage() {
             trendValue="+3"
             icon={<Shield size={20} />}
             color="danger"
+            onClick={() => navigate('/security/vulnerabilities')}
           />
           <KpiCard
             title="Incidentes P1"
@@ -245,18 +248,21 @@ export function DashboardPage() {
             trendValue="-1"
             icon={<AlertOctagon size={20} />}
             color="warning"
+            onClick={() => navigate('/security/incidents')}
           />
           <KpiCard
             title="Total Aplicaciones"
             value={applications.length}
             icon={<Package size={20} />}
             color="primary"
+            onClick={() => navigate('/catalog/applications')}
           />
           <KpiCard
             title="Exposición de Riesgos"
             value={totalRiskScore}
             icon={<AlertTriangle size={20} />}
             color="danger"
+            onClick={() => navigate('/governance/risks')}
           />
           <KpiCard
             title="Compliance Score"
@@ -266,12 +272,14 @@ export function DashboardPage() {
             trendValue={complianceScore >= 80 ? 'saludable' : complianceScore >= 50 ? 'regular' : `${openFindings} abiertos`}
             icon={<FileWarning size={20} />}
             color={complianceScore >= 80 ? 'success' : complianceScore >= 50 ? 'warning' : 'danger'}
+            onClick={() => navigate('/governance/audit')}
           />
           <KpiCard
             title="Equipos Elite DORA"
             value={eliteTeams}
             icon={<Users size={20} />}
             color="success"
+            onClick={() => navigate('/teams')}
           />
           <KpiCard
             title="THI Score"
@@ -280,6 +288,7 @@ export function DashboardPage() {
             trendValue="+2"
             icon={<TrendingUp size={20} />}
             color="success"
+            onClick={() => {}}
           />
           <KpiCard
             title="Tecnologías EOL"
@@ -287,6 +296,7 @@ export function DashboardPage() {
             subtitle={`${extendedTechs.length} en soporte extendido`}
             icon={<XCircle size={20} />}
             color="danger"
+            onClick={() => navigate('/catalog/obsolescence')}
           />
         </div>
       </div>
@@ -298,6 +308,7 @@ export function DashboardPage() {
           value={activePlans}
           icon={<TrendingUp size={20} />}
           color="primary"
+          onClick={() => navigate('/execution/plans')}
         />
         <KpiCard
           title="Bloqueos Abiertos"
@@ -306,18 +317,21 @@ export function DashboardPage() {
           trendValue={openBlockers > 0 ? 'necesita atencion' : undefined}
           icon={<AlertTriangle size={20} />}
           color={openBlockers > 0 ? 'danger' : 'success'}
+          onClick={() => navigate('/execution/daily')}
         />
         <KpiCard
           title="Compromisos Vencidos"
           value={overdueCommitments}
           icon={<XCircle size={20} />}
           color={overdueCommitments > 0 ? 'warning' : 'success'}
+          onClick={() => navigate('/execution/commitments')}
         />
         <KpiCard
           title="Actividades Hoy"
           value={activitiesDueToday}
           icon={<AlertOctagon size={20} />}
           color={activitiesDueToday > 0 ? 'warning' : 'success'}
+          onClick={() => navigate('/execution/daily')}
         />
       </div>
 

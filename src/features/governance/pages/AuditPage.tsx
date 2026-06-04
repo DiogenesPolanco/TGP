@@ -96,7 +96,9 @@ export function AuditPage() {
               const sla = getSlaStatus(finding.dueDate)
               const app = applications.find((a) => a.id === finding.applicationId)
               return (
-                <tr key={finding.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                <tr key={finding.id}
+                  onClick={() => navigate(`${finding.id}/edit`)}
+                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                   <td className="px-6 py-4 text-sm font-medium text-neutral-90 dark:text-white">{finding.auditReference}</td>
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{finding.title}</p>
@@ -146,13 +148,13 @@ export function AuditPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => navigate(`${finding.id}/edit`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(finding.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
                         className="text-sm text-danger hover:underline"
                       >
                         Eliminar

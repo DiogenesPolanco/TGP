@@ -206,7 +206,10 @@ function BusinessUnitRow({
   )
 
   return (
-    <tr className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+    <tr
+      onClick={() => onEdit(bu.id, bu.name)}
+      className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer"
+    >
       <td className="px-6 py-4">
         <span className="text-sm font-medium text-neutral-90 dark:text-white">{bu.name}</span>
       </td>
@@ -224,14 +227,14 @@ function BusinessUnitRow({
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
           <button
-            onClick={() => onEdit(bu.id, bu.name)}
+            onClick={(e) => { e.stopPropagation(); onEdit(bu.id, bu.name) }}
             className="p-2 rounded-lg text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
             title="Editar"
           >
             <Edit2 size={16} />
           </button>
           <button
-            onClick={() => onDelete(bu.id, bu.name)}
+            onClick={(e) => { e.stopPropagation(); onDelete(bu.id, bu.name) }}
             className="p-2 rounded-lg text-danger/60 hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >

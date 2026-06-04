@@ -287,7 +287,9 @@ export function ObsolescencePage() {
                   return techIds.includes(tech.id)
                 }).length
                 return (
-                  <tr key={tech.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                  <tr key={tech.id}
+                    onClick={() => navigate(`${tech.id}/edit`)}
+                    className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3">
                       <span className="text-sm font-medium text-neutral-90 dark:text-white">{tech.name}</span>
                     </td>
@@ -332,14 +334,14 @@ export function ObsolescencePage() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => navigate(`${tech.id}/edit`)}
+                          onClick={(e) => { e.stopPropagation(); navigate(`${tech.id}/edit`) }}
                           className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
                           title="Editar"
                         >
                           <Edit size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(tech.id)}
+                          onClick={(e) => { e.stopPropagation(); handleDelete(tech.id) }}
                           className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-danger transition-colors"
                           title="Eliminar"
                         >

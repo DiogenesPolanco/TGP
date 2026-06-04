@@ -188,9 +188,11 @@ export function CommitmentsPage() {
                     new Date(c.commitmentDate) < today
 
                   return (
-                    <tr key={c.id} className={`hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group ${
-                      isOverdue ? 'bg-danger/5' : ''
-                    }`}>
+                    <tr key={c.id}
+                      onClick={() => navigate(`/execution/commitments/${c.id}/edit`)}
+                      className={`hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group cursor-pointer ${
+                        isOverdue ? 'bg-danger/5' : ''
+                      }`}>
                       <td className="px-4 py-3">
                         <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
                         {c.description && (
@@ -210,6 +212,7 @@ export function CommitmentsPage() {
                       <td className="px-4 py-3">
                         <select
                           value={c.status}
+                          onClick={(e) => e.stopPropagation()}
                           onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
                           className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
                         >
@@ -233,14 +236,14 @@ export function CommitmentsPage() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
                           <button
-                            onClick={() => navigate(`/execution/commitments/${c.id}/edit`)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/execution/commitments/${c.id}/edit`) }}
                             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
                             title="Editar"
                           >
                             <Edit3 size={14} />
                           </button>
                           <button
-                            onClick={() => handleDelete(c)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(c) }}
                             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
                             title="Eliminar"
                           >

@@ -109,7 +109,9 @@ export function ObjectivesPage() {
           const team = teams.find((t) => t.id === objective.teamId)
           const bu = businessUnits.find((b) => b.id === objective.businessUnitId)
           return (
-            <div key={objective.id} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+            <div key={objective.id}
+              onClick={() => navigate(`${objective.id}/edit`)}
+              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -154,13 +156,13 @@ export function ObjectivesPage() {
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
                 <button
-                  onClick={() => navigate(`${objective.id}/edit`)}
+                  onClick={(e) => { e.stopPropagation(); navigate(`${objective.id}/edit`) }}
                   className="text-sm text-primary hover:underline"
                 >
                   Editar
                 </button>
                 <button
-                  onClick={() => handleDelete(objective.id)}
+                  onClick={(e) => { e.stopPropagation(); handleDelete(objective.id) }}
                   className="text-sm text-danger hover:underline"
                 >
                   Eliminar
@@ -219,6 +221,7 @@ function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
         <span className="text-xs text-neutral-60 dark:text-neutral-40">{kr.current} / {kr.target} {kr.measure}</span>
         <select
           value={kr.status}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => handleStatusChange(e.target.value)}
           className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer ${getStatusStyle(kr.status)}`}
         >

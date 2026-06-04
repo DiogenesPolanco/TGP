@@ -134,7 +134,9 @@ export function RisksPage() {
             {paginatedRisks.map((risk) => {
               const app = applications.find((a) => a.id === risk.applicationId)
               return (
-                <tr key={risk.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                <tr key={risk.id}
+                  onClick={() => navigate(`${risk.id}/edit`)}
+                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{risk.title}</p>
                     <p className="text-xs text-neutral-50 dark:text-neutral-50">{risk.description}</p>
@@ -166,13 +168,13 @@ export function RisksPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => navigate(`${risk.id}/edit`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(risk.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
                         className="text-sm text-danger hover:underline"
                       >
                         Eliminar

@@ -106,7 +106,9 @@ export function VulnerabilitiesPage() {
               const sla = getSlaStatus(vuln.slaDeadline)
               const app = applications.find((a) => a.id === vuln.applicationId)
               return (
-                <tr key={vuln.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                <tr key={vuln.id}
+                  onClick={() => navigate(`${vuln.id}/edit`)}
+                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{vuln.title}</p>
                     <p className="text-xs text-neutral-50 dark:text-neutral-50">{vuln.externalId}</p>
@@ -134,13 +136,13 @@ export function VulnerabilitiesPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => navigate(`${vuln.id}/edit`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}/edit`) }}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(vuln.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(vuln.id) }}
                         className="text-sm text-danger hover:underline"
                       >
                         Eliminar

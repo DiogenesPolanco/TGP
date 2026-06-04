@@ -214,7 +214,9 @@ export function ApplicationsPage() {
           </thead>
           <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
             {paginatedApps.map((app) => (
-              <tr key={app.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+              <tr key={app.id}
+                onClick={() => navigate(`/catalog/applications/${app.id}`)}
+                className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                 <td className="px-6 py-4">
                   <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline">
                     {app.name}
@@ -248,7 +250,7 @@ export function ApplicationsPage() {
                       <Edit size={16} className="text-neutral-60 dark:text-neutral-40" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(app.id)}
+                      onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
                       className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
                     >
                       <Trash2 size={16} className="text-danger" />

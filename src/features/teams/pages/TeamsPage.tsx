@@ -82,10 +82,13 @@ export function TeamsPage() {
           const bu = businessUnits.find((b) => b.id === team.businessUnitId)
           const dora = getDoraLevel(team.currentMetrics)
           return (
-            <div key={team.id} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div key={team.id}
+              onClick={() => navigate(`${team.id}/edit`)}
+              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <Link to={`/teams/${team.id}`} className="text-lg font-semibold text-primary hover:underline">
+                  <Link to={`/teams/${team.id}`} className="text-lg font-semibold text-primary hover:underline" onClick={(e) => e.stopPropagation()}>
                     {team.name}
                   </Link>
                   <p className="text-sm text-neutral-60 dark:text-neutral-40">{bu?.name} • {team.members.length} miembros</p>
@@ -106,13 +109,13 @@ export function TeamsPage() {
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
                 <button
-                  onClick={() => navigate(`${team.id}/edit`)}
+                  onClick={(e) => { e.stopPropagation(); navigate(`${team.id}/edit`) }}
                   className="text-sm text-primary hover:underline"
                 >
                   Editar
                 </button>
                 <button
-                  onClick={() => handleDelete(team.id)}
+                  onClick={(e) => { e.stopPropagation(); handleDelete(team.id) }}
                   className="text-sm text-danger hover:underline"
                 >
                   Eliminar

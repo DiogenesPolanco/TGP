@@ -39,7 +39,6 @@ export function DailyPage() {
       return act ? planMap.get(act.planId) : undefined
     }
     if (blocker.sourceType === 'commitment') {
-      const comm = commitments.find((c) => c.id === blocker.sourceId)
       return undefined // commitments don't have a direct planId
     }
     if (blocker.sourceType === 'task') {

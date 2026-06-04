@@ -9,6 +9,7 @@ interface KpiCardProps {
   trendValue?: string
   icon?: React.ReactNode
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  onClick?: () => void
 }
 
 const colorMap = {
@@ -44,19 +45,21 @@ const colorMap = {
   },
 }
 
-export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color = 'primary' }: KpiCardProps) {
+export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color = 'primary', onClick }: KpiCardProps) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
   const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-danger' : 'text-neutral-50'
   const styles = colorMap[color]
 
   return (
     <div
+      onClick={onClick}
       className={cn(
         'group relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5',
         'shadow-sm hover:shadow-lg transition-all duration-300',
         'hover:-translate-y-0.5',
         styles.shadow,
         'overflow-hidden',
+        onClick && 'cursor-pointer',
       )}
     >
       {/* Gradient overlay on hover */}

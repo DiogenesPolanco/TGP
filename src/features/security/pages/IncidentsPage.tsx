@@ -89,7 +89,9 @@ export function IncidentsPage() {
             {paginatedIncidents.map((incident) => {
               const app = applications.find((a) => a.id === incident.applicationId)
               return (
-                <tr key={incident.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                <tr key={incident.id}
+                  onClick={() => navigate(`${incident.id}/edit`)}
+                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{incident.title}</p>
                     <p className="text-xs text-neutral-50 dark:text-neutral-50">{incident.externalId}</p>
@@ -123,13 +125,13 @@ export function IncidentsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => navigate(`${incident.id}/edit`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`${incident.id}/edit`) }}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(incident.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(incident.id) }}
                         className="text-sm text-danger hover:underline"
                       >
                         Eliminar
