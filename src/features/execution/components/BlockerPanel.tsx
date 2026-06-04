@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
+import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -24,6 +25,7 @@ const statusBadge: Record<string, string> = {
 }
 
 export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
+  const { confirm } = useConfirm()
   const [collapsed, setCollapsed] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
@@ -105,6 +107,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
   }
 
   const handleDelete = async (id: string) => {
+    if (!(await confirm('¿Eliminar este bloqueo?'))) return
     await db.blockers.delete(id)
   }
 
@@ -278,10 +281,10 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                   ) : (
                     <button
                       onClick={() => handleEdit(blocker)}
-                      className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+                      className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary transition-colors"
                       title="Editar"
                     >
-                      <span className="text-xs text-primary font-medium">Editar</span>
+                      <Pencil size={14} />
                     </button>
                   )}
                   <button

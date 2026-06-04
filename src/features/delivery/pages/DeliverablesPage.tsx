@@ -3,13 +3,16 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
+import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import {
   Filter,
-  X,
   ArrowRight,
   Search,
+  Upload,
+  Pencil,
+  Trash2,
 } from 'lucide-react'
 import type { DeliverableStatus } from '@/types/domain'
 
@@ -28,6 +31,7 @@ const statusLabel: Record<DeliverableStatus, string> = {
 }
 
 export function DeliverablesPage() {
+  const { confirm } = useConfirm()
   const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState<DeliverableStatus | 'all'>('all')
   const [appFilter, setAppFilter] = useState('')
@@ -58,18 +62,28 @@ export function DeliverablesPage() {
   const { page, setPage, totalPages, paginatedItems: paginatedDeliverables } = usePagination(filtered, 5)
 
   const handleDelete = async (id: string) => {
+    if (!(await confirm('¿Eliminar este entregable?'))) return
     await db.deliverables.delete(id)
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
-          Entregables Generales
-        </h2>
-        <span className="text-sm text-neutral-50 px-3 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70">
-          {filtered.length} de {allDeliverables.length}
-        </span>
+        <div>
+          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+            Entregables Generales
+          </h2>
+          <span className="text-sm text-neutral-50 px-3 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70">
+            {filtered.length} de {allDeliverables.length}
+          </span>
+        </div>
+        <button
+          onClick={() => navigate('/admin/import')}
+          className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
+          <Upload size={16} />
+          Importar
+        </button>
       </div>
 
       {/* Filters bar */}
@@ -212,13 +226,24 @@ export function DeliverablesPage() {
                         {obj?.title ?? '—'}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => handleDelete(del.id)}
-                          className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
-                          title="Eliminar"
-                        >
-                          <X size={14} />
-                        </button>
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                          {del.applicationId && (
+                            <button
+                              onClick={() => navigate(`/catalog/applications/${del.applicationId}`)}
+                              className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(del.id)}
+                            className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )

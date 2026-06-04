@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { Plus, X, Save, ChevronDown, ChevronUp } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
+import { Plus, X, Save, ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
 
@@ -173,6 +174,7 @@ function DeliverableRow({
   deliverable: Deliverable
   allObjectives: Objective[]
 }) {
+  const { confirm } = useConfirm()
   const [editing, setEditing] = useState(false)
   const [status, setStatus] = useState(deliverable.status)
   const [dueDate, setDueDate] = useState(
@@ -191,6 +193,7 @@ function DeliverableRow({
   }
 
   const handleDelete = async () => {
+    if (!(await confirm('¿Eliminar este entregable?'))) return
     await db.deliverables.delete(deliverable.id)
   }
 
@@ -276,14 +279,14 @@ function DeliverableRow({
             className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
             title="Editar"
           >
-            <Save size={14} />
+            <Pencil size={14} />
           </button>
           <button
             onClick={handleDelete}
             className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >
-            <X size={14} />
+            <Trash2 size={14} />
           </button>
         </div>
       )}
