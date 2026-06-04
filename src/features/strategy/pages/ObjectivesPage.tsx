@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, Target, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
-import { ObjectiveForm } from '../components/ObjectiveForm'
-import type { Objective, KeyResult } from '@/types/domain'
+import type { KeyResult } from '@/types/domain'
 
 export function ObjectivesPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingObjective, setEditingObjective] = useState<Objective | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -22,6 +23,8 @@ export function ObjectivesPage() {
     o.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const { page, setPage, totalPages, paginatedItems: paginatedObjectives } = usePagination(filteredObjectives, 5)
+
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar objetivo?')) {
       await db.objectives.delete(id)
@@ -29,11 +32,20 @@ export function ObjectivesPage() {
     }
   }
 
+  const STATUS_LABELS: Record<string, string> = {
+    not_started: 'No iniciado',
+    on_track: 'On track',
+    at_risk: 'En riesgo',
+    behind: 'Atrasado',
+    achieved: 'Logrado',
+  }
+
   const stats = {
     total: objectives.length,
     onTrack: objectives.filter((o) => o.status === 'on_track').length,
     atRisk: objectives.filter((o) => o.status === 'at_risk').length,
     behind: objectives.filter((o) => o.status === 'behind').length,
+    notStarted: objectives.filter((o) => o.status === 'not_started').length,
     achieved: objectives.filter((o) => o.status === 'achieved').length,
   }
 
@@ -62,7 +74,7 @@ export function ObjectivesPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">OKRs / KPIs</h2>
         <button
-          onClick={() => { setEditingObjective(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -70,12 +82,13 @@ export function ObjectivesPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <StatCard icon={<Target size={20} />} label="Total" value={stats.total} color="text-primary" />
         <StatCard icon={<TrendingUp size={20} />} label="On Track" value={stats.onTrack} color="text-success" />
-        <StatCard icon={<AlertCircle size={20} />} label="At Risk" value={stats.atRisk} color="text-warning" />
-        <StatCard icon={<AlertCircle size={20} />} label="Behind" value={stats.behind} color="text-danger" />
-        <StatCard icon={<CheckCircle2 size={20} />} label="Achieved" value={stats.achieved} color="text-success" />
+        <StatCard icon={<AlertCircle size={20} />} label="En Riesgo" value={stats.atRisk} color="text-warning" />
+        <StatCard icon={<AlertCircle size={20} />} label="Atrasado" value={stats.behind} color="text-danger" />
+        <StatCard icon={<Target size={16} />} label="No Iniciado" value={stats.notStarted} color="text-neutral-50" />
+        <StatCard icon={<CheckCircle2 size={20} />} label="Logrado" value={stats.achieved} color="text-success" />
       </div>
 
       <div className="flex items-center gap-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
@@ -92,7 +105,7 @@ export function ObjectivesPage() {
       </div>
 
       <div className="space-y-4">
-        {filteredObjectives.map((objective) => {
+        {paginatedObjectives.map((objective) => {
           const team = teams.find((t) => t.id === objective.teamId)
           const bu = businessUnits.find((b) => b.id === objective.businessUnitId)
           return (
@@ -102,7 +115,7 @@ export function ObjectivesPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(objective.status)}`}>
                       {getStatusIcon(objective.status)}
-                      {objective.status}
+                      {STATUS_LABELS[objective.status] ?? objective.status}
                     </span>
                     <span className="text-xs text-neutral-50 dark:text-neutral-50">{objective.type.toUpperCase()}</span>
                   </div>
@@ -141,7 +154,7 @@ export function ObjectivesPage() {
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
                 <button
-                  onClick={() => { setEditingObjective(objective); setShowForm(true) }}
+                  onClick={() => navigate(`${objective.id}/edit`)}
                   className="text-sm text-primary hover:underline"
                 >
                   Editar
@@ -158,23 +171,20 @@ export function ObjectivesPage() {
         })}
       </div>
 
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filteredObjectives.length}
+        pageSize={5}
+        onPageChange={setPage}
+      />
+
       {filteredObjectives.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
           <p className="text-neutral-50 dark:text-neutral-50">No se encontraron objetivos</p>
         </div>
       )}
 
-      {showForm && (
-        <ObjectiveForm
-          objective={editingObjective}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingObjective(null)
-            addNotification({ type: 'success', message: editingObjective ? 'Objetivo actualizado' : 'Objetivo creado' })
-          }}
-        />
-      )}
     </div>
   )
 }

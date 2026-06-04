@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Plus } from 'lucide-react'
-import type { Objective, KeyResult } from '@/types/domain'
+import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 interface ObjectiveFormProps {
   objective: Objective | null
@@ -149,7 +149,21 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as ObjectiveStatus })}
+                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="not_started">No iniciado</option>
+                <option value="on_track">On track</option>
+                <option value="at_risk">En riesgo</option>
+                <option value="behind">Atrasado</option>
+                <option value="achieved">Logrado</option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Inicio *</label>
               <input

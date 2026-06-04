@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, Shield, AlertTriangle, Clock } from 'lucide-react'
-import { VulnerabilityForm } from '../components/VulnerabilityForm'
-import type { Vulnerability } from '@/types/domain'
 
 export function VulnerabilitiesPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingVuln, setEditingVuln] = useState<Vulnerability | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -20,6 +20,8 @@ export function VulnerabilitiesPage() {
   const filteredVulns = vulnerabilities.filter((v) =>
     v.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedVulns } = usePagination(filteredVulns, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar vulnerabilidad?')) {
@@ -58,7 +60,7 @@ export function VulnerabilitiesPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Vulnerabilidades</h2>
         <button
-          onClick={() => { setEditingVuln(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -100,7 +102,7 @@ export function VulnerabilitiesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {filteredVulns.map((vuln) => {
+            {paginatedVulns.map((vuln) => {
               const sla = getSlaStatus(vuln.slaDeadline)
               const app = applications.find((a) => a.id === vuln.applicationId)
               return (
@@ -132,7 +134,7 @@ export function VulnerabilitiesPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => { setEditingVuln(vuln); setShowForm(true) }}
+                        onClick={() => navigate(`${vuln.id}/edit`)}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
@@ -150,6 +152,13 @@ export function VulnerabilitiesPage() {
             })}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={filteredVulns.length}
+          pageSize={5}
+          onPageChange={setPage}
+        />
         {filteredVulns.length === 0 && (
           <div className="text-center py-12">
             <p className="text-neutral-50 dark:text-neutral-50">No se encontraron vulnerabilidades</p>
@@ -157,17 +166,6 @@ export function VulnerabilitiesPage() {
         )}
       </div>
 
-      {showForm && (
-        <VulnerabilityForm
-          vulnerability={editingVuln}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingVuln(null)
-            addNotification({ type: 'success', message: editingVuln ? 'Vulnerabilidad actualizada' : 'Vulnerabilidad creada' })
-          }}
-        />
-      )}
     </div>
   )
 }

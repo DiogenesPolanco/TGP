@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Users, TrendingUp, Award } from 'lucide-react'
-import { TeamForm } from '../components/TeamForm'
-import type { Team } from '@/types/domain'
 
 export function TeamsPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingTeam, setEditingTeam] = useState<Team | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -21,6 +21,8 @@ export function TeamsPage() {
   const filteredTeams = teams.filter((t) =>
     t.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedTeams } = usePagination(filteredTeams, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar equipo?')) {
@@ -48,7 +50,7 @@ export function TeamsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Equipos</h2>
         <button
-          onClick={() => { setEditingTeam(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -76,7 +78,7 @@ export function TeamsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredTeams.map((team) => {
+        {paginatedTeams.map((team) => {
           const bu = businessUnits.find((b) => b.id === team.businessUnitId)
           const dora = getDoraLevel(team.currentMetrics)
           return (
@@ -104,7 +106,7 @@ export function TeamsPage() {
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
                 <button
-                  onClick={() => { setEditingTeam(team); setShowForm(true) }}
+                  onClick={() => navigate(`${team.id}/edit`)}
                   className="text-sm text-primary hover:underline"
                 >
                   Editar
@@ -121,23 +123,20 @@ export function TeamsPage() {
         })}
       </div>
 
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filteredTeams.length}
+        pageSize={5}
+        onPageChange={setPage}
+      />
+
       {filteredTeams.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
           <p className="text-neutral-50 dark:text-neutral-50">No se encontraron equipos</p>
         </div>
       )}
 
-      {showForm && (
-        <TeamForm
-          team={editingTeam}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingTeam(null)
-            addNotification({ type: 'success', message: editingTeam ? 'Equipo actualizado' : 'Equipo creado' })
-          }}
-        />
-      )}
     </div>
   )
 }

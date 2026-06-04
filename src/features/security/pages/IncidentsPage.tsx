@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { Plus, Search, Activity, AlertOctagon, Clock } from 'lucide-react'
-import { IncidentForm } from '../components/IncidentForm'
-import type { Incident } from '@/types/domain'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
+import { Plus, Search, Clock, Activity, AlertOctagon } from 'lucide-react'
 
 export function IncidentsPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingIncident, setEditingIncident] = useState<Incident | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -20,6 +20,8 @@ export function IncidentsPage() {
   const filteredIncidents = incidents.filter((i) =>
     i.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedIncidents } = usePagination(filteredIncidents, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar incidente?')) {
@@ -42,7 +44,7 @@ export function IncidentsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Incidentes</h2>
         <button
-          onClick={() => { setEditingIncident(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -84,7 +86,7 @@ export function IncidentsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {filteredIncidents.map((incident) => {
+            {paginatedIncidents.map((incident) => {
               const app = applications.find((a) => a.id === incident.applicationId)
               return (
                 <tr key={incident.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
@@ -121,7 +123,7 @@ export function IncidentsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => { setEditingIncident(incident); setShowForm(true) }}
+                        onClick={() => navigate(`${incident.id}/edit`)}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
@@ -139,6 +141,13 @@ export function IncidentsPage() {
             })}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={filteredIncidents.length}
+          pageSize={5}
+          onPageChange={setPage}
+        />
         {filteredIncidents.length === 0 && (
           <div className="text-center py-12">
             <p className="text-neutral-50 dark:text-neutral-50">No se encontraron incidentes</p>
@@ -146,17 +155,6 @@ export function IncidentsPage() {
         )}
       </div>
 
-      {showForm && (
-        <IncidentForm
-          incident={editingIncident}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingIncident(null)
-            addNotification({ type: 'success', message: editingIncident ? 'Incidente actualizado' : 'Incidente creado' })
-          }}
-        />
-      )}
     </div>
   )
 }
