@@ -35,6 +35,7 @@ const TABLE_NAMES = [
   'oneOnOnes',
   'achievements',
   'vacationRecords',
+  'teamSprints',
 ] as const
 
 async function getTableData(tableName: string): Promise<Record<string, unknown>[]> {
@@ -184,6 +185,7 @@ const IMPORT_ORDER: string[] = [
   'oneOnOnes',
   'achievements',
   'vacationRecords',
+  'teamSprints',
 ]
 
 export async function importBackup(backup: DatabaseBackup): Promise<{
