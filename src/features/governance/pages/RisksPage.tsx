@@ -6,11 +6,14 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, Pencil, Trash2 } from 'lucide-react'
 
 export function RisksPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
   const [selectedCell, setSelectedCell] = useState<{ prob: number; impact: number } | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
@@ -20,6 +23,8 @@ export function RisksPage() {
 
   const filteredRisks = risks.filter((r) =>
     r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (statusFilter === 'all' || r.status === statusFilter) &&
+    (categoryFilter === 'all' || r.category === categoryFilter) &&
     (!selectedCell || (r.probability === selectedCell.prob && r.impact === selectedCell.impact))
   )
 
@@ -49,13 +54,22 @@ export function RisksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Riesgos</h2>
-        <button
-          onClick={() => navigate('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Riesgo
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Riesgo
+          </button>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
@@ -95,24 +109,83 @@ export function RisksPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-        <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
-          <input
-            type="text"
-            placeholder="Buscar riesgos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-        </div>
-        {selectedCell && (
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <input
+              type="text"
+              placeholder="Buscar riesgos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
           <button
-            onClick={() => setSelectedCell(null)}
-            className="px-3 py-2 text-sm text-primary hover:underline"
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+              showFilters || statusFilter !== 'all' || categoryFilter !== 'all'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+            }`}
           >
-            Limpiar filtro
+            <Filter size={16} />
+            Filtros
+            {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
           </button>
+          {selectedCell && (
+            <button
+              onClick={() => setSelectedCell(null)}
+              className="px-3 py-2 text-sm text-primary hover:underline"
+            >
+              Limpiar calor
+            </button>
+          )}
+        </div>
+
+        {showFilters && (
+          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                <option value="open">Abierto</option>
+                <option value="mitigated">Mitigado</option>
+                <option value="accepted">Aceptado</option>
+                <option value="closed">Cerrado</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Categoría</label>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todas</option>
+                <option value="technical">Técnico</option>
+                <option value="security">Seguridad</option>
+                <option value="operational">Operacional</option>
+                <option value="regulatory">Regulatorio</option>
+                <option value="financial">Financiero</option>
+              </select>
+            </div>
+            {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+              <button
+                onClick={() => { setStatusFilter('all'); setCategoryFilter('all') }}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+              >
+                <X size={14} />
+                Limpiar filtros
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -169,15 +242,17 @@ export function RisksPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
-                        className="text-sm text-primary hover:underline"
+                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                        title="Editar"
                       >
-                        Editar
+                        <Pencil size={16} />
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
-                        className="text-sm text-danger hover:underline"
+                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                        title="Eliminar"
                       >
-                        Eliminar
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>

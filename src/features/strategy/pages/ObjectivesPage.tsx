@@ -6,12 +6,14 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Search, Target, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, Target, TrendingUp, AlertCircle, CheckCircle2, Pencil, Trash2 } from 'lucide-react'
 import type { KeyResult } from '@/types/domain'
 
 export function ObjectivesPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -20,7 +22,8 @@ export function ObjectivesPage() {
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
   const filteredObjectives = objectives.filter((o) =>
-    o.title.toLowerCase().includes(searchTerm.toLowerCase())
+    o.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (statusFilter === 'all' || o.status === statusFilter)
   )
 
   const { page, setPage, totalPages, paginatedItems: paginatedObjectives } = usePagination(filteredObjectives, 5)
@@ -73,35 +76,89 @@ export function ObjectivesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">OKRs / KPIs</h2>
-        <button
-          onClick={() => navigate('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Objetivo
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Objetivo
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-6 gap-4">
-        <StatCard icon={<Target size={20} />} label="Total" value={stats.total} color="text-primary" />
-        <StatCard icon={<TrendingUp size={20} />} label="On Track" value={stats.onTrack} color="text-success" />
-        <StatCard icon={<AlertCircle size={20} />} label="En Riesgo" value={stats.atRisk} color="text-warning" />
-        <StatCard icon={<AlertCircle size={20} />} label="Atrasado" value={stats.behind} color="text-danger" />
-        <StatCard icon={<Target size={16} />} label="No Iniciado" value={stats.notStarted} color="text-neutral-50" />
-        <StatCard icon={<CheckCircle2 size={20} />} label="Logrado" value={stats.achieved} color="text-success" />
+        <StatCard icon={<Target size={20} />} label="Total" value={stats.total} color="text-primary" onClick={() => { setStatusFilter('all'); setShowFilters(false) }} />
+        <StatCard icon={<TrendingUp size={20} />} label="On Track" value={stats.onTrack} color="text-success" onClick={() => { setStatusFilter('on_track'); setShowFilters(true) }} />
+        <StatCard icon={<AlertCircle size={20} />} label="En Riesgo" value={stats.atRisk} color="text-warning" onClick={() => { setStatusFilter('at_risk'); setShowFilters(true) }} />
+        <StatCard icon={<AlertCircle size={20} />} label="Atrasado" value={stats.behind} color="text-danger" onClick={() => { setStatusFilter('behind'); setShowFilters(true) }} />
+        <StatCard icon={<Target size={16} />} label="No Iniciado" value={stats.notStarted} color="text-neutral-50" onClick={() => { setStatusFilter('not_started'); setShowFilters(true) }} />
+        <StatCard icon={<CheckCircle2 size={20} />} label="Logrado" value={stats.achieved} color="text-success" onClick={() => { setStatusFilter('achieved'); setShowFilters(true) }} />
       </div>
 
-      <div className="flex items-center gap-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-        <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
-          <input
-            type="text"
-            placeholder="Buscar objetivos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <input
+              type="text"
+              placeholder="Buscar objetivos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+              showFilters || statusFilter !== 'all'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+            }`}
+          >
+            <Filter size={16} />
+            Filtros
+            {statusFilter !== 'all' && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
+          </button>
         </div>
+
+        {showFilters && (
+          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                <option value="not_started">No Iniciado</option>
+                <option value="on_track">On Track</option>
+                <option value="at_risk">En Riesgo</option>
+                <option value="behind">Atrasado</option>
+                <option value="achieved">Logrado</option>
+              </select>
+            </div>
+            {statusFilter !== 'all' && (
+              <button
+                onClick={() => setStatusFilter('all')}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+              >
+                <X size={14} />
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -157,15 +214,17 @@ export function ObjectivesPage() {
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
                 <button
                   onClick={(e) => { e.stopPropagation(); navigate(`${objective.id}/edit`) }}
-                  className="text-sm text-primary hover:underline"
+                  className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                  title="Editar"
                 >
-                  Editar
+                  <Pencil size={16} />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDelete(objective.id) }}
-                  className="text-sm text-danger hover:underline"
+                  className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                  title="Eliminar"
                 >
-                  Eliminar
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
@@ -236,12 +295,16 @@ function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
   )
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+  const Comp = onClick ? 'button' : 'div'
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+    <Comp
+      onClick={onClick}
+      className={`bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm${onClick ? ' cursor-pointer hover:shadow-md transition-all text-left' : ''}`}
+    >
       <div className={`${color} mb-2`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </div>
+    </Comp>
   )
 }

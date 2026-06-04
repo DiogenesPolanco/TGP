@@ -6,11 +6,14 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Search, FileWarning, CheckCircle, Clock } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Pencil, Trash2 } from 'lucide-react'
 
 export function AuditPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [severityFilter, setSeverityFilter] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -18,7 +21,9 @@ export function AuditPage() {
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
 
   const filteredFindings = findings.filter((f) =>
-    f.title.toLowerCase().includes(searchTerm.toLowerCase())
+    f.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (statusFilter === 'all' || f.status === statusFilter) &&
+    (severityFilter === 'all' || f.severity === severityFilter)
   )
 
   const { page, setPage, totalPages, paginatedItems: paginatedFindings } = usePagination(filteredFindings, 5)
@@ -48,33 +53,101 @@ export function AuditPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Auditoría</h2>
-        <button
-          onClick={() => navigate('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Hallazgo
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Hallazgo
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={<FileWarning size={20} />} label="Total" value={stats.total} color="text-primary" />
-        <StatCard icon={<Clock size={20} />} label="Abiertos" value={stats.open} color="text-warning" />
-        <StatCard icon={<FileWarning size={20} />} label="Vencidos" value={stats.overdue} color="text-danger" />
-        <StatCard icon={<CheckCircle size={20} />} label="Cerrados" value={stats.closed} color="text-success" />
+        <StatCard icon={<FileWarning size={20} />} label="Total" value={stats.total} color="text-primary" onClick={() => { setStatusFilter('all'); setSeverityFilter('all'); setShowFilters(false) }} />
+        <StatCard icon={<Clock size={20} />} label="Abiertos" value={stats.open} color="text-warning" onClick={() => { setStatusFilter('open'); setShowFilters(true) }} />
+        <StatCard icon={<FileWarning size={20} />} label="Vencidos" value={stats.overdue} color="text-danger" onClick={() => { setStatusFilter('overdue'); setShowFilters(true) }} />
+        <StatCard icon={<CheckCircle size={20} />} label="Cerrados" value={stats.closed} color="text-success" onClick={() => { setStatusFilter('closed'); setShowFilters(true) }} />
       </div>
 
-      <div className="flex items-center gap-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-        <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
-          <input
-            type="text"
-            placeholder="Buscar hallazgos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <input
+              type="text"
+              placeholder="Buscar hallazgos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+              showFilters || statusFilter !== 'all' || severityFilter !== 'all'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+            }`}
+          >
+            <Filter size={16} />
+            Filtros
+            {(statusFilter !== 'all' || severityFilter !== 'all') && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
+          </button>
         </div>
+
+        {showFilters && (
+          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                <option value="open">Abierto</option>
+                <option value="in_progress">En Progreso</option>
+                <option value="overdue">Vencido</option>
+                <option value="resolved">Resuelto</option>
+                <option value="closed">Cerrado</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-neutral-60">Severidad</label>
+              <select
+                value={severityFilter}
+                onChange={(e) => setSeverityFilter(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">Todas</option>
+                <option value="critical">Crítica</option>
+                <option value="high">Alta</option>
+                <option value="medium">Media</option>
+                <option value="low">Baja</option>
+              </select>
+            </div>
+            {(statusFilter !== 'all' || severityFilter !== 'all') && (
+              <button
+                onClick={() => { setStatusFilter('all'); setSeverityFilter('all') }}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+              >
+                <X size={14} />
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
@@ -149,15 +222,17 @@ export function AuditPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
-                        className="text-sm text-primary hover:underline"
+                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                        title="Editar"
                       >
-                        Editar
+                        <Pencil size={16} />
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
-                        className="text-sm text-danger hover:underline"
+                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                        title="Eliminar"
                       >
-                        Eliminar
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
@@ -184,12 +259,16 @@ export function AuditPage() {
   )
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+  const Comp = onClick ? 'button' : 'div'
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+    <Comp
+      onClick={onClick}
+      className={`bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm${onClick ? ' cursor-pointer hover:shadow-md transition-all text-left' : ''}`}
+    >
       <div className={`${color} mb-2`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </div>
+    </Comp>
   )
 }
