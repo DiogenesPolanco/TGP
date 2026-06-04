@@ -6,15 +6,17 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAppStore } from '@/stores/appStore'
 import { useDemoData } from '@/hooks/useDemoData'
 import { useTheme } from '@/hooks/useTheme'
+import { usePrivacyBlur } from '@/hooks/usePrivacyBlur'
 import { cn } from '@/lib/utils'
 
 export function AppShell() {
   const { sidebarOpen } = useAppStore()
+  const isTabHidden = usePrivacyBlur()
   useDemoData()
   useTheme()
 
   return (
-    <div className="flex h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div className={cn('flex h-screen bg-neutral-10 dark:bg-neutral-90', isTabHidden && 'blur-xl transition-all duration-300')}>
       <Sidebar />
       <div
         className={cn(
