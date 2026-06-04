@@ -271,7 +271,11 @@ export function DailyPage() {
                     const plan = planMap.get(act.planId)
                     const app = appMap.get(act.applicationId ?? '')
                     return (
-                      <div key={act.id} className="px-4 py-3 flex items-center justify-between group">
+                      <div
+                        key={act.id}
+                        className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
+                        onClick={() => navigate(`/execution/plans/${act.planId}`)}
+                      >
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{act.title}</p>
                           <p className="text-xs text-neutral-50">
@@ -280,28 +284,28 @@ export function DailyPage() {
                             {act.assigneeId && <span> &middot; {act.assigneeId}</span>}
                           </p>
                         </div>
-                        <button
-                          onClick={() => navigate(`/execution/plans/${act.planId}`)}
-                          className="shrink-0 p-1.5 rounded text-neutral-50 hover:text-primary opacity-0 group-hover:opacity-100 transition-all"
-                        >
-                          <ArrowRight size={16} />
-                        </button>
+                        <ArrowRight size={16} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     )
                   })}
                   {agenda.commitmentsDueSoon.map((c) => {
                     const app = appMap.get(c.applicationId ?? '')
                     return (
-                      <div key={c.id} className="px-4 py-3 flex items-center justify-between group">
+                      <div
+                        key={c.id}
+                        className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
+                        onClick={() => navigate('/execution/commitments')}
+                      >
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
                             Compromiso: {c.title}
                           </p>
                           <p className="text-xs text-neutral-50">
-                            Due: {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
+                            Vence: {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
                             {app && <span> &middot; {app.name}</span>}
                           </p>
                         </div>
+                        <ArrowRight size={16} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     )
                   })}
