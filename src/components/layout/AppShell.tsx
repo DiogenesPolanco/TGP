@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -8,12 +9,17 @@ import { useDemoData } from '@/hooks/useDemoData'
 import { useTheme } from '@/hooks/useTheme'
 import { usePrivacyBlur } from '@/hooks/usePrivacyBlur'
 import { cn } from '@/lib/utils'
+import { startAutomatedChecks } from '@/services/jobs/automatedChecksService'
 
 export function AppShell() {
   const { sidebarOpen } = useAppStore()
   const isTabHidden = usePrivacyBlur()
   useDemoData()
   useTheme()
+
+  useEffect(() => {
+    startAutomatedChecks()
+  }, [])
 
   return (
     <div className={cn('flex h-screen bg-neutral-10 dark:bg-neutral-90', isTabHidden && 'blur-xl transition-all duration-300')}>
@@ -25,7 +31,7 @@ export function AppShell() {
         )}
       >
         <Header />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4">
           <Outlet />
         </main>
       </div>
