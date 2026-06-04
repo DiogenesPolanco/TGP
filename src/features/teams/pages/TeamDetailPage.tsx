@@ -1,14 +1,19 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
-import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2 } from 'lucide-react'
+import { TeamSprintsSection } from '@/features/teams/components/TeamSprintsSection'
+import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2, BarChart3, Eye } from 'lucide-react'
+
+type Tab = 'dora' | 'sprints'
 
 export function TeamDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { confirm } = useConfirm()
+  const [activeTab, setActiveTab] = useState<Tab>('dora')
 
   const team = useLiveQuery(() => db.teams.get(id!), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray())
@@ -30,12 +35,12 @@ export function TeamDetailPage() {
       return { label: 'Elite', color: 'text-success', bg: 'bg-success/10' }
     }
     if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 168 && metrics.changeFailureRate <= 10 && metrics.mttrHours <= 24) {
-      return { label: 'High', color: 'text-info', bg: 'bg-info/10' }
+      return { label: 'Alto', color: 'text-info', bg: 'bg-info/10' }
     }
     if (metrics.deploymentFrequency >= 0.25 && metrics.leadTimeHours <= 720 && metrics.changeFailureRate <= 15 && metrics.mttrHours <= 168) {
-      return { label: 'Medium', color: 'text-warning', bg: 'bg-warning/10' }
+      return { label: 'Medio', color: 'text-warning', bg: 'bg-warning/10' }
     }
-    return { label: 'Low', color: 'text-danger', bg: 'bg-danger/10' }
+    return { label: 'Bajo', color: 'text-danger', bg: 'bg-danger/10' }
   }
 
   const dora = getDoraLevel()
@@ -45,6 +50,11 @@ export function TeamDetailPage() {
     const updatedMembers = team.members.filter((m) => m.id !== memberId)
     await db.teams.update(team.id, { members: updatedMembers })
   }
+
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: 'dora', label: 'DORA y Miembros', icon: <Zap size={16} /> },
+    { id: 'sprints', label: 'Sprints', icon: <BarChart3 size={16} /> },
+  ]
 
   return (
     <div className="space-y-6">
@@ -61,74 +71,106 @@ export function TeamDetailPage() {
         </div>
       </div>
 
-      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${dora.bg}`}>
-        <span className={`text-sm font-semibold ${dora.color}`}>Nivel DORA: {dora.label}</span>
+      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab.id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-neutral-50 hover:text-neutral-90 hover:border-neutral-30'
+            }`}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {metrics && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <DoraCard
-            icon={<Zap size={24} />}
-            label="Deployment Frequency"
-            value={`${metrics.deploymentFrequency}/día`}
-            benchmark={metrics.deploymentFrequency >= 1 ? 'Elite' : metrics.deploymentFrequency >= 0.25 ? 'High' : 'Low'}
-            color={metrics.deploymentFrequency >= 1 ? 'text-success' : metrics.deploymentFrequency >= 0.25 ? 'text-info' : 'text-danger'}
-          />
-          <DoraCard
-            icon={<Clock size={24} />}
-            label="Lead Time"
-            value={`${metrics.leadTimeHours}h`}
-            benchmark={metrics.leadTimeHours <= 1 ? 'Elite' : metrics.leadTimeHours <= 168 ? 'High' : 'Low'}
-            color={metrics.leadTimeHours <= 1 ? 'text-success' : metrics.leadTimeHours <= 168 ? 'text-info' : 'text-danger'}
-          />
-          <DoraCard
-            icon={<AlertTriangle size={24} />}
-            label="Change Failure Rate"
-            value={`${metrics.changeFailureRate}%`}
-            benchmark={metrics.changeFailureRate <= 5 ? 'Elite' : metrics.changeFailureRate <= 10 ? 'High' : 'Low'}
-            color={metrics.changeFailureRate <= 5 ? 'text-success' : metrics.changeFailureRate <= 10 ? 'text-info' : 'text-danger'}
-          />
-          <DoraCard
-            icon={<TrendingUp size={24} />}
-            label="MTTR"
-            value={`${metrics.mttrHours}h`}
-            benchmark={metrics.mttrHours <= 1 ? 'Elite' : metrics.mttrHours <= 24 ? 'High' : 'Low'}
-            color={metrics.mttrHours <= 1 ? 'text-success' : metrics.mttrHours <= 24 ? 'text-info' : 'text-danger'}
-          />
-        </div>
+      {activeTab === 'dora' && (
+        <>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${dora.bg}`}>
+            <span className={`text-sm font-semibold ${dora.color}`}>Nivel DORA: {dora.label}</span>
+          </div>
+
+          {metrics && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <DoraCard
+                icon={<Zap size={24} />}
+                label="Frecuencia de Despliegue"
+                value={`${metrics.deploymentFrequency}/día`}
+                benchmark={metrics.deploymentFrequency >= 1 ? 'Elite' : metrics.deploymentFrequency >= 0.25 ? 'Alto' : 'Bajo'}
+                color={metrics.deploymentFrequency >= 1 ? 'text-success' : metrics.deploymentFrequency >= 0.25 ? 'text-info' : 'text-danger'}
+              />
+              <DoraCard
+                icon={<Clock size={24} />}
+                label="Tiempo de Entrega"
+                value={`${metrics.leadTimeHours}h`}
+                benchmark={metrics.leadTimeHours <= 1 ? 'Elite' : metrics.leadTimeHours <= 168 ? 'Alto' : 'Bajo'}
+                color={metrics.leadTimeHours <= 1 ? 'text-success' : metrics.leadTimeHours <= 168 ? 'text-info' : 'text-danger'}
+              />
+              <DoraCard
+                icon={<AlertTriangle size={24} />}
+                label="Tasa de Fallos"
+                value={`${metrics.changeFailureRate}%`}
+                benchmark={metrics.changeFailureRate <= 5 ? 'Elite' : metrics.changeFailureRate <= 10 ? 'Alto' : 'Bajo'}
+                color={metrics.changeFailureRate <= 5 ? 'text-success' : metrics.changeFailureRate <= 10 ? 'text-info' : 'text-danger'}
+              />
+              <DoraCard
+                icon={<TrendingUp size={24} />}
+                label="MTTR"
+                value={`${metrics.mttrHours}h`}
+                benchmark={metrics.mttrHours <= 1 ? 'Elite' : metrics.mttrHours <= 24 ? 'Alto' : 'Bajo'}
+                color={metrics.mttrHours <= 1 ? 'text-success' : metrics.mttrHours <= 24 ? 'text-info' : 'text-danger'}
+              />
+            </div>
+          )}
+
+          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
+            <div className="space-y-2">
+              {team.members.map((member) => (
+                <div key={member.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Users size={14} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
+                      <p className="text-xs text-neutral-60 dark:text-neutral-40">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
+                    <button
+                      onClick={() => navigate(`/teams/${team.id}/performance/${member.id}`)}
+                      className="p-1 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Ver rendimiento"
+                    >
+                      <Eye size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleRemoveMember(member.id)}
+                      className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Eliminar miembro"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {team.members.length === 0 && (
+                <p className="text-sm text-neutral-50 dark:text-neutral-50">No hay miembros</p>
+              )}
+            </div>
+          </div>
+        </>
       )}
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
-        <div className="space-y-2">
-          {team.members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Users size={14} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                  <p className="text-xs text-neutral-60 dark:text-neutral-40">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
-                <button
-                  onClick={() => handleRemoveMember(member.id)}
-                  className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Eliminar miembro"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
-          {team.members.length === 0 && (
-            <p className="text-sm text-neutral-50 dark:text-neutral-50">No hay miembros</p>
-          )}
-        </div>
-      </div>
+      {activeTab === 'sprints' && (
+        <TeamSprintsSection teamId={team.id} members={team.members} />
+      )}
     </div>
   )
 }
