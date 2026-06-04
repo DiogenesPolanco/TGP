@@ -1,15 +1,18 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { runEscalation } from '../services/escalationService'
+import { BlockerForm } from '../components/BlockerForm'
 import {
-  AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight,
+  AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight, Pencil,
   Calendar, ListTodo, Ban, Target,
 } from 'lucide-react'
+import type { Blocker } from '@/types/domain'
 
 export function DailyPage() {
   const navigate = useNavigate()
+  const [editingBlocker, setEditingBlocker] = useState<Blocker | null>(null)
   const today = useMemo(() => {
     const d = new Date()
     d.setHours(0, 0, 0, 0)
@@ -93,7 +96,7 @@ export function DailyPage() {
   const criticalBlockers = agenda.activeBlockers.filter((b) => b.severity === 'critical' || b.severity === 'high')
 
   return (
-    <div className="space-y-6">
+    <><div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -165,7 +168,11 @@ export function DailyPage() {
               </div>
               <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
                 {agenda.activeBlockers.slice(0, 5).map((blocker) => (
-                  <div key={blocker.id} className="px-4 py-3">
+                  <div
+                    key={blocker.id}
+                    className="px-4 py-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
+                    onClick={() => setEditingBlocker(blocker)}
+                  >
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
                         blocker.severity === 'critical' ? 'bg-danger/10 text-danger' :
@@ -174,7 +181,8 @@ export function DailyPage() {
                       }`}>
                         {blocker.severity}
                       </span>
-                      <span className="text-sm font-medium text-neutral-90 dark:text-white">{blocker.title}</span>
+                      <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
+                      <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1 ml-1">
                       {blocker.description?.slice(0, 120)}
@@ -290,7 +298,11 @@ export function DailyPage() {
                 {agenda.tasksDue.slice(0, 8).map((task) => {
                   const plan = planMap.get(task.planId ?? '')
                   return (
-                    <div key={task.id} className="px-4 py-2.5 flex items-center gap-3">
+                    <div
+                      key={task.id}
+                      className="px-4 py-2.5 flex items-center gap-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
+                      onClick={() => task.planId && navigate(`/execution/plans/${task.planId}`)}
+                    >
                       <div className={`w-2 h-2 rounded-full ${
                         task.priority === 'critical' ? 'bg-danger' :
                         task.priority === 'high' ? 'bg-warning' :
@@ -298,6 +310,7 @@ export function DailyPage() {
                       }`} />
                       <span className="text-sm text-neutral-90 dark:text-white flex-1 truncate">{task.title}</span>
                       {plan && <span className="text-xs text-neutral-50 shrink-0">{plan.title}</span>}
+                      <ArrowRight size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   )
                 })}
@@ -363,6 +376,17 @@ export function DailyPage() {
         </div>
       </div>
     </div>
+
+      {editingBlocker && (
+        <BlockerForm
+          blocker={editingBlocker}
+          sourceType={editingBlocker.sourceType}
+          sourceId={editingBlocker.sourceId}
+          onClose={() => setEditingBlocker(null)}
+          onSave={() => setEditingBlocker(null)}
+        />
+      )}
+    </>
   )
 }
 
