@@ -252,6 +252,7 @@ export function ObjectivesPage() {
 
 function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const handleStatusChange = async (newStatus: string) => {
     const objective = await db.objectives.get(objectiveId)
@@ -261,6 +262,15 @@ function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
     )
     await db.objectives.update(objectiveId, { keyResults: updatedKrs, updatedAt: new Date() })
     addNotification({ type: 'success', message: `KR actualizado a "${newStatus}"` })
+  }
+
+  const handleDeleteKr = async () => {
+    if (!(await confirm('¿Eliminar este Key Result?'))) return
+    const objective = await db.objectives.get(objectiveId)
+    if (!objective) return
+    const updatedKrs = objective.keyResults.filter((k) => k.id !== kr.id)
+    await db.objectives.update(objectiveId, { keyResults: updatedKrs, updatedAt: new Date() })
+    addNotification({ type: 'success', message: 'Key Result eliminado' })
   }
 
   const getStatusStyle = (status: string) => {
@@ -290,6 +300,13 @@ function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
           <option value="behind">Atrasado</option>
           <option value="achieved">Logrado</option>
         </select>
+        <button
+          onClick={(e) => { e.stopPropagation(); handleDeleteKr() }}
+          className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+          title="Eliminar"
+        >
+          <Trash2 size={14} />
+        </button>
       </div>
     </div>
   )

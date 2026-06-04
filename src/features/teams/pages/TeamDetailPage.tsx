@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
+import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2 } from 'lucide-react'
 
 export function TeamDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { confirm } = useConfirm()
 
   const team = useLiveQuery(() => db.teams.get(id!), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray())
@@ -36,6 +38,12 @@ export function TeamDetailPage() {
   }
 
   const dora = getDoraLevel()
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!(await confirm('¿Eliminar este miembro del equipo?'))) return
+    const updatedMembers = team.members.filter((m) => m.id !== memberId)
+    await db.teams.update(team.id, { members: updatedMembers })
+  }
 
   return (
     <div className="space-y-6">
@@ -93,7 +101,7 @@ export function TeamDetailPage() {
         <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
         <div className="space-y-2">
           {team.members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+            <div key={member.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                   <Users size={14} className="text-primary" />
@@ -103,7 +111,16 @@ export function TeamDetailPage() {
                   <p className="text-xs text-neutral-60 dark:text-neutral-40">{member.role}</p>
                 </div>
               </div>
-              <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
+                <button
+                  onClick={() => handleRemoveMember(member.id)}
+                  className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Eliminar miembro"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </div>
           ))}
           {team.members.length === 0 && (
