@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X } from 'lucide-react'
+import { X, Trash2 } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
 
 interface TeamFormProps {
@@ -11,6 +12,7 @@ interface TeamFormProps {
 }
 
 export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
+  const { confirm } = useConfirm()
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
   const [formData, setFormData] = useState({
     name: team?.name ?? '',
@@ -66,7 +68,8 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
     setFormData({ ...formData, members: updated })
   }
 
-  const removeMember = (index: number) => {
+  const removeMember = async (index: number) => {
+    if (!(await confirm('¿Eliminar este miembro?'))) return
     setFormData({ ...formData, members: formData.members.filter((_, i) => i !== index) })
   }
 
@@ -163,9 +166,10 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                   <button
                     type="button"
                     onClick={() => removeMember(index)}
-                    className="text-sm text-danger hover:underline"
+                    className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+                    title="Eliminar miembro"
                   >
-                    Eliminar
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}

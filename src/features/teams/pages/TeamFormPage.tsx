@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { ArrowLeft, Plus, Users } from 'lucide-react'
+import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
 
 interface MemberInput {
@@ -25,6 +26,7 @@ export function TeamFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const team = useLiveQuery(() => (id ? db.teams.get(id) : undefined), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
@@ -61,7 +63,11 @@ export function TeamFormPage() {
     const updated = [...members]; updated[index] = { ...updated[index], [field]: value }; setMembers(updated)
   }
 
-  const removeMember = (index: number) => { if (members.length > 1) setMembers(members.filter((_, i) => i !== index)) }
+  const removeMember = async (index: number) => {
+    if (members.length <= 1) return
+    if (!(await confirm('¿Eliminar este miembro?'))) return
+    setMembers(members.filter((_, i) => i !== index))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -138,7 +144,7 @@ export function TeamFormPage() {
                 <input type="text" placeholder="Nombre" value={member.name} onChange={(e) => updateMember(index, 'name', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
                 <input type="text" placeholder="Rol" value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value)} className="w-24 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
                 <input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" />
-                <button type="button" onClick={() => removeMember(index)} className="text-danger hover:underline text-sm">Eliminar</button>
+                <button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
