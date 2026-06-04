@@ -438,7 +438,13 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
       let existing: any = null
 
       if (matchKeys.length === 1) {
-        existing = await table.where(matchKeys[0]).equals(matchFields[matchKeys[0]]).first()
+        try {
+          existing = await table.where(matchKeys[0]).equals(matchFields[matchKeys[0]]).first()
+        } catch {
+          // Fallback if the field isn't indexed (e.g. schema not yet migrated)
+          const all = await table.toArray()
+          existing = all.find((item: any) => item[matchKeys[0]] === matchFields[matchKeys[0]])
+        }
       } else {
         const all = await table.toArray()
         existing = all.find((item: any) =>
