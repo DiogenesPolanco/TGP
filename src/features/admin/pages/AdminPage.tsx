@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Download, Upload, Database, Trash2, FileSpreadsheet, Cpu, RefreshCw } from 'lucide-react'
-import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import { Download, Upload, Database, Trash2, FileSpreadsheet, RefreshCw, Shield } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
-import type { SeedResult } from '@/services/demo/seedTechnologies'
+import { getSecret, verifyTotp } from '@/services/auth/authService'
+import { encryptField, decryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 
 export function AdminPage() {
@@ -18,31 +17,72 @@ export function AdminPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [seedResult, setSeedResult] = useState<SeedResult | null>(null)
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
 
-  const stats = useLiveQuery(async () => ({
-    applications: await db.applications.count(),
-    vulnerabilities: await db.vulnerabilities.count(),
-    incidents: await db.incidents.count(),
-    risks: await db.risks.count(),
-    findings: await db.auditFindings.count(),
-    teams: await db.teams.count(),
-    objectives: await db.objectives.count(),
-  }))
+  // TOTP re-auth for export
+  const [showTotpDialog, setShowTotpDialog] = useState(false)
+  const [totpCode, setTotpCode] = useState('')
+  const [totpError, setTotpError] = useState('')
+
+  const handleReAuthExport = async () => {
+    const secret = await getSecret()
+    if (!secret) {
+      addNotification({ type: 'error', message: 'No hay configuración de seguridad. Regístrate primero.' })
+      return
+    }
+    setTotpCode('')
+    setTotpError('')
+    setShowTotpDialog(true)
+  }
+
+  const handleConfirmExport = async () => {
+    const secret = await getSecret()
+    if (!secret) return
+
+    if (!verifyTotp(totpCode, secret)) {
+      setTotpError('Código inválido. Intenta de nuevo.')
+      return
+    }
+
+    setShowTotpDialog(false)
+    setTotpCode('')
+    setTotpError('')
+    await handleExport()
+  }
 
   const handleExport = async () => {
     setIsExporting(true)
     try {
+      const [applications, auditFindings] = await Promise.all([
+        db.applications.toArray(),
+        db.auditFindings.toArray(),
+      ])
+
+      // Encrypt sensitive business fields before export
+      const encryptedApplications = await Promise.all(
+        applications.map(async (app) => ({
+          ...app,
+          name: await encryptField(app.name),
+          description: app.description ? await encryptField(app.description) : '',
+        }))
+      )
+      const encryptedFindings = await Promise.all(
+        auditFindings.map(async (f) => ({
+          ...f,
+          title: await encryptField(f.title),
+          description: f.description ? await encryptField(f.description) : '',
+        }))
+      )
+
       const data = {
         tenants: await db.tenants.toArray(),
         businessUnits: await db.businessUnits.toArray(),
-        applications: await db.applications.toArray(),
+        applications: encryptedApplications,
         technologies: await db.technologies.toArray(),
         vulnerabilities: await db.vulnerabilities.toArray(),
         incidents: await db.incidents.toArray(),
         risks: await db.risks.toArray(),
-        auditFindings: await db.auditFindings.toArray(),
+        auditFindings: encryptedFindings,
         teams: await db.teams.toArray(),
         objectives: await db.objectives.toArray(),
         healthIndexHistory: await db.healthIndexHistory.toArray(),
@@ -117,15 +157,6 @@ export function AdminPage() {
     addNotification({ type: 'success', message: 'Datos de demo cargados' })
   }
 
-  const handleSeedTechnologies = async () => {
-    const result = await seedTechnologies()
-    setSeedResult(result)
-    addNotification({
-      type: 'success',
-      message: `Tecnologías sembradas: ${result.added} añadidas, ${result.skipped} omitidas`,
-    })
-  }
-
   const handleSyncTechnologies = async () => {
     setIsSyncing(true)
     setSyncResult(null)
@@ -148,29 +179,19 @@ export function AdminPage() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Administración</h2>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Aplicaciones" value={stats?.applications ?? 0} />
-        <StatCard label="Vulnerabilidades" value={stats?.vulnerabilities ?? 0} />
-        <StatCard label="Incidentes" value={stats?.incidents ?? 0} />
-        <StatCard label="Riesgos" value={stats?.risks ?? 0} />
-        <StatCard label="Hallazgos" value={stats?.findings ?? 0} />
-        <StatCard label="Equipos" value={stats?.teams ?? 0} />
-        <StatCard label="Objetivos" value={stats?.objectives ?? 0} />
-      </div>
-
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
         <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">Gestión de Datos</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={handleExport}
+            onClick={handleReAuthExport}
             disabled={isExporting}
             className="flex items-center gap-3 p-4 rounded-lg border border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
-            <Download size={24} className="text-primary" />
+            <Shield size={24} className="text-primary" />
             <div className="text-left">
               <p className="text-sm font-medium text-neutral-90 dark:text-white">Exportar Datos</p>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40">Descargar backup JSON</p>
+              <p className="text-xs text-warning">Requiere autenticación · Datos cifrados</p>
             </div>
           </button>
 
@@ -208,21 +229,6 @@ export function AdminPage() {
             <div className="text-left">
               <p className="text-sm font-medium text-neutral-90 dark:text-white">Cargar Datos Demo</p>
               <p className="text-xs text-warning">Sobrescribe TODOS los datos existentes</p>
-            </div>
-          </button>
-
-          <button
-            onClick={handleSeedTechnologies}
-            className="flex items-center gap-3 p-4 rounded-lg border border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-          >
-            <Cpu size={24} className="text-warning" />
-            <div className="text-left">
-              <p className="text-sm font-medium text-neutral-90 dark:text-white">Sembrar Catálogo de Tecnologías</p>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40">
-                {seedResult
-                  ? `${seedResult.added} añadidas · ${seedResult.skipped} omitidas`
-                  : 'Cargar todas las tecnologías conocidas'}
-              </p>
             </div>
           </button>
 
@@ -278,15 +284,51 @@ export function AdminPage() {
           </div>
         </div>
       </div>
+      {/* TOTP Re-auth dialog */}
+      {showTotpDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <Shield size={24} className="text-primary" />
+              <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">Verificar identidad</h3>
+            </div>
+            <p className="text-sm text-neutral-60 dark:text-neutral-40">
+              Ingresa el código de 6 dígitos de tu autenticador para exportar los datos.
+            </p>
+            <input
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              maxLength={6}
+              value={totpCode}
+              onChange={(e) => { setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setTotpError('') }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmExport() }}
+              className="w-full px-3 py-3 text-center text-2xl tracking-[0.5em] font-mono rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="000000"
+            />
+            {totpError && (
+              <p className="text-sm text-danger">{totpError}</p>
+            )}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowTotpDialog(false)}
+                className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmExport}
+                disabled={totpCode.length !== 6}
+                className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50"
+              >
+                Verificar y Exportar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </div>
-  )
-}
+
