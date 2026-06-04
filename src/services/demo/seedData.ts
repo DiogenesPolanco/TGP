@@ -161,12 +161,46 @@ export async function seedDemoData() {
   const risks = [risk_7d, risk_90d, risk_ytd]
 
   // ── Audit findings spread across time ──
-  // Within 7d
-  const find_7d: AuditFinding = { id: 'find-1', applicationId: 'app-1', auditReference: 'AUD-2024-001', title: 'Controles de acceso insuficientes', description: 'Falta de RBAC granular', severity: 'high', category: 'security', status: 'open', dueDate: new Date('2025-02-28'), evidence: [], actionPlan: null, metadata: {}, createdAt: days(3), updatedAt: days(3) }
-  // ~50d ago (shows in 90d, ytd — NOT in 7d or 30d)
-  const find_90d: AuditFinding = { id: 'find-2', applicationId: 'app-5', auditReference: 'AUD-2024-002', title: 'Documentación obsoleta', description: 'La documentación no refleja el estado actual', severity: 'medium', category: 'compliance', status: 'overdue', dueDate: new Date('2024-11-30'), evidence: [], actionPlan: null, metadata: {}, createdAt: days(50), updatedAt: days(50) }
+  // Closed on time (counts toward compliance: ✓)
+  const find_closed_1: AuditFinding = {
+    id: 'find-1', applicationId: 'app-1', auditReference: 'AUD-2024-001',
+    title: 'Controles de acceso insuficientes', description: 'Falta de RBAC granular en módulo de pagos. Corregido con políticas IAM.',
+    severity: 'high', category: 'security', status: 'closed',
+    dueDate: new Date('2026-08-15'), evidence: [], actionPlan: null,
+    metadata: {}, createdAt: days(90), updatedAt: days(10),
+  }
+  const find_closed_2: AuditFinding = {
+    id: 'find-3', applicationId: 'app-4', auditReference: 'AUD-2024-003',
+    title: 'Cifrado de datos en tránsito', description: 'ISO 27001: A.10.1.1 — Implementar TLS 1.3 en todos los endpoints.',
+    severity: 'high', category: 'compliance', status: 'resolved',
+    dueDate: new Date('2026-07-31'), evidence: [], actionPlan: null,
+    metadata: {}, createdAt: days(60), updatedAt: days(5),
+  }
+  const find_closed_3: AuditFinding = {
+    id: 'find-4', applicationId: 'app-2', auditReference: 'AUD-2024-004',
+    title: 'Política de backups', description: 'Verificar y documentar política de backups según compliance interno.',
+    severity: 'medium', category: 'compliance', status: 'closed',
+    dueDate: new Date('2026-06-30'), evidence: [], actionPlan: null,
+    metadata: {}, createdAt: days(45), updatedAt: days(15),
+  }
+  // Open — still within due date (does NOT count toward compliance: ✗)
+  const find_open: AuditFinding = {
+    id: 'find-5', applicationId: 'app-3', auditReference: 'AUD-2024-005',
+    title: 'Auditoría de accesos privilegiados', description: 'Revisión de accesos administrativos según SOX.',
+    severity: 'medium', category: 'access_control', status: 'open',
+    dueDate: new Date('2026-09-30'), evidence: [], actionPlan: null,
+    metadata: {}, createdAt: days(20), updatedAt: days(20),
+  }
+  // Overdue (does NOT count toward compliance: ✗)
+  const find_overdue: AuditFinding = {
+    id: 'find-2', applicationId: 'app-5', auditReference: 'AUD-2024-002',
+    title: 'Documentación de continuidad', description: 'Actualizar plan de continuidad del negocio según BCP.',
+    severity: 'medium', category: 'business_continuity', status: 'overdue',
+    dueDate: new Date('2026-01-15'), evidence: [], actionPlan: null,
+    metadata: {}, createdAt: days(120), updatedAt: days(30),
+  }
 
-  const auditFindings = [find_7d, find_90d]
+  const auditFindings = [find_closed_1, find_overdue, find_closed_2, find_closed_3, find_open]
 
   const teams: Team[] = [
     { id: 'team-1', businessUnitId: 'bu-digital', name: 'Platform Team', sourceSystem: 'jira', externalId: 'TEAM-1', members: [{ id: 'tm-1', userPrincipal: 'user-1', displayName: 'Juan Pérez', role: 'Tech Lead', allocationPct: 100, isActive: true }], currentMetrics: { velocity: 45, leadTimeHours: 12, cycleTimeHours: 8, throughput: 12, deploymentFrequency: 2, changeFailureRate: 3, mttrHours: 0.5, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
@@ -270,4 +304,53 @@ export async function seedDemoData() {
   await db.blockers.bulkAdd(blockers)
 
   localStorage.setItem(SEEDED_FLAG, 'true')
+}
+
+/**
+ * Ensure compliance audit findings exist, even for already-seeded users.
+ * Runs on every app load — only inserts/updates what's missing.
+ */
+export async function seedComplianceFindings() {
+  const now = Date.now()
+  const days = (n: number) => new Date(now - n * 24 * 60 * 60 * 1000)
+
+  const upserts: AuditFinding[] = [
+    {
+      id: 'find-1', applicationId: 'app-1', auditReference: 'AUD-2024-001',
+      title: 'Controles de acceso insuficientes', description: 'Falta de RBAC granular en módulo de pagos. Corregido con políticas IAM.',
+      severity: 'high', category: 'security', status: 'closed',
+      dueDate: new Date('2026-08-15'), evidence: [], actionPlan: null,
+      metadata: {}, createdAt: days(90), updatedAt: days(10),
+    },
+    {
+      id: 'find-2', applicationId: 'app-5', auditReference: 'AUD-2024-002',
+      title: 'Documentación de continuidad', description: 'Actualizar plan de continuidad del negocio según BCP.',
+      severity: 'medium', category: 'business_continuity', status: 'overdue',
+      dueDate: new Date('2026-01-15'), evidence: [], actionPlan: null,
+      metadata: {}, createdAt: days(120), updatedAt: days(30),
+    },
+    {
+      id: 'find-3', applicationId: 'app-4', auditReference: 'AUD-2024-003',
+      title: 'Cifrado de datos en tránsito', description: 'ISO 27001: A.10.1.1 — Implementar TLS 1.3 en todos los endpoints.',
+      severity: 'high', category: 'compliance', status: 'resolved',
+      dueDate: new Date('2026-07-31'), evidence: [], actionPlan: null,
+      metadata: {}, createdAt: days(60), updatedAt: days(5),
+    },
+    {
+      id: 'find-4', applicationId: 'app-2', auditReference: 'AUD-2024-004',
+      title: 'Política de backups', description: 'Verificar y documentar política de backups según compliance interno.',
+      severity: 'medium', category: 'compliance', status: 'closed',
+      dueDate: new Date('2026-06-30'), evidence: [], actionPlan: null,
+      metadata: {}, createdAt: days(45), updatedAt: days(15),
+    },
+    {
+      id: 'find-5', applicationId: 'app-3', auditReference: 'AUD-2024-005',
+      title: 'Auditoría de accesos privilegiados', description: 'Revisión de accesos administrativos según SOX.',
+      severity: 'medium', category: 'access_control', status: 'open',
+      dueDate: new Date('2026-09-30'), evidence: [], actionPlan: null,
+      metadata: {}, createdAt: days(20), updatedAt: days(20),
+    },
+  ]
+
+  await db.auditFindings.bulkPut(upserts)
 }
