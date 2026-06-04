@@ -267,6 +267,29 @@ Al abrir la app por primera vez:
 6. Tras **30 minutos de inactividad**, la sesión se cierra automáticamente
 7. Para cerrar sesión manualmente, usar el botón de logout en el header
 
+### Bypass para desarrollo
+
+Para saltar la autenticación en entorno de desarrollo, pega esto en la consola del navegador (F12) y recarga:
+
+```js
+sessionStorage.setItem('tgp-auth-session', JSON.stringify({
+  token: crypto.randomUUID(),
+  createdAt: Date.now(),
+  expiresAt: Date.now() + 86400000
+}));
+location.reload();
+```
+
+Para reiniciar la configuración desde cero (nuevo QR):
+
+```js
+localStorage.removeItem('tgp-auth-secret');
+localStorage.removeItem('tgp-auth-secret-iv');
+localStorage.removeItem('tgp-auth-secret-salt');
+sessionStorage.removeItem('tgp-auth-session');
+location.reload();
+```
+
 ## Licencia
 
 Propietaria — TGP &copy; 2026
