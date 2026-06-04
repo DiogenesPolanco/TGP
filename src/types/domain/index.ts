@@ -350,6 +350,8 @@ export interface Activity {
   status: DeliverableStatus
   estimatedHours: number | null
   actualHours: number | null
+  plannedPoints: number | null
+  completedPoints: number | null
   startDate: Date | null
   dueDate: Date | null
   completedAt: Date | null

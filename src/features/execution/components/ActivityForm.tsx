@@ -25,7 +25,8 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
   const [parentActivityId, setParentActivityId] = useState(activity?.parentActivityId ?? '')
   const [priority, setPriority] = useState<Criticality>(activity?.priority ?? 'medium')
   const [status, setStatus] = useState<DeliverableStatus>(activity?.status ?? 'pending')
-  const [estimatedHours, setEstimatedHours] = useState(activity?.estimatedHours?.toString() ?? '')
+  const [plannedPoints, setPlannedPoints] = useState(activity?.plannedPoints?.toString() ?? '')
+  const [completedPoints, setCompletedPoints] = useState(activity?.completedPoints?.toString() ?? '')
   const [startDate, setStartDate] = useState(
     activity?.startDate ? activity.startDate.toISOString().split('T')[0] : '',
   )
@@ -79,8 +80,9 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
         applicationId: applicationId || null,
         priority,
         status,
-        estimatedHours: estimatedHours ? Number(estimatedHours) : null,
         actualHours: activity?.actualHours ?? null,
+        plannedPoints: plannedPoints ? Number(plannedPoints) : null,
+        completedPoints: completedPoints ? Number(completedPoints) : null,
         startDate: startDate ? new Date(startDate) : null,
         dueDate: dueDate ? new Date(dueDate) : null,
         completedAt: activity?.completedAt ?? null,
@@ -229,11 +231,22 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Horas Est.</label>
+            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Planif.</label>
             <input
               type="number"
-              value={estimatedHours}
-              onChange={(e) => setEstimatedHours(e.target.value)}
+              value={plannedPoints}
+              onChange={(e) => setPlannedPoints(e.target.value)}
+              min="0"
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Comp.</label>
+            <input
+              type="number"
+              value={completedPoints}
+              onChange={(e) => setCompletedPoints(e.target.value)}
               min="0"
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />

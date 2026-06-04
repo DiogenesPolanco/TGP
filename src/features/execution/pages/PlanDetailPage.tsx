@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { ArrowLeft, Plus, Edit, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, Plus, Edit, Edit3, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
 import { ActivityForm } from '../components/ActivityForm'
 import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
@@ -133,6 +133,13 @@ export function PlanDetailPage() {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{plan.title}</h2>
+            <button
+              onClick={() => navigate(`/execution/plans/${plan.id}/edit`)}
+              className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors"
+              title="Editar Plan"
+            >
+              <Edit3 size={18} />
+            </button>
             <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
               plan.health === 'red' ? 'bg-danger/10 text-danger border-danger/30' :
               plan.health === 'yellow' ? 'bg-warning/10 text-warning border-warning/30' :
@@ -293,7 +300,7 @@ function ActivityNode({
               {activity.assigneeId && <span>{activity.assigneeId}</span>}
               {teamMap.get(activity.teamId ?? '') && <span>{teamMap.get(activity.teamId!)?.name}</span>}
               {appMap.get(activity.applicationId ?? '') && <span>{appMap.get(activity.applicationId!)?.name}</span>}
-              {activity.estimatedHours && <span>{activity.estimatedHours}h est.</span>}
+              {activity.plannedPoints && <span>{activity.plannedPoints} pts planif.</span>}
               {activity.dueDate && (
                 <span className={new Date(activity.dueDate) < new Date() && activity.status !== 'completed' ? 'text-danger' : ''}>
                   Vence: {new Date(activity.dueDate).toLocaleDateString('es-ES')}

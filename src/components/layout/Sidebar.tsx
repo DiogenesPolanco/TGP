@@ -33,6 +33,7 @@ const navItems: NavItem[] = [
       { label: 'Seguimiento Diario', path: '/execution/daily' },
       { label: 'Planes', path: '/execution/plans' },
       { label: 'Compromisos', path: '/execution/commitments' },
+      { label: 'Predictibilidad', path: '/execution/predictability' },
     ],
   },
   {
