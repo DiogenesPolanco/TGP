@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import {
   Filter,
   X,
@@ -52,6 +54,8 @@ export function DeliverablesPage() {
     }
     return true
   })
+
+  const { page, setPage, totalPages, paginatedItems: paginatedDeliverables } = usePagination(filtered, 5)
 
   const handleDelete = async (id: string) => {
     await db.deliverables.delete(id)
@@ -157,69 +161,78 @@ export function DeliverablesPage() {
             <p className="text-sm">No hay entregables que coincidan con los filtros</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Título</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Aplicación</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Fecha Límite</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">OKR</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Acción</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {filtered.map((del) => {
-                const app = del.applicationId ? appMap.get(del.applicationId) : null
-                const obj = del.objectiveId ? allObjectives.find((o) => o.id === del.objectiveId) : null
-                return (
-                  <tr key={del.id} className="group hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{del.title}</p>
-                      {del.description && (
-                        <p className="text-xs text-neutral-50 mt-0.5 max-w-xs truncate">{del.description}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {app ? (
+          <>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Título</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Aplicación</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Estado</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Fecha Límite</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">OKR</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
+                {paginatedDeliverables.map((del) => {
+                  const app = del.applicationId ? appMap.get(del.applicationId) : null
+                  const obj = del.objectiveId ? allObjectives.find((o) => o.id === del.objectiveId) : null
+                  return (
+                    <tr key={del.id} className="group hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white">{del.title}</p>
+                        {del.description && (
+                          <p className="text-xs text-neutral-50 mt-0.5 max-w-xs truncate">{del.description}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {app ? (
+                          <button
+                            onClick={() => navigate(`/catalog/applications/${app.id}`)}
+                            className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors"
+                          >
+                            {app.name}
+                            <ArrowRight size={12} />
+                          </button>
+                        ) : (
+                          <span className="text-sm text-neutral-50">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[del.status])}>
+                          {statusLabel[del.status]}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">
+                        {del.dueDate
+                          ? del.dueDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
+                          : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30 max-w-[180px] truncate">
+                        {obj?.title ?? '—'}
+                      </td>
+                      <td className="px-4 py-3 text-right">
                         <button
-                          onClick={() => navigate(`/catalog/applications/${app.id}`)}
-                          className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors"
+                          onClick={() => handleDelete(del.id)}
+                          className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
+                          title="Eliminar"
                         >
-                          {app.name}
-                          <ArrowRight size={12} />
+                          <X size={14} />
                         </button>
-                      ) : (
-                        <span className="text-sm text-neutral-50">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[del.status])}>
-                        {statusLabel[del.status]}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">
-                      {del.dueDate
-                        ? del.dueDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
-                        : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30 max-w-[180px] truncate">
-                      {obj?.title ?? '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => handleDelete(del.id)}
-                        className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
-                        title="Eliminar"
-                      >
-                        <X size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={filtered.length}
+              pageSize={5}
+              onPageChange={setPage}
+            />
+          </>
         )}
       </div>
     </div>

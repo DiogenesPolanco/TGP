@@ -7,10 +7,10 @@ import {
   ArrowLeft, Edit, Shield, AlertTriangle, Activity, FileWarning,
   Plus, X, Unlink, Search,
 } from 'lucide-react'
-import { ApplicationForm } from '../components/ApplicationForm'
 import type { Technology, Vulnerability, Risk, Incident, AuditFinding, SupportStatus } from '@/types/domain'
 import { DeliverablesTab } from '../components/DeliverablesTab'
 import { MicroservicesTab } from '../components/MicroservicesTab'
+import { ArchitectureTab } from '../components/ArchitectureTab'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -30,7 +30,6 @@ export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('summary')
-  const [showEditForm, setShowEditForm] = useState(false)
 
   const application = useLiveQuery(() => db.applications.get(id!), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray())
@@ -55,6 +54,7 @@ export function ApplicationDetailPage() {
 
   const tabs = [
     { id: 'summary', label: 'Resumen' },
+    { id: 'architecture', label: `Arquitectura` },
     { id: 'tech', label: `Tech Stack (${appTechnologies.length})` },
     { id: 'microservices', label: `Microservicios (${microservices?.length ?? 0})` },
     { id: 'vulns', label: `Vulnerabilidades (${vulnerabilities?.length ?? 0})` },
@@ -90,7 +90,7 @@ export function ApplicationDetailPage() {
           </div>
         </div>
         <button
-          onClick={() => setShowEditForm(true)}
+          onClick={() => navigate(`/catalog/applications/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Edit size={18} />
@@ -180,6 +180,10 @@ export function ApplicationDetailPage() {
           </div>
         )}
 
+        {activeTab === 'architecture' && (
+          <ArchitectureTab applicationId={id!} />
+        )}
+
         {activeTab === 'tech' && (
           <TechStackManager
             applicationId={application.id}
@@ -245,13 +249,6 @@ export function ApplicationDetailPage() {
         )}
       </div>
 
-      {showEditForm && (
-        <ApplicationForm
-          application={application}
-          onClose={() => setShowEditForm(false)}
-          onSave={() => setShowEditForm(false)}
-        />
-      )}
     </div>
   )
 }

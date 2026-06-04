@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
 
 export function BusinessUnitsPage() {
@@ -13,6 +15,8 @@ export function BusinessUnitsPage() {
   const [formName, setFormName] = useState('')
 
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
+
+  const { page, setPage, totalPages, paginatedItems: paginatedBUs } = usePagination(businessUnits, 10)
 
   const resetForm = () => {
     setFormName('')
@@ -135,37 +139,46 @@ export function BusinessUnitsPage() {
             </p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-20 dark:border-neutral-70">
-                <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
-                  Nombre
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
-                  Aplicaciones
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
-                  Equipos
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
-                  Creado
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {businessUnits.map((bu) => (
-                <BusinessUnitRow
-                  key={bu.id}
-                  bu={bu}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </tbody>
-          </table>
+          <>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-neutral-20 dark:border-neutral-70">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Nombre
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Aplicaciones
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Equipos
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Creado
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
+                {paginatedBUs.map((bu) => (
+                  <BusinessUnitRow
+                    key={bu.id}
+                    bu={bu}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </tbody>
+            </table>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={businessUnits.length}
+              pageSize={10}
+              onPageChange={setPage}
+            />
+          </>
         )}
       </div>
     </div>
