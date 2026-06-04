@@ -33,6 +33,7 @@ import { CommitmentFormPage } from '@/features/execution/pages/CommitmentFormPag
 import { PredictabilityPage } from '@/features/execution/pages/PredictabilityPage'
 import { PerformancePage } from '@/features/performance/pages/PerformancePage'
 import { MemberPerformancePage } from '@/features/performance/pages/MemberPerformancePage'
+import ReportsPage from '@/features/reports/pages/ReportsPage'
 
 export const router = createBrowserRouter([
   {
@@ -83,6 +84,7 @@ export const router = createBrowserRouter([
       { path: 'execution/commitments/new', element: <CommitmentFormPage /> },
       { path: 'execution/commitments/:id/edit', element: <CommitmentFormPage /> },
       { path: 'execution/predictability', element: <PredictabilityPage /> },
+      { path: 'reports', element: <ReportsPage /> },
     ],
   },
 ])

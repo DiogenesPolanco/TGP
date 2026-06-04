@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   ClipboardList,
+  FileText,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -76,6 +77,7 @@ const navItems: NavItem[] = [
       { label: 'Miembros', path: '/teams/members' },
     ],
   },
+  { label: 'Reportes', icon: <FileText size={20} />, path: '/reports' },
   {
     label: 'Administración',
     icon: <Settings size={20} />,
