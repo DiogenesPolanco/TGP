@@ -1,6 +1,4 @@
 import { useState, useMemo } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '@/services/db/database'
 import { usePredictability, getPredictabilityColor, getPredictabilityBg } from '../hooks/usePredictability'
 import type { PeriodGranularity } from '../hooks/usePredictability'
 import {
@@ -9,12 +7,34 @@ import {
 import {
   Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar,
 } from 'lucide-react'
+import { ChartGradients } from '@/components/charts/ChartGradients'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
   { key: 'quarterly', label: 'Trimestral' },
   { key: 'yearly', label: 'Anual' },
 ]
+
+const colorMapSummary = {
+  success: 'text-success bg-success/10',
+  warning: 'text-warning bg-warning/10',
+  danger: 'text-danger bg-danger/10',
+  primary: 'text-primary bg-primary/10',
+}
+
+const gradientAccentSummary = {
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+  primary: 'bg-primary',
+}
+
+const gradientOverlaySummary = {
+  success: 'from-success/5',
+  warning: 'from-warning/5',
+  danger: 'from-danger/5',
+  primary: 'from-primary/5',
+}
 
 export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
@@ -69,13 +89,27 @@ export function PredictabilityPage() {
     if (!active || !payload?.length) return null
     const data = payload[0].payload
     return (
-      <div className="bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg p-3 text-sm">
-        <p className="font-semibold text-neutral-90 dark:text-white mb-1">{label}</p>
-        <div className="space-y-1 text-neutral-60 dark:text-neutral-40">
-          <p>Predictibilidad: <span className="font-medium text-neutral-90 dark:text-white">{data.predictabilidad}%</span></p>
-          <p>Story points planificados: <span className="font-medium">{data.estimado} pts</span></p>
-          <p>Story points completados: <span className="font-medium">{data.real} pts</span></p>
-          <p>Planes: <span className="font-medium">{data.planes}</span></p>
+      <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
+        <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+          {label}
+        </p>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-neutral-60 dark:text-neutral-40">Predictibilidad</span>
+            <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad}%</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-neutral-60 dark:text-neutral-40">Planificados</span>
+            <span className="font-medium text-neutral-90 dark:text-white">{data.estimado} pts</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-neutral-60 dark:text-neutral-40">Completados</span>
+            <span className="font-medium text-neutral-90 dark:text-white">{data.real} pts</span>
+          </div>
+          <div className="flex items-center justify-between gap-4 pt-1 border-t border-neutral-20 dark:border-neutral-70">
+            <span className="text-neutral-60 dark:text-neutral-40">Planes</span>
+            <span className="font-medium text-neutral-90 dark:text-white">{data.planes}</span>
+          </div>
         </div>
       </div>
     )
@@ -186,30 +220,66 @@ export function PredictabilityPage() {
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" />
+              <defs>
+                <ChartGradients id="pred-chart" />
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" strokeOpacity={0.6} />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: '#6B778C' }}
                 angle={granularity === 'monthly' ? -45 : 0}
                 textAnchor={granularity === 'monthly' ? 'end' : 'middle'}
                 height={granularity === 'monthly' ? 80 : 40}
+                axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
+                tickLine={false}
               />
-              <YAxis domain={[0, 200]} tickFormatter={(v) => `${v}%`} />
-              <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine y={80} stroke="#36B37E" strokeDasharray="4 4" label={{ value: '80% mínimo ideal', position: 'right', fontSize: 11, fill: '#36B37E' }} />
-              <ReferenceLine y={120} stroke="#36B37E" strokeDasharray="4 4" label={{ value: '120% máximo ideal', position: 'right', fontSize: 11, fill: '#36B37E' }} />
+              <YAxis
+                domain={[0, 200]}
+                tickFormatter={(v) => `${v}%`}
+                tick={{ fontSize: 12, fill: '#6B778C' }}
+                axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
+                tickLine={false}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
+              <ReferenceLine
+                y={80}
+                stroke="#36B37E"
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                label={{
+                  value: '80% mínimo',
+                  position: 'right',
+                  fontSize: 11,
+                  fill: '#36B37E',
+                }}
+              />
+              <ReferenceLine
+                y={120}
+                stroke="#36B37E"
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                label={{
+                  value: '120% máximo',
+                  position: 'right',
+                  fontSize: 11,
+                  fill: '#36B37E',
+                }}
+              />
               <Bar
                 dataKey="predictabilidad"
-                radius={[4, 4, 0, 0]}
+                radius={[6, 6, 0, 0]}
                 maxBarSize={60}
-                fill="#0052CC"
+                fill="url(#pred-chart-primary)"
+                animationBegin={0}
+                animationDuration={1200}
+                animationEasing="ease-out"
                 shape={(props: any) => {
                   const { x, y, width, height, payload } = props
-                  const fill = payload.color === 'success' ? '#36B37E'
-                    : payload.color === 'warning' ? '#FFAB00'
-                    : '#FF5630'
+                  const fill = payload.color === 'success' ? 'url(#pred-chart-success)'
+                    : payload.color === 'warning' ? 'url(#pred-chart-warning)'
+                    : 'url(#pred-chart-danger)'
                   return (
-                    <rect x={x} y={y} width={width} height={height} rx={4} fill={fill} />
+                    <rect x={x} y={y} width={width} height={height} rx={6} fill={fill} />
                   )
                 }}
               />
@@ -288,20 +358,20 @@ function SummaryCard({
   icon: React.ReactNode
   color: 'success' | 'warning' | 'danger' | 'primary'
 }) {
-  const colorMap = {
-    success: 'text-success bg-success/10',
-    warning: 'text-warning bg-warning/10',
-    danger: 'text-danger bg-danger/10',
-    primary: 'text-primary bg-primary/10',
-  }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-      <div className={`w-fit p-2 rounded-lg ${colorMap[color]} mb-3`}>
-        {icon}
+    <div className="group relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
+      <div
+        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
+      />
+      <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`} />
+      <div className="relative">
+        <div className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}>
+          {icon}
+        </div>
+        <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
+        <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{title}</p>
+        {subtitle && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>}
       </div>
-      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{title}</p>
-      {subtitle && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>}
     </div>
   )
 }
