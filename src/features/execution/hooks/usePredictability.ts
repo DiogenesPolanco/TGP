@@ -4,16 +4,17 @@ import { db } from '@/services/db/database'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
-export interface PlanPredictability {
-  planId: string
-  planTitle: string
-  teamId: string | null
-  estimatedPoints: number
-  completedPoints: number
+export interface SprintPredictability {
+  sprintId: string
+  sprintName: string
+  teamId: string
+  plannedSP: number
+  completedSP: number
+  notCompletedSP: number
   predictability: number
-  startDate: Date
   endDate: Date
-  status: string
+  quarter: string
+  year: number
 }
 
 export interface PredictabilityPeriod {
@@ -23,87 +24,77 @@ export interface PredictabilityPeriod {
   totalEstimated: number
   totalActual: number
   planCount: number
-  plans: PlanPredictability[]
+  sprints: SprintPredictability[]
   color: 'success' | 'warning' | 'danger'
 }
 
 export type PeriodGranularity = 'monthly' | 'quarterly' | 'yearly'
 
 export function usePredictability(teamId?: string | null) {
-  const plans = useLiveQuery(() => db.plans.toArray()) ?? []
-  const activities = useLiveQuery(() => db.activities.toArray()) ?? []
+  const teamSprints = useLiveQuery(() => db.teamSprints.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
 
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
 
-  const plansWithPredictability = useMemo<PlanPredictability[]>(() => {
-    const relevantPlans = plans.filter((p) => {
-      if (p.status !== 'completed' && p.status !== 'in_progress') return false
-      if (teamId && p.teamId !== teamId) return false
+  const predictabilitySprints = useMemo<SprintPredictability[]>(() => {
+    const filtered = teamSprints.filter((s) => {
+      if (teamId && s.teamId !== teamId) return false
       return true
     })
 
-    return relevantPlans.map((plan) => {
-      const planActivities = activities.filter((a) => a.planId === plan.id)
+    return filtered
+      .map((s) => {
+        const predictability = s.plannedSP > 0
+          ? Math.round((s.completedSP / s.plannedSP) * 100)
+          : 0
 
-      const estimatedPoints = planActivities
-        .filter((a) => a.status !== 'cancelled' && a.plannedPoints != null)
-        .reduce((sum, a) => sum + (a.plannedPoints ?? 0), 0)
-
-      const completedPoints = planActivities
-        .filter((a) => a.status === 'completed' && a.completedPoints != null)
-        .reduce((sum, a) => sum + (a.completedPoints ?? 0), 0)
-
-      const predictability = estimatedPoints > 0
-        ? Math.round((completedPoints / estimatedPoints) * 100)
-        : 0
-
-      return {
-        planId: plan.id,
-        planTitle: plan.title,
-        teamId: plan.teamId,
-        estimatedPoints,
-        completedPoints,
-        predictability,
-        startDate: new Date(plan.startDate),
-        endDate: new Date(plan.endDate),
-        status: plan.status,
-      }
-    }).filter((p) => p.estimatedPoints > 0)
-  }, [plans, activities, teamId])
+        return {
+          sprintId: s.id,
+          sprintName: s.sprintName,
+          teamId: s.teamId,
+          plannedSP: s.plannedSP,
+          completedSP: s.completedSP,
+          notCompletedSP: s.notCompletedSP,
+          predictability,
+          endDate: s.endDate instanceof Date ? s.endDate : new Date(s.endDate),
+          quarter: s.quarter,
+          year: s.year,
+        }
+      })
+      .filter((s) => s.plannedSP > 0)
+  }, [teamSprints, teamId])
 
   const aggregateByPeriod = useMemo(() => {
     function aggregate(granularity: PeriodGranularity) {
-      const groups = new Map<string, PlanPredictability[]>()
+      const groups = new Map<string, SprintPredictability[]>()
 
-      for (const p of plansWithPredictability) {
+      for (const s of predictabilitySprints) {
         let key: string
 
         switch (granularity) {
           case 'monthly': {
-            key = format(p.endDate, 'yyyy-MM', { locale: es })
+            key = format(s.endDate, 'yyyy-MM', { locale: es })
             break
           }
           case 'quarterly': {
-            const q = Math.ceil((p.endDate.getMonth() + 1) / 3)
-            key = `${p.endDate.getFullYear()}-Q${q}`
+            key = `${s.year}-${s.quarter}`
             break
           }
           case 'yearly': {
-            key = String(p.endDate.getFullYear())
+            key = String(s.year)
             break
           }
         }
 
         const existing = groups.get(key) ?? []
-        existing.push(p)
+        existing.push(s)
         groups.set(key, existing)
       }
 
       return Array.from(groups.entries())
-        .map(([periodKey, periodPlans]) => {
-          const totalEstimated = periodPlans.reduce((s, p) => s + p.estimatedPoints, 0)
-          const totalActual = periodPlans.reduce((s, p) => s + p.completedPoints, 0)
+        .map(([periodKey, periodSprints]) => {
+          const totalEstimated = periodSprints.reduce((sum, s) => sum + s.plannedSP, 0)
+          const totalActual = periodSprints.reduce((sum, s) => sum + s.completedSP, 0)
           const avgPredictability = totalEstimated > 0
             ? Math.round((totalActual / totalEstimated) * 100)
             : 0
@@ -117,17 +108,17 @@ export function usePredictability(teamId?: string | null) {
           let label: string
           switch (granularity) {
             case 'monthly': {
-              const l = format(periodPlans[0].endDate, "MMMM yyyy", { locale: es })
+              const d = new Date(periodSprints[0].endDate)
+              const l = format(d, 'MMMM yyyy', { locale: es })
               label = l.charAt(0).toUpperCase() + l.slice(1)
               break
             }
             case 'quarterly': {
-              const q = Math.ceil((periodPlans[0].endDate.getMonth() + 1) / 3)
-              label = `Q${q} ${periodPlans[0].endDate.getFullYear()}`
+              label = `${periodSprints[0].quarter} ${periodSprints[0].year}`
               break
             }
             case 'yearly':
-              label = String(periodPlans[0].endDate.getFullYear())
+              label = String(periodSprints[0].year)
               break
           }
 
@@ -137,8 +128,8 @@ export function usePredictability(teamId?: string | null) {
             avgPredictability,
             totalEstimated,
             totalActual,
-            planCount: periodPlans.length,
-            plans: periodPlans,
+            planCount: periodSprints.length,
+            sprints: periodSprints,
             color,
           }
         })
@@ -150,14 +141,13 @@ export function usePredictability(teamId?: string | null) {
       quarterly: aggregate('quarterly'),
       yearly: aggregate('yearly'),
     }
-  }, [plansWithPredictability])
+  }, [predictabilitySprints])
 
   const teamOptions = useMemo(() => {
     return teams.map((t) => ({ id: t.id, name: t.name }))
   }, [teams])
 
   return {
-    plansWithPredictability,
     periods: aggregateByPeriod,
     teamOptions,
     teams,

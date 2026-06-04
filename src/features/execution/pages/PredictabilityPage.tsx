@@ -40,7 +40,7 @@ export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
   const [granularity, setGranularity] = useState<PeriodGranularity>('monthly')
 
-  const { periods, teamOptions, plansWithPredictability } = usePredictability(
+  const { periods, teamOptions } = usePredictability(
     selectedTeamId || null,
   )
 
@@ -69,10 +69,10 @@ export function PredictabilityPage() {
       avg,
       best: best.value > 0 ? best : null,
       worst: worst.value < Infinity ? worst : null,
-      totalPlans: plansWithPredictability.length,
+      totalPlans: currentPeriods.reduce((s, p) => s + p.planCount, 0),
       healthyCount,
     }
-  }, [currentPeriods, plansWithPredictability])
+  }, [currentPeriods])
 
   const chartData = useMemo(() => {
     return currentPeriods.map((p) => ({
@@ -289,9 +289,7 @@ export function PredictabilityPage() {
           <div className="py-16 text-center">
             <BarChart3 size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
             <p className="text-sm text-neutral-50">
-              {plansWithPredictability.length === 0
-                ? 'No hay planes con datos de predictibilidad. Crea actividades con puntos planificados y completados para ver el gráfico.'
-                : 'No se encontraron datos para el filtro seleccionado.'}
+          No se encontraron sprints de equipo para el filtro seleccionado. Registra sprints en el detalle del equipo para ver el gráfico.
             </p>
           </div>
         )}
