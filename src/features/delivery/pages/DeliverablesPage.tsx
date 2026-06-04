@@ -219,7 +219,7 @@ export function DeliverablesPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">
                         {del.dueDate
-                          ? del.dueDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
+                          ? new Date(del.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
                           : '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30 max-w-[180px] truncate">

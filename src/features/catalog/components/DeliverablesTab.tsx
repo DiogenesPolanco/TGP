@@ -178,7 +178,7 @@ function DeliverableRow({
   const [editing, setEditing] = useState(false)
   const [status, setStatus] = useState(deliverable.status)
   const [dueDate, setDueDate] = useState(
-    deliverable.dueDate ? deliverable.dueDate.toISOString().split('T')[0] : '',
+    deliverable.dueDate ? new Date(deliverable.dueDate).toISOString().split('T')[0] : '',
   )
   const [objectiveId, setObjectiveId] = useState(deliverable.objectiveId ?? '')
 
@@ -218,7 +218,7 @@ function DeliverableRow({
         <div className="flex items-center gap-3 mt-1.5 text-xs text-neutral-50">
           {deliverable.dueDate && (
             <span>
-              {deliverable.dueDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
+              {new Date(deliverable.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
             </span>
           )}
           {obj && <span>→ {obj.title}</span>}
@@ -264,7 +264,7 @@ function DeliverableRow({
             onClick={() => {
               setEditing(false)
               setStatus(deliverable.status)
-              setDueDate(deliverable.dueDate?.toISOString().split('T')[0] ?? '')
+              setDueDate(deliverable.dueDate ? new Date(deliverable.dueDate).toISOString().split('T')[0] : '')
               setObjectiveId(deliverable.objectiveId ?? '')
             }}
             className="p-1 rounded text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"

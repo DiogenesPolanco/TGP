@@ -56,7 +56,7 @@ export function ApplicationsPage() {
       criticality: app.criticality,
       architecture: app.architecture,
       status: app.status,
-      supportEndDate: app.supportEndDate?.toISOString().split('T')[0] ?? '',
+      supportEndDate: app.supportEndDate ? new Date(app.supportEndDate).toISOString().split('T')[0] : '',
     }))
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)

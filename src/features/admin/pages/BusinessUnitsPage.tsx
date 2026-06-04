@@ -327,7 +327,7 @@ function BusinessUnitRow({
       </td>
       <td className="px-6 py-4">
         <span className="text-sm text-neutral-60 dark:text-neutral-40">
-          {bu.createdAt.toLocaleDateString()}
+          {new Date(bu.createdAt).toLocaleDateString()}
         </span>
       </td>
       <td className="px-6 py-4 text-right">
