@@ -8,6 +8,7 @@ export interface MemberProfile {
   phoneHome: string
   address: string
   role: MemberRole
+  status?: string
   skills: Skill[]
   technologies: string[]
   microservices: string[]

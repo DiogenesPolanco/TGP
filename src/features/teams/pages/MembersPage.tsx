@@ -170,7 +170,6 @@ export function MembersPage() {
         ) : (
           <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
             {paginatedItems.map(({ member, team, kpis }) => {
-              const statusLabel = MEMBER_STATUS_LABELS[member.status]
               const statusColors: Record<MemberStatus, string> = {
                 activo: 'bg-success/10 text-success',
                 licencia: 'bg-warning/10 text-warning',
@@ -196,7 +195,38 @@ export function MembersPage() {
                         <span>·</span>
                         <span>{team.name}</span>
                         <span>·</span>
-                        <span className={statusColors[member.status]}>{statusLabel}</span>
+                        <select
+                          value={member.status}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={async (e) => {
+                            e.stopPropagation()
+                            const newStatus = e.target.value as MemberStatus
+                            const teamRef = teams.find((t) => t.id === team.id)
+                            if (!teamRef) return
+                            const updatedMembers = teamRef.members.map((m) =>
+                              m.id === member.id ? { ...m, status: newStatus } : m
+                            )
+                            await db.teams.update(team.id, { members: updatedMembers })
+                            const profile = await db.memberProfiles.get(member.id)
+                            if (profile) {
+                              await db.memberProfiles.put({ ...profile as any, status: newStatus, updatedAt: new Date() })
+                            }
+                            setGlobalData((prev) => {
+                              if (!prev) return prev
+                              return {
+                                ...prev,
+                                kpisList: prev.kpisList.map((k) =>
+                                  k.member.id === member.id ? { ...k, member: { ...k.member, status: newStatus } } : k
+                                ),
+                              }
+                            })
+                          }}
+                          className={`text-xs px-1.5 py-0.5 rounded border-0 font-medium cursor-pointer outline-none ${statusColors[member.status]}`}
+                        >
+                          {Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => (
+                            <option key={k} value={k} className="text-neutral-90 bg-white dark:bg-neutral-80">{v}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </div>
