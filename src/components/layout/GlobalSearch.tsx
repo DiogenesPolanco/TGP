@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, startTransition } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
@@ -24,9 +24,6 @@ import {
   Stamp,
 } from 'lucide-react'
 
-
-/* ─── Types ─── */
-
 interface SearchGroup {
   label: string
   icon: typeof Search
@@ -41,8 +38,6 @@ interface SearchResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entity: any
 }
-
-/* ─── Search logic ─── */
 
 function score(query: string, text: string): number {
   const lower = text.toLowerCase()
@@ -59,7 +54,6 @@ function score(query: string, text: string): number {
   return 0
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function searchEntity(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: { toArray: () => Promise<any[]> },
@@ -121,63 +115,6 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
     }
     return items
   }, [groups])
-
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-        return
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setSelectedIndex((i) => Math.min(i + 1, flatResults.length - 1))
-        return
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setSelectedIndex((i) => Math.max(i - 1, 0))
-        return
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        const result = flatResults[selectedIndex]
-        if (result) {
-          navigate(result.route)
-          onClose()
-        }
-        return
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [open, selectedIndex, flatResults, navigate, onClose])
-
-  /* ---- Auto-focus ---- */
-
-  useEffect(() => {
-    if (open) {
-      setQuery('')
-      setGroups([])
-      setSelectedIndex(0)
-      setTimeout(() => inputRef.current?.focus(), 50)
-    }
-  }, [open])
-
-  /* ---- Debounced search ---- */
-
-  useEffect(() => {
-    if (!query.trim()) {
-      setGroups([])
-      return
-    }
-
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => runSearch(query.trim()), 200)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-  }, [query])
 
   const runSearch = useCallback(async (q: string) => {
     setLoading(true)
@@ -428,9 +365,62 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
     } finally {
       setLoading(false)
     }
-  }, [navigate])
+  }, [])
 
-  /* ---- Flatten for keyboard nav ---- */
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedIndex((i) => Math.min(i + 1, flatResults.length - 1))
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedIndex((i) => Math.max(i - 1, 0))
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const result = flatResults[selectedIndex]
+        if (result) {
+          navigate(result.route)
+          onClose()
+        }
+        return
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, selectedIndex, flatResults, navigate, onClose])
+
+  useEffect(() => {
+    if (open) {
+      startTransition(() => {
+        setQuery('')
+        setGroups([])
+        setSelectedIndex(0)
+      })
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!query.trim()) {
+      startTransition(() => setGroups([]))
+      return
+    }
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => runSearch(query.trim()), 200)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [query, runSearch])
 
   const handleSelect = (route: string) => {
     navigate(route)

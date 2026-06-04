@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, startTransition } from 'react'
 import { AlertTriangle, X } from 'lucide-react'
 import { useConfirmStore } from '@/stores/confirmStore'
 
@@ -9,10 +9,9 @@ export function ConfirmDialog() {
 
   useEffect(() => {
     if (open) {
-      // Trigger mount animation on next frame
-      requestAnimationFrame(() => setVisible(true))
+      requestAnimationFrame(() => startTransition(() => setVisible(true)))
     } else {
-      setVisible(false)
+      startTransition(() => setVisible(false))
     }
   }, [open])
 
