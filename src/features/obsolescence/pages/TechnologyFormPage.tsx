@@ -19,6 +19,7 @@ export function TechnologyFormPage() {
     category: '',
     supportStatus: 'active' as SupportStatus,
     eolDate: '',
+    cveList: '',
   })
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export function TechnologyFormPage() {
         category: technology.category ?? '',
         supportStatus: technology.supportStatus ?? 'active',
         eolDate: technology.eolDate ? new Date(technology.eolDate).toISOString().split('T')[0] : '',
+        cveList: technology.cveList?.join(', ') ?? '',
       })
     }
   }, [technology])
@@ -38,7 +40,8 @@ export function TechnologyFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const data = { ...formData, category: formData.category as TechCategory, eolDate: formData.eolDate ? new Date(formData.eolDate) : null, cveList: technology?.cveList ?? [], metadata: technology?.metadata ?? {}, createdAt: technology?.createdAt ?? new Date() }
+    const cves = formData.cveList.split(',').map((c) => c.trim()).filter(Boolean)
+    const data = { ...formData, category: formData.category as TechCategory, eolDate: formData.eolDate ? new Date(formData.eolDate) : null, cveList: cves, metadata: technology?.metadata ?? {}, createdAt: technology?.createdAt ?? new Date() }
     if (technology) { await db.technologies.update(technology.id, data); addNotification({ type: 'success', message: 'Tecnología actualizada' }) }
     else { await db.technologies.add({ ...data, id: crypto.randomUUID() }); addNotification({ type: 'success', message: 'Tecnología creada' }) }
     navigate('/catalog/obsolescence')
@@ -65,6 +68,11 @@ export function TechnologyFormPage() {
               <option value="active">Activo</option><option value="extended">Soporte Extendido</option><option value="eol">EOL</option><option value="unknown">Desconocido</option>
             </select></div>
           <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label><input type="date" value={formData.eolDate} onChange={(e) => setFormData({ ...formData, eolDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">CVE(s) conocidos</label>
+          <input type="text" value={formData.cveList} onChange={(e) => setFormData({ ...formData, cveList: e.target.value })} placeholder="CVE-2024-1234, CVE-2024-5678" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <p className="text-xs text-neutral-50 mt-1">Separados por coma</p>
         </div>
         <div className="flex justify-end gap-3 pt-4">
           <button type="button" onClick={() => navigate('/catalog/obsolescence')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>

@@ -207,6 +207,7 @@ export function JobSchedulerConfig() {
           <li>Bloqueos abiertos — alerta bloqueos sin resolver o escalados</li>
           <li>Actividades vencidas — alerta actividades fuera de plazo</li>
           <li>Entregables vencidos — alerta entregables no completados</li>
+          <li>Vulnerabilidades en librerías — alerta si alguna librería con CVEs está en uso</li>
           <li>Backup automático — guarda copia local y, si está configurado, sube a Azure</li>
         </ul>
       </details>

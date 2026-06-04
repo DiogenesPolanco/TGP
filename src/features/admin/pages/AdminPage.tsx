@@ -242,12 +242,12 @@ export function AdminPage() {
             <RefreshCw size={24} className={`text-info ${isSyncing ? 'animate-spin' : ''}`} />
             <div className="text-left">
               <p className="text-sm font-medium text-neutral-90 dark:text-white">
-                {isSyncing ? 'Sincronizando...' : 'Sincronizar con endoflife.date'}
+                {isSyncing ? 'Sincronizando...' : 'Sincronizar tecnologías'}
               </p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40">
                 {syncResult
                   ? `${syncResult.updated} actualizadas · ${syncResult.notFound} sin datos · ${syncResult.errors} errores (${syncResult.duration}ms)`
-                  : 'Actualizar EOL y soporte desde API pública'}
+                  : 'Actualizar EOLs'}
               </p>
             </div>
           </button>
