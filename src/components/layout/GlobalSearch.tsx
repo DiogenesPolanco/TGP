@@ -14,6 +14,14 @@ import {
   Target,
   Building2,
   X,
+  FileText,
+  CheckSquare,
+  Ban,
+  Package,
+  Box,
+  User,
+  CalendarDays,
+  Stamp,
 } from 'lucide-react'
 
 
@@ -30,7 +38,8 @@ interface SearchResult {
   id: string
   title: string
   subtitle: string
-  entity: unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  entity: any
 }
 
 /* ─── Search logic ─── */
@@ -173,7 +182,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const runSearch = useCallback(async (q: string) => {
     setLoading(true)
     try {
-      const [applications, technologies, vulnerabilities, incidents, risks, auditFindings, teams, objectives, businessUnits] =
+      const [applications, technologies, vulnerabilities, incidents, risks, auditFindings, teams, objectives, businessUnits, plans, activities, tasks, commitments, blockers, deliverables, microservices, members, teamSprints] =
         await Promise.all([
           searchEntity(db.applications, ['name', 'description', 'ownerName'], q, (item) => ({
             id: item.id,
@@ -227,6 +236,60 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             id: item.id,
             title: item.name,
             subtitle: '',
+            entity: item,
+          })),
+          searchEntity(db.plans, ['title', 'description'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.status} · ${item.teamId}`,
+            entity: item,
+          })),
+          searchEntity(db.activities, ['title'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.status}`,
+            entity: item,
+          })),
+          searchEntity(db.tasks, ['title'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.status} · ${item.priority}`,
+            entity: item,
+          })),
+          searchEntity(db.commitments, ['title', 'description'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.status}`,
+            entity: item,
+          })),
+          searchEntity(db.blockers, ['title', 'description'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.severity} · ${item.status}`,
+            entity: item,
+          })),
+          searchEntity(db.deliverables, ['title', 'description'], q, (item) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: item.status,
+            entity: item,
+          })),
+          searchEntity(db.microservices, ['name', 'description'], q, (item) => ({
+            id: item.id,
+            title: item.name,
+            subtitle: item.description ?? '',
+            entity: item,
+          })),
+          searchEntity(db.memberProfiles, ['email', 'role'], q, (item) => ({
+            id: item.id,
+            title: item.email,
+            subtitle: `Rol: ${item.role}`,
+            entity: item,
+          })),
+          searchEntity(db.teamSprints, ['sprintName'], q, (item) => ({
+            id: item.id,
+            title: item.sprintName,
+            subtitle: `${item.quarter} ${item.year}`,
             entity: item,
           })),
         ])
@@ -295,6 +358,69 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           icon: Building2,
           route: () => `/admin/business-units`,
           items: businessUnits,
+        })
+      if (plans.length > 0)
+        result.push({
+          label: 'Planes',
+          icon: FileText,
+          route: (item) => `/execution/plans/${item.id}`,
+          items: plans,
+        })
+      if (commitments.length > 0)
+        result.push({
+          label: 'Compromisos',
+          icon: Stamp,
+          route: (item) => `/execution/commitments/${item.id}/edit`,
+          items: commitments,
+        })
+      if (activities.length > 0)
+        result.push({
+          label: 'Actividades',
+          icon: CheckSquare,
+          route: (item) => `/execution/plans/${item.entity.planId}`,
+          items: activities,
+        })
+      if (tasks.length > 0)
+        result.push({
+          label: 'Tareas',
+          icon: CheckSquare,
+          route: (item) => `/execution/plans/${item.entity.planId}`,
+          items: tasks,
+        })
+      if (blockers.length > 0)
+        result.push({
+          label: 'Bloqueos',
+          icon: Ban,
+          route: (item) => `/execution/plans/${item.id}`,
+          items: blockers,
+        })
+      if (deliverables.length > 0)
+        result.push({
+          label: 'Entregables',
+          icon: Package,
+          route: () => `/catalog/deliverables`,
+          items: deliverables,
+        })
+      if (microservices.length > 0)
+        result.push({
+          label: 'Microservicios',
+          icon: Box,
+          route: (item) => `/catalog/applications/${item.entity.applicationId}`,
+          items: microservices,
+        })
+      if (members.length > 0)
+        result.push({
+          label: 'Miembros',
+          icon: User,
+          route: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
+          items: members,
+        })
+      if (teamSprints.length > 0)
+        result.push({
+          label: 'Sprints de Equipo',
+          icon: CalendarDays,
+          route: (item) => `/teams/${item.entity.teamId}`,
+          items: teamSprints,
         })
 
       setGroups(result)
