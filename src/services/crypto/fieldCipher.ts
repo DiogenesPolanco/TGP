@@ -1,6 +1,6 @@
 const STORAGE_SALT = 'tgp-field-cipher-salt'
 
-async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
+async function deriveKey(salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
   const fingerprint = [
     window.location.origin,
     navigator.userAgent,
@@ -16,7 +16,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   )
 
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: salt.buffer.slice(0), iterations: 100_000, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
     keyMaterial,
     { name: 'AES-GCM', length: 256 },
     false,
@@ -24,7 +24,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   )
 }
 
-function getOrCreateSalt(): Uint8Array {
+function getOrCreateSalt(): Uint8Array<ArrayBuffer> {
   const raw = localStorage.getItem(STORAGE_SALT)
   if (raw) return new Uint8Array(atob(raw).split('').map((c) => c.charCodeAt(0)))
   const salt = crypto.getRandomValues(new Uint8Array(16))
@@ -32,7 +32,7 @@ function getOrCreateSalt(): Uint8Array {
   return salt
 }
 
-function base64ToBytes(b64: string): Uint8Array {
+function base64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
   return new Uint8Array(atob(b64).split('').map((c) => c.charCodeAt(0)))
 }
 
