@@ -117,8 +117,8 @@ export function PlanDetailPage() {
     )
   }
 
-  const daysTotal = Math.ceil((plan.endDate.getTime() - plan.startDate.getTime()) / (1000 * 60 * 60 * 24))
-  const daysLeft = Math.ceil((plan.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+  const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
 
   const objective = plan.objectiveId ? objectives.find((o) => o.id === plan.objectiveId) : null
@@ -193,9 +193,9 @@ export function PlanDetailPage() {
           />
         </div>
         <div className="flex items-center justify-between mt-2 text-xs text-neutral-50">
-          <span>{plan.startDate.toLocaleDateString('es-ES')}</span>
+          <span>{new Date(plan.startDate).toLocaleDateString('es-ES')}</span>
           {objective && <span>OKR: {objective.title}</span>}
-          <span>{plan.endDate.toLocaleDateString('es-ES')}</span>
+          <span>{new Date(plan.endDate).toLocaleDateString('es-ES')}</span>
         </div>
       </div>
 

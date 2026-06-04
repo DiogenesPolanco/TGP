@@ -49,7 +49,7 @@ export function CommitmentFormPage() {
         objectiveId: commitment.objectiveId ?? '',
         deliverableId: commitment.deliverableId ?? '',
         status: (commitment.status as CommitmentStatus) ?? 'active',
-        commitmentDate: commitment.commitmentDate ? commitment.commitmentDate.toISOString().split('T')[0] : '',
+        commitmentDate: commitment.commitmentDate ? new Date(commitment.commitmentDate).toISOString().split('T')[0] : '',
       })
     }
   }, [commitment])

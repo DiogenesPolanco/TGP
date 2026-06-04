@@ -36,7 +36,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
   const [status, setStatus] = useState<CommitmentStatus>(commitment?.status ?? 'active')
   const [commitmentDate, setCommitmentDate] = useState(
     commitment?.commitmentDate
-      ? commitment.commitmentDate.toISOString().split('T')[0]
+      ? new Date(commitment.commitmentDate).toISOString().split('T')[0]
       : '',
   )
   const [saving, setSaving] = useState(false)

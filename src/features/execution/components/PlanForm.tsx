@@ -24,10 +24,10 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
   const [status, setStatus] = useState<ProjectStatus>(plan?.status ?? 'planned')
   const [health, setHealth] = useState<ProjectHealth>(plan?.health ?? 'green')
   const [startDate, setStartDate] = useState(
-    plan?.startDate ? plan.startDate.toISOString().split('T')[0] : '',
+    plan?.startDate ? new Date(plan.startDate).toISOString().split('T')[0] : '',
   )
   const [endDate, setEndDate] = useState(
-    plan?.endDate ? plan.endDate.toISOString().split('T')[0] : '',
+    plan?.endDate ? new Date(plan.endDate).toISOString().split('T')[0] : '',
   )
   const [saving, setSaving] = useState(false)
 

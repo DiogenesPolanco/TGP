@@ -65,8 +65,8 @@ export function usePredictability(teamId?: string | null) {
         estimatedPoints,
         completedPoints,
         predictability,
-        startDate: plan.startDate,
-        endDate: plan.endDate,
+        startDate: new Date(plan.startDate),
+        endDate: new Date(plan.endDate),
         status: plan.status,
       }
     }).filter((p) => p.estimatedPoints > 0)

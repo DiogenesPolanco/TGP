@@ -130,8 +130,8 @@ export function PlansPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {paginatedPlans.map((plan) => {
           const stats = getActivityStats(plan.id)
-          const daysTotal = Math.ceil((plan.endDate.getTime() - plan.startDate.getTime()) / (1000 * 60 * 60 * 24))
-          const daysLeft = Math.ceil((plan.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+          const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
           const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
           const cfg = statusConfig[plan.status]
 

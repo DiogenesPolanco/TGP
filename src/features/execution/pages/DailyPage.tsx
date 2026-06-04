@@ -364,8 +364,8 @@ export function DailyPage() {
               const total = planActivities.length
               const healthColor = plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
 
-              const daysTotal = Math.ceil((plan.endDate.getTime() - plan.startDate.getTime()) / (1000 * 60 * 60 * 24))
-              const daysLeft = Math.ceil((plan.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+              const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+              const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
               const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
 
               return (
@@ -394,7 +394,7 @@ export function DailyPage() {
                   <div className="flex items-center justify-between text-xs text-neutral-60 dark:text-neutral-40">
                     <span>{progress}% completo</span>
                     <span>{completed}/{total} actividades</span>
-                    <span>{plan.startDate.toLocaleDateString('es-ES')} - {plan.endDate.toLocaleDateString('es-ES')}</span>
+                      <span>{new Date(plan.startDate).toLocaleDateString('es-ES')} - {new Date(plan.endDate).toLocaleDateString('es-ES')}</span>
                   </div>
                 </div>
               )

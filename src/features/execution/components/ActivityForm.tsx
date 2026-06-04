@@ -28,10 +28,10 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
   const [plannedPoints, setPlannedPoints] = useState(activity?.plannedPoints?.toString() ?? '')
   const [completedPoints, setCompletedPoints] = useState(activity?.completedPoints?.toString() ?? '')
   const [startDate, setStartDate] = useState(
-    activity?.startDate ? activity.startDate.toISOString().split('T')[0] : '',
+    activity?.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '',
   )
   const [dueDate, setDueDate] = useState(
-    activity?.dueDate ? activity.dueDate.toISOString().split('T')[0] : '',
+    activity?.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '',
   )
   const [saving, setSaving] = useState(false)
 

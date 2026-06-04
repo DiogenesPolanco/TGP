@@ -235,7 +235,7 @@ export function CommitmentsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-neutral-70 dark:text-neutral-30">
-                            {c.commitmentDate.toLocaleDateString('es-ES')}
+                            {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
                           </span>
                           <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>
                             ({daysInfo.label})

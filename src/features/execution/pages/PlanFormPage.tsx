@@ -37,8 +37,8 @@ export function PlanFormPage() {
         objectiveId: plan.objectiveId ?? '',
         status: (plan.status as ProjectStatus) ?? 'planned',
         health: (plan.health as ProjectHealth) ?? 'green',
-        startDate: plan.startDate ? plan.startDate.toISOString().split('T')[0] : '',
-        endDate: plan.endDate ? plan.endDate.toISOString().split('T')[0] : '',
+        startDate: plan.startDate ? new Date(plan.startDate).toISOString().split('T')[0] : '',
+        endDate: plan.endDate ? new Date(plan.endDate).toISOString().split('T')[0] : '',
       })
     }
   }, [plan])
