@@ -3,7 +3,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { cn } from '@/lib/utils'
 import { Search, Bell, Moon, Sun, Calendar, LogOut } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { GlobalSearch } from './GlobalSearch'
 import { clearSession } from '@/services/auth/authService'
 
@@ -20,6 +20,23 @@ export function Header() {
   const { selectedPeriod, setPeriod } = useFilterStore()
   const [searchOpen, setSearchOpen] = useState(false)
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
+  const [showAlerts, setShowAlerts] = useState(false)
+  const alertsRef = useRef<HTMLDivElement>(null)
+
+  const alerts = useAppStore((s) => s.alerts)
+  const criticalCount = alerts.filter((a) => a.type === 'critical' || a.type === 'warning').length
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (alertsRef.current && !alertsRef.current.contains(e.target as Node)) {
+        setShowAlerts(false)
+      }
+    }
+    if (showAlerts) {
+      document.addEventListener('mousedown', handler)
+    }
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showAlerts])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -99,10 +116,62 @@ export function Header() {
           )}
         </div>
 
-        <button className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors relative">
-          <Bell size={18} className="text-neutral-60 dark:text-neutral-40" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full" />
-        </button>
+        <div className="relative" ref={alertsRef}>
+          <button
+            onClick={() => setShowAlerts(!showAlerts)}
+            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors relative"
+          >
+            <Bell size={18} className="text-neutral-60 dark:text-neutral-40" />
+            {criticalCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-danger text-white text-[10px] font-bold rounded-full px-1">
+                {criticalCount > 99 ? '99+' : criticalCount}
+              </span>
+            )}
+          </button>
+
+          {showAlerts && (
+            <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+              <div className="p-3 border-b border-neutral-20 dark:border-neutral-70">
+                <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                  Alertas ({alerts.length})
+                </h4>
+              </div>
+              {alerts.length > 0 ? (
+                <div className="p-2 space-y-1">
+                  {alerts.map((alert, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-start gap-2 p-2 rounded-lg text-xs ${
+                        alert.type === 'critical'
+                          ? 'bg-danger/10 text-danger'
+                          : alert.type === 'warning'
+                          ? 'bg-warning/10 text-warning'
+                          : alert.type === 'success'
+                          ? 'bg-success/10 text-success'
+                          : 'bg-info/10 text-info'
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${
+                        alert.type === 'critical'
+                          ? 'bg-danger'
+                          : alert.type === 'warning'
+                          ? 'bg-warning'
+                          : alert.type === 'success'
+                          ? 'bg-success'
+                          : 'bg-info'
+                      }`} />
+                      <span className="text-neutral-80 dark:text-neutral-20">{alert.message}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-sm text-neutral-50">
+                  Sin alertas activas
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <button
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}

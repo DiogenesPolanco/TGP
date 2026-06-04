@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '@/stores/appStore'
-import { cn } from '@/lib/utils'
 import { CheckCircle, AlertTriangle, XCircle, Info, X } from 'lucide-react'
 
 const iconMap = {
@@ -10,18 +9,40 @@ const iconMap = {
   info: Info,
 }
 
-const colorMap = {
-  success: 'bg-success/10 text-success border-success/20',
-  warning: 'bg-warning/10 text-warning border-warning/20',
-  error: 'bg-danger/10 text-danger border-danger/20',
-  info: 'bg-info/10 text-info border-info/20',
+const styles = {
+  success: {
+    bg: 'bg-success',
+    border: 'border-emerald-700',
+    text: 'text-white',
+    iconColor: 'text-white',
+  },
+  warning: {
+    bg: 'bg-warning',
+    border: 'border-amber-700',
+    text: 'text-white',
+    iconColor: 'text-white',
+  },
+  error: {
+    bg: 'bg-danger',
+    border: 'border-red-700',
+    text: 'text-white',
+    iconColor: 'text-white',
+  },
+  info: {
+    bg: 'bg-info',
+    border: 'border-blue-700',
+    text: 'text-white',
+    iconColor: 'text-white',
+  },
 }
 
 export function NotificationToast() {
   const { notifications, removeNotification } = useAppStore()
 
+  if (notifications.length === 0) return null
+
   return (
-    <div className="fixed top-4 right-4 z-[100] space-y-2">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 w-full max-w-md pointer-events-none">
       {notifications.map((notification) => (
         <ToastItem
           key={notification.id}
@@ -41,25 +62,50 @@ function ToastItem({
   onRemove: () => void
 }) {
   const Icon = iconMap[notification.type]
+  const [progress, setProgress] = useState(100)
+  const style = styles[notification.type]
+  const duration = notification.duration ?? 8000
 
   useEffect(() => {
-    const duration = notification.duration ?? 5000
-    const timer = setTimeout(onRemove, duration)
-    return () => clearTimeout(timer)
-  }, [notification.duration, onRemove])
+    const start = Date.now()
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start
+      const remaining = Math.max(0, 100 - (elapsed / duration) * 100)
+      setProgress(remaining)
+      if (elapsed >= duration) {
+        clearInterval(interval)
+        onRemove()
+      }
+    }, 50)
+    return () => clearInterval(interval)
+  }, [duration, onRemove])
 
   return (
     <div
-      className={cn(
-        'flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg min-w-[300px] max-w-[400px]',
-        colorMap[notification.type]
-      )}
+      className={`
+        pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl border shadow-2xl
+        min-w-[320px] w-full
+        animate-slide-in
+        ${style.bg} ${style.text} ${style.border}
+      `}
+      role="alert"
     >
-      <Icon size={20} />
-      <p className="flex-1 text-sm font-medium">{notification.message}</p>
+      <div className="shrink-0 mt-0.5">
+        <Icon size={20} className={style.iconColor} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold leading-snug">{notification.message}</p>
+        <div className="mt-2 h-1 w-full rounded-full bg-white/30 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-white/70 transition-all duration-[50ms] linear"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
       <button
         onClick={onRemove}
-        className="p-1 rounded-md hover:bg-black/5 transition-colors"
+        className="shrink-0 p-1 rounded-md hover:bg-white/20 transition-colors"
+        aria-label="Cerrar"
       >
         <X size={16} />
       </button>

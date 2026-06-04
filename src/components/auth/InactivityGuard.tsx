@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { LogOut, Clock } from 'lucide-react'
 import {
   startInactivityWatch,
@@ -18,9 +18,13 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
   const [remaining, setRemaining] = useState(WARNING_DURATION_MS)
   const [warningVisible, setWarningVisible] = useState(false)
 
+  // Ref para evitar que cambios en showingWarning disparen re-ejecución del effect principal
+  const warningActiveRef = useRef(false)
+
   const handleExpired = useCallback(() => {
     setShowingWarning(false)
     setWarningVisible(false)
+    warningActiveRef.current = false
     logout()
     onExpired()
   }, [onExpired])
@@ -28,40 +32,45 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
   const handleDismiss = useCallback(() => {
     setShowingWarning(false)
     setWarningVisible(false)
+    warningActiveRef.current = false
     dismissInactivityWarning()
   }, [])
 
+  // Effect principal: se registra UNA SOLA VEZ al montar
   useEffect(() => {
     startInactivityWatch((phase) => {
       if (phase === 'warning') {
-        // Check if this is a "dismiss" signal (user activity during warning)
-        if (showingWarning) {
+        if (warningActiveRef.current) {
+          // Señal de "dismiss" — el usuario hizo actividad durante la advertencia
           setShowingWarning(false)
           setWarningVisible(false)
+          warningActiveRef.current = false
           return
         }
+        warningActiveRef.current = true
         setShowingWarning(true)
-        // Delay the visible animation slightly for a smoother UX
         requestAnimationFrame(() => setWarningVisible(true))
       } else if (phase === 'expired') {
         handleExpired()
       }
     })
 
-    // Warning countdown
-    const countdownTimer = setInterval(() => {
-      if (showingWarning) {
-        setRemaining(getWarningRemainingMs())
-      }
-    }, 200)
-
     return () => {
       stopInactivityWatch()
-      clearInterval(countdownTimer)
     }
-  }, [showingWarning, handleExpired])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // ⚠️ Sin dependencias de estado — se monta/desmonta una sola vez
 
-  // Close on Esc
+  // Timer de conteo regresivo: se activa solo cuando la advertencia está visible
+  useEffect(() => {
+    if (!showingWarning) return
+    const interval = setInterval(() => {
+      setRemaining(getWarningRemainingMs())
+    }, 200)
+    return () => clearInterval(interval)
+  }, [showingWarning])
+
+  // Cerrar con Escape
   useEffect(() => {
     if (!showingWarning) return
     const onKey = (e: KeyboardEvent) => {
@@ -78,14 +87,11 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-50 bg-black/40 transition-opacity duration-300 ${
           warningVisible ? 'opacity-100' : 'opacity-0'
         }`}
       />
-
-      {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
           className={`pointer-events-auto w-full max-w-md bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-8 transition-all duration-300 ${
@@ -116,7 +122,6 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
               Tu sesión se cerrará automáticamente por inactividad. Mueve el mouse o presiona una tecla para continuar.
             </p>
 
-            {/* Countdown */}
             <div className="flex items-center justify-center gap-3">
               <div
                 className={`text-3xl font-mono font-bold tabular-nums ${
@@ -128,7 +133,6 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
               <span className="text-sm text-neutral-50">segundos</span>
             </div>
 
-            {/* Progress bar */}
             <div className="h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-linear ${
@@ -142,7 +146,6 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
               />
             </div>
 
-            {/* Actions */}
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={handleExpired}
