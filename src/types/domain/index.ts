@@ -29,7 +29,6 @@ export type {
 
 export type {
   MemberProfile,
-  MemberMicroservice,
   Skill,
   SprintRecord,
   OneOnOne,

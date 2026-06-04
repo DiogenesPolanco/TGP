@@ -40,7 +40,7 @@ export function SkillsSection({ memberId }: Props) {
       address: (existing as any).address ?? '',
       role: (existing as any).role ?? 'developer',
       technologies: (existing as any).technologies ?? [],
-      microservices: (existing as any).microservices ?? [],
+      microservices: (existing as any).microservices ?? [] as string[],
       avgStoryPoints: (existing as any).avgStoryPoints ?? 0,
       vacationDaysPerYear: (existing as any).vacationDaysPerYear ?? 20,
       vacationUsed: (existing as any).vacationUsed ?? 0,

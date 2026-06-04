@@ -33,7 +33,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       teamId: '',
       skills: profile?.skills ?? [],
       technologies: profile?.technologies ?? [],
-      microservices: profile?.microservices ?? [],
+      microservices: (profile as any)?.microservices ?? [],
       avgStoryPoints: profile?.avgStoryPoints ?? 0,
       createdAt: profile?.createdAt ?? now,
       updatedAt: now,
