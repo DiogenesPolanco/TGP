@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { ArrowLeft, Plus, Edit, Edit3, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, Plus, Pencil, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
 import { ActivityForm } from '../components/ActivityForm'
 import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
@@ -138,7 +138,7 @@ export function PlanDetailPage() {
               className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors"
               title="Editar Plan"
             >
-              <Edit3 size={18} />
+              <Pencil size={18} />
             </button>
             <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
               plan.health === 'red' ? 'bg-danger/10 text-danger border-danger/30' :
@@ -317,7 +317,7 @@ function ActivityNode({
             </button>
           )}
           <button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
-            <Edit size={14} />
+            <Pencil size={14} />
           </button>
           <button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger opacity-0 group-hover:opacity-100 transition-all">
             <Trash2 size={14} />
@@ -341,7 +341,7 @@ function ActivityNode({
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0 ml-4 opacity-0 group-hover:opacity-100 transition-all">
-                <button onClick={onEdit} className="p-1 rounded text-neutral-50 hover:text-primary"><Edit size={14} /></button>
+                <button onClick={onEdit} className="p-1 rounded text-neutral-50 hover:text-primary"><Pencil size={14} /></button>
                 <button onClick={onDelete} className="p-1 rounded text-neutral-50 hover:text-danger"><Trash2 size={14} /></button>
               </div>
             </div>

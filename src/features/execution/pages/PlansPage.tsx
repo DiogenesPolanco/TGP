@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Search, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Edit3 } from 'lucide-react'
+import { Plus, Search, Upload, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Pencil, Trash2 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan } from '@/types/domain'
 
@@ -80,13 +80,22 @@ export function PlansPage() {
             Gestiona sprints, trimestres e iniciativas
           </p>
         </div>
-        <button
-          onClick={() => navigate('/execution/plans/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Plan
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('/execution/plans/new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Plan
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -170,15 +179,17 @@ export function PlansPage() {
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => { e.stopPropagation(); navigate(`/execution/plans/${plan.id}/edit`) }}
-                    className="text-xs text-primary hover:underline flex items-center gap-1"
+                    className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                    title="Editar"
                   >
-                    <Edit3 size={12} /> Editar
+                    <Pencil size={14} />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(plan) }}
-                    className="text-xs text-danger hover:underline"
+                    className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                    title="Eliminar"
                   >
-                    Eliminar
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>

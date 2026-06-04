@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Search, AlertTriangle, CheckCircle, XCircle, Clock, Edit3 } from 'lucide-react'
+import { Plus, Search, Upload, AlertTriangle, CheckCircle, XCircle, Clock, Pencil, Trash2 } from 'lucide-react'
 import { runEscalation } from '../services/escalationService'
 import type { CommitmentStatus } from '@/constants/enums'
 import type { Commitment } from '@/types/domain'
@@ -100,37 +100,46 @@ export function CommitmentsPage() {
             Seguimiento de compromisos, promesas y deadlines cross-equipo
           </p>
         </div>
-        <button
-          onClick={() => navigate('/execution/commitments/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Compromiso
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/import')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Upload size={16} />
+            Importar
+          </button>
+          <button
+            onClick={() => navigate('/execution/commitments/new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Compromiso
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-4">
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Total</p>
-        </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        </button>
+        <button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-info">{stats.active}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Activos</p>
-        </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-warning/20 p-4 shadow-sm">
+        </button>
+        <button onClick={() => setStatusFilter('at_risk')} className="bg-white dark:bg-neutral-80 rounded-xl border border-warning/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-warning">{stats.atRisk}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">En Riesgo</p>
-        </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-danger/20 p-4 shadow-sm">
+        </button>
+        <button onClick={() => setStatusFilter('breached')} className="bg-white dark:bg-neutral-80 rounded-xl border border-danger/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-danger">{stats.breached}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Incumplidos</p>
-        </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        </button>
+        <button onClick={() => setStatusFilter('fulfilled')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-success">{stats.fulfilled}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Cumplidos</p>
-        </div>
+        </button>
       </div>
 
       {/* Filters */}
@@ -240,14 +249,14 @@ export function CommitmentsPage() {
                             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
                             title="Editar"
                           >
-                            <Edit3 size={14} />
+                            <Pencil size={14} />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDelete(c) }}
                             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
                             title="Eliminar"
                           >
-                            <XCircle size={14} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </td>
