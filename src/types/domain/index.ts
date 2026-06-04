@@ -1,4 +1,4 @@
-import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus } from '@/constants/enums'
+import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus, MemberRole } from '@/constants/enums'
 
 export type {
   Criticality,
@@ -24,7 +24,19 @@ export type {
   DeliverableStatus,
   UserRole,
   BusinessUnitStatus,
+  MemberRole,
 }
+
+export type {
+  MemberProfile,
+  Skill,
+  SprintRecord,
+  OneOnOne,
+  Oportunidad,
+  Accion,
+  Compromiso,
+  Achievement,
+} from './performance'
 
 export interface Tenant {
   id: string

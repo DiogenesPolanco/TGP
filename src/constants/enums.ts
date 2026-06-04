@@ -32,3 +32,4 @@ export type CommitmentStatus = 'active' | 'at_risk' | 'breached' | 'fulfilled' |
 export type BlockerSeverity = 'low' | 'medium' | 'high' | 'critical'
 export type BlockerStatus = 'open' | 'escalated' | 'resolved'
 export type DependencyRelation = 'blocks' | 'depends_on' | 'related_to'
+export type MemberRole = 'developer' | 'senior_developer' | 'tech_lead' | 'architect' | 'qa' | 'devops' | 'product_owner' | 'scrum_master' | 'ux_designer' | 'analyst' | 'manager' | 'intern' | 'other'
