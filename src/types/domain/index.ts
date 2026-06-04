@@ -1,4 +1,4 @@
-import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth } from '@/constants/enums'
+import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus } from '@/constants/enums'
 
 export type {
   Criticality,
@@ -23,6 +23,7 @@ export type {
   TrendDirection,
   DeliverableStatus,
   UserRole,
+  BusinessUnitStatus,
 }
 
 export interface Tenant {
@@ -68,6 +69,7 @@ export interface BusinessUnit {
   id: string
   tenantId: string
   name: string
+  status: BusinessUnitStatus
   createdAt: Date
 }
 

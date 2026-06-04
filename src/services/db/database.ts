@@ -50,16 +50,16 @@ export class TGPDatabase extends Dexie {
 
   constructor() {
     super('TGPDatabase')
-    this.version(3).stores({
+    this.version(5).stores({
       tenants: 'id, name, slug',
-      businessUnits: 'id, tenantId, name',
+      businessUnits: 'id, tenantId, name, status',
       applications: 'id, businessUnitId, name, criticality, status, ownerId',
       technologies: 'id, name, version, category, supportStatus',
       applicationDependencies: 'id, applicationId, dependsOnAppId',
-      vulnerabilities: 'id, applicationId, severity, status, slaDeadline, detectedAt',
-      incidents: 'id, applicationId, severity, status, detectedAt',
-      risks: 'id, businessUnitId, applicationId, status, riskScore',
-      auditFindings: 'id, applicationId, severity, status, dueDate',
+      vulnerabilities: 'id, applicationId, severity, status, slaDeadline, detectedAt, title',
+      incidents: 'id, applicationId, severity, status, detectedAt, title',
+      risks: 'id, businessUnitId, applicationId, status, riskScore, title',
+      auditFindings: 'id, applicationId, severity, status, dueDate, title',
       teams: 'id, businessUnitId, name',
       objectives: 'id, teamId, businessUnitId, status, periodStart',
       healthIndexHistory: 'id, businessUnitId, calculatedAt',

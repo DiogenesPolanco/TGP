@@ -22,15 +22,20 @@ import type {
 } from '@/types/domain'
 
 const SEEDED_FLAG = 'tgp-seeded'
+let seedingInProgress = false
 
 export async function seedDemoData() {
   // Only seed once in the lifetime of the app
   if (localStorage.getItem(SEEDED_FLAG)) return
+  // Guard against React StrictMode double-invocation
+  if (seedingInProgress) return
+  seedingInProgress = true
 
   // Check if data already exists (e.g. imported data on first visit)
   const counts = await Promise.all(db.tables.map((t) => t.count()))
   if (counts.some((c) => c > 0)) {
     localStorage.setItem(SEEDED_FLAG, 'true')
+    seedingInProgress = false
     return
   }
 
@@ -72,9 +77,9 @@ export async function seedDemoData() {
   }
 
   const businessUnits: BusinessUnit[] = [
-    { id: 'bu-digital', tenantId: 'tenant-1', name: 'Digital', createdAt: new Date() },
-    { id: 'bu-core', tenantId: 'tenant-1', name: 'Core', createdAt: new Date() },
-    { id: 'bu-legacy', tenantId: 'tenant-1', name: 'Legacy', createdAt: new Date() },
+    { id: 'bu-digital', tenantId: 'tenant-1', name: 'Digital', status: 'active', createdAt: new Date() },
+    { id: 'bu-core', tenantId: 'tenant-1', name: 'Core', status: 'active', createdAt: new Date() },
+    { id: 'bu-legacy', tenantId: 'tenant-1', name: 'Legacy', status: 'active', createdAt: new Date() },
   ]
 
   const technologies: Technology[] = [
@@ -147,8 +152,9 @@ export async function seedDemoData() {
   const inc_30d: Incident = { id: 'inc-1', applicationId: 'app-1', externalId: 'INC-001', title: 'Caída del servicio de pagos', description: 'El servicio de pagos no responde', severity: 'critical', status: 'resolved', detectedAt: daysAgo(25), respondedAt: daysAgo(25, 15 * 60 * 1000), resolvedAt: daysAgo(25, 2 * 60 * 60 * 1000), downtimeMinutes: 120, rca: 'Problema de conexión a base de datos', metadata: {}, createdAt: daysAgo(25), updatedAt: daysAgo(25) }
   // Open incident (to show in counters) — 3d ago
   const inc_open: Incident = { id: 'inc-3', applicationId: 'app-3', externalId: 'INC-003', title: 'Error 500 en carrito de compras', description: 'Error intermitente en endpoint de carrito', severity: 'high', status: 'in_progress', detectedAt: daysAgo(2), respondedAt: daysAgo(2, 10 * 60 * 1000), resolvedAt: null, downtimeMinutes: 45, rca: null, metadata: {}, createdAt: daysAgo(2), updatedAt: daysAgo(2) }
+  const inc_detected: Incident = { id: 'inc-4', applicationId: 'app-1', externalId: 'INC-004', title: 'Intento de acceso no autorizado', description: 'Múltiples intentos fallidos de autenticación desde IP externa', severity: 'critical', status: 'detected', detectedAt: daysAgo(0, -2 * 60 * 60 * 1000), respondedAt: null, resolvedAt: null, downtimeMinutes: 0, rca: null, metadata: {}, createdAt: daysAgo(0, -2 * 60 * 60 * 1000), updatedAt: daysAgo(0, -2 * 60 * 60 * 1000) }
 
-  const incidents = [inc_7d, inc_30d, inc_open]
+  const incidents = [inc_7d, inc_30d, inc_open, inc_detected]
 
   // ── Risks spread across time ──
   // Open within 7d
@@ -304,6 +310,7 @@ export async function seedDemoData() {
   await db.blockers.bulkAdd(blockers)
 
   localStorage.setItem(SEEDED_FLAG, 'true')
+  seedingInProgress = false
 }
 
 /**
