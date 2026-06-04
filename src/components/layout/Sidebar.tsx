@@ -72,7 +72,8 @@ const navItems: NavItem[] = [
     label: 'Equipos',
     icon: <Users size={20} />,
     children: [
-      { label: 'Miembros', path: '/teams' },
+      { label: 'Equipos', path: '/teams' },
+      { label: 'Miembros', path: '/teams/members' },
       { label: 'Rendimiento', path: '/teams/performance' },
     ],
   },

@@ -1,6 +1,11 @@
 import { db } from '@/services/db/database'
 import type { Team, TeamMember } from '@/types/domain'
 
+export interface MemberWithTeam {
+  member: TeamMember
+  team: Team
+}
+
 export interface MemberKPIs {
   memberId: string
   memberName: string
@@ -92,3 +97,35 @@ export async function getTeamPerformanceIndicators(team: Team): Promise<{
     bottomSP: bottomSP ? { member: bottomSP.member, sp: bottomSP.kpis.totalSP } : null,
   }
 }
+
+export async function getGlobalMembersKPIs() {
+  const teams = await db.teams.toArray()
+  const allMembers = teams.flatMap((t) =>
+    t.members.map((m) => ({ member: m, team: t }))
+  )
+  const kpisList = await Promise.all(
+    allMembers.map(async ({ member, team }) => {
+      const kpis = await getMemberKPIs(member.id)
+      kpis.memberName = member.displayName
+      return { member, team, kpis }
+    })
+  )
+
+  const withSP = kpisList.filter((k) => k.kpis.totalSP > 0)
+  const bestPerformer = withSP.length > 0
+    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
+    : null
+  const worstPerformer = withSP.length > 0
+    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
+    : null
+  const topSP = withSP.length > 0
+    ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
+    : null
+  const bottomSP = withSP.length > 0
+    ? withSP.reduce((a, b) => (a.kpis.totalSP < b.kpis.totalSP ? a : b))
+    : null
+
+  return { kpisList, bestPerformer, worstPerformer, topSP, bottomSP }
+}
+
+export type GlobalMemberKPIs = Awaited<ReturnType<typeof getGlobalMembersKPIs>>

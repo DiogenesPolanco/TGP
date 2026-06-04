@@ -1,4 +1,4 @@
-import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus, MemberRole } from '@/constants/enums'
+import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus, MemberRole, MemberStatus } from '@/constants/enums'
 
 export type {
   Criticality,
@@ -25,6 +25,7 @@ export type {
   UserRole,
   BusinessUnitStatus,
   MemberRole,
+  MemberStatus,
 }
 
 export type {
@@ -243,7 +244,7 @@ export interface TeamMember {
   displayName: string
   role: MemberRole
   allocationPct: number
-  isActive: boolean
+  status: MemberStatus
 }
 
 export interface TeamMetrics {

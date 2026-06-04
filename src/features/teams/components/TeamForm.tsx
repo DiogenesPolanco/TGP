@@ -64,7 +64,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
       displayName: '',
       role: 'developer',
       allocationPct: 100,
-      isActive: true,
+      status: 'activo',
     }
     setFormData({ ...formData, members: [...formData.members, newMember] })
   }

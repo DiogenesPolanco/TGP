@@ -1,4 +1,4 @@
-import type { MemberRole } from './enums'
+import type { MemberRole, MemberStatus } from './enums'
 
 export const MEMBER_ROLE_LABELS: Record<MemberRole, string> = {
   developer: 'Developer',
@@ -17,3 +17,10 @@ export const MEMBER_ROLE_LABELS: Record<MemberRole, string> = {
 }
 
 export const MEMBER_ROLES = Object.keys(MEMBER_ROLE_LABELS) as MemberRole[]
+
+export const MEMBER_STATUS_LABELS: Record<MemberStatus, string> = {
+  activo: 'Activo',
+  licencia: 'Licencia',
+  vacaciones: 'Vacaciones',
+  desvinculado: 'Desvinculado',
+}

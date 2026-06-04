@@ -78,7 +78,7 @@ export function TeamFormPage() {
       displayName: m.name,
       role: m.role,
       allocationPct: m.allocation,
-      isActive: true,
+      status: 'activo' as const,
     }))
     const metadata = {
       ...(team?.metadata ?? {}),

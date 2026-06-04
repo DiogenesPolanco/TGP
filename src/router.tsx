@@ -15,6 +15,7 @@ import { AuditFormPage } from '@/features/governance/pages/AuditFormPage'
 import { TeamsPage } from '@/features/teams/pages/TeamsPage'
 import { TeamDetailPage } from '@/features/teams/pages/TeamDetailPage'
 import { TeamFormPage } from '@/features/teams/pages/TeamFormPage'
+import { MembersPage } from '@/features/teams/pages/MembersPage'
 import { ObjectivesPage } from '@/features/strategy/pages/ObjectivesPage'
 import { ObjectiveFormPage } from '@/features/strategy/pages/ObjectiveFormPage'
 import { AdminPage } from '@/features/admin/pages/AdminPage'
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
       { path: 'governance/audit', element: <AuditPage /> },
       { path: 'governance/audit/new', element: <AuditFormPage /> },
       { path: 'governance/audit/:id/edit', element: <AuditFormPage /> },
+      { path: 'teams/members', element: <MembersPage /> },
       { path: 'teams/performance', element: <TeamPerformanceSelectorPage /> },
       { path: 'teams/new', element: <TeamFormPage /> },
       { path: 'teams/:id/edit', element: <TeamFormPage /> },
