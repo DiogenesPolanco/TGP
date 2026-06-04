@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import {
   Plus,
@@ -14,15 +15,15 @@ import {
   Calendar,
   Shield,
 } from 'lucide-react'
-import { TechnologyForm } from '../components/TechnologyForm'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import type { Technology, SupportStatus, TechCategory } from '@/types/domain'
 import { computeAppTechMap } from '@/utils/technologyUtils'
 
 export function ObsolescencePage() {
+  const navigate = useNavigate()
   const { confirm } = useConfirm()
-  const [showForm, setShowForm] = useState(false)
-  const [editingTech, setEditingTech] = useState<Technology | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<SupportStatus | 'all'>('all')
   const [categoryFilter, setCategoryFilter] = useState<TechCategory | 'all'>('all')
@@ -39,6 +40,8 @@ export function ObsolescencePage() {
       return true
     })
   }, [technologies, search, statusFilter, categoryFilter])
+
+  const { page, setPage, totalPages, paginatedItems: paginatedTechs } = usePagination(filteredTechs, 5)
 
   const appTechMap = useMemo(
     () => computeAppTechMap(applications, microservices),
@@ -140,7 +143,7 @@ export function ObsolescencePage() {
           </p>
         </div>
         <button
-          onClick={() => { setEditingTech(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -277,7 +280,7 @@ export function ObsolescencePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {filteredTechs.map((tech) => {
+              {paginatedTechs.map((tech) => {
                 const urgency = getEolUrgency(tech)
                 const appCount = applications.filter((app) => {
                   const techIds = appTechMap.get(app.id) ?? app.technologies
@@ -329,7 +332,7 @@ export function ObsolescencePage() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => { setEditingTech(tech); setShowForm(true) }}
+                          onClick={() => navigate(`${tech.id}/edit`)}
                           className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
                           title="Editar"
                         >
@@ -361,16 +364,16 @@ export function ObsolescencePage() {
               )}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={filteredTechs.length}
+            pageSize={5}
+            onPageChange={setPage}
+          />
         </div>
       </div>
 
-      {showForm && (
-        <TechnologyForm
-          technology={editingTech}
-          onClose={() => { setShowForm(false); setEditingTech(null) }}
-          onSave={() => { setShowForm(false); setEditingTech(null) }}
-        />
-      )}
     </div>
   )
 }

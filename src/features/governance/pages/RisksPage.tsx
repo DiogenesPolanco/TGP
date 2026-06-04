@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search } from 'lucide-react'
-import { RiskForm } from '../components/RiskForm'
-import type { Risk } from '@/types/domain'
 
 export function RisksPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingRisk, setEditingRisk] = useState<Risk | null>(null)
   const [selectedCell, setSelectedCell] = useState<{ prob: number; impact: number } | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
@@ -22,6 +22,8 @@ export function RisksPage() {
     r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (!selectedCell || (r.probability === selectedCell.prob && r.impact === selectedCell.impact))
   )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedRisks } = usePagination(filteredRisks, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar riesgo?')) {
@@ -48,7 +50,7 @@ export function RisksPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Riesgos</h2>
         <button
-          onClick={() => { setEditingRisk(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -129,7 +131,7 @@ export function RisksPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {filteredRisks.map((risk) => {
+            {paginatedRisks.map((risk) => {
               const app = applications.find((a) => a.id === risk.applicationId)
               return (
                 <tr key={risk.id} className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
@@ -164,7 +166,7 @@ export function RisksPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => { setEditingRisk(risk); setShowForm(true) }}
+                        onClick={() => navigate(`${risk.id}/edit`)}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
@@ -182,6 +184,13 @@ export function RisksPage() {
             })}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={filteredRisks.length}
+          pageSize={5}
+          onPageChange={setPage}
+        />
         {filteredRisks.length === 0 && (
           <div className="text-center py-12">
             <p className="text-neutral-50 dark:text-neutral-50">No se encontraron riesgos</p>
@@ -189,17 +198,6 @@ export function RisksPage() {
         )}
       </div>
 
-      {showForm && (
-        <RiskForm
-          risk={editingRisk}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingRisk(null)
-            addNotification({ type: 'success', message: editingRisk ? 'Riesgo actualizado' : 'Riesgo creado' })
-          }}
-        />
-      )}
     </div>
   )
 }

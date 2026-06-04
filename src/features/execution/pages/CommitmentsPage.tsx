@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { Plus, Search, AlertTriangle, CheckCircle, XCircle, Clock, ArrowRight } from 'lucide-react'
-import { CommitmentForm } from '../components/CommitmentForm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
+import { Plus, Search, AlertTriangle, CheckCircle, XCircle, Clock, Edit3 } from 'lucide-react'
 import { runEscalation } from '../services/escalationService'
-import type { Commitment } from '@/types/domain'
 import type { CommitmentStatus } from '@/constants/enums'
+import type { Commitment } from '@/types/domain'
 
 const statusConfig: Record<CommitmentStatus, { label: string; color: string; icon: React.ReactNode }> = {
   active: { label: 'Activo', color: 'bg-info/10 text-info', icon: <Clock size={14} /> },
@@ -17,12 +19,11 @@ const statusConfig: Record<CommitmentStatus, { label: string; color: string; ico
 }
 
 export function CommitmentsPage() {
+  const navigate = useNavigate()
   const { confirm } = useConfirm()
 
   useEffect(() => { runEscalation() }, [])
 
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<Commitment | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<CommitmentStatus | 'all'>('all')
 
@@ -55,6 +56,8 @@ export function CommitmentsPage() {
     if (diff !== 0) return diff
     return new Date(a.commitmentDate).getTime() - new Date(b.commitmentDate).getTime()
   })
+
+  const { page, setPage, totalPages, paginatedItems: paginatedCommitments } = usePagination(sorted, 5)
 
   const stats = useMemo(() => ({
     total: commitments.length,
@@ -98,7 +101,7 @@ export function CommitmentsPage() {
           </p>
         </div>
         <button
-          onClick={() => { setEditing(null); setShowForm(true) }}
+          onClick={() => navigate('/execution/commitments/new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -165,100 +168,102 @@ export function CommitmentsPage() {
             No hay compromisos que coincidan con los filtros.
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Compromiso</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Owner / Stakeholder</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Equipo / App</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Fecha</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {sorted.map((c) => {
-                const daysInfo = getDaysInfo(c.commitmentDate)
-                const cfg = statusConfig[c.status]
-                const isOverdue = (c.status === 'active' || c.status === 'at_risk') &&
-                  new Date(c.commitmentDate) < today
+          <>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Compromiso</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Owner / Stakeholder</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Equipo / App</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Estado</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Fecha</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
+                {paginatedCommitments.map((c) => {
+                  const daysInfo = getDaysInfo(c.commitmentDate)
+                  const cfg = statusConfig[c.status]
+                  const isOverdue = (c.status === 'active' || c.status === 'at_risk') &&
+                    new Date(c.commitmentDate) < today
 
-                return (
-                  <tr key={c.id} className={`hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group ${
-                    isOverdue ? 'bg-danger/5' : ''
-                  }`}>
-                    <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
-                      {c.description && (
-                        <p className="text-xs text-neutral-50 mt-0.5 line-clamp-1">{c.description}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-sm text-neutral-70 dark:text-neutral-30">{c.ownerId}</p>
-                      <p className="text-xs text-neutral-50">a: {c.accountableId}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-sm text-neutral-70 dark:text-neutral-30">
-                        {teamMap.get(c.teamId ?? '')?.name ?? '-'}
-                      </p>
-                      <p className="text-xs text-neutral-50">{appMap.get(c.applicationId ?? '')?.name ?? ''}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={c.status}
-                        onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
-                        className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
-                      >
-                        <option value="active">Activo</option>
-                        <option value="at_risk">En Riesgo</option>
-                        <option value="breached">Incumplido</option>
-                        <option value="fulfilled">Cumplido</option>
-                        <option value="cancelled">Cancelado</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-neutral-70 dark:text-neutral-30">
-                          {c.commitmentDate.toLocaleDateString('es-ES')}
-                        </span>
-                        <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>
-                          ({daysInfo.label})
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                        <button
-                          onClick={() => { setEditing(c); setShowForm(true) }}
-                          className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                          title="Editar"
+                  return (
+                    <tr key={c.id} className={`hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group ${
+                      isOverdue ? 'bg-danger/5' : ''
+                    }`}>
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
+                        {c.description && (
+                          <p className="text-xs text-neutral-50 mt-0.5 line-clamp-1">{c.description}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-neutral-70 dark:text-neutral-30">{c.ownerId}</p>
+                        <p className="text-xs text-neutral-50">a: {c.accountableId}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-neutral-70 dark:text-neutral-30">
+                          {teamMap.get(c.teamId ?? '')?.name ?? '-'}
+                        </p>
+                        <p className="text-xs text-neutral-50">{appMap.get(c.applicationId ?? '')?.name ?? ''}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <select
+                          value={c.status}
+                          onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
+                          className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
                         >
-                          <ArrowRight size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(c)}
-                          className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                          title="Eliminar"
-                        >
-                          <XCircle size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                          <option value="active">Activo</option>
+                          <option value="at_risk">En Riesgo</option>
+                          <option value="breached">Incumplido</option>
+                          <option value="fulfilled">Cumplido</option>
+                          <option value="cancelled">Cancelado</option>
+                        </select>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-neutral-70 dark:text-neutral-30">
+                            {c.commitmentDate.toLocaleDateString('es-ES')}
+                          </span>
+                          <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>
+                            ({daysInfo.label})
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                          <button
+                            onClick={() => navigate(`/execution/commitments/${c.id}/edit`)}
+                            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                            title="Editar"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c)}
+                            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                            title="Eliminar"
+                          >
+                            <XCircle size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={sorted.length}
+              pageSize={5}
+              onPageChange={setPage}
+            />
+          </>
         )}
       </div>
 
-      {showForm && (
-        <CommitmentForm
-          commitment={editing}
-          onClose={() => { setShowForm(false); setEditing(null) }}
-          onSave={() => { setShowForm(false); setEditing(null) }}
-        />
-      )}
     </div>
   )
 }

@@ -3,10 +3,11 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { Plus, Search, Target, AlertCircle, CheckCircle, PauseCircle, XCircle } from 'lucide-react'
-import { PlanForm } from '../components/PlanForm'
-import type { Plan } from '@/types/domain'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
+import { Plus, Search, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Edit3 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
+import type { Plan } from '@/types/domain'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   planned: { label: 'Planificado', color: 'bg-info/10 text-info border-info/30', icon: <Target size={16} /> },
@@ -25,8 +26,6 @@ const healthColor: Record<string, string> = {
 export function PlansPage() {
   const navigate = useNavigate()
   const { confirm } = useConfirm()
-  const [showForm, setShowForm] = useState(false)
-  const [editingPlan, setEditingPlan] = useState<Plan | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all')
 
@@ -46,6 +45,8 @@ export function PlansPage() {
     }
     return true
   })
+
+  const { page, setPage, totalPages, paginatedItems: paginatedPlans } = usePagination(filteredPlans, 5)
 
   const getActivityStats = (planId: string) => {
     const planActivities = activities.filter((a) => a.planId === planId)
@@ -80,7 +81,7 @@ export function PlansPage() {
           </p>
         </div>
         <button
-          onClick={() => { setEditingPlan(null); setShowForm(true) }}
+          onClick={() => navigate('/execution/plans/new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -118,7 +119,7 @@ export function PlansPage() {
 
       {/* Plan cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredPlans.map((plan) => {
+        {paginatedPlans.map((plan) => {
           const stats = getActivityStats(plan.id)
           const daysTotal = Math.ceil((plan.endDate.getTime() - plan.startDate.getTime()) / (1000 * 60 * 60 * 24))
           const daysLeft = Math.ceil((plan.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -168,10 +169,10 @@ export function PlansPage() {
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={(e) => { e.stopPropagation(); setEditingPlan(plan); setShowForm(true) }}
-                    className="text-xs text-primary hover:underline"
+                    onClick={(e) => { e.stopPropagation(); navigate(`/execution/plans/${plan.id}/edit`) }}
+                    className="text-xs text-primary hover:underline flex items-center gap-1"
                   >
-                    Editar
+                    <Edit3 size={12} /> Editar
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(plan) }}
@@ -186,6 +187,14 @@ export function PlansPage() {
         })}
       </div>
 
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filteredPlans.length}
+        pageSize={5}
+        onPageChange={setPage}
+      />
+
       {filteredPlans.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
           <Target size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
@@ -195,13 +204,6 @@ export function PlansPage() {
         </div>
       )}
 
-      {showForm && (
-        <PlanForm
-          plan={editingPlan}
-          onClose={() => { setShowForm(false); setEditingPlan(null) }}
-          onSave={() => { setShowForm(false); setEditingPlan(null) }}
-        />
-      )}
     </div>
   )
 }
