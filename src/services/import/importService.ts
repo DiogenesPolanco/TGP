@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx-js-style'
 import { db } from '@/services/db/database'
 import type {
   Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus,

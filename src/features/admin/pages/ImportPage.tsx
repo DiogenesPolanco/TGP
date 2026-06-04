@@ -381,7 +381,7 @@ function downloadTemplate(entityType: string) {
     const config = getImportConfig(entityType)
     if (!config) return
 
-    import('xlsx').then((XLSX) => {
+    import('xlsx-js-style').then((XLSX) => {
       const headerRow = config.columns.map((c) => c.label)
       const exampleRow = config.columns.map((c) => {
         if (c.required) {
