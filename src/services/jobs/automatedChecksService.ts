@@ -265,6 +265,42 @@ async function checkOverdueDeliverables(): Promise<DashboardAlert[]> {
   return alerts
 }
 
+async function checkLibraryVulnerabilities(): Promise<DashboardAlert[]> {
+  const usedIds = new Set<string>()
+  const [apps, microservices] = await Promise.all([
+    db.applications.toArray(),
+    db.microservices.toArray(),
+  ])
+  for (const app of apps) for (const id of app.technologies) usedIds.add(id)
+  for (const ms of microservices) for (const id of ms.technologies) usedIds.add(id)
+
+  const vulnerableLibs = await db.technologies
+    .filter((t) => t.category === 'library' && t.cveList.length > 0 && usedIds.has(t.id))
+    .toArray()
+
+  const alerts: DashboardAlert[] = []
+
+  for (const tech of vulnerableLibs) {
+    const appNames: string[] = []
+    for (const app of apps) {
+      if (app.technologies.includes(tech.id)) appNames.push(app.name)
+    }
+    for (const ms of microservices) {
+      if (ms.technologies.includes(tech.id)) appNames.push(`${ms.name} (ms)`)
+    }
+
+    const locations = appNames.slice(0, 3).join(', ')
+    const suffix = appNames.length > 3 ? ` y ${appNames.length - 3} más` : ''
+
+    alerts.push({
+      type: tech.supportStatus === 'eol' ? 'critical' : 'warning',
+      message: `${tech.name} v${tech.version} tiene ${tech.cveList.length} CVE y se usa en ${locations}${suffix}`,
+    })
+  }
+
+  return alerts
+}
+
 // ─── Runner ──────────────────────────────────────────────────────────
 
 async function runBackup(): Promise<DashboardAlert[]> {
@@ -320,11 +356,12 @@ export async function runAutomatedChecks(): Promise<{
     checkOpenBlockers(),
     checkOverdueActivities(),
     checkOverdueDeliverables(),
+    checkLibraryVulnerabilities(),
     runBackup(),
   ])
 
   const alerts = checks.flat()
-  const totalChecks = 8
+  const totalChecks = 9
 
   // Fire toast notifications via the store
   const store = useAppStore.getState?.()

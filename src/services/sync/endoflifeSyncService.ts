@@ -1,5 +1,8 @@
 import { db } from '@/services/db/database'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import { lookupDepsPackage } from '@/services/security/depsDevService'
+import { DEPS_SYSTEMS } from '@/services/security/depsDevService'
+import type { DepsSystem } from '@/services/security/depsDevService'
 import type { Technology, SupportStatus } from '@/types/domain'
 
 interface V1Release {
@@ -323,5 +326,89 @@ export async function syncTechnologies(): Promise<SyncResult> {
   }
 
   result.duration = Date.now() - startTime
+
+  // ── 2nd pass: deps.dev sync for libraries ──
+  const depsResults = await syncLibrariesFromDepsDev()
+  for (const dr of depsResults) {
+    result.details.push(dr)
+    if (dr.action === 'updated') result.updated++
+    else if (dr.action === 'not_found') result.notFound++
+    else if (dr.action === 'error') result.errors++
+  }
+
+  result.duration = Date.now() - startTime
   return result
+}
+
+/* ─── deps.dev helpers ─── */
+
+function detectDepsSystem(tech: Technology): DepsSystem | null {
+  const sysFromMeta = tech.metadata?.system as string | undefined
+  if (sysFromMeta && ['npm', 'maven', 'nuget', 'pypi', 'go', 'cargo'].includes(sysFromMeta)) {
+    return sysFromMeta as DepsSystem
+  }
+
+  const vendor = tech.vendor?.toLowerCase() ?? ''
+  const known = DEPS_SYSTEMS.map((s) => s.label.toLowerCase())
+  if (known.includes(vendor)) {
+    return DEPS_SYSTEMS.find((s) => s.label.toLowerCase() === vendor)!.value
+  }
+
+  return null
+}
+
+async function syncLibrariesFromDepsDev(): Promise<SyncResultItem[]> {
+  const libraries = await db.technologies
+    .filter((t) => t.category === 'library')
+    .toArray()
+
+  const results: SyncResultItem[] = []
+
+  for (const tech of libraries) {
+    const system = detectDepsSystem(tech)
+    if (!system) continue
+
+    const searchTerm = tech.version ? `${tech.name}@${tech.version}` : tech.name
+    const depsResult = await lookupDepsPackage(searchTerm, system)
+
+    if (!depsResult) {
+      results.push({
+        name: tech.name,
+        version: tech.version,
+        action: 'not_found',
+        error: `${system}: no encontrado en deps.dev`,
+      })
+      continue
+    }
+
+    const previousStatus = tech.supportStatus
+    const previousCveCount = tech.cveList.length
+
+    await db.technologies.update(tech.id, {
+      supportStatus: depsResult.supportStatus,
+      cveList: depsResult.cveList,
+      metadata: {
+        ...tech.metadata,
+        system,
+        license: depsResult.license,
+        description: depsResult.description,
+        advisories: depsResult.advisories,
+        advisoryIds: depsResult.advisoryIds,
+        lastSyncFromDepsDev: new Date().toISOString(),
+      },
+    })
+
+    results.push({
+      name: tech.name,
+      version: tech.version,
+      action: 'updated',
+      previousStatus,
+      newStatus: depsResult.supportStatus,
+      error: previousCveCount !== depsResult.cveList.length
+        ? `CVEs: ${previousCveCount} → ${depsResult.cveList.length}`
+        : undefined,
+    })
+  }
+
+  return results
 }
