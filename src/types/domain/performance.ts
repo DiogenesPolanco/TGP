@@ -87,3 +87,13 @@ export interface Achievement {
   linkedToPromotion: boolean
   createdAt: Date
 }
+
+export interface VacationRecord {
+  id: string
+  memberId: string
+  startDate: Date
+  endDate: Date
+  days: number
+  reason: string
+  createdAt: Date
+}

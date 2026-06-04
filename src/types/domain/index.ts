@@ -37,6 +37,7 @@ export type {
   Accion,
   Compromiso,
   Achievement,
+  VacationRecord,
 } from './performance'
 
 export interface Tenant {

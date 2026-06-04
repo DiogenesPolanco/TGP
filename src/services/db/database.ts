@@ -25,6 +25,7 @@ import type {
   SprintRecord,
   OneOnOne,
   Achievement,
+  VacationRecord,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -57,6 +58,7 @@ export class TGPDatabase extends Dexie {
   sprintRecords!: Table<SprintRecord, string>
   oneOnOnes!: Table<OneOnOne, string>
   achievements!: Table<Achievement, string>
+  vacationRecords!: Table<VacationRecord, string>
 
   constructor() {
     super('TGPDatabase')
@@ -88,6 +90,9 @@ export class TGPDatabase extends Dexie {
       sprintRecords: 'id, memberId, year, quarter',
       oneOnOnes: 'id, memberId, date',
       achievements: 'id, memberId, type, date',
+    })
+    this.version(7).stores({
+      vacationRecords: 'id, memberId, startDate',
     })
   }
 }

@@ -19,6 +19,10 @@ import type {
   Task,
   Commitment,
   Blocker,
+  MemberProfile,
+  SprintRecord,
+  OneOnOne,
+  Achievement,
 } from '@/types/domain'
 
 const SEEDED_FLAG = 'tgp-seeded'
@@ -209,8 +213,18 @@ export async function seedDemoData() {
   const auditFindings = [find_closed_1, find_overdue, find_closed_2, find_closed_3, find_open]
 
   const teams: Team[] = [
-    { id: 'team-1', businessUnitId: 'bu-digital', name: 'Platform Team', sourceSystem: 'jira', externalId: 'TEAM-1', members: [{ id: 'tm-1', userPrincipal: 'user-1', displayName: 'Juan Pérez', role: 'tech_lead', allocationPct: 100, status: 'activo' }], currentMetrics: { velocity: 45, leadTimeHours: 12, cycleTimeHours: 8, throughput: 12, deploymentFrequency: 2, changeFailureRate: 3, mttrHours: 0.5, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
-    { id: 'team-2', businessUnitId: 'bu-core', name: 'Core Squad', sourceSystem: 'azure_devops', externalId: 'TEAM-2', members: [{ id: 'tm-2', userPrincipal: 'user-2', displayName: 'María García', role: 'senior_developer', allocationPct: 100, status: 'activo' }], currentMetrics: { velocity: 38, leadTimeHours: 24, cycleTimeHours: 16, throughput: 10, deploymentFrequency: 1, changeFailureRate: 8, mttrHours: 2, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
+    { id: 'team-1', businessUnitId: 'bu-digital', name: 'Platform Team', sourceSystem: 'jira', externalId: 'TEAM-1', members: [
+      { id: 'tm-1', userPrincipal: 'user-1', displayName: 'Juan Pérez', role: 'tech_lead', allocationPct: 100, status: 'activo' },
+      { id: 'tm-3', userPrincipal: 'user-3', displayName: 'Carlos López', role: 'senior_developer', allocationPct: 100, status: 'activo' },
+      { id: 'tm-4', userPrincipal: 'user-4', displayName: 'Ana Martínez', role: 'developer', allocationPct: 100, status: 'activo' },
+      { id: 'tm-5', userPrincipal: 'user-5', displayName: 'Pedro Sánchez', role: 'intern', allocationPct: 100, status: 'activo' },
+    ], currentMetrics: { velocity: 45, leadTimeHours: 12, cycleTimeHours: 8, throughput: 12, deploymentFrequency: 2, changeFailureRate: 3, mttrHours: 0.5, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
+    { id: 'team-2', businessUnitId: 'bu-core', name: 'Core Squad', sourceSystem: 'azure_devops', externalId: 'TEAM-2', members: [
+      { id: 'tm-2', userPrincipal: 'user-2', displayName: 'María García', role: 'senior_developer', allocationPct: 100, status: 'activo' },
+      { id: 'tm-6', userPrincipal: 'user-6', displayName: 'Laura Rodríguez', role: 'tech_lead', allocationPct: 100, status: 'activo' },
+      { id: 'tm-7', userPrincipal: 'user-7', displayName: 'Diego Fernández', role: 'developer', allocationPct: 100, status: 'vacaciones' },
+      { id: 'tm-8', userPrincipal: 'user-8', displayName: 'Sofía Torres', role: 'intern', allocationPct: 100, status: 'activo' },
+    ], currentMetrics: { velocity: 38, leadTimeHours: 24, cycleTimeHours: 16, throughput: 10, deploymentFrequency: 1, changeFailureRate: 8, mttrHours: 2, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
   ]
 
   const objectives: Objective[] = [
@@ -308,6 +322,120 @@ export async function seedDemoData() {
   await db.tasks.bulkAdd(tasks)
   await db.commitments.bulkAdd(commitments)
   await db.blockers.bulkAdd(blockers)
+
+  // ── Performance module seed data ──
+  const ds2 = (offset: number) => {
+    const d = new Date()
+    d.setDate(d.getDate() + offset)
+    d.setHours(12, 0, 0, 0)
+    return d
+  }
+
+  const memberProfiles: MemberProfile[] = [
+    { id: 'tm-1', teamId: 'team-1', email: 'juan.perez@tgp.demo', phoneCell: '+56911111111', phoneHome: '+56911111112', address: 'Santiago, Chile', role: 'tech_lead', skills: [{ id: 'sk-1', name: 'Arquitectura', level: 'expert', category: 'Arquitectura' }, { id: 'sk-2', name: 'Node.js', level: 'advanced', category: 'Backend' }, { id: 'sk-3', name: 'React', level: 'advanced', category: 'Frontend' }], technologies: ['tech-2', 'tech-4', 'tech-6', 'tech-7'], microservices: ['ms-1', 'ms-2', 'ms-6'], avgStoryPoints: 41, vacationDaysPerYear: 14, vacationUsed: 5, createdAt: ds2(-180), updatedAt: ds2(-1) },
+    { id: 'tm-3', teamId: 'team-1', email: 'carlos.lopez@tgp.demo', phoneCell: '+56911111113', phoneHome: '', address: 'Santiago, Chile', role: 'senior_developer', skills: [{ id: 'sk-4', name: '.NET', level: 'expert', category: 'Backend' }, { id: 'sk-5', name: 'PostgreSQL', level: 'advanced', category: 'Base de Datos' }, { id: 'sk-6', name: 'Docker', level: 'intermediate', category: 'DevOps' }], technologies: ['tech-1', 'tech-4', 'tech-5'], microservices: ['ms-2'], avgStoryPoints: 31, vacationDaysPerYear: 14, vacationUsed: 3, createdAt: ds2(-180), updatedAt: ds2(-1) },
+    { id: 'tm-4', teamId: 'team-1', email: 'ana.martinez@tgp.demo', phoneCell: '+56911111114', phoneHome: '', address: 'Santiago, Chile', role: 'developer', skills: [{ id: 'sk-7', name: 'Angular', level: 'intermediate', category: 'Frontend' }, { id: 'sk-8', name: 'TypeScript', level: 'intermediate', category: 'Frontend' }, { id: 'sk-9', name: 'Python', level: 'beginner', category: 'Backend' }], technologies: ['tech-3', 'tech-7', 'tech-13'], microservices: ['ms-4', 'ms-5'], avgStoryPoints: 21, vacationDaysPerYear: 14, vacationUsed: 7, createdAt: ds2(-120), updatedAt: ds2(-1) },
+    { id: 'tm-5', teamId: 'team-1', email: 'pedro.sanchez@tgp.demo', phoneCell: '+56911111115', phoneHome: '', address: 'Santiago, Chile', role: 'intern', skills: [{ id: 'sk-10', name: 'JavaScript', level: 'beginner', category: 'Frontend' }, { id: 'sk-11', name: 'SQL', level: 'beginner', category: 'Base de Datos' }], technologies: ['tech-7', 'tech-13'], microservices: [], avgStoryPoints: 11, vacationDaysPerYear: 14, vacationUsed: 2, createdAt: ds2(-60), updatedAt: ds2(-1) },
+    { id: 'tm-2', teamId: 'team-2', email: 'maria.garcia@tgp.demo', phoneCell: '+56922222221', phoneHome: '', address: 'Valparaíso, Chile', role: 'senior_developer', skills: [{ id: 'sk-12', name: 'Java', level: 'expert', category: 'Backend' }, { id: 'sk-13', name: 'Spring Boot', level: 'advanced', category: 'Backend' }, { id: 'sk-14', name: 'PostgreSQL', level: 'advanced', category: 'Base de Datos' }], technologies: ['tech-2', 'tech-4', 'tech-6'], microservices: ['ms-1', 'ms-6'], avgStoryPoints: 34, vacationDaysPerYear: 14, vacationUsed: 4, createdAt: ds2(-180), updatedAt: ds2(-1) },
+    { id: 'tm-6', teamId: 'team-2', email: 'laura.rodriguez@tgp.demo', phoneCell: '+56922222222', phoneHome: '+56922222223', address: 'Viña del Mar, Chile', role: 'tech_lead', skills: [{ id: 'sk-15', name: 'Arquitectura', level: 'expert', category: 'Arquitectura' }, { id: 'sk-16', name: 'Python', level: 'advanced', category: 'Backend' }, { id: 'sk-17', name: 'Kubernetes', level: 'advanced', category: 'DevOps' }, { id: 'sk-18', name: 'Redis', level: 'intermediate', category: 'Cache' }], technologies: ['tech-8', 'tech-14', 'tech-15', 'tech-16', 'tech-6'], microservices: ['ms-7', 'ms-8', 'ms-9'], avgStoryPoints: 41, vacationDaysPerYear: 14, vacationUsed: 2, createdAt: ds2(-180), updatedAt: ds2(-1) },
+    { id: 'tm-7', teamId: 'team-2', email: 'diego.fernandez@tgp.demo', phoneCell: '+56922222224', phoneHome: '', address: 'Valparaíso, Chile', role: 'developer', skills: [{ id: 'sk-19', name: 'Java', level: 'intermediate', category: 'Backend' }, { id: 'sk-20', name: 'React', level: 'intermediate', category: 'Frontend' }], technologies: ['tech-2', 'tech-13'], microservices: ['ms-6'], avgStoryPoints: 14, vacationDaysPerYear: 14, vacationUsed: 10, createdAt: ds2(-90), updatedAt: ds2(-1) },
+    { id: 'tm-8', teamId: 'team-2', email: 'sofia.torres@tgp.demo', phoneCell: '+56922222225', phoneHome: '', address: 'Valparaíso, Chile', role: 'intern', skills: [{ id: 'sk-21', name: 'JavaScript', level: 'beginner', category: 'Frontend' }, { id: 'sk-22', name: 'HTML/CSS', level: 'beginner', category: 'Frontend' }], technologies: ['tech-13'], microservices: [], avgStoryPoints: 7, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: ds2(-45), updatedAt: ds2(-1) },
+  ]
+
+  const sprintRecords: SprintRecord[] = [
+    // Juan Pérez (tm-1) — 4 sprints, alta eficiencia
+    { id: 'sr-1', memberId: 'tm-1', sprintName: 'Sprint 1', quarter: 'Q1', year: 2026, storyPointsCompleted: 40, storyPointsNotCompleted: 5, createdAt: ds2(-90) },
+    { id: 'sr-2', memberId: 'tm-1', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 45, storyPointsNotCompleted: 3, createdAt: ds2(-60) },
+    { id: 'sr-3', memberId: 'tm-1', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 7, createdAt: ds2(-30) },
+    { id: 'sr-4', memberId: 'tm-1', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 42, storyPointsNotCompleted: 4, createdAt: ds2(-1) },
+    // Carlos López (tm-3) — 4 sprints, buena eficiencia
+    { id: 'sr-5', memberId: 'tm-3', sprintName: 'Sprint 1', quarter: 'Q1', year: 2026, storyPointsCompleted: 30, storyPointsNotCompleted: 8, createdAt: ds2(-90) },
+    { id: 'sr-6', memberId: 'tm-3', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 35, storyPointsNotCompleted: 5, createdAt: ds2(-60) },
+    { id: 'sr-7', memberId: 'tm-3', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 28, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
+    { id: 'sr-8', memberId: 'tm-3', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 32, storyPointsNotCompleted: 6, createdAt: ds2(-1) },
+    // Ana Martínez (tm-4) — 3 sprints, eficiencia media
+    { id: 'sr-9', memberId: 'tm-4', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 20, storyPointsNotCompleted: 15, createdAt: ds2(-60) },
+    { id: 'sr-10', memberId: 'tm-4', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 25, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
+    { id: 'sr-11', memberId: 'tm-4', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 18, storyPointsNotCompleted: 12, createdAt: ds2(-1) },
+    // Pedro Sánchez (tm-5) — 3 sprints, baja eficiencia
+    { id: 'sr-12', memberId: 'tm-5', sprintName: 'Sprint 2', quarter: 'Q1', year: 2026, storyPointsCompleted: 10, storyPointsNotCompleted: 20, createdAt: ds2(-60) },
+    { id: 'sr-13', memberId: 'tm-5', sprintName: 'Sprint 3', quarter: 'Q2', year: 2026, storyPointsCompleted: 15, storyPointsNotCompleted: 18, createdAt: ds2(-30) },
+    { id: 'sr-14', memberId: 'tm-5', sprintName: 'Sprint 4', quarter: 'Q2', year: 2026, storyPointsCompleted: 8, storyPointsNotCompleted: 22, createdAt: ds2(-1) },
+    // María García (tm-2) — 4 sprints, buena eficiencia
+    { id: 'sr-15', memberId: 'tm-2', sprintName: 'Sprint A', quarter: 'Q1', year: 2026, storyPointsCompleted: 35, storyPointsNotCompleted: 5, createdAt: ds2(-90) },
+    { id: 'sr-16', memberId: 'tm-2', sprintName: 'Sprint B', quarter: 'Q1', year: 2026, storyPointsCompleted: 32, storyPointsNotCompleted: 8, createdAt: ds2(-60) },
+    { id: 'sr-17', memberId: 'tm-2', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 4, createdAt: ds2(-30) },
+    { id: 'sr-18', memberId: 'tm-2', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 30, storyPointsNotCompleted: 6, createdAt: ds2(-1) },
+    // Laura Rodríguez (tm-6) — 4 sprints, muy alta eficiencia
+    { id: 'sr-19', memberId: 'tm-6', sprintName: 'Sprint A', quarter: 'Q1', year: 2026, storyPointsCompleted: 42, storyPointsNotCompleted: 3, createdAt: ds2(-90) },
+    { id: 'sr-20', memberId: 'tm-6', sprintName: 'Sprint B', quarter: 'Q1', year: 2026, storyPointsCompleted: 38, storyPointsNotCompleted: 5, createdAt: ds2(-60) },
+    { id: 'sr-21', memberId: 'tm-6', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 45, storyPointsNotCompleted: 2, createdAt: ds2(-30) },
+    { id: 'sr-22', memberId: 'tm-6', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 40, storyPointsNotCompleted: 4, createdAt: ds2(-1) },
+    // Diego Fernández (tm-7) — 2 sprints, eficiencia media-baja
+    { id: 'sr-23', memberId: 'tm-7', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 15, storyPointsNotCompleted: 10, createdAt: ds2(-30) },
+    { id: 'sr-24', memberId: 'tm-7', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 12, storyPointsNotCompleted: 8, createdAt: ds2(-1) },
+    // Sofía Torres (tm-8) — 2 sprints, baja eficiencia
+    { id: 'sr-25', memberId: 'tm-8', sprintName: 'Sprint C', quarter: 'Q2', year: 2026, storyPointsCompleted: 8, storyPointsNotCompleted: 25, createdAt: ds2(-30) },
+    { id: 'sr-26', memberId: 'tm-8', sprintName: 'Sprint D', quarter: 'Q2', year: 2026, storyPointsCompleted: 5, storyPointsNotCompleted: 20, createdAt: ds2(-1) },
+  ]
+
+  const oneOnOnes: OneOnOne[] = [
+    // Juan Pérez — 3 reuniones, ánimo alto
+    { id: 'oo-1', memberId: 'tm-1', date: ds2(-45), tipo: 'semanal', feedbackDelLider: 'Excelente desempeño en la migración, liderazgo técnico destacado.', feedbackDelMiembro: 'Me gustaría tener más tiempo para investigar nuevas tecnologías.', estadoAnimo: 5, oportunidades: [{ id: 'op-1', descripcion: 'Liderar taller de arquitectura', tipo: 'crecimiento', status: 'completada', createdAt: ds2(-45) }], acciones: [{ id: 'ac-1', descripcion: 'Asignar tiempo de investigación', asignadoA: 'Juan Pérez', fechaLimite: ds2(-15), completada: true, completadaEn: ds2(-20) }], compromisos: [{ id: 'co-1', descripcion: 'Preparar presentación de arquitectura', fechaCompromiso: ds2(-30), cumplido: true, cumplidoEn: ds2(-31) }], createdAt: ds2(-45), updatedAt: ds2(-45) },
+    { id: 'oo-2', memberId: 'tm-1', date: ds2(-20), tipo: 'quincenal', feedbackDelLider: 'Buena gestión del equipo, sigue así.', feedbackDelMiembro: 'El equipo está motivado con el proyecto.', estadoAnimo: 4, oportunidades: [{ id: 'op-2', descripcion: 'Certificación AWS Solutions Architect', tipo: 'capacitacion', status: 'en_progreso', createdAt: ds2(-20) }], acciones: [], compromisos: [], createdAt: ds2(-20), updatedAt: ds2(-20) },
+    { id: 'oo-3', memberId: 'tm-1', date: ds2(-5), tipo: 'semanal', feedbackDelLider: 'Sprint exitoso, métricas muy buenas.', feedbackDelMiembro: 'Todo bien, equipo rindiendo bien.', estadoAnimo: 5, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-5), updatedAt: ds2(-5) },
+    // Carlos López — 2 reuniones
+    { id: 'oo-4', memberId: 'tm-3', date: ds2(-30), tipo: 'quincenal', feedbackDelLider: 'Buen trabajo en la migración de bases de datos.', feedbackDelMiembro: 'Me gustaría aprender más sobre Kubernetes.', estadoAnimo: 4, oportunidades: [{ id: 'op-3', descripcion: 'Curso de Kubernetes', tipo: 'capacitacion', status: 'pendiente', createdAt: ds2(-30) }], acciones: [{ id: 'ac-2', descripcion: 'Inscribir a Carlos en curso K8s', asignadoA: 'Juan Pérez', fechaLimite: ds2(-10), completada: false, completadaEn: null }], compromisos: [], createdAt: ds2(-30), updatedAt: ds2(-30) },
+    { id: 'oo-5', memberId: 'tm-3', date: ds2(-7), tipo: 'semanal', feedbackDelLider: 'Sigue mejorando, consistente.', feedbackDelMiembro: 'El equipo de core necesita más apoyo.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-7), updatedAt: ds2(-7) },
+    // Ana Martínez — 2 reuniones
+    { id: 'oo-6', memberId: 'tm-4', date: ds2(-25), tipo: 'quincenal', feedbackDelLider: 'Cumpliendo objetivos, pero mejorar estimaciones.', feedbackDelMiembro: 'Me siento un poco sobrecargada de trabajo.', estadoAnimo: 3, oportunidades: [{ id: 'op-4', descripcion: 'Mejora en estimación ágil', tipo: 'mejora', status: 'en_progreso', createdAt: ds2(-25) }], acciones: [{ id: 'ac-3', descripcion: 'Revisar carga de trabajo semanal', asignadoA: 'Juan Pérez', fechaLimite: ds2(-10), completada: true, completadaEn: ds2(-12) }], compromisos: [], createdAt: ds2(-25), updatedAt: ds2(-25) },
+    { id: 'oo-7', memberId: 'tm-4', date: ds2(-3), tipo: 'semanal', feedbackDelLider: 'Mejorando, sigue practicando.', feedbackDelMiembro: 'Necesito ayuda con Angular.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-3), updatedAt: ds2(-3) },
+    // Pedro Sánchez — 3 reuniones, ánimo bajo
+    { id: 'oo-8', memberId: 'tm-5', date: ds2(-35), tipo: 'semanal', feedbackDelLider: 'Está aprendiendo, tiene potencial.', feedbackDelMiembro: 'Me cuesta seguir el ritmo del equipo.', estadoAnimo: 2, oportunidades: [{ id: 'op-5', descripcion: 'Mentoría con senior', tipo: 'mentoria', status: 'en_progreso', createdAt: ds2(-35) }], acciones: [{ id: 'ac-4', descripcion: 'Asignar mentor', asignadoA: 'Juan Pérez', fechaLimite: ds2(-28), completada: true, completadaEn: ds2(-28) }], compromisos: [], createdAt: ds2(-35), updatedAt: ds2(-35) },
+    { id: 'oo-9', memberId: 'tm-5', date: ds2(-14), tipo: 'semanal', feedbackDelLider: 'Progreso lento pero constante.', feedbackDelMiembro: 'La mentoría está ayudando.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-14), updatedAt: ds2(-14) },
+    { id: 'oo-10', memberId: 'tm-5', date: ds2(-2), tipo: 'semanal', feedbackDelLider: 'Mejorando en JavaScript.', feedbackDelMiembro: 'Quiero aprender React.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-2), updatedAt: ds2(-2) },
+    // María García — 2 reuniones
+    { id: 'oo-11', memberId: 'tm-2', date: ds2(-20), tipo: 'quincenal', feedbackDelLider: 'Sólido desempeño, referente técnico.', feedbackDelMiembro: 'Equipo motivado, buen ambiente.', estadoAnimo: 4, oportunidades: [{ id: 'op-6', descripcion: 'Ascenso a tech lead', tipo: 'ascenso', status: 'pendiente', createdAt: ds2(-20) }], acciones: [], compromisos: [], createdAt: ds2(-20), updatedAt: ds2(-20) },
+    { id: 'oo-12', memberId: 'tm-2', date: ds2(-4), tipo: 'semanal', feedbackDelLider: 'Sprint excelente, cero deuda técnica.', feedbackDelMiembro: 'Todo bien, sin novedades.', estadoAnimo: 4, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-4), updatedAt: ds2(-4) },
+    // Laura Rodríguez — 3 reuniones, ánimo alto
+    { id: 'oo-13', memberId: 'tm-6', date: ds2(-40), tipo: 'semanal', feedbackDelLider: 'Liderazgo excepcional en el equipo core.', feedbackDelMiembro: 'El equipo está alineado con los objetivos.', estadoAnimo: 5, oportunidades: [{ id: 'op-7', descripcion: 'Programa de liderazgo técnico', tipo: 'crecimiento', status: 'completada', createdAt: ds2(-40) }], acciones: [], compromisos: [], createdAt: ds2(-40), updatedAt: ds2(-40) },
+    { id: 'oo-14', memberId: 'tm-6', date: ds2(-15), tipo: 'quincenal', feedbackDelLider: 'Métricas mejorando continuamente.', feedbackDelMiembro: 'Todo fluye bien, equipo comprometido.', estadoAnimo: 4, oportunidades: [{ id: 'op-8', descripcion: 'Certificación Google Cloud', tipo: 'capacitacion', status: 'en_progreso', createdAt: ds2(-15) }], acciones: [], compromisos: [], createdAt: ds2(-15), updatedAt: ds2(-15) },
+    { id: 'oo-15', memberId: 'tm-6', date: ds2(-2), tipo: 'semanal', feedbackDelLider: 'Sprint récord, 45 SP completados.', feedbackDelMiembro: 'Excelente dinámica de equipo.', estadoAnimo: 5, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-2), updatedAt: ds2(-2) },
+    // Diego Fernández — 1 reunión
+    { id: 'oo-16', memberId: 'tm-7', date: ds2(-10), tipo: 'quincenal', feedbackDelLider: 'Rendimiento aceptable, pero puede mejorar.', feedbackDelMiembro: 'Estoy de vacaciones la próxima semana.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-10), updatedAt: ds2(-10) },
+    // Sofía Torres — 2 reuniones, ánimo bajo
+    { id: 'oo-17', memberId: 'tm-8', date: ds2(-20), tipo: 'semanal', feedbackDelLider: 'Necesita mejorar velocidad, pero buena actitud.', feedbackDelMiembro: 'Me cuesta entender las historias de usuario.', estadoAnimo: 2, oportunidades: [{ id: 'op-9', descripcion: 'Curso de metodologías ágiles', tipo: 'capacitacion', status: 'en_progreso', createdAt: ds2(-20) }], acciones: [{ id: 'ac-5', descripcion: 'Asignar pairing con senior', asignadoA: 'Laura Rodríguez', fechaLimite: ds2(-10), completada: true, completadaEn: ds2(-12) }], compromisos: [], createdAt: ds2(-20), updatedAt: ds2(-20) },
+    { id: 'oo-18', memberId: 'tm-8', date: ds2(-3), tipo: 'semanal', feedbackDelLider: 'Mejorando con el pairing, sigue así.', feedbackDelMiembro: 'El pairing me está ayudando mucho.', estadoAnimo: 3, oportunidades: [], acciones: [], compromisos: [], createdAt: ds2(-3), updatedAt: ds2(-3) },
+  ]
+
+  const achievements: Achievement[] = [
+    // Juan Pérez
+    { id: 'ach-1', memberId: 'tm-1', title: 'Migración Core Exitosa', description: 'Lideró la migración del core bancario a .NET 8 sin downtime.', date: ds2(-15), type: 'logro', linkedToPromotion: false, createdAt: ds2(-15) },
+    { id: 'ach-2', memberId: 'tm-1', title: 'Certificación AWS Solutions Architect', description: 'Obtuvo la certificación AWS Solutions Architect Associate.', date: ds2(-30), type: 'certificacion', linkedToPromotion: false, createdAt: ds2(-30) },
+    { id: 'ach-3', memberId: 'tm-1', title: 'Reconocimiento al Liderazgo', description: 'Reconocido por su liderazgo técnico en el Q1 2026.', date: ds2(-60), type: 'reconocimiento', linkedToPromotion: false, createdAt: ds2(-60) },
+    { id: 'ach-4', memberId: 'tm-1', title: 'Ascenso a Tech Lead', description: 'Ascendido a Tech Lead del Platform Team.', date: ds2(-180), type: 'ascenso', linkedToPromotion: true, createdAt: ds2(-180) },
+    // Carlos López
+    { id: 'ach-5', memberId: 'tm-3', title: 'Optimización de Consultas SQL', description: 'Redujo el tiempo de respuesta de consultas críticas en un 60%.', date: ds2(-25), type: 'logro', linkedToPromotion: false, createdAt: ds2(-25) },
+    { id: 'ach-6', memberId: 'tm-3', title: 'Mentor del Mes', description: 'Reconocido como mentor del mes por apoyar a junior.', date: ds2(-50), type: 'reconocimiento', linkedToPromotion: false, createdAt: ds2(-50) },
+    // Ana Martínez
+    { id: 'ach-7', memberId: 'tm-4', title: 'Rediseño Portal Clientes', description: 'Lideró el rediseño del portal mejorando UX y performance.', date: ds2(-20), type: 'logro', linkedToPromotion: false, createdAt: ds2(-20) },
+    // Pedro Sánchez
+    { id: 'ach-8', memberId: 'tm-5', title: 'Curso JavaScript Avanzado', description: 'Completó el curso de JavaScript avanzado con distinción.', date: ds2(-35), type: 'certificacion', linkedToPromotion: false, createdAt: ds2(-35) },
+    // María García
+    { id: 'ach-9', memberId: 'tm-2', title: 'Cero Bugs en Sprint', description: 'Entregó su sprint completo sin bugs reportados.', date: ds2(-10), type: 'logro', linkedToPromotion: false, createdAt: ds2(-10) },
+    { id: 'ach-10', memberId: 'tm-2', title: 'Ascenso a Senior Developer', description: 'Ascendida a Senior Developer por desempeño consistente.', date: ds2(-180), type: 'ascenso', linkedToPromotion: true, createdAt: ds2(-180) },
+    // Laura Rodríguez
+    { id: 'ach-11', memberId: 'tm-6', title: 'Mejora en Deploy Frequency', description: 'Aumentó la frecuencia de deploy del equipo a 3 por semana.', date: ds2(-20), type: 'logro', linkedToPromotion: false, createdAt: ds2(-20) },
+    { id: 'ach-12', memberId: 'tm-6', title: 'Certificación Google Cloud', description: 'Obtuvo la certificación Professional Cloud Architect.', date: ds2(-10), type: 'certificacion', linkedToPromotion: false, createdAt: ds2(-10) },
+    { id: 'ach-13', memberId: 'tm-6', title: 'Premio a la Innovación', description: 'Reconocida por implementar arquitectura de eventos.', date: ds2(-45), type: 'reconocimiento', linkedToPromotion: false, createdAt: ds2(-45) },
+    // Diego Fernández
+    { id: 'ach-14', memberId: 'tm-7', title: 'Mención por Colaboración', description: 'Destacado por su colaboración en el equipo core.', date: ds2(-30), type: 'reconocimiento', linkedToPromotion: false, createdAt: ds2(-30) },
+  ]
+
+  await db.memberProfiles.bulkAdd(memberProfiles)
+  await db.sprintRecords.bulkAdd(sprintRecords)
+  await db.oneOnOnes.bulkAdd(oneOnOnes)
+  await db.achievements.bulkAdd(achievements)
 
   localStorage.setItem(SEEDED_FLAG, 'true')
   seedingInProgress = false
