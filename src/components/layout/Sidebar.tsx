@@ -68,7 +68,6 @@ const navItems: NavItem[] = [
       { label: 'OKRs / KPIs', path: '/strategy/objectives' },
     ],
   },
-  { label: 'Equipos', icon: <Users size={20} />, path: '/teams' },
   {
     label: 'Equipos',
     icon: <Users size={20} />,
