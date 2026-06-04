@@ -30,6 +30,24 @@ export function DailyPage() {
 
   const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])
   const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p])), [plans])
+  const activityMap = useMemo(() => new Map(activities.map((a) => [a.id, a])), [activities])
+
+  const blockerPlan = useMemo(() => (blocker: Blocker) => {
+    if (blocker.sourceType === 'plan') return planMap.get(blocker.sourceId)
+    if (blocker.sourceType === 'activity') {
+      const act = activityMap.get(blocker.sourceId)
+      return act ? planMap.get(act.planId) : undefined
+    }
+    if (blocker.sourceType === 'commitment') {
+      const comm = commitments.find((c) => c.id === blocker.sourceId)
+      return undefined // commitments don't have a direct planId
+    }
+    if (blocker.sourceType === 'task') {
+      const task = tasks.find((t) => t.id === blocker.sourceId)
+      return task?.planId ? planMap.get(task.planId) : undefined
+    }
+    return undefined
+  }, [planMap, activityMap, commitments, tasks])
 
   const agenda = useMemo(() => {
     const tomorrow = new Date(today)
@@ -167,29 +185,35 @@ export function DailyPage() {
                 <h3 className="text-sm font-semibold text-danger">Bloqueos Activos ({agenda.activeBlockers.length})</h3>
               </div>
               <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
-                {agenda.activeBlockers.slice(0, 5).map((blocker) => (
-                  <div
-                    key={blocker.id}
-                    className="px-4 py-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
-                    onClick={() => setEditingBlocker(blocker)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-                        blocker.severity === 'critical' ? 'bg-danger/10 text-danger' :
-                        blocker.severity === 'high' ? 'bg-warning/10 text-warning' :
-                        'bg-neutral-10 text-neutral-60'
-                      }`}>
-                        {blocker.severity}
-                      </span>
-                      <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
-                      <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {agenda.activeBlockers.slice(0, 5).map((blocker) => {
+                  const plan = blockerPlan(blocker)
+                  return (
+                    <div
+                      key={blocker.id}
+                      className="px-4 py-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
+                      onClick={() => setEditingBlocker(blocker)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                          blocker.severity === 'critical' ? 'bg-danger/10 text-danger' :
+                          blocker.severity === 'high' ? 'bg-warning/10 text-warning' :
+                          'bg-neutral-10 text-neutral-60'
+                        }`}>
+                          {blocker.severity}
+                        </span>
+                        <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
+                        <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1 ml-1">
+                        {blocker.description?.slice(0, 120)}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 ml-1">
+                        {plan && <span className="text-xs text-primary font-medium">{plan.title}</span>}
+                        {blocker.assigneeId && <span className="text-xs text-neutral-50">Asignado: {blocker.assigneeId}</span>}
+                      </div>
                     </div>
-                    <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1 ml-1">
-                      {blocker.description?.slice(0, 120)}
-                      {blocker.assigneeId && <span className="ml-2">Asignado: {blocker.assigneeId}</span>}
-                    </p>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
