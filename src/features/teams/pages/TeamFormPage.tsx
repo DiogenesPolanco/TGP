@@ -64,7 +64,6 @@ export function TeamFormPage() {
   }
 
   const removeMember = async (index: number) => {
-    if (members.length <= 1) return
     if (!(await confirm('¿Eliminar este miembro?'))) return
     setMembers(members.filter((_, i) => i !== index))
   }
