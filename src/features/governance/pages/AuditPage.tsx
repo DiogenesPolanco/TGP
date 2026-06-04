@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, FileWarning, CheckCircle, Clock } from 'lucide-react'
-import { AuditForm } from '../components/AuditForm'
-import type { AuditFinding } from '@/types/domain'
 
 export function AuditPage() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingFinding, setEditingFinding] = useState<AuditFinding | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -20,6 +20,8 @@ export function AuditPage() {
   const filteredFindings = findings.filter((f) =>
     f.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const { page, setPage, totalPages, paginatedItems: paginatedFindings } = usePagination(filteredFindings, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar hallazgo?')) {
@@ -47,7 +49,7 @@ export function AuditPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Auditoría</h2>
         <button
-          onClick={() => { setEditingFinding(null); setShowForm(true) }}
+          onClick={() => navigate('new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
@@ -81,6 +83,7 @@ export function AuditPage() {
             <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
               <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Referencia</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Categoría</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Severidad</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
@@ -89,7 +92,7 @@ export function AuditPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {filteredFindings.map((finding) => {
+            {paginatedFindings.map((finding) => {
               const sla = getSlaStatus(finding.dueDate)
               const app = applications.find((a) => a.id === finding.applicationId)
               return (
@@ -97,7 +100,24 @@ export function AuditPage() {
                   <td className="px-6 py-4 text-sm font-medium text-neutral-90 dark:text-white">{finding.auditReference}</td>
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{finding.title}</p>
-                    <p className="text-xs text-neutral-50 dark:text-neutral-50">{finding.category}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      finding.category === 'compliance' ? 'bg-info/10 text-info' :
+                      finding.category === 'security' ? 'bg-danger/10 text-danger' :
+                      finding.category === 'architecture' ? 'bg-primary/10 text-primary' :
+                      finding.category === 'data_governance' ? 'bg-warning/10 text-warning' :
+                      'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40'
+                    }`}>
+                      {finding.category === 'compliance' ? 'Cumplimiento' :
+                       finding.category === 'security' ? 'Seguridad' :
+                       finding.category === 'architecture' ? 'Arquitectura' :
+                       finding.category === 'process' ? 'Proceso' :
+                       finding.category === 'data_governance' ? 'Data Gov.' :
+                       finding.category === 'access_control' ? 'Acceso' :
+                       finding.category === 'business_continuity' ? 'Continuidad' :
+                       finding.category}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
                   <td className="px-6 py-4">
@@ -126,7 +146,7 @@ export function AuditPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => { setEditingFinding(finding); setShowForm(true) }}
+                        onClick={() => navigate(`${finding.id}/edit`)}
                         className="text-sm text-primary hover:underline"
                       >
                         Editar
@@ -144,6 +164,13 @@ export function AuditPage() {
             })}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={filteredFindings.length}
+          pageSize={5}
+          onPageChange={setPage}
+        />
         {filteredFindings.length === 0 && (
           <div className="text-center py-12">
             <p className="text-neutral-50 dark:text-neutral-50">No se encontraron hallazgos</p>
@@ -151,17 +178,6 @@ export function AuditPage() {
         )}
       </div>
 
-      {showForm && (
-        <AuditForm
-          finding={editingFinding}
-          onClose={() => setShowForm(false)}
-          onSave={() => {
-            setShowForm(false)
-            setEditingFinding(null)
-            addNotification({ type: 'success', message: editingFinding ? 'Hallazgo actualizado' : 'Hallazgo creado' })
-          }}
-        />
-      )}
     </div>
   )
 }
