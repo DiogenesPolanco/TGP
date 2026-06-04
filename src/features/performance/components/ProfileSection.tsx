@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
-import type { MemberProfile } from '@/types/domain'
-import { Save, AtSign, Phone, Home, MapPin, Briefcase, Calendar, Umbrella } from 'lucide-react'
+import type { MemberProfile, MemberStatus } from '@/types/domain'
+import { MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
+import { Save, AtSign, Phone, Home, MapPin, Briefcase, Calendar, Umbrella, Clock } from 'lucide-react'
 
 interface Props {
   memberId: string
@@ -12,13 +13,14 @@ interface Props {
 export function ProfileSection({ memberId, memberDisplayName, profile }: Props) {
   const [form, setForm] = useState<{
     email: string; phoneCell: string; phoneHome: string; address: string
-    role: string; vacationDaysPerYear: number; vacationUsed: number
+    role: string; status: string; vacationDaysPerYear: number; vacationUsed: number
   }>({
     email: profile?.email ?? '',
     phoneCell: profile?.phoneCell ?? '',
     phoneHome: profile?.phoneHome ?? '',
     address: profile?.address ?? '',
     role: profile?.role ?? 'developer',
+    status: (profile as any)?.status ?? 'activo',
     vacationDaysPerYear: profile?.vacationDaysPerYear ?? 20,
     vacationUsed: profile?.vacationUsed ?? 0,
   })
@@ -45,9 +47,11 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
     const allTeams = await db.teams.toArray()
     for (const t of allTeams) {
       const member = t.members.find((m) => m.id === memberId)
-      if (member && member.role !== data.role) {
+      if (member) {
         const updatedMembers = t.members.map((m) =>
-          m.id === memberId ? { ...m, role: data.role as any } : m
+          m.id === memberId
+            ? { ...m, role: data.role as any, status: (form.status as MemberStatus) }
+            : m
         )
         await db.teams.update(t.id, { members: updatedMembers })
       }
@@ -107,6 +111,20 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
             <option value="manager">Manager</option>
             <option value="intern">Intern</option>
             <option value="other">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+            <Clock size={14} /> Estado
+          </label>
+          <select
+            value={form.status}
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
+            className={inputClass}
+          >
+            {Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>{v}</option>
+            ))}
           </select>
         </div>
         <div>

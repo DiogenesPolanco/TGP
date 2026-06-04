@@ -59,7 +59,7 @@ export function MemberPerformancePage() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'perfil', label: 'Perfil' },
-    { key: 'skills', label: 'Skills' },
+    { key: 'skills', label: 'Habilidades' },
     { key: 'tecnologias', label: 'Tecnologías' },
     { key: 'microservicios', label: 'Microservicios' },
     { key: 'sprints', label: 'Sprints' },

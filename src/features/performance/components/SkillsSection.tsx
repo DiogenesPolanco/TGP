@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Skill } from '@/types/domain'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Search } from 'lucide-react'
 
 interface Props {
   memberId: string
@@ -14,12 +14,20 @@ const levelColors: Record<string, string> = {
   expert: 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300',
 }
 
+const levelLabels: Record<string, string> = {
+  beginner: 'Principiante',
+  intermediate: 'Intermedio',
+  advanced: 'Avanzado',
+  expert: 'Experto',
+}
+
 export function SkillsSection({ memberId }: Props) {
   const [profile, setProfile] = useState<{ skills: Skill[] } | null>(null)
   const [skills, setSkills] = useState<Skill[]>([])
   const [newName, setNewName] = useState('')
   const [newCategory, setNewCategory] = useState('')
   const [newLevel, setNewLevel] = useState<Skill['level']>('intermediate')
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   useEffect(() => {
     db.memberProfiles.get(memberId).then((p) => {
@@ -27,6 +35,27 @@ export function SkillsSection({ memberId }: Props) {
       setSkills(p?.skills ?? [])
     })
   }, [memberId])
+
+  const [allExistingSkills, setAllExistingSkills] = useState<string[]>([])
+  useEffect(() => {
+    db.memberProfiles.toArray().then((profiles) => {
+      const names = new Set<string>()
+      for (const p of profiles) {
+        if (p.id === memberId) continue
+        for (const s of (p as any).skills ?? []) {
+          if (s.name) names.add(s.name)
+        }
+      }
+      setAllExistingSkills([...names].sort())
+    })
+  }, [memberId])
+
+  const suggestions = useMemo(() => {
+    if (!newName.trim()) return []
+    return allExistingSkills.filter((n) =>
+      n.toLowerCase().includes(newName.toLowerCase())
+    ).slice(0, 8)
+  }, [allExistingSkills, newName])
 
   const saveSkills = async (updated: Skill[]) => {
     const existing = profile ?? { skills: [] }
@@ -50,16 +79,20 @@ export function SkillsSection({ memberId }: Props) {
     } as any)
   }
 
-  const addSkill = async () => {
-    if (!newName.trim()) return
+  const addSkill = async (name?: string, category?: string) => {
+    const skillName = (name ?? newName).trim()
+    const skillCategory = (category ?? newCategory).trim()
+    if (!skillName) return
+    if (skills.some((s) => s.name.toLowerCase() === skillName.toLowerCase())) return
     const updated: Skill[] = [
       ...skills,
-      { id: crypto.randomUUID(), name: newName.trim(), level: newLevel, category: newCategory.trim() },
+      { id: crypto.randomUUID(), name: skillName, level: newLevel, category: skillCategory },
     ]
     setSkills(updated)
     await saveSkills(updated)
     setNewName('')
     setNewCategory('')
+    setShowSuggestions(false)
   }
 
   const removeSkill = async (id: string) => {
@@ -77,23 +110,42 @@ export function SkillsSection({ memberId }: Props) {
 
   return (
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
-      <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Skills</h2>
+      <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Habilidades</h2>
 
-      {/* Add form */}
-      <div className="flex flex-wrap gap-2 mb-6 p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-        <input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          placeholder="Nombre del skill"
-          className="flex-1 min-w-[160px] rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
-          onKeyDown={(e) => e.key === 'Enter' && addSkill()}
-        />
+      <div className="relative flex flex-wrap gap-2 mb-6 p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+        <div className="relative flex-1 min-w-[160px]">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => { setNewName(e.target.value); setShowSuggestions(true) }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            placeholder="Buscar o escribir habilidad..."
+            className="w-full pl-8 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+            onKeyDown={(e) => e.key === 'Enter' && addSkill()}
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
+              {suggestions.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => addSkill(name)}
+                  className="w-full text-left px-3 py-2 text-sm text-neutral-90 dark:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <input
           type="text"
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
-          placeholder="Categoría (opcional)"
+          placeholder="Categoría"
           className="w-[140px] rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
           onKeyDown={(e) => e.key === 'Enter' && addSkill()}
         />
@@ -102,22 +154,21 @@ export function SkillsSection({ memberId }: Props) {
           onChange={(e) => setNewLevel(e.target.value as Skill['level'])}
           className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
         >
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-          <option value="expert">Expert</option>
+          <option value="beginner">Principiante</option>
+          <option value="intermediate">Intermedio</option>
+          <option value="advanced">Avanzado</option>
+          <option value="expert">Experto</option>
         </select>
         <button
-          onClick={addSkill}
+          onClick={() => addSkill()}
           className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={16} /> Agregar
         </button>
       </div>
 
-      {/* Skills grid */}
       {Object.keys(grouped).length === 0 ? (
-        <p className="text-center py-8 text-neutral-40">Sin skills registrados</p>
+        <p className="text-center py-8 text-neutral-40">Sin habilidades registradas</p>
       ) : (
         Object.entries(grouped).map(([category, catskills]) => (
           <div key={category} className="mb-4">
@@ -129,7 +180,8 @@ export function SkillsSection({ memberId }: Props) {
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${levelColors[s.level]}`}
                 >
                   {s.name}
-                  <button onClick={() => removeSkill(s.id)} className="hover:opacity-70">
+                  <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
+                  <button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
                     <X size={12} />
                   </button>
                 </span>

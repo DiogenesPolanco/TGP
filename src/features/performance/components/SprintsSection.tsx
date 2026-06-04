@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { SprintRecord } from '@/types/domain'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Search } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
@@ -19,10 +19,30 @@ export function SprintsSection({ memberId }: Props) {
     storyPointsCompleted: 0,
     storyPointsNotCompleted: 0,
   })
+  const [showSprintSuggestions, setShowSprintSuggestions] = useState(false)
 
   useEffect(() => {
     db.sprintRecords.where('memberId').equals(memberId).toArray().then(setSprints)
   }, [memberId])
+
+  const [allSprintNames, setAllSprintNames] = useState<string[]>([])
+  useEffect(() => {
+    db.sprintRecords.toArray().then((records) => {
+      const names = new Set<string>()
+      for (const r of records) {
+        if (r.memberId === memberId) continue
+        if (r.sprintName) names.add(r.sprintName)
+      }
+      setAllSprintNames([...names].sort())
+    })
+  }, [memberId])
+
+  const sprintSuggestions = useMemo(() => {
+    if (!newSprint.sprintName.trim()) return []
+    return allSprintNames.filter((n) =>
+      n.toLowerCase().includes(newSprint.sprintName.toLowerCase())
+    ).slice(0, 8)
+  }, [allSprintNames, newSprint.sprintName])
 
   const addSprint = async () => {
     if (!newSprint.sprintName.trim()) return
@@ -70,7 +90,6 @@ export function SprintsSection({ memberId }: Props) {
         </button>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
           <p className="text-xl font-bold text-primary">{totalSP}</p>
@@ -90,15 +109,33 @@ export function SprintsSection({ memberId }: Props) {
       {showForm && (
         <div className="mb-6 p-4 border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-5 mb-3">
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-2 relative">
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Nombre del Sprint</label>
+              <Search size={14} className="absolute left-3 top-8 z-10 text-neutral-50" />
               <input
                 type="text"
                 value={newSprint.sprintName}
-                onChange={(e) => setNewSprint({ ...newSprint, sprintName: e.target.value })}
-                className={inputClass}
+                onChange={(e) => { setNewSprint({ ...newSprint, sprintName: e.target.value }); setShowSprintSuggestions(true) }}
+                onFocus={() => setShowSprintSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSprintSuggestions(false), 200)}
+                className={`${inputClass} pl-8`}
                 placeholder="Sprint 1"
               />
+              {showSprintSuggestions && sprintSuggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
+                  {sprintSuggestions.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => { setNewSprint({ ...newSprint, sprintName: name }); setShowSprintSuggestions(false) }}
+                      className="w-full text-left px-3 py-2 text-sm text-neutral-90 dark:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Quarter</label>
