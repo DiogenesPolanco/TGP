@@ -158,9 +158,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
     <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Shield size={32} className="text-white" />
-          </div>
+          <img src="/favicon.svg" alt="TGP" className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">TGP</h1>
           <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
             Technology Governance Platform
