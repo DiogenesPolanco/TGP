@@ -1,8 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useMemo, useEffect } from 'react'
+import { useAppStore } from '@/stores/appStore'
 import { db } from '@/services/db/database'
 import { useThiCalculation } from '@/features/dashboard/hooks/useThiCalculation'
 import { ThiGauge } from '@/components/charts/ThiGauge'
 import { KpiCard } from '@/components/data-display/KpiCard'
+import { generateExecutiveNarrative } from '@/services/thi/narrativeGenerator'
 import { useFilterStore } from '@/stores/filterStore'
 import {
   Shield,
@@ -26,6 +29,8 @@ import {
   Pie,
   Cell,
 } from 'recharts'
+import { ChartTooltipSimple } from '@/components/charts/ChartTooltip'
+import { ChartGradients } from '@/components/charts/ChartGradients'
 
 function getPeriodStartDate(period: '7d' | '30d' | '90d' | 'ytd' | 'custom'): Date {
   const now = new Date()
@@ -59,11 +64,14 @@ export function DashboardPage() {
   const vulnsInPeriod = vulnerabilities.filter((v) => v.createdAt >= periodStart)
   const incidentsInPeriod = incidents.filter((i) => i.createdAt >= periodStart)
   const risksInPeriod = risks.filter((r) => r.createdAt >= periodStart)
-  const findingsInPeriod = auditFindings.filter((f) => f.createdAt >= periodStart)
 
   const criticalVulns = vulnsInPeriod.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length
   const openIncidents = incidentsInPeriod.filter((i) => i.status !== 'resolved' && i.status !== 'closed').length
-  const overdueFindings = findingsInPeriod.filter((f) => f.status === 'overdue').length
+  const overdueFindings = auditFindings.filter((f) => f.status === 'overdue').length
+  const totalFindings = auditFindings.length
+  const openFindings = auditFindings.filter((f) => f.status === 'open' || f.status === 'in_progress').length
+  const closedFindings = auditFindings.filter((f) => f.status === 'closed' || f.status === 'resolved').length
+  const complianceScore = thi?.complianceScore ?? 0
   const totalRiskScore = risksInPeriod.filter((r) => r.status === 'open').reduce((sum, r) => sum + r.riskScore, 0)
   const eliteTeams = teams.filter((t) => {
     if (!t.currentMetrics) return false
@@ -90,11 +98,6 @@ export function DashboardPage() {
 
   const eolTechs = technologies.filter((t) => t.supportStatus === 'eol')
   const extendedTechs = technologies.filter((t) => t.supportStatus === 'extended')
-  const eolTechIds = eolTechs.map((t) => t.id)
-  const criticalAppsWithEol = applications.filter(
-    (app) => app.technologies.some((tId) => eolTechIds.includes(tId)) &&
-      (app.criticality === 'critical' || app.criticality === 'high')
-  )
   const techStatusData = [
     { name: 'Activas', value: technologies.filter((t) => t.supportStatus === 'active').length, color: '#36B37E' },
     { name: 'S. Extendido', value: extendedTechs.length, color: '#FFAB00' },
@@ -149,7 +152,6 @@ export function DashboardPage() {
         return Math.max(0, 100 - Math.min(totalScore / 5, 80))
       })()
 
-      // Average of available dimensions (skip delivery/quality/compliance — they're global)
       const dimensions = [securityScore, availabilityScore, obsolescenceScore, riskScore]
       const thi = Math.round(dimensions.reduce((a, b) => a + b, 0) / dimensions.length)
 
@@ -157,24 +159,52 @@ export function DashboardPage() {
     })
     .filter((d): d is { name: string; thi: number } => d !== null)
 
-  const alerts = [
-    { type: 'critical' as const, message: `SLA vulnerabilidad crítica vence en 2 días - App Core Banking` },
-    ...(eolTechs.length > 0
-      ? [{
-          type: 'critical' as const,
-          message: `${eolTechs.length} tecnologías EOL (${criticalAppsWithEol.length} apps críticas afectadas): ${eolTechs.map((t) => `${t.name} ${t.version}`).join(', ')}`,
-        }]
-      : []),
-    ...(extendedTechs.length > 0
-      ? [{
-          type: 'warning' as const,
-          message: `${extendedTechs.length} tecnologías en soporte extendido - planificar migración`,
-        }]
-      : []),
-    { type: 'critical' as const, message: 'Riesgo crítico sin mitigar - App Core Banking' },
-    { type: 'warning' as const, message: `${overdueFindings} hallazgos vencidos - BU Legacy` },
-    { type: 'success' as const, message: 'Todos los equipos en Elite DORA' },
-  ]
+  const narrative = useMemo(
+    () => generateExecutiveNarrative({
+      thi,
+      applications,
+      vulnerabilities,
+      incidents,
+      risks,
+      auditFindings,
+      teams,
+      technologies,
+      businessUnits,
+      blockers,
+      commitments,
+      periodStart,
+    }),
+    [thi, applications, vulnerabilities, incidents, risks, auditFindings, teams, technologies, businessUnits, blockers, commitments, periodStart],
+  )
+
+  const alerts = useMemo(() => {
+    const items: { type: 'critical' | 'warning' | 'success' | 'info'; message: string }[] = []
+
+    if (narrative.flashBriefing) {
+      items.push({ type: 'info', message: narrative.flashBriefing })
+    }
+
+    for (const insight of narrative.keyInsights) {
+      const type = insight.icon === 'critical' ? 'critical'
+        : insight.icon === 'warning' ? 'warning'
+        : insight.icon === 'positive' ? 'success'
+        : 'info'
+      items.push({ type, message: insight.text })
+    }
+
+    for (const bu of narrative.buHighlights) {
+      items.push({ type: 'info', message: `BU ${bu.name}: THI ${bu.thi} — ${bu.text}` })
+    }
+
+    for (const rec of narrative.recommendations) {
+      items.push({ type: 'info', message: rec })
+    }
+
+    return items
+  }, [narrative])
+
+  const setAlerts = useAppStore((s) => s.setAlerts)
+  useEffect(() => { setAlerts(alerts) }, [alerts, setAlerts])
 
   return (
     <div className="space-y-6">
@@ -229,10 +259,13 @@ export function DashboardPage() {
             color="danger"
           />
           <KpiCard
-            title="Hallazgos Vencidos"
-            value={overdueFindings}
+            title="Compliance Score"
+            value={totalFindings > 0 ? `${Math.round(complianceScore)}%` : '—'}
+            subtitle={totalFindings > 0 ? `${overdueFindings} vencidos · ${closedFindings} cerrados` : 'Sin hallazgos'}
+            trend={complianceScore >= 80 ? 'up' : complianceScore >= 50 ? 'neutral' : 'down'}
+            trendValue={complianceScore >= 80 ? 'saludable' : complianceScore >= 50 ? 'regular' : `${openFindings} abiertos`}
             icon={<FileWarning size={20} />}
-            color="warning"
+            color={complianceScore >= 80 ? 'success' : complianceScore >= 50 ? 'warning' : 'danger'}
           />
           <KpiCard
             title="Equipos Elite DORA"
@@ -296,11 +329,38 @@ export function DashboardPage() {
           {buData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={buData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" />
-                <XAxis type="number" domain={[0, 100]} />
-                <YAxis dataKey="name" type="category" width={80} />
-                <Tooltip />
-                <Bar dataKey="thi" fill="#0052CC" radius={[0, 4, 4, 0]} />
+                <defs>
+                  <ChartGradients id="bu-chart" />
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" strokeOpacity={0.6} />
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tick={{ fontSize: 12, fill: '#6B778C' }}
+                  axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
+                  tickLine={false}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={80}
+                  tick={{ fontSize: 12, fill: '#6B778C' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={<ChartTooltipSimple />}
+                  cursor={{ fill: '#F4F5F7', opacity: 0.5 }}
+                />
+                <Bar
+                  dataKey="thi"
+                  fill="url(#bu-chart-primary)"
+                  radius={[0, 6, 6, 0]}
+                  maxBarSize={24}
+                  animationBegin={0}
+                  animationDuration={1200}
+                  animationEasing="ease-out"
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -318,6 +378,9 @@ export function DashboardPage() {
             <div className="flex items-center gap-4">
               <ResponsiveContainer width="60%" height={200}>
                 <PieChart>
+                  <defs>
+                    <ChartGradients id="pie-chart" />
+                  </defs>
                   <Pie
                     data={techStatusData}
                     cx="50%"
@@ -325,12 +388,25 @@ export function DashboardPage() {
                     innerRadius={55}
                     outerRadius={80}
                     dataKey="value"
+                    isAnimationActive={true}
+                    animationBegin={200}
+                    animationDuration={1000}
+                    animationEasing="ease-out"
+                    stroke="white"
+                    strokeWidth={2}
                   >
                     {techStatusData.map((entry) => (
-                      <Cell key={entry.name} fill={entry.color} />
+                      <Cell
+                        key={entry.name}
+                        fill={entry.color}
+                        stroke="white"
+                        strokeWidth={2}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    content={<ChartTooltipSimple />}
+                  />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-2 flex-1">
@@ -358,10 +434,10 @@ export function DashboardPage() {
 
         <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
           <h3 className="text-base font-semibold text-neutral-90 dark:text-white mb-4">
-            Alertas Activas
+            Alertas ({alerts.length})
           </h3>
-          <div className="space-y-3">
-            {alerts.map((alert, index) => (
+          <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+            {alerts.length > 0 ? alerts.map((alert, index) => (
               <div
                 key={index}
                 className={`flex items-start gap-3 p-3 rounded-lg ${
@@ -369,7 +445,9 @@ export function DashboardPage() {
                     ? 'bg-danger/10 border border-danger/20'
                     : alert.type === 'warning'
                     ? 'bg-warning/10 border border-warning/20'
-                    : 'bg-success/10 border border-success/20'
+                    : alert.type === 'success'
+                    ? 'bg-success/10 border border-success/20'
+                    : 'bg-info/10 border border-info/20'
                 }`}
               >
                 <div
@@ -378,12 +456,16 @@ export function DashboardPage() {
                       ? 'bg-danger'
                       : alert.type === 'warning'
                       ? 'bg-warning'
-                      : 'bg-success'
+                      : alert.type === 'success'
+                      ? 'bg-success'
+                      : 'bg-info'
                   }`}
                 />
                 <p className="text-sm text-neutral-80 dark:text-neutral-20">{alert.message}</p>
               </div>
-            ))}
+            )) : (
+              <p className="text-sm text-neutral-50 py-4 text-center">Sin alertas activas</p>
+            )}
           </div>
         </div>
       </div>
