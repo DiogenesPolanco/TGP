@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { Plus, ArrowLeft } from 'lucide-react'
+import { Plus, ArrowLeft, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 export function ObjectiveFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const objective = useLiveQuery(() => (id ? db.objectives.get(id) : undefined), [id])
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -91,7 +93,8 @@ export function ObjectiveFormPage() {
     setFormData({ ...formData, keyResults: updated })
   }
 
-  const removeKeyResult = (index: number) => {
+  const removeKeyResult = async (index: number) => {
+    if (!(await confirm('¿Eliminar este Key Result?'))) return
     setFormData({ ...formData, keyResults: formData.keyResults.filter((_, i) => i !== index) })
   }
 
@@ -269,9 +272,10 @@ export function ObjectiveFormPage() {
                 <button
                   type="button"
                   onClick={() => removeKeyResult(index)}
-                  className="text-sm text-danger hover:underline"
+                  className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+                  title="Eliminar KR"
                 >
-                  Eliminar
+                  <Trash2 size={14} />
                 </button>
               </div>
             ))}

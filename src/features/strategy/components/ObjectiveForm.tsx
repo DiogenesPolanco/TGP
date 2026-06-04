@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X, Plus } from 'lucide-react'
+import { X, Plus, Trash2 } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 interface ObjectiveFormProps {
@@ -11,6 +12,7 @@ interface ObjectiveFormProps {
 }
 
 export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps) {
+  const { confirm } = useConfirm()
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
   const [formData, setFormData] = useState({
@@ -70,7 +72,8 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
     setFormData({ ...formData, keyResults: updated })
   }
 
-  const removeKeyResult = (index: number) => {
+  const removeKeyResult = async (index: number) => {
+    if (!(await confirm('¿Eliminar este Key Result?'))) return
     setFormData({ ...formData, keyResults: formData.keyResults.filter((_, i) => i !== index) })
   }
 
@@ -249,9 +252,10 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
                   <button
                     type="button"
                     onClick={() => removeKeyResult(index)}
-                    className="text-sm text-danger hover:underline"
+                    className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+                    title="Eliminar KR"
                   >
-                    Eliminar
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
