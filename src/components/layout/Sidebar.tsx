@@ -70,6 +70,14 @@ const navItems: NavItem[] = [
   },
   { label: 'Equipos', icon: <Users size={20} />, path: '/teams' },
   {
+    label: 'Equipos',
+    icon: <Users size={20} />,
+    children: [
+      { label: 'Miembros', path: '/teams' },
+      { label: 'Rendimiento', path: '/teams/performance' },
+    ],
+  },
+  {
     label: 'Administración',
     icon: <Settings size={20} />,
     children: [
