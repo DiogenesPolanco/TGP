@@ -237,63 +237,63 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
         result.push({
           label: 'Aplicaciones',
           icon: AppWindow,
-          route: () => `/catalog/applications`,
+          route: (item) => `/catalog/applications/${item.id}/edit`,
           items: applications,
         })
       if (technologies.length > 0)
         result.push({
           label: 'Tecnologías',
           icon: Cpu,
-          route: () => `/catalog/obsolescence`,
+          route: (item) => `/catalog/obsolescence/${item.id}/edit`,
           items: technologies,
         })
       if (vulnerabilities.length > 0)
         result.push({
           label: 'Vulnerabilidades',
           icon: Bug,
-          route: () => `/security/vulnerabilities`,
+          route: (item) => `/security/vulnerabilities/${item.id}/edit`,
           items: vulnerabilities,
         })
       if (incidents.length > 0)
         result.push({
           label: 'Incidentes',
           icon: AlertTriangle,
-          route: () => `/security/incidents`,
+          route: (item) => `/security/incidents/${item.id}/edit`,
           items: incidents,
         })
       if (risks.length > 0)
         result.push({
           label: 'Riesgos',
           icon: ShieldAlert,
-          route: () => `/governance/risks`,
+          route: (item) => `/governance/risks/${item.id}/edit`,
           items: risks,
         })
       if (auditFindings.length > 0)
         result.push({
           label: 'Hallazgos',
           icon: ClipboardCheck,
-          route: () => `/governance/audit`,
+          route: (item) => `/governance/audit/${item.id}/edit`,
           items: auditFindings,
         })
       if (teams.length > 0)
         result.push({
           label: 'Equipos',
           icon: Users,
-          route: (item) => `/teams/${item.id}`,
+          route: (item) => `/teams/${item.id}/edit`,
           items: teams,
         })
       if (objectives.length > 0)
         result.push({
           label: 'Objetivos',
           icon: Target,
-          route: () => `/strategy/objectives`,
+          route: (item) => `/strategy/objectives/${item.id}/edit`,
           items: objectives,
         })
       if (businessUnits.length > 0)
         result.push({
           label: 'Unidades de Negocio',
           icon: Building2,
-          route: () => `/dashboard`,
+          route: () => `/admin/business-units`,
           items: businessUnits,
         })
 

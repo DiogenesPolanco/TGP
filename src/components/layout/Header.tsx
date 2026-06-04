@@ -24,7 +24,6 @@ export function Header() {
   const alertsRef = useRef<HTMLDivElement>(null)
 
   const alerts = useAppStore((s) => s.alerts)
-  const criticalCount = alerts.filter((a) => a.type === 'critical' || a.type === 'warning').length
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -122,9 +121,9 @@ export function Header() {
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors relative"
           >
             <Bell size={18} className="text-neutral-60 dark:text-neutral-40" />
-            {criticalCount > 0 && (
+            {alerts.length > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-danger text-white text-[10px] font-bold rounded-full px-1">
-                {criticalCount > 99 ? '99+' : criticalCount}
+                {alerts.length > 99 ? '99+' : alerts.length}
               </span>
             )}
           </button>
