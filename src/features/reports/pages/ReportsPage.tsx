@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, startTransition } from 'react'
 import { generateReport, type ReportSection } from '@/services/reports/pdfService'
 import { generateExcel } from '@/services/reports/excelService'
 import * as reportData from '@/services/reports/reportDataService'
@@ -60,7 +60,7 @@ export default function ReportsPage() {
   }, [activeTabDef])
 
   useEffect(() => {
-    loadData()
+    startTransition(() => { loadData() })
   }, [loadData])
 
   const handleExportPDF = () => {

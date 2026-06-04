@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, startTransition } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import {
@@ -36,14 +36,23 @@ export function AzureBackupConfig() {
     setInfo(getAzureBackupInfo())
   }, [])
 
-  // Auto-cargar lista de backups si está configurado al montar el componente
+  const loadBackupList = useCallback(async () => {
+    setLoadingBackups(true)
+    try {
+      const list = await listAzureBackups()
+      setBackups(list)
+    } catch {
+      setBackups([])
+    } finally {
+      setLoadingBackups(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (initialInfo.configured) {
-      loadBackupList()
+      startTransition(() => { loadBackupList() })
     }
-    // Solo al montar
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [initialInfo.configured, loadBackupList])
 
   const handleTest = async () => {
     if (!sasUrl.trim()) {
@@ -101,18 +110,6 @@ export function AzureBackupConfig() {
       setUploading(false)
     }
   }
-
-  const loadBackupList = useCallback(async () => {
-    setLoadingBackups(true)
-    try {
-      const list = await listAzureBackups()
-      setBackups(list)
-    } catch {
-      setBackups([])
-    } finally {
-      setLoadingBackups(false)
-    }
-  }, [])
 
   const handleRestore = async (blobName: string) => {
     if (!await confirm(`¿Restaurar datos desde "${blobName}"? Esto sobrescribirá TODOS los datos actuales en el navegador.`)) {

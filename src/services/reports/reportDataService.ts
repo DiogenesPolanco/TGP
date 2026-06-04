@@ -351,8 +351,8 @@ export async function getRisksReport() {
     vence: r.targetDate ? r.targetDate.toLocaleDateString('es-ES') : '-',
   }))
 
-  const byStatus = { open: 0, in_progress: 0, mitigated: 0, closed: 0 }
-  risks.forEach((r) => { (byStatus as any)[r.status] = ((byStatus as any)[r.status] || 0) + 1 })
+  const byStatus: Record<string, number> = { open: 0, in_progress: 0, mitigated: 0, closed: 0 }
+  risks.forEach((r) => { byStatus[r.status] = (byStatus[r.status] || 0) + 1 })
 
   const sections: ReportSection[] = [
     {

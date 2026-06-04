@@ -18,7 +18,8 @@ export interface ReportColumn {
 export interface ReportSection {
   title: string
   columns: ReportColumn[]
-  rows: Record<string, any>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rows: any[]
 }
 
 export function generateReport(
@@ -164,8 +165,10 @@ export function generateReport(
             if (col.align) acc[idx] = { ...acc[idx], halign: col.align }
             return acc
           },
-          {} as Record<number, any>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          {} as any,
         ),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         didParseCell: (data: any) => {
           if (data.section === 'body') {
             const severityColors: Record<string, string> = {
@@ -192,6 +195,7 @@ export function generateReport(
         },
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       y = (doc as any).lastAutoTable.finalY + 8
     }
   }
