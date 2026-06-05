@@ -12,6 +12,7 @@ import { VacationsSection } from '@/features/performance/components/VacationsSec
 interface Props {
   memberId: string
   memberName: string
+  teamId?: string
   open: boolean
   onClose: () => void
 }
@@ -27,7 +28,7 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'achievements', label: 'Logros', icon: <Award size={16} /> },
 ]
 
-export function MemberEditModal({ memberId, memberName, open, onClose }: Props) {
+export function MemberEditModal({ memberId, memberName, teamId, open, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [visible, setVisible] = useState(false)
 
@@ -121,7 +122,7 @@ export function MemberEditModal({ memberId, memberName, open, onClose }: Props) 
           )}
           {activeTab === 'vacations' && <VacationsSection memberId={memberId} />}
           {activeTab === 'skills' && <SkillsSection memberId={memberId} />}
-          {activeTab === 'sprints' && <SprintsSection memberId={memberId} teamId={profile?.teamId ?? ''} />}
+          {activeTab === 'sprints' && <SprintsSection memberId={memberId} teamId={teamId || profile?.teamId || ''} />}
           {activeTab === 'oneonone' && <OneOnOneSection memberId={memberId} />}
           {activeTab === 'achievements' && <AchievementsSection memberId={memberId} />}
         </div>

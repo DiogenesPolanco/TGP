@@ -13,6 +13,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
   const { confirm } = useConfirm()
   const [sprints, setSprints] = useState<SprintRecord[]>([])
   const [teamSprints, setTeamSprints] = useState<TeamSprint[]>([])
+  const [loadingTeamSprints, setLoadingTeamSprints] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [newSprint, setNewSprint] = useState({
     sprintName: '',
@@ -35,7 +36,11 @@ export function SprintsSection({ memberId, teamId }: Props) {
   }, [memberId])
 
   useEffect(() => {
-    db.teamSprints.where('teamId').equals(teamId).toArray().then(setTeamSprints)
+    setLoadingTeamSprints(true)
+    db.teamSprints.where('teamId').equals(teamId).toArray().then((data) => {
+      setTeamSprints(data)
+      setLoadingTeamSprints(false)
+    })
   }, [teamId])
 
   const handleTeamSprintSelect = (sprintName: string, setter: typeof setNewSprint | typeof setEditData, current: typeof newSprint | typeof editData) => {
@@ -164,8 +169,14 @@ export function SprintsSection({ memberId, teamId }: Props) {
                     </option>
                   )
                 })}
-                {sprintSelectOptions.length === 0 && (
+                {!loadingTeamSprints && sprintSelectOptions.length === 0 && teamSprints.length === 0 && (
+                  <option value="" disabled>No hay sprints registrados para este equipo. Agrégalos desde la página del equipo.</option>
+                )}
+                {!loadingTeamSprints && sprintSelectOptions.length === 0 && teamSprints.length > 0 && (
                   <option value="" disabled>Todos los sprints del equipo ya están registrados</option>
+                )}
+                {loadingTeamSprints && (
+                  <option value="" disabled>Cargando sprints del equipo...</option>
                 )}
               </select>
             </div>

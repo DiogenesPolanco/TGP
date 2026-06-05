@@ -18,6 +18,7 @@ export function MembersPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [editMemberId, setEditMemberId] = useState<string | null>(null)
   const [editMemberName, setEditMemberName] = useState('')
+  const [editMemberTeamId, setEditMemberTeamId] = useState<string>('')
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const [globalData, setGlobalData] = useState<Awaited<ReturnType<typeof getGlobalMembersKPIs>> | null>(null)
@@ -89,7 +90,7 @@ export function MembersPage() {
           value={filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'}
           subtitle={filteredKpis?.bestPerformer?.member.displayName}
           memberId={filteredKpis?.bestPerformer?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.bestPerformer?.member.displayName ?? '') }}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.bestPerformer?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.bestPerformer?.team.id ?? '') }}
           color="text-success"
         />
         <KpiCard
@@ -98,7 +99,7 @@ export function MembersPage() {
           value={filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'}
           subtitle={filteredKpis?.worstPerformer?.member.displayName}
           memberId={filteredKpis?.worstPerformer?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.worstPerformer?.member.displayName ?? '') }}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.worstPerformer?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.worstPerformer?.team.id ?? '') }}
           color="text-danger"
         />
         <KpiCard
@@ -107,7 +108,7 @@ export function MembersPage() {
           value={filteredKpis?.topSP ? `${filteredKpis.topSP.kpis.totalSP}` : '—'}
           subtitle={filteredKpis?.topSP?.member.displayName}
           memberId={filteredKpis?.topSP?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.topSP?.member.displayName ?? '') }}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.topSP?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.topSP?.team.id ?? '') }}
           color="text-warning"
         />
         <KpiCard
@@ -116,7 +117,7 @@ export function MembersPage() {
           value={filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'}
           subtitle={filteredKpis?.needsAttention?.member.displayName}
           memberId={filteredKpis?.needsAttention?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.needsAttention?.member.displayName ?? '') }}
+          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.needsAttention?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.needsAttention?.team.id ?? '') }}
           color="text-danger"
           info={filteredKpis?.needsAttention ? (() => {
             const k = filteredKpis.needsAttention!.kpis
@@ -242,6 +243,7 @@ export function MembersPage() {
                       onClick={() => {
                         setEditMemberId(member.id)
                         setEditMemberName(member.displayName)
+                        setEditMemberTeamId(team.id)
                       }}
                       className="hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors cursor-pointer"
                     >
@@ -277,8 +279,9 @@ export function MembersPage() {
       <MemberEditModal
         memberId={editMemberId ?? ''}
         memberName={editMemberName}
+        teamId={editMemberTeamId}
         open={editMemberId !== null}
-        onClose={() => setEditMemberId(null)}
+        onClose={() => { setEditMemberId(null); setEditMemberTeamId('') }}
       />
     </div>
   )
