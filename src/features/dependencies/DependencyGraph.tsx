@@ -1,23 +1,5 @@
 import { useMemo } from 'react'
 
-interface Node {
-  id: string
-  label: string
-  x: number
-  y: number
-  vx: number
-  vy: number
-  radius: number
-  criticality: string
-}
-
-interface Edge {
-  source: string
-  target: string
-  type: string
-  criticality: string
-}
-
 interface Props {
   nodes: { id: string; label: string; criticality: string }[]
   edges: { source: string; target: string; type: string; criticality: string }[]
@@ -35,10 +17,12 @@ const CRITICALITY_COLORS: Record<string, string> = {
 }
 
 const EDGE_COLORS: Record<string, string> = {
-  hard: '#FF5630',
-  soft: '#FFAB00',
-  data: '#2684FF',
-  network: '#6554C0',
+  api: '#2684FF',
+  database: '#6554C0',
+  library: '#36B37E',
+  infrastructure: '#FF8B00',
+  message: '#FFAB00',
+  external: '#FF5630',
 }
 
 const CENTER_X = 500
@@ -49,7 +33,7 @@ const DAMPING = 0.85
 const ITERATIONS = 120
 
 function forceLayout(
-  nodeList: { id: string; label: string }[],
+  nodeList: { id: string; label: string; criticality?: string }[],
   edgeList: { source: string; target: string }[]
 ) {
   const nodes = nodeList.map((n, i) => {
@@ -154,7 +138,6 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
     const midX = (sx + tx) / 2
     const midY = (sy + ty) / 2
 
-    const arrowSize = 8
     const angle = Math.atan2(ty - sy, tx - sx)
     const ax = tx - Math.cos(angle) * (target.radius + 4)
     const ay = ty - Math.sin(angle) * (target.radius + 4)

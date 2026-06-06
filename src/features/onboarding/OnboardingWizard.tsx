@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { seedDemoData, seedComplianceFindings } from '@/services/demo/seedData'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
-import { requestNotificationPermission } from '@/services/notifications/browserNotificationService'
-import { setBrowserNotificationsEnabled } from '@/services/notifications/browserNotificationService'
+
 import { Check, ChevronRight, ChevronLeft, Building2, Database, Bell, Sparkles, AppWindow, Cpu, Users, Shield, Target, LayoutDashboard } from 'lucide-react'
 
 const STORAGE_KEY = 'tgp-onboarding-done'
@@ -46,32 +45,6 @@ interface StepProps {
 }
 
 // ── Shared card layout ──
-function StepShell({ icon, iconBg, title, children, onNext, onSkip, nextLabel = 'Continuar' }: StepProps & {
-  icon: React.ReactNode; iconBg: string; title: string; children: React.ReactNode; nextLabel?: string
-}) {
-  return (
-    <div className="space-y-6">
-      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto ${iconBg}`}>
-        {icon}
-      </div>
-      <div className="space-y-2 text-center">
-        <h2 className="text-xl font-bold text-neutral-90 dark:text-white">{title}</h2>
-        {children}
-      </div>
-      <div className="flex items-center justify-center gap-3 pt-2">
-        <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
-          {nextLabel} <ChevronRight size={16} />
-        </button>
-        {onSkip && (
-          <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors">
-            Saltar
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
 // ── Step 1: Welcome + Architecture overview ──
 function StepWelcome({ onNext }: StepProps) {
   return (
@@ -312,7 +285,6 @@ function StepSecurity({ onNext, onSkip }: StepProps) {
 
 // ── Step 7: Execution + OKRs ──
 function StepExecution({ onNext, onSkip }: StepProps) {
-  const navigate = useNavigate()
   return (
     <div className="space-y-5">
       <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto">

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getShareType, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
-import { Lock, Clock, TrendingUp, TrendingDown, Users, Award, BarChart3, Zap, Star, Target } from 'lucide-react'
+import { Lock, Clock, TrendingUp, Users, Award, BarChart3, Target } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function PublicPerformancePage() {
@@ -36,13 +36,20 @@ export function PublicPerformancePage() {
       ? Math.round(recentSprints.reduce((s, sp) => s + (sp.storyPointsCompleted / (sp.storyPointsCompleted + sp.storyPointsNotCompleted || 1)) * 100, 0) / recentSprints.length)
       : 0
 
+    const memberNameMap = new Map<string, string>()
+    for (const team of data.teams) {
+      for (const tm of team.members ?? []) {
+        if (!memberNameMap.has(tm.id)) memberNameMap.set(tm.id, tm.displayName)
+      }
+    }
     const topMembers = data.members
       .map((m) => {
         const memberSprints = data.sprints.filter((s) => s.memberId === m.id)
         const totalSP = memberSprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
         const avgMood = data.oneOnOnes.filter((o) => o.memberId === m.id)
           .reduce((s, o, _, arr) => s + o.estadoAnimo / arr.length, 0)
-        return { member: m, totalSP, avgMood }
+        const displayName = memberNameMap.get(m.id) ?? m.email.split('@')[0] ?? 'Miembro'
+        return { member: m, displayName, totalSP, avgMood }
       })
       .sort((a, b) => b.totalSP - a.totalSP)
       .slice(0, 5)
@@ -138,7 +145,7 @@ export function PublicPerformancePage() {
                       'bg-neutral-50/20 text-neutral-500'
                     )}>{i + 1}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-neutral-90 dark:text-white truncate">{item.member.displayName}</p>
+                      <p className="text-sm font-semibold text-neutral-90 dark:text-white truncate">{item.displayName}</p>
                       <p className="text-xs text-neutral-50">{team?.name ?? '—'} · {item.member.role}</p>
                     </div>
                     <div className="text-right">

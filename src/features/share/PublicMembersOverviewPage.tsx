@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getShareInfo, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
-import { Lock, Clock, TrendingUp, TrendingDown, Users, Award, Star, Zap, AlertTriangle, Brain, BarChart3 } from 'lucide-react'
+import { Lock, Clock, TrendingUp, Users, Award, Star, AlertTriangle, Brain, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function PublicMembersOverviewPage() {
@@ -100,21 +100,21 @@ export function PublicMembersOverviewPage() {
 
         {/* Top performers grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <CategoryCard title="Más Story Points" icon={<Award size={16} className="text-amber-500" />} color="border-l-amber-500">
+          <CategoryCard title="Más Story Points" icon={<Award size={16} className="text-amber-500" />}>
             {analytics.topSP.map((item, i) => (
               <MemberRow key={item.member.id} rank={i + 1} name={item.displayName}
                 rightLabel={`${item.totalSP} SP`} rightSublabel={`${item.sprintCount} sprints`} highlight={i === 0} />
             ))}
           </CategoryCard>
 
-          <CategoryCard title="Mejor Completitud" icon={<TrendingUp size={16} className="text-success" />} color="border-l-success">
+          <CategoryCard title="Mejor Completitud" icon={<TrendingUp size={16} className="text-success" />}>
             {analytics.topCompletion.map((item, i) => (
               <MemberRow key={item.member.id} rank={i + 1} name={item.displayName}
                 rightLabel={`${item.avgCompletion}%`} rightSublabel={`${item.totalSP} SP totales`} highlight={i === 0} />
             ))}
           </CategoryCard>
 
-          <CategoryCard title="Mejor Ánimo" icon={<Star size={16} className="text-primary" />} color="border-l-primary">
+          <CategoryCard title="Mejor Ánimo" icon={<Star size={16} className="text-primary" />}>
             {analytics.topMood.filter((m) => m.avgMood > 0).slice(0, 3).map((item, i) => (
               <MemberRow key={item.member.id} rank={i + 1} name={item.displayName}
                 rightLabel={`${item.avgMood}/5`} rightSublabel={`${item.oneOnOneCount} reuniones`} highlight={i === 0} />

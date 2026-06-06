@@ -134,14 +134,14 @@ export async function seedDemoData(force = false) {
   // Reporting depends on Data Lake
   // Legacy CRM and Intranet are isolated (no deps)
   const appDeps: ApplicationDependency[] = [
-    { id: 'dep-1', applicationId: 'app-4', dependsOnAppId: 'app-1', dependencyType: 'hard', criticality: 'critical', description: 'Payments ejecuta transacciones sobre cuentas del Core Banking', createdAt: days(365) },
-    { id: 'dep-2', applicationId: 'app-2', dependsOnAppId: 'app-1', dependencyType: 'soft', criticality: 'high', description: 'Portal consulta saldos y datos del cliente desde Core Banking', createdAt: days(365) },
-    { id: 'dep-3', applicationId: 'app-2', dependsOnAppId: 'app-4', dependencyType: 'data', criticality: 'high', description: 'Portal muestra historial de pagos desde Payments', createdAt: days(300) },
-    { id: 'dep-4', applicationId: 'app-6', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'medium', description: 'Analytics consume datasets procesados del Data Lake', createdAt: days(180) },
-    { id: 'dep-5', applicationId: 'app-7', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'low', description: 'Reporting genera reportes sobre datos del Data Lake', createdAt: days(200) },
-    { id: 'dep-6', applicationId: 'app-3', dependsOnAppId: 'app-2', dependencyType: 'network', criticality: 'high', description: 'App Móvil consume APIs del Portal Clientes', createdAt: days(180) },
-    { id: 'dep-7', applicationId: 'app-9', dependsOnAppId: 'app-6', dependencyType: 'data', criticality: 'medium', description: 'Data Lake recibe streams de datos desde Analytics', createdAt: days(150) },
-    { id: 'dep-8', applicationId: 'app-1', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'medium', description: 'Core Banking consume reportes del Data Lake', createdAt: days(120) },
+    { id: 'dep-1', applicationId: 'app-4', dependsOnAppId: 'app-1', dependencyType: 'api', criticality: 'critical', description: 'Payments ejecuta transacciones sobre cuentas del Core Banking', createdAt: days(365) },
+    { id: 'dep-2', applicationId: 'app-2', dependsOnAppId: 'app-1', dependencyType: 'api', criticality: 'high', description: 'Portal consulta saldos y datos del cliente desde Core Banking', createdAt: days(365) },
+    { id: 'dep-3', applicationId: 'app-2', dependsOnAppId: 'app-4', dependencyType: 'database', criticality: 'high', description: 'Portal muestra historial de pagos desde Payments', createdAt: days(300) },
+    { id: 'dep-4', applicationId: 'app-6', dependsOnAppId: 'app-9', dependencyType: 'database', criticality: 'medium', description: 'Analytics consume datasets procesados del Data Lake', createdAt: days(180) },
+    { id: 'dep-5', applicationId: 'app-7', dependsOnAppId: 'app-9', dependencyType: 'database', criticality: 'low', description: 'Reporting genera reportes sobre datos del Data Lake', createdAt: days(200) },
+    { id: 'dep-6', applicationId: 'app-3', dependsOnAppId: 'app-2', dependencyType: 'api', criticality: 'high', description: 'App Móvil consume APIs del Portal Clientes', createdAt: days(180) },
+    { id: 'dep-7', applicationId: 'app-9', dependsOnAppId: 'app-6', dependencyType: 'database', criticality: 'medium', description: 'Data Lake recibe streams de datos desde Analytics', createdAt: days(150) },
+    { id: 'dep-8', applicationId: 'app-1', dependsOnAppId: 'app-9', dependencyType: 'database', criticality: 'medium', description: 'Core Banking consume reportes del Data Lake', createdAt: days(120) },
   ]
 
   const microservices: Microservice[] = [

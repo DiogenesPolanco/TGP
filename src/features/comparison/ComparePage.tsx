@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { ArrowLeft, X, Shield, AlertTriangle, Users, Package, ChevronRight } from 'lucide-react'
+import { ArrowLeft, X, Shield, AlertTriangle, Users, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function ComparePage() {

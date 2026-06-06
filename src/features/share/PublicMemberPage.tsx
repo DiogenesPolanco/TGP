@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getShareInfo, getPublicMemberData, type PublicMemberData } from '@/services/share/publicShareService'
-import { Lock, Clock, TrendingUp, Star, Award, BarChart3, Brain, ChevronRight } from 'lucide-react'
+import { Lock, Clock, BarChart3, Brain } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function PublicMemberPage() {

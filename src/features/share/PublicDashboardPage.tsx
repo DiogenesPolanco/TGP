@@ -2,9 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getPublicDashboardData, type PublicDashboardData } from '@/services/share/publicShareService'
 import {
-  Shield, AlertTriangle, Lock, Clock, TrendingUp, TrendingDown,
+  Shield, AlertTriangle, Lock, Clock, TrendingUp,
   Users, Package, Building2, AlertOctagon, Target, CheckCircle2,
-  FileWarning,
 } from 'lucide-react'
 import { ThiGauge } from '@/components/charts/ThiGauge'
 import { cn } from '@/lib/utils'
@@ -58,7 +57,7 @@ export function PublicDashboardPage() {
     const securityScore = data.applications.length === 0 ? 100
       : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
     const totalDowntime = data.incidents.filter((i) => i.status === 'resolved')
-      .reduce((s, i) => s + (i.downtimeMinutes ?? 0), 0)
+      .reduce((s, i) => s + ((i as any).downtimeMinutes ?? 0), 0)
     const availabilityScore = data.applications.length === 0 ? 100
       : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
     const appsWithEol = data.applications.filter((a) =>

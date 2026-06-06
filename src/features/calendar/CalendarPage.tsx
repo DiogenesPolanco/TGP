@@ -4,22 +4,14 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import {
   ChevronLeft, ChevronRight, Calendar as CalendarIcon,
-  AlertTriangle, Target, Package, AlertOctagon,
-  ChevronDown, ChevronUp, ArrowRight, BarChart3,
+  AlertTriangle, Target, AlertOctagon,
+  ArrowRight, BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getCalendarEvents, type CalendarEvent } from './calendarService'
 
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-
-const TYPE_COLORS: Record<string, string> = {
-  plan: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-  activity: 'text-purple-500 bg-purple-500/10 border-purple-500/20',
-  commitment: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-  deliverable: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-  blocker: 'text-red-500 bg-red-500/10 border-red-500/20',
-}
 
 const TYPE_DOTS: Record<string, string> = {
   plan: 'bg-blue-500',
@@ -98,7 +90,6 @@ export function CalendarPage() {
 
   // ── Calendar grid ──
   const firstDay = new Date(currentYear, currentMonth, 1).getDay()
-  const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate()
 
   const getEventsForDay = (day: number) =>
     events.filter((e) => {
@@ -117,7 +108,7 @@ export function CalendarPage() {
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const dayEvents = getEventsForDay(d)
-    const isOverdue = dayEvents.some((e) => new Date(e.date) < now && e.type !== 'blocker')
+    const isOverdue = dayEvents.some((e) => new Date(e.date).getTime() < now && e.type !== 'blocker')
     const isSelected = selectedDate?.getDate() === d && selectedDate?.getMonth() === currentMonth
     const isPast = new Date(currentYear, currentMonth, d, 23, 59, 59).getTime() < now
     days.push(
