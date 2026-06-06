@@ -13,6 +13,7 @@ import type {
   HealthIndex,
   Deliverable,
   Microservice,
+  AppDatabase,
   User,
   Plan,
   Activity,
@@ -135,6 +136,30 @@ export async function seedDemoData() {
     // Data Lake (app-9) microservices
     { id: 'ms-8', applicationId: 'app-9', name: 'data-ingestion', description: 'Ingesta de datos batch y streaming', technologies: ['tech-8', 'tech-17', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
     { id: 'ms-9', applicationId: 'app-9', name: 'etl-orchestrator', description: 'Orquestación de pipelines ETL', technologies: ['tech-8', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
+  ]
+
+  // ── Databases ──
+  const databases: AppDatabase[] = [
+    // Core Banking (app-1) databases
+    { id: 'db-1', applicationId: 'app-1', name: 'corebanking-db', description: 'Base de datos principal del core bancario', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'prod', technologies: ['tech-4'], microserviceIds: ['ms-1', 'ms-2'], host: 'pg.corebanking.internal', port: 5432, isManaged: false, createdAt: days(365), updatedAt: days(1) },
+    { id: 'db-2', applicationId: 'app-1', name: 'corebanking-cache', description: 'Caché distribuida para sesiones y rate-limiting', engine: 'Redis', version: '7', dbType: 'cache', environment: 'prod', technologies: ['tech-6'], microserviceIds: ['ms-1', 'ms-2', 'ms-3'], host: 'redis.corebanking.internal', port: 6379, isManaged: true, createdAt: days(365), updatedAt: days(1) },
+    { id: 'db-3', applicationId: 'app-1', name: 'corebanking-legacy-db', description: 'Base de datos legacy del core bancario (migración en curso)', engine: 'SQL Server', version: '2019', dbType: 'relational', environment: 'prod', technologies: ['tech-5'], microserviceIds: ['ms-2'], host: 'sql.corebanking.internal', port: 1433, isManaged: false, createdAt: days(730), updatedAt: days(30) },
+    // Portal Clientes (app-2) databases
+    { id: 'db-4', applicationId: 'app-2', name: 'portal-db', description: 'Base de datos del portal de clientes', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'prod', technologies: ['tech-4'], microserviceIds: ['ms-4', 'ms-5'], host: 'pg.portal.internal', port: 5432, isManaged: true, createdAt: days(365), updatedAt: days(5) },
+    { id: 'db-5', applicationId: 'app-2', name: 'portal-cache', description: 'Caché de sesiones del portal', engine: 'Redis', version: '7', dbType: 'cache', environment: 'prod', technologies: ['tech-6'], microserviceIds: ['ms-4'], host: 'redis.portal.internal', port: 6379, isManaged: true, createdAt: days(365), updatedAt: days(5) },
+    // Payments (app-4) databases
+    { id: 'db-6', applicationId: 'app-4', name: 'payments-db', description: 'Base de datos transaccional de pagos', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'prod', technologies: ['tech-4'], microserviceIds: ['ms-6'], host: 'pg.payments.internal', port: 5432, isManaged: false, createdAt: days(365), updatedAt: days(1) },
+    { id: 'db-7', applicationId: 'app-4', name: 'fraud-cache', description: 'Caché en memoria para detección de fraudes en tiempo real', engine: 'Redis', version: '7', dbType: 'cache', environment: 'prod', technologies: ['tech-6'], microserviceIds: ['ms-7'], host: 'redis.fraud.internal', port: 6379, isManaged: true, createdAt: days(365), updatedAt: days(1) },
+    // Legacy (app-5) databases
+    { id: 'db-8', applicationId: 'app-5', name: 'legacy-crm-db', description: 'Base de datos del CRM legacy', engine: 'SQL Server', version: '2019', dbType: 'relational', environment: 'prod', technologies: ['tech-5'], microserviceIds: [], host: 'sql.legacy.internal', port: 1433, isManaged: false, createdAt: days(1095), updatedAt: days(60) },
+    // Intranet (app-8) databases
+    { id: 'db-9', applicationId: 'app-8', name: 'intranet-db', description: 'Base de datos de la intranet corporativa', engine: 'MySQL', version: '5.7', dbType: 'relational', environment: 'prod', technologies: ['tech-12'], microserviceIds: [], host: 'mysql.intranet.internal', port: 3306, isManaged: false, createdAt: days(730), updatedAt: days(90) },
+    // Analytics (app-6) database
+    { id: 'db-10', applicationId: 'app-6', name: 'analytics-warehouse', description: 'Data warehouse de analytics', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'prod', technologies: ['tech-4'], microserviceIds: [], host: 'pg.analytics.internal', port: 5432, isManaged: true, createdAt: days(180), updatedAt: days(5) },
+    // Data Lake (app-9) databases
+    { id: 'db-11', applicationId: 'app-9', name: 'datalake-metastore', description: 'Metastore del data lake', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'staging', technologies: ['tech-4'], microserviceIds: ['ms-8'], host: 'pg.datalake.internal', port: 5432, isManaged: true, createdAt: days(180), updatedAt: days(5) },
+    // QA/DEV environment databases
+    { id: 'db-12', applicationId: 'app-1', name: 'corebanking-db-dev', description: 'Entorno de desarrollo del core bancario', engine: 'PostgreSQL', version: '16', dbType: 'relational', environment: 'dev', technologies: ['tech-4'], microserviceIds: ['ms-1', 'ms-2'], host: 'pg-dev.corebanking.internal', port: 5432, isManaged: false, createdAt: days(180), updatedAt: days(5) },
   ]
 
   // ── Vulnerabilities spread across time windows ──
@@ -263,6 +288,7 @@ export async function seedDemoData() {
   await db.objectives.bulkAdd(objectives)
   await db.deliverables.bulkAdd(deliverables)
   await db.microservices.bulkAdd(microservices)
+  await db.appDatabases.bulkAdd(databases)
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
 

@@ -26,6 +26,7 @@ export type {
   BusinessUnitStatus,
   MemberRole,
   MemberStatus,
+  EnvironmentType,
 }
 
 export type {
@@ -310,6 +311,26 @@ export interface Microservice {
   name: string
   description: string
   technologies: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type DatabaseType = 'relational' | 'document' | 'key-value' | 'graph' | 'time-series' | 'search' | 'cache' | 'message_queue' | 'vector' | 'other'
+
+export interface AppDatabase {
+  id: string
+  applicationId: string
+  name: string
+  description: string
+  engine: string
+  version: string
+  dbType: DatabaseType
+  environment: EnvironmentType
+  technologies: string[]
+  microserviceIds: string[]
+  host: string | null
+  port: number | null
+  isManaged: boolean
   createdAt: Date
   updatedAt: Date
 }

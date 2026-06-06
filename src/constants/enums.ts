@@ -25,6 +25,7 @@ export type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
 export type TrendDirection = 'improving' | 'stable' | 'declining' | 'unknown'
 export type DeliverableStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled'
 export type UserRole = 'admin' | 'executive' | 'manager' | 'operator'
+export type EnvironmentType = 'dev' | 'qa' | 'staging' | 'prod' | 'dr' | 'test' | 'uat' | 'perf'
 
 /* ─── Ejecución ─── */
 export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done'

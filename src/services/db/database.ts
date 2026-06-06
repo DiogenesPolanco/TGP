@@ -14,6 +14,7 @@ import type {
   HealthIndex,
   Deliverable,
   Microservice,
+  AppDatabase,
   User,
   Plan,
   Activity,
@@ -44,6 +45,7 @@ export class TGPDatabase extends Dexie {
   healthIndexHistory!: Table<HealthIndex, string>
   deliverables!: Table<Deliverable, string>
   microservices!: Table<Microservice, string>
+  appDatabases!: Table<AppDatabase, string>
   users!: Table<User, string>
 
   // Ejecución
@@ -98,6 +100,9 @@ export class TGPDatabase extends Dexie {
     })
     this.version(8).stores({
       teamSprints: 'id, teamId, year, quarter',
+    })
+    this.version(9).stores({
+      appDatabases: 'id, applicationId, dbType, engine, environment',
     })
   }
 }
