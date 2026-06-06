@@ -2,19 +2,35 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getShareType, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
 import { Lock, Clock, TrendingUp, Users, Award, BarChart3, Target, Zap } from 'lucide-react'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { cn } from '@/lib/utils'
 
 export function PublicPerformancePage() {
   const { hash } = useParams<{ hash: string }>()
   const [valid, setValid] = useState<boolean | null>(null)
   const [data, setData] = useState<PublicPerformanceData | null>(null)
+  const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
+
+    const tryDecryptOrShow = (raw: unknown) => {
+      if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
+        setPendingEncrypted(raw as EncryptedPayload)
+        setValid(true)
+        setLoading(false)
+      } else {
+        setData(raw as PublicPerformanceData)
+        setValid(true)
+        setLoading(false)
+      }
+    }
+
     import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
-      const azureData = await downloadShareFromAzure(hash) as PublicPerformanceData | null
-      if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+      const azureData = await downloadShareFromAzure(hash)
+      if (azureData) { tryDecryptOrShow(azureData); return }
       if (getShareType(hash) === 'performance') {
         const d = await getPublicPerformanceData()
         setData(d); setValid(true)
@@ -25,7 +41,7 @@ export function PublicPerformancePage() {
 
   const summary = useMemo(() => {
     if (!data) return null
-    const totalMembers = data.members.length
+    const totalMembers = data.members?.length ?? 0
     const teamsWithMetrics = data.teams.filter((t) => t.currentMetrics)
     const eliteTeams = teamsWithMetrics.filter((t) => (t.currentMetrics?.deploymentFrequency ?? 0) >= 1)
     const avgVelocity = teamsWithMetrics.length
@@ -59,7 +75,24 @@ export function PublicPerformancePage() {
 
   if (loading) return <Loader />
   if (!valid) return <InvalidLink />
-  if (!data || !summary) return null
+  if (!data || !summary) {
+    if (pendingEncrypted) {
+      return (
+        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+          <PassphraseModal
+            title="Datos protegidos con contraseña"
+            description="Este reporte fue compartido con cifrado de extremo a extremo."
+            onSubmit={async (pass) => {
+              const decrypted = await decryptData(pendingEncrypted, pass)
+              if (decrypted) { setData(decrypted as any); setPendingEncrypted(null) }
+              else { alert('Contraseña incorrecta') }
+            }}
+          />
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90">

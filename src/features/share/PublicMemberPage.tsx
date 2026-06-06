@@ -2,19 +2,31 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getShareInfo, getPublicMemberData, type PublicMemberData } from '@/services/share/publicShareService'
 import { Lock, Clock, BarChart3, Brain } from 'lucide-react'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { cn } from '@/lib/utils'
 
 export function PublicMemberPage() {
   const { hash } = useParams<{ hash: string }>()
   const [valid, setValid] = useState<boolean | null>(null)
   const [data, setData] = useState<PublicMemberData>(null)
+  const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
+
+    const tryDecryptOrShow = (raw: unknown) => {
+      if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
+        setPendingEncrypted(raw as EncryptedPayload); setValid(true); setLoading(false)
+      } else {
+        setData(raw as PublicMemberData); setValid(true); setLoading(false)
+      }
+    }
+
     import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
-      const azureData = await downloadShareFromAzure(hash) as PublicMemberData | null
-      if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+      const azureData = await downloadShareFromAzure(hash)
+      if (azureData) { tryDecryptOrShow(azureData); return }
       const info = getShareInfo(hash)
       if (info && info.type === 'member' && info.ref) {
         const d = await getPublicMemberData(info.ref)
@@ -36,7 +48,22 @@ export function PublicMemberPage() {
 
   if (loading) return <Loader />
   if (!valid) return <InvalidLink />
-  if (!data || !stats || !data.member) return null
+  if (!data || !stats || !data.member) {
+    if (pendingEncrypted) {
+      return (
+        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+          <PassphraseModal title="Datos protegidos" description="Contenido cifrado. Ingresa la contraseña."
+            onSubmit={async (pass) => {
+              const decrypted = await decryptData(pendingEncrypted, pass)
+              if (decrypted) { setData(decrypted as PublicMemberData); setPendingEncrypted(null) }
+              else { alert('Contraseña incorrecta') }
+            }}
+          />
+        </div>
+      )
+    }
+    return null
+  }
 
   const { member, displayName, team, sprints, oneOnOnes } = data
 

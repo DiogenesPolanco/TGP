@@ -8,6 +8,8 @@ import type { MemberStatus } from '@/types/domain'
 import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3, Share2, Check, Copy } from 'lucide-react'
 import { getGlobalMembersKPIs } from '@/services/performance/performanceService'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
 
 type TeamEntry = { id: string; name: string }
@@ -22,6 +24,8 @@ export function MembersPage() {
   const [editMemberTeamId, setEditMemberTeamId] = useState<string>('')
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<any>(null)
 
   const rawTeams = useLiveQuery(() => db.teams.toArray())
   const teams = useMemo(() => rawTeams ?? [], [rawTeams])
@@ -87,8 +91,8 @@ export function MembersPage() {
         <button
           onClick={async () => {
             const data = await getPublicPerformanceData()
-            const { url } = await createShareLink(48, 'members', undefined, data)
-            setShareUrl(url)
+            setSharePending(data)
+            setShowPassphrase(true)
           }}
           className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
@@ -108,6 +112,23 @@ export function MembersPage() {
           </button>
         </div>
       )})()}
+
+      {showPassphrase && (
+        <PassphraseModal
+          title="Proteger enlace"
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'members', undefined, payload)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onSkip={async () => {
+            const { url } = await createShareLink(48, 'members', undefined, sharePending)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard

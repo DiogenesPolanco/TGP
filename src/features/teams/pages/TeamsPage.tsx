@@ -5,6 +5,8 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Link } from 'react-router-dom'
@@ -19,6 +21,8 @@ export function TeamsPage() {
   const { confirm } = useConfirm()
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<any>(null)
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -66,8 +70,8 @@ export function TeamsPage() {
           <button
             onClick={async () => {
               const data = await getPublicPerformanceData()
-              const { url } = await createShareLink(48, 'performance', undefined, data)
-              setShareUrl(url)
+              setSharePending(data)
+              setShowPassphrase(true)
             }}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
@@ -95,6 +99,25 @@ export function TeamsPage() {
           </button>
         </div>
       )})()}
+
+      {showPassphrase && (
+        <PassphraseModal
+          title="Proteger enlace compartido"
+          description="Opcional: agrega una contraseña para cifrar los datos."
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'performance', undefined, payload)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onSkip={async () => {
+            const data = sharePending
+            const { url } = await createShareLink(48, 'performance', undefined, data)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
 
       <div className="grid grid-cols-3 gap-4">
         <StatCard icon={<Users size={20} />} label="Total Equipos" value={teams.length} color="text-primary" onClick={() => setSearchTerm('')} />

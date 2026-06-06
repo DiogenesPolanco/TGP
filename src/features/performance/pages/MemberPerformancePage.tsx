@@ -5,6 +5,8 @@ import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { createShareLink, getPublicMemberData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { ArrowLeft, Loader2, Share2, Check } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
@@ -21,6 +23,8 @@ export function MemberPerformancePage() {
   const navigate = useNavigate()
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<any>(null)
   const [team, setTeam] = useState<Team | null>(null)
   const [profile, setProfile] = useState<MemberProfile | null>(null)
   const [kpis, setKpis] = useState<Awaited<ReturnType<typeof getMemberKPIs>> | null>(null)
@@ -90,12 +94,9 @@ export function MemberPerformancePage() {
             onClick={async () => {
               if (shareUrl) { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); return }
               const data = await getPublicMemberData(memberId!)
-              const { url } = await createShareLink(48, 'member', memberId, data)
-              setShareUrl(url)
-              navigator.clipboard.writeText(url)
-              setCopied(true)
-              setTimeout(() => setCopied(false), 2000)
-            }}
+              setSharePending(data)
+              setShowPassphrase(true)
+            }}          
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             title="Compartir perfil"
           >
@@ -110,6 +111,28 @@ export function MemberPerformancePage() {
             <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-2 py-1 rounded truncate font-mono min-w-0">{cleanUrl}</code>
           </div>
         )})()}
+
+        {showPassphrase && (
+          <PassphraseModal
+            title="Proteger enlace"
+            onSubmit={async (pass) => {
+              const payload = pass ? await encryptData(sharePending, pass) : sharePending
+              const { url } = await createShareLink(48, 'member', memberId, payload)
+              setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+              navigator.clipboard.writeText(url)
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+            onSkip={async () => {
+              const { url } = await createShareLink(48, 'member', memberId, sharePending)
+              setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+              navigator.clipboard.writeText(url)
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+            onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          />
+        )}
 
         {/* Mini KPIs */}
         {kpis && (
