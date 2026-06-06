@@ -20,18 +20,28 @@ export function PublicDashboardPage() {
     if (!hash) { setValid(false); setLoading(false); return }
 
     const load = async () => {
-      // 1. Try URL hash fragment (manifest) — base64url is already URL-safe
-      const fragment = window.location.hash.replace(/^#/, '')
-      if (fragment) {
-        const { downloadUsingManifest } = await import('@/services/share/azureShareService')
-        const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
-        if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+      // 1. Try URL hash fragment (manifest)
+      const rawHash = window.location.hash.replace(/^#/, '')
+      if (rawHash) {
+        try {
+          const fragment = decodeURIComponent(rawHash)
+          const { downloadUsingManifest } = await import('@/services/share/azureShareService')
+          const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
+          if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+          console.warn('[PublicDashboard] Manifest found but Azure returned no data')
+        } catch (err) {
+          console.error('[PublicDashboard] Azure download error:', err)
+        }
       }
 
       // 2. Fallback: viewer's own Azure config
-      const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
-      const viewerData = await downloadShareFromAzure(hash) as PublicDashboardData | null
-      if (viewerData) { setData(viewerData); setValid(true); setLoading(false); return }
+      try {
+        const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+        const viewerData = await downloadShareFromAzure(hash) as PublicDashboardData | null
+        if (viewerData) { setData(viewerData); setValid(true); setLoading(false); return }
+      } catch (err) {
+        console.warn('[PublicDashboard] Viewer Azure config error:', err)
+      }
 
       // 3. Last fallback: localStorage (same-browser dev/testing)
       if (isValidShareHash(hash)) {
