@@ -20,3 +20,7 @@ PROMPT-*.md
 *.njsproj
 *.sln
 *.sw?
+
+.memento.json
+
+.memento/scripts/
