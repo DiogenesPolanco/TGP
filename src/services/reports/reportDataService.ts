@@ -3,15 +3,53 @@ import type { ReportSection } from './pdfService'
 
 function statusBadge(s: string): string {
   const map: Record<string, string> = {
+    // Estados generales
     open: 'Abierto', in_progress: 'En Progreso', fixed: 'Solucionado',
     accepted: 'Aceptado', resolved: 'Resuelto', active: 'Activo',
-    eol: 'EOL', extended: 'S. Extendido', unknown: '?',
     completed: 'Completado', cancelled: 'Cancelado', pending: 'Pendiente',
     on_track: 'Encaminado', at_risk: 'En Riesgo', behind: 'Atrasado',
     achieved: 'Logrado', fulfilled: 'Cumplido', breached: 'Incumplido',
     closed: 'Cerrado', escalated: 'Escalado',
+    detected: 'Detectado', acknowledged: 'Reconocido',
+    mitigated: 'Mitigado', overdue: 'Vencido',
+    // Soporte tecnológico
+    eol: 'EOL', extended: 'S. Extendido', unknown: '?',
+    // Severidad
+    critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info',
+    // Roles
+    developer: 'Desarrollador',
+    senior_developer: 'Desarrollador Senior',
+    tech_lead: 'Líder Técnico',
+    architect: 'Arquitecto',
+    qa: 'QA',
+    devops: 'DevOps',
+    product_owner: 'Product Owner',
+    scrum_master: 'Scrum Master',
+    ux_designer: 'UX Designer',
+    analyst: 'Analista',
+    manager: 'Gerente',
+    intern: 'Pasante',
+    other: 'Otro',
   }
   return map[s] || s
+}
+
+const riskCategoryLabel: Record<string, string> = {
+  technical: 'Técnica',
+  security: 'Seguridad',
+  operational: 'Operacional',
+  regulatory: 'Regulatorio',
+  financial: 'Financiero',
+}
+
+const auditCategoryLabel: Record<string, string> = {
+  compliance: 'Cumplimiento',
+  security: 'Seguridad',
+  architecture: 'Arquitectura',
+  process: 'Proceso',
+  data_governance: 'Data Gov.',
+  access_control: 'Control de Acceso',
+  business_continuity: 'Continuidad del Negocio',
 }
 
 /* ─── 1. Obsolescencia de Aplicaciones ─── */
@@ -343,7 +381,7 @@ export async function getRisksReport() {
   const rows = risks.map((r) => ({
     título: r.title,
     aplicación: r.applicationId ? appMap.get(r.applicationId) || '-' : '-',
-    categoría: r.category,
+    categoría: riskCategoryLabel[r.category] || r.category,
     probabilidad: `${r.probability}/5`,
     impacto: `${r.impact}/5`,
     score: String(r.riskScore),
@@ -400,7 +438,7 @@ export async function getAuditReport() {
     título: f.title,
     aplicación: f.applicationId ? appMap.get(f.applicationId) || '-' : '-',
     severidad: statusBadge(f.severity),
-    categoría: f.category,
+    categoría: auditCategoryLabel[f.category] || f.category,
     estado: statusBadge(f.status),
     vence: f.dueDate.toLocaleDateString('es-ES'),
     acciones: f.actionPlan ? f.actionPlan.items.length : 0,

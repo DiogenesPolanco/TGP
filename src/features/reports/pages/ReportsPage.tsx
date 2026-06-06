@@ -161,7 +161,7 @@ export default function ReportsPage() {
             No se pudieron cargar los datos.
           </div>
         ) : (
-          <div className="space-y-6 max-w-6xl">
+          <div className="space-y-6">
             {data.summary && data.summary.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {data.summary.map((item, i) => (
