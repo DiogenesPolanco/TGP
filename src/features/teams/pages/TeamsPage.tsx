@@ -103,6 +103,7 @@ export function TeamsPage() {
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace compartido"
+          buttonLabel="Proteger"
           description="Opcional: agrega una contraseña para cifrar los datos."
           onSubmit={async (pass) => {
             const data = sharePending

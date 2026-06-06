@@ -126,6 +126,7 @@ export function DashboardPage() {
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace compartido"
+          buttonLabel="Proteger"
           description="Opcional: agrega una contraseña para cifrar los datos. Quien reciba el enlace necesitará la contraseña para verlos."
           onSubmit={async (pass) => {
             const data = sharePending

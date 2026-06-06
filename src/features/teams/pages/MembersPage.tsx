@@ -116,6 +116,7 @@ export function MembersPage() {
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace"
+            buttonLabel="Proteger"
           onSubmit={async (pass) => {
             const data = sharePending
             const payload = pass ? await encryptData(data, pass) : data

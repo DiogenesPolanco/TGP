@@ -4,12 +4,13 @@ import { Eye, EyeOff, ArrowRight, Shield, Check } from 'lucide-react'
 interface Props {
   title?: string
   description?: string
+  buttonLabel?: string
   onSubmit: (passphrase: string) => void
   onSkip?: () => void
   onClose?: () => void
 }
 
-export function PassphraseModal({ title = 'Proteger con contraseña', description, onSubmit, onSkip, onClose }: Props) {
+export function PassphraseModal({ title = 'Proteger con contraseña', description, buttonLabel = 'Desbloquear', onSubmit, onSkip, onClose }: Props) {
   const [pass, setPass] = useState('')
   const [show, setShow] = useState(false)
 
@@ -76,7 +77,7 @@ export function PassphraseModal({ title = 'Proteger con contraseña', descriptio
                 <div className="flex items-center gap-2">
                   <button onClick={() => onSubmit(pass)} disabled={!pass}
                     className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25">
-                    Desbloquear {pass ? <ArrowRight size={18} /> : null}
+                    {buttonLabel} {pass ? <ArrowRight size={18} /> : null}
                   </button>
                   {onSkip && (
                     <button onClick={onSkip} className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0">Sin clave</button>
