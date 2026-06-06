@@ -53,7 +53,7 @@ export function DashboardPage() {
 
       {shareUrl && (
         <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
-          <span className="text-sm text-neutral-50 shrink-0">Link:</span>
+          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-3 py-1.5 rounded-lg text-neutral-70 dark:text-neutral-30 truncate font-mono min-w-0">
             {cleanUrl}
           </code>

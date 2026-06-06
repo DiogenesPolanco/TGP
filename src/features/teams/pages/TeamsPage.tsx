@@ -87,7 +87,7 @@ export function TeamsPage() {
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
         <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
-          <span className="text-sm text-neutral-50 shrink-0">Link:</span>
+          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-3 py-1.5 rounded-lg text-neutral-70 dark:text-neutral-30 truncate font-mono min-w-0">{cleanUrl}</code>
           <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
