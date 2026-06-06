@@ -87,9 +87,9 @@ export function MemberPerformancePage() {
             <p className="text-sm text-neutral-50">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role} · {team?.name}</p>
           </div>
           <button
-            onClick={() => {
+            onClick={async () => {
               if (shareUrl) { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); return }
-              const { url } = createShareLink(48, 'member', memberId)
+              const { url } = await createShareLink(48, 'member', memberId)
               setShareUrl(url)
               navigator.clipboard.writeText(url)
               setCopied(true)

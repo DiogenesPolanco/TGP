@@ -1,6 +1,8 @@
 import { db } from '@/services/db/database'
+import { uploadShareToAzure, isAzureShareConfigured } from '@/services/share/azureShareService'
 
 const SHARED_LINKS_KEY = 'tgp-shared-links'
+const AZURE_LINKS_KEY = 'tgp-azure-links'
 
 type ShareType = 'dashboard' | 'performance' | 'member' | 'members'
 
@@ -30,7 +32,28 @@ function saveSharedLinks(links: SharedLink[]) {
   localStorage.setItem(SHARED_LINKS_KEY, JSON.stringify(links))
 }
 
-export function createShareLink(hoursValid = 48, type: ShareType = 'dashboard', ref?: string): { hash: string; url: string } {
+function getAzureLinks(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(AZURE_LINKS_KEY) ?? '[]')
+  } catch {
+    return []
+  }
+}
+
+function saveAzureLinks(links: string[]) {
+  localStorage.setItem(AZURE_LINKS_KEY, JSON.stringify(links))
+}
+
+export function isLinkInAzure(hash: string): boolean {
+  return getAzureLinks().includes(hash)
+}
+
+export async function createShareLink(
+  hoursValid = 48,
+  type: ShareType = 'dashboard',
+  ref?: string,
+  data?: unknown,
+): Promise<{ hash: string; url: string }> {
   const links = getSharedLinks()
   const hash = generateHash()
   const link: SharedLink = {
@@ -42,6 +65,17 @@ export function createShareLink(hoursValid = 48, type: ShareType = 'dashboard', 
   }
   links.push(link)
   saveSharedLinks(links)
+
+  // If Azure is configured and data is provided, upload to Azure
+  if (data && isAzureShareConfigured()) {
+    const azureUrl = await uploadShareToAzure(hash, data)
+    if (azureUrl) {
+      const azureLinks = getAzureLinks()
+      azureLinks.push(hash)
+      saveAzureLinks(azureLinks)
+    }
+  }
+
   const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : '/public'
   return { hash, url: `${window.location.origin}${base}/${hash}` }
 }
@@ -74,6 +108,19 @@ export function isValidShareHash(hash: string): boolean {
   if (!link) return false
   if (link.expiresAt < Date.now()) return false
   return true
+}
+
+/** Check both localStorage and Azure for a valid share */
+export async function isShareValid(hash: string): Promise<boolean> {
+  if (isValidShareHash(hash)) return true
+  if (isLinkInAzure(hash)) return true
+  try {
+    const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+    const data = await downloadShareFromAzure(hash)
+    return data !== null
+  } catch {
+    return false
+  }
 }
 
 export async function getPublicDashboardData() {
@@ -134,3 +181,12 @@ export async function getPublicMemberData(memberId: string) {
 }
 
 export type PublicMemberData = Awaited<ReturnType<typeof getPublicMemberData>>
+
+export async function fetchAzureShareData<T = unknown>(hash: string): Promise<T | null> {
+  try {
+    const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+    return await downloadShareFromAzure(hash) as T | null
+  } catch {
+    return null
+  }
+}

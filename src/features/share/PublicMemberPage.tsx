@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidShareHash, getShareInfo, getPublicMemberData, type PublicMemberData } from '@/services/share/publicShareService'
+import { getShareInfo, getPublicMemberData, type PublicMemberData } from '@/services/share/publicShareService'
 import { Lock, Clock, BarChart3, Brain } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -13,14 +13,16 @@ export function PublicMemberPage() {
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
     const info = getShareInfo(hash)
-    if (!info || info.type !== 'member' || !info.ref) { setValid(false); setLoading(false); return }
-    const ok = isValidShareHash(hash)
-    setValid(ok)
-    if (ok) {
+    if (info && info.type === 'member' && info.ref) {
+      setValid(true)
       getPublicMemberData(info.ref).then((d) => { setData(d); setLoading(false) })
-    } else {
-      setLoading(false)
+      return
     }
+    import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
+      const azureData = await downloadShareFromAzure(hash) as PublicMemberData | null
+      if (azureData) { setData(azureData); setValid(true) } else { setValid(false) }
+      setLoading(false)
+    })
   }, [hash])
 
   const stats = useMemo(() => {

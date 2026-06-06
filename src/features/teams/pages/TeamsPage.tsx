@@ -64,10 +64,10 @@ export function TeamsPage() {
             Importar
           </button>
           <button
-            onClick={() => {
+            onClick={async () => {
               const existing = getSharedLinksList().filter((l) => l.url.includes('/public/performance/'))
               if (existing.length > 0) { setShareUrl(existing[0].url); return }
-              const { url } = createShareLink(48, 'performance')
+              const { url } = await createShareLink(48, 'performance')
               setShareUrl(url)
             }}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"

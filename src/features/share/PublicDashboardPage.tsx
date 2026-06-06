@@ -18,13 +18,30 @@ export function PublicDashboardPage() {
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
-    const ok = isValidShareHash(hash)
-    setValid(ok)
-    if (ok) {
-      getPublicDashboardData().then((d) => { setData(d); setLoading(false) })
-    } else {
-      setLoading(false)
+
+    const fetchData = async () => {
+      // 1. Try localStorage first (same browser)
+      if (isValidShareHash(hash)) {
+        setValid(true)
+        const d = await getPublicDashboardData()
+        setData(d)
+        setLoading(false)
+        return
+      }
+
+      // 2. Try Azure (cross-browser share)
+      import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
+        const azureData = await downloadShareFromAzure(hash) as PublicDashboardData | null
+        if (azureData) {
+          setData(azureData)
+          setValid(true)
+        } else {
+          setValid(false)
+        }
+        setLoading(false)
+      })
     }
+    fetchData()
   }, [hash])
 
   const kpis = useMemo(() => {

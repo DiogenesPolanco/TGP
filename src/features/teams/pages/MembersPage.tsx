@@ -85,10 +85,10 @@ export function MembersPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento</h2>
         <button
-          onClick={() => {
+          onClick={async () => {
             const existing = getSharedLinksList().filter((l) => l.url.includes('/public/members/'))
             if (existing.length > 0) { setShareUrl(existing[0].url); return }
-            const { url } = createShareLink(48, 'members')
+            const { url } = await createShareLink(48, 'members')
             setShareUrl(url)
           }}
           className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
@@ -102,7 +102,7 @@ export function MembersPage() {
         <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3">
           <span className="text-sm text-neutral-50 shrink-0">Enlace:</span>
           <code className="flex-1 text-sm bg-neutral-5 dark:bg-neutral-85 px-3 py-1.5 rounded-lg text-neutral-70 dark:text-neutral-30 truncate font-mono">{shareUrl}</code>
-          <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+          <button onClick={async () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20">
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
@@ -224,7 +224,7 @@ export function MembersPage() {
             </div>
             {(filterTeam || filterStatus) && (
               <button
-                onClick={() => { setFilterTeam(''); setFilterStatus('') }}
+                onClick={async () => { setFilterTeam(''); setFilterStatus('') }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger"
               >
                 <X size={14} />
@@ -267,7 +267,7 @@ export function MembersPage() {
                   return (
                     <tr
                       key={member.id}
-                      onClick={() => {
+                      onClick={async () => {
                         setEditMemberId(member.id)
                         setEditMemberName(member.displayName)
                         setEditMemberTeamId(team.id)
