@@ -1,28 +1,11 @@
 import { getAzureConfig as _getAzureConfig } from '@/services/backup/azureBackupService'
 export const getAzureConfig = _getAzureConfig
 
-const CIPHER_KEY = 'TGP_SHARE_2026_XOR'
-
-function toB64u(s: string): string {
-  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-function fromB64u(s: string): string {
-  const pad = s.length % 4 === 3 ? '=' : s.length % 4 === 2 ? '==' : ''
-  return s.replace(/-/g, '+').replace(/_/g, '/') + pad
-}
-
-function encrypt(text: string): string {
-  let out = ''
-  for (let i = 0; i < text.length; i++)
-    out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))
-  return toB64u(btoa(out))
-}
-function decrypt(encoded: string): string {
-  const text = atob(fromB64u(encoded))
-  let out = ''
-  for (let i = 0; i < text.length; i++)
-    out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))
-  return out
+// Simple base64 obfuscation (no cipher key to get out of sync)
+function enc(t: string): string { return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,'') }
+function dec(s: string): string {
+  const p = s.length%4===3?'=':s.length%4===2?'==':''
+  return atob(s.replace(/-/g,'+').replace(/_/g,'/')+p)
 }
 
 type Manifest = [number, string, string, string]
@@ -58,7 +41,7 @@ export async function downloadUsingManifest(m: string): Promise<unknown | null> 
   try {
     const [v, es, c, f]: Manifest = JSON.parse(m)
     if (v !== 1) return null
-    const sasUrl = decrypt(es)
+    const sasUrl = dec(es)
     console.log('[AzureShare] Decrypted SAS URL starts with:', sasUrl.slice(0, 80))
     console.log('[AzureShare] Container:', c, 'File:', f)
     if (!sasUrl.startsWith('https://')) {
@@ -79,5 +62,5 @@ export async function downloadUsingManifest(m: string): Promise<unknown | null> 
 export function buildManifestString(hash: string): string | null {
   const cfg = getAzureConfig()
   if (!cfg?.sasUrl || !cfg.containerName) return null
-  return JSON.stringify([1, encrypt(cfg.sasUrl), cfg.containerName, `d${hash.slice(0, 16)}.json`])
+  return JSON.stringify([1, enc(cfg.sasUrl), cfg.containerName, `d${hash.slice(0, 16)}.json`])
 }
