@@ -1,11 +1,5 @@
-import { useEffect } from 'react'
-import { seedDemoData, seedComplianceFindings } from '@/services/demo/seedData'
-
+// Demo data seeding is now handled by the onboarding wizard
+// when the user explicitly chooses "Cargar datos demo"
 export function useDemoData() {
-  useEffect(() => {
-    seedDemoData().then(() => {
-      // Ensures compliance findings exist even for already-seeded users
-      seedComplianceFindings().catch(console.error)
-    }).catch(console.error)
-  }, [])
+  // No-op: seed only happens on user action via onboarding
 }

@@ -34,6 +34,7 @@ const navItems: NavItem[] = [
       { label: 'Seguimiento Diario', path: '/execution/daily' },
       { label: 'Planes', path: '/execution/plans' },
       { label: 'Compromisos', path: '/execution/commitments' },
+      { label: 'Calendario', path: '/calendar' },
       { label: 'Predictibilidad', path: '/execution/predictability' },
     ],
   },
@@ -44,6 +45,7 @@ const navItems: NavItem[] = [
       { label: 'Aplicaciones', path: '/catalog/applications' },
       { label: 'Entregables', path: '/catalog/deliverables' },
       { label: 'Obsolescencia', path: '/catalog/obsolescence' },
+      { label: 'Dependencias', path: '/dependencies' },
     ],
   },
   {
@@ -95,13 +97,14 @@ export function Sidebar() {
 
   const toggleItem = (label: string) => {
     setExpandedItems((prev) => {
-      const next = new Set(prev)
-      if (next.has(label)) {
+      // If already open, toggle it closed
+      if (prev.has(label)) {
+        const next = new Set(prev)
         next.delete(label)
-      } else {
-        next.add(label)
+        return next
       }
-      return next
+      // Otherwise, close all others and open only this one
+      return new Set([label])
     })
   }
 
@@ -151,7 +154,9 @@ export function Sidebar() {
                   onClick={() => sidebarOpen && toggleItem(item.label)}
                   className={cn(
                     'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
-                    item.children?.some((c) => location.pathname.startsWith(c.path)) &&
+                    item.children?.some((c) =>
+                      location.pathname === c.path || location.pathname.startsWith(c.path + '/')
+                    ) &&
                       'bg-primary/10 text-primary dark:bg-primary/20'
                   )}
                 >

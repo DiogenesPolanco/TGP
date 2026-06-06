@@ -152,20 +152,33 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <img src="/favicon.svg" alt="TGP" className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">TGP</h1>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
-            Technology Governance Platform
-          </p>
-        </div>
+    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Gradient mesh background */}
+      <div
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
+        style={{
+          background: `
+            radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%),
+            radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%),
+            radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)
+          `,
+        }}
+      />
 
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl p-8">
+      {/* Decorative dots pattern (subtle) */}
+      <div
+        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
+        style={{
+          backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      <div className="w-full max-w-5xl relative">
+        <div className="bg-white/95 dark:bg-neutral-80/95 backdrop-blur-xl rounded-3xl border border-neutral-20/80 dark:border-neutral-70/80 shadow-2xl shadow-neutral-30/30 dark:shadow-black/30 overflow-hidden">
           {locked ? (
             /* ── Lockout screen ── */
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 p-8">
               <div className="w-14 h-14 bg-danger/10 rounded-full flex items-center justify-center mx-auto">
                 <Lock size={28} className="text-danger" />
               </div>
@@ -181,87 +194,143 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               </div>
             </div>
           ) : mode === 'setup' && secret ? (
-            /* ── Setup: QR + verify ── */
-            <div className="space-y-6">
-              <div className="text-center">
-                <ShieldCheck size={40} className="text-success mx-auto mb-2" />
-                <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
-                  Configurar Autenticación
-                </h2>
-                <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
-                  Escanea el código QR con tu app de autenticación
-                </p>
-              </div>
+            /* ── Boarding-pass style setup ── */
+            <div className="flex flex-col lg:flex-row min-h-[520px]">
+              {/* Left: Vision + logo inside */}
+              <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
+                }} />
 
-              <div className="flex justify-center">
-                <div className="bg-white p-4 rounded-xl shadow-sm">
-                  <QRCodeSVG value={secret.uri} size={200} level="M" />
+                {/* Logo inside card */}
+                  <div className="relative flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
+                      <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold tracking-tight">TGP</p>
+                      <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                    </div>
+                  </div>
+
+                <div className="relative flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-4">
+                    <ShieldCheck size={16} />
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Setup · Primer acceso</span>
+                  </div>
+                  <h2 className="text-3xl font-bold leading-tight mb-4">
+                    Tu gobierno<br />tecnológico<br />empieza aquí
+                  </h2>
+                  <p className="text-base leading-relaxed opacity-85 mb-5">
+                    TGP unifica cada dimensión de tu portafolio en un solo tablero de comando.
+                    Desde la salud de tus aplicaciones hasta el rendimiento de tus equipos,
+                    todo converge en decisiones más rápidas, informadas y estratégicas.
+                  </p>
+                  <ul className="space-y-3 text-base">
+                    {[
+                      'THI en tiempo real con 7 dimensiones de salud',
+                      'Alertas automáticas de riesgos y vencimientos',
+                      'Métricas DORA y OKRs vinculados a ejecución',
+                      'Obsolescencia sincronizada con endoflife.date',
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
+                        <span className="opacity-90">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="relative mt-6 pt-4 border-t border-white/15">
+                  <p className="text-sm opacity-60 leading-relaxed">
+                    Datos en tu navegador · Sin conexión externa · Cifrado local
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-neutral-10 dark:bg-neutral-70 rounded-lg p-3">
-                <p className="text-xs text-neutral-50 mb-1">
-                  Si no puedes escanear el QR, ingresa este código manualmente:
-                </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-xs font-mono bg-white dark:bg-neutral-80 px-2 py-1.5 rounded border border-neutral-20 dark:border-neutral-70 select-all">
-                    {secret.base32}
-                  </code>
-                  <button
-                    onClick={handleCopy}
-                    className="p-1.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
-                    title="Copiar"
-                  >
-                    {copied ? (
-                      <Check size={16} className="text-success" />
-                    ) : (
-                      <Copy size={16} className="text-neutral-50" />
-                    )}
-                  </button>
+              {/* Divider: perforated line */}
+              <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70" />
+                  ))}
                 </div>
               </div>
 
-              <p className="text-xs text-neutral-50 text-center">
-                Apps recomendadas: Google Authenticator, Authy, Microsoft Authenticator
-              </p>
+              {/* Right: QR + verify */}
+              <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
+                <div className="max-w-lg mx-auto w-full space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Configura tu acceso</h3>
+                    <p className="text-base text-neutral-60 dark:text-neutral-40 mt-1">
+                      Escanea el código QR con tu app de autenticación
+                    </p>
+                  </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
-                    Verifica el código de 6 dígitos
-                  </label>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    value={otp}
-                    onChange={(e) => handleOtpChange(e.target.value)}
-                    placeholder="000000"
-                    className="w-full text-center text-2xl tracking-[0.5em] font-mono px-4 py-3 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    maxLength={6}
-                  />
+                  <div className="flex flex-col sm:flex-row items-start gap-6">
+                    <div className="bg-neutral-5 dark:bg-neutral-85 rounded-2xl p-4 border border-neutral-20 dark:border-neutral-70">
+                      <QRCodeSVG value={secret.uri} size={170} level="M" />
+                    </div>
+
+                    <div className="flex-1 space-y-4 w-full">
+                      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-neutral-20 dark:border-neutral-70 overflow-hidden">
+                        <p className="text-xs font-medium text-neutral-50 mb-1.5">Código secreto (ingreso manual)</p>
+                        <div className="flex items-center gap-2 w-full">
+                          <code className="flex-1 text-[10px] font-mono bg-white dark:bg-neutral-80 px-2 py-1.5 rounded-lg border border-neutral-20 dark:border-neutral-70 select-all truncate min-w-0 leading-relaxed">
+                            {secret.base32}
+                          </code>
+                          <button onClick={handleCopy} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0" title="Copiar">
+                            {copied ? <Check size={18} className="text-success" /> : <Copy size={18} className="text-neutral-50" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm text-neutral-50">
+                        <span className="w-2 h-2 rounded-full bg-primary" />
+                        Google Authenticator · Authy · Microsoft Authenticator
+                      </div>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-base font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+                        Verifica el código de 6 dígitos
+                      </label>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={otp}
+                        onChange={(e) => handleOtpChange(e.target.value)}
+                        placeholder="000000"
+                        className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/25"
+                        maxLength={6}
+                      />
+                    </div>
+
+                    {error && <p className="text-base text-danger text-center">{error}</p>}
+
+                    <button
+                      type="submit"
+                      disabled={otp.length !== 6 || verifying}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25"
+                    >
+                      {verifying ? 'Verificando…' : 'Verificar y despegar'}
+                      {!verifying && <ArrowRight size={20} />}
+                    </button>
+                  </form>
                 </div>
-
-                {error && (
-                  <p className="text-sm text-danger text-center">{error}</p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={otp.length !== 6 || verifying}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-                >
-                  {verifying ? 'Verificando…' : 'Verificar y Continuar'}
-                  {!verifying && <ArrowRight size={18} />}
-                </button>
-              </form>
+              </div>
             </div>
           ) : (
             /* ── Login: OTP input ── */
             <div className="space-y-6">
               <div className="text-center">
-                <Shield size={40} className="text-primary mx-auto mb-2" />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield size={24} className="text-primary" />
+                </div>
                 <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
                   Autenticación OTP
                 </h2>
@@ -280,7 +349,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                     value={otp}
                     onChange={(e) => handleOtpChange(e.target.value)}
                     placeholder="000000"
-                    className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-shadow duration-300"
                     maxLength={6}
                   />
                 </div>
@@ -300,7 +369,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                 <button
                   type="submit"
                   disabled={otp.length !== 6 || verifying}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg font-medium hover:from-primary-dark hover:to-primary-dark transition-all duration-300 disabled:opacity-50 shadow-lg shadow-primary/20"
                 >
                   {verifying ? 'Verificando…' : 'Ingresar'}
                   {!verifying && <ArrowRight size={18} />}
@@ -310,8 +379,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
           )}
         </div>
 
-        <p className="text-center text-xs text-neutral-50 mt-6">
-          Almacenamiento local encriptado • Sin conexión externa
+        <p className="text-center text-xs text-neutral-50 mt-6 font-medium">
+          Almacenamiento local encriptado · Sin conexión externa
         </p>
       </div>
     </div>

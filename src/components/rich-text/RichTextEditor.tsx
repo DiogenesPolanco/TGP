@@ -48,7 +48,7 @@ const MenuButton = ({
     className={`p-1.5 rounded transition-colors ${
       active
         ? 'bg-primary/10 text-primary'
-        : 'text-neutral-50 hover:bg-neutral-10 hover:text-neutral-70'
+        : 'text-neutral-50 hover:bg-neutral-10 hover:text-neutral-70 dark:text-neutral-40 dark:hover:bg-neutral-70 dark:hover:text-neutral-20'
     }`}
   >
     {children}
@@ -56,7 +56,7 @@ const MenuButton = ({
 )
 
 const Divider = () => (
-  <div className="w-px h-5 bg-neutral-20 mx-1" />
+  <div className="w-px h-5 bg-neutral-20 dark:bg-neutral-60 mx-1" />
 )
 
 export function RichTextEditor({
@@ -264,7 +264,7 @@ export function RichTextEditor({
 
       {/* Editor */}
       <div
-        className="px-4 py-3"
+        className="px-4 py-3 dark:bg-neutral-85 [&_.tiptap]:text-neutral-90 [&_.tiptap]:dark:text-neutral-10"
         style={{ minHeight }}
       >
         <EditorContent editor={editor} />

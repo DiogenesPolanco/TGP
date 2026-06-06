@@ -8,7 +8,14 @@ import { router } from './router'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { getSession } from '@/services/auth/authService'
 import { InactivityGuard } from '@/components/auth/InactivityGuard'
+import { ErrorBoundary } from '@/components/error/ErrorBoundary'
+import { setupGlobalErrorHandler } from '@/services/notifications/globalErrorHandler'
 import './styles/globals.css'
+
+setupGlobalErrorHandler()
+
+const isPublicRoute = () =>
+  typeof window !== 'undefined' && window.location.pathname.startsWith('/public/')
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
@@ -16,6 +23,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const [sessionExpired, setSessionExpired] = useState(false)
 
   useEffect(() => {
+    if (isPublicRoute()) {
+      setChecking(false)
+      return
+    }
     queueMicrotask(() => {
       const session = getSession()
       if (session) setAuthed(true)
@@ -31,6 +42,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const handleAuth = useCallback(() => {
     setAuthed(true)
   }, [])
+
+  if (isPublicRoute()) {
+    return <>{children}</>
+  }
 
   if (checking) {
     return (
@@ -65,7 +80,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthGate>
-        <RouterProvider router={router} />
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
       </AuthGate>
     </QueryClientProvider>
   </StrictMode>,

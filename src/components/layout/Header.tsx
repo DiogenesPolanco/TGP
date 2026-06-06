@@ -2,10 +2,15 @@ import { useLocation } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { useFilterStore } from '@/stores/filterStore'
 import { cn } from '@/lib/utils'
-import { Search, Bell, Moon, Sun, Calendar, LogOut } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Calendar, LogOut, Speaker } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { GlobalSearch } from './GlobalSearch'
 import { clearSession } from '@/services/auth/authService'
+import {
+  areBrowserNotificationsEnabled,
+  setBrowserNotificationsEnabled,
+  requestNotificationPermission,
+} from '@/services/notifications/browserNotificationService'
 
 const periodOptions = [
   { value: '7d' as const, label: '7 días' },
@@ -21,6 +26,7 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
   const [showAlerts, setShowAlerts] = useState(false)
+  const [browserNotifs, setBrowserNotifs] = useState(areBrowserNotificationsEnabled())
   const alertsRef = useRef<HTMLDivElement>(null)
 
   const alerts = useAppStore((s) => s.alerts)
@@ -47,6 +53,16 @@ export function Header() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
+
+  const handleToggleBrowserNotifs = async () => {
+    if (!browserNotifs) {
+      const granted = await requestNotificationPermission()
+      if (!granted) return
+    }
+    const next = !browserNotifs
+    setBrowserNotifs(next)
+    setBrowserNotificationsEnabled(next)
+  }
 
   const handleLogout = () => {
     clearSession()
@@ -130,10 +146,22 @@ export function Header() {
 
           {showAlerts && (
             <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
-              <div className="p-3 border-b border-neutral-20 dark:border-neutral-70">
+              <div className="p-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">
                   Alertas ({alerts.length})
                 </h4>
+                <button
+                  onClick={handleToggleBrowserNotifs}
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    browserNotifs
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
+                  }`}
+                  title={browserNotifs ? 'Notificaciones activadas' : 'Activar notificaciones del navegador'}
+                >
+                  <Speaker size={14} />
+                  {browserNotifs ? 'Activadas' : 'Notificar'}
+                </button>
               </div>
               {alerts.length > 0 ? (
                 <div className="p-2 space-y-1">

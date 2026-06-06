@@ -1,155 +1,112 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
-import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
-import { ApplicationsPage } from '@/features/catalog/pages/ApplicationsPage'
-import { ApplicationDetailPage } from '@/features/catalog/pages/ApplicationDetailPage'
-import { ApplicationFormPage } from '@/features/catalog/pages/ApplicationFormPage'
-import { DatabaseFormPage } from '@/features/catalog/pages/DatabaseFormPage'
-import { VulnerabilitiesPage } from '@/features/security/pages/VulnerabilitiesPage'
-import { VulnerabilityFormPage } from '@/features/security/pages/VulnerabilityFormPage'
-import { VulnerabilityDetailPage } from '@/features/security/pages/VulnerabilityDetailPage'
-import { IncidentsPage } from '@/features/security/pages/IncidentsPage'
-import { IncidentFormPage } from '@/features/security/pages/IncidentFormPage'
-import { IncidentDetailPage } from '@/features/security/pages/IncidentDetailPage'
-import { RisksPage } from '@/features/governance/pages/RisksPage'
-import { RiskFormPage } from '@/features/governance/pages/RiskFormPage'
-import { RiskDetailPage } from '@/features/governance/pages/RiskDetailPage'
-import { AuditPage } from '@/features/governance/pages/AuditPage'
-import { AuditFormPage } from '@/features/governance/pages/AuditFormPage'
-import { AuditDetailPage } from '@/features/governance/pages/AuditDetailPage'
-import { TeamsPage } from '@/features/teams/pages/TeamsPage'
-import { TeamDetailPage } from '@/features/teams/pages/TeamDetailPage'
-import { TeamFormPage } from '@/features/teams/pages/TeamFormPage'
-import { MembersPage } from '@/features/teams/pages/MembersPage'
-import { ObjectivesPage } from '@/features/strategy/pages/ObjectivesPage'
-import { ObjectiveFormPage } from '@/features/strategy/pages/ObjectiveFormPage'
-import { ObjectiveDetailPage } from '@/features/strategy/pages/ObjectiveDetailPage'
-import { AdminPage } from '@/features/admin/pages/AdminPage'
-import { ImportPage } from '@/features/admin/pages/ImportPage'
-import { BusinessUnitsPage } from '@/features/admin/pages/BusinessUnitsPage'
-import { UsersPage } from '@/features/admin/pages/UsersPage'
-import { UserFormPage } from '@/features/admin/pages/UserFormPage'
-import { ObsolescencePage } from '@/features/obsolescence/pages/ObsolescencePage'
-import { TechnologyFormPage } from '@/features/obsolescence/pages/TechnologyFormPage'
-import { TechnologyDetailPage } from '@/features/obsolescence/pages/TechnologyDetailPage'
-import { DeliverablesPage } from '@/features/delivery/pages/DeliverablesPage'
-import { DeliverableDetailPage } from '@/features/delivery/pages/DeliverableDetailPage'
-import { DailyPage } from '@/features/execution/pages/DailyPage'
-import { PlansPage } from '@/features/execution/pages/PlansPage'
-import { PlanFormPage } from '@/features/execution/pages/PlanFormPage'
-import { PlanDetailPage } from '@/features/execution/pages/PlanDetailPage'
-import { ActivityFormPage } from '@/features/execution/pages/ActivityFormPage'
-import { BlockersPage } from '@/features/execution/pages/BlockersPage'
-import { BlockerFormPage } from '@/features/execution/pages/BlockerFormPage'
-import { CommitmentsPage } from '@/features/execution/pages/CommitmentsPage'
-import { CommitmentFormPage } from '@/features/execution/pages/CommitmentFormPage'
-import { CommitmentDetailPage } from '@/features/execution/pages/CommitmentDetailPage'
-import { PredictabilityPage } from '@/features/execution/pages/PredictabilityPage'
-import { TasksPage } from '@/features/execution/pages/TasksPage'
-import { TaskFormPage } from '@/features/execution/pages/TaskFormPage'
-import { TaskDetailPage } from '@/features/execution/pages/TaskDetailPage'
-import { DependenciesPage } from '@/features/execution/pages/DependenciesPage'
-import { PerformancePage } from '@/features/performance/pages/PerformancePage'
-import { MemberPerformancePage } from '@/features/performance/pages/MemberPerformancePage'
-import ReportsPage from '@/features/reports/pages/ReportsPage'
+import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
 
 export const router = createBrowserRouter([
+  {
+    path: '/public/:hash',
+    element: <PublicDashboardPage />,
+  },
   {
     path: '/',
     element: <AppShell />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: 'dashboard', element: <DashboardPage /> },
+
+      { path: 'dashboard', lazy: () => import('@/features/dashboard/pages/DashboardPage').then((m) => ({ Component: m.DashboardPage })) },
+      { path: 'calendar', lazy: () => import('@/features/calendar/CalendarPage').then((m) => ({ Component: m.CalendarPage })) },
+      { path: 'compare', lazy: () => import('@/features/comparison/ComparePage').then((m) => ({ Component: m.ComparePage })) },
+      { path: 'dependencies', lazy: () => import('@/features/dependencies/DependencyMapPage').then((m) => ({ Component: m.DependencyMapPage })) },
+      { path: 'predictions', lazy: () => import('@/features/predictions/PredictionsPage').then((m) => ({ Component: m.PredictionsPage })) },
+      { path: 'reports', lazy: () => import('@/features/reports/pages/ReportsPage') },
 
       // Catálogo
-      { path: 'catalog/applications', element: <ApplicationsPage /> },
-      { path: 'catalog/applications/new', element: <ApplicationFormPage /> },
-      { path: 'catalog/applications/:id/edit', element: <ApplicationFormPage /> },
-      { path: 'catalog/applications/:appId/databases/new', element: <DatabaseFormPage /> },
-      { path: 'catalog/applications/:appId/databases/:id/edit', element: <DatabaseFormPage /> },
-      { path: 'catalog/applications/:id', element: <ApplicationDetailPage /> },
+      { path: 'catalog/applications', lazy: () => import('@/features/catalog/pages/ApplicationsPage').then((m) => ({ Component: m.ApplicationsPage })) },
+      { path: 'catalog/applications/new', lazy: () => import('@/features/catalog/pages/ApplicationFormPage').then((m) => ({ Component: m.ApplicationFormPage })) },
+      { path: 'catalog/applications/:id/edit', lazy: () => import('@/features/catalog/pages/ApplicationFormPage').then((m) => ({ Component: m.ApplicationFormPage })) },
+      { path: 'catalog/applications/:appId/databases/new', lazy: () => import('@/features/catalog/pages/DatabaseFormPage').then((m) => ({ Component: m.DatabaseFormPage })) },
+      { path: 'catalog/applications/:appId/databases/:id/edit', lazy: () => import('@/features/catalog/pages/DatabaseFormPage').then((m) => ({ Component: m.DatabaseFormPage })) },
+      { path: 'catalog/applications/:id', lazy: () => import('@/features/catalog/pages/ApplicationDetailPage').then((m) => ({ Component: m.ApplicationDetailPage })) },
 
-      { path: 'catalog/obsolescence', element: <ObsolescencePage /> },
-      { path: 'catalog/obsolescence/new', element: <TechnologyFormPage /> },
-      { path: 'catalog/obsolescence/:id/edit', element: <TechnologyFormPage /> },
-      { path: 'catalog/obsolescence/:id', element: <TechnologyDetailPage /> },
+      { path: 'catalog/obsolescence', lazy: () => import('@/features/obsolescence/pages/ObsolescencePage').then((m) => ({ Component: m.ObsolescencePage })) },
+      { path: 'catalog/obsolescence/new', lazy: () => import('@/features/obsolescence/pages/TechnologyFormPage').then((m) => ({ Component: m.TechnologyFormPage })) },
+      { path: 'catalog/obsolescence/:id/edit', lazy: () => import('@/features/obsolescence/pages/TechnologyFormPage').then((m) => ({ Component: m.TechnologyFormPage })) },
+      { path: 'catalog/obsolescence/:id', lazy: () => import('@/features/obsolescence/pages/TechnologyDetailPage').then((m) => ({ Component: m.TechnologyDetailPage })) },
 
-      { path: 'catalog/deliverables', element: <DeliverablesPage /> },
-      { path: 'catalog/deliverables/:id', element: <DeliverableDetailPage /> },
+      { path: 'catalog/deliverables', lazy: () => import('@/features/delivery/pages/DeliverablesPage').then((m) => ({ Component: m.DeliverablesPage })) },
+      { path: 'catalog/deliverables/:id', lazy: () => import('@/features/delivery/pages/DeliverableDetailPage').then((m) => ({ Component: m.DeliverableDetailPage })) },
 
       // Seguridad
-      { path: 'security/vulnerabilities', element: <VulnerabilitiesPage /> },
-      { path: 'security/vulnerabilities/new', element: <VulnerabilityFormPage /> },
-      { path: 'security/vulnerabilities/:id/edit', element: <VulnerabilityFormPage /> },
-      { path: 'security/vulnerabilities/:id', element: <VulnerabilityDetailPage /> },
+      { path: 'security/vulnerabilities', lazy: () => import('@/features/security/pages/VulnerabilitiesPage').then((m) => ({ Component: m.VulnerabilitiesPage })) },
+      { path: 'security/vulnerabilities/new', lazy: () => import('@/features/security/pages/VulnerabilityFormPage').then((m) => ({ Component: m.VulnerabilityFormPage })) },
+      { path: 'security/vulnerabilities/:id/edit', lazy: () => import('@/features/security/pages/VulnerabilityFormPage').then((m) => ({ Component: m.VulnerabilityFormPage })) },
+      { path: 'security/vulnerabilities/:id', lazy: () => import('@/features/security/pages/VulnerabilityDetailPage').then((m) => ({ Component: m.VulnerabilityDetailPage })) },
 
-      { path: 'security/incidents', element: <IncidentsPage /> },
-      { path: 'security/incidents/new', element: <IncidentFormPage /> },
-      { path: 'security/incidents/:id/edit', element: <IncidentFormPage /> },
-      { path: 'security/incidents/:id', element: <IncidentDetailPage /> },
+      { path: 'security/incidents', lazy: () => import('@/features/security/pages/IncidentsPage').then((m) => ({ Component: m.IncidentsPage })) },
+      { path: 'security/incidents/new', lazy: () => import('@/features/security/pages/IncidentFormPage').then((m) => ({ Component: m.IncidentFormPage })) },
+      { path: 'security/incidents/:id/edit', lazy: () => import('@/features/security/pages/IncidentFormPage').then((m) => ({ Component: m.IncidentFormPage })) },
+      { path: 'security/incidents/:id', lazy: () => import('@/features/security/pages/IncidentDetailPage').then((m) => ({ Component: m.IncidentDetailPage })) },
 
       // Gobierno
-      { path: 'governance/risks', element: <RisksPage /> },
-      { path: 'governance/risks/new', element: <RiskFormPage /> },
-      { path: 'governance/risks/:id/edit', element: <RiskFormPage /> },
-      { path: 'governance/risks/:id', element: <RiskDetailPage /> },
+      { path: 'governance/risks', lazy: () => import('@/features/governance/pages/RisksPage').then((m) => ({ Component: m.RisksPage })) },
+      { path: 'governance/risks/new', lazy: () => import('@/features/governance/pages/RiskFormPage').then((m) => ({ Component: m.RiskFormPage })) },
+      { path: 'governance/risks/:id/edit', lazy: () => import('@/features/governance/pages/RiskFormPage').then((m) => ({ Component: m.RiskFormPage })) },
+      { path: 'governance/risks/:id', lazy: () => import('@/features/governance/pages/RiskDetailPage').then((m) => ({ Component: m.RiskDetailPage })) },
 
-      { path: 'governance/audit', element: <AuditPage /> },
-      { path: 'governance/audit/new', element: <AuditFormPage /> },
-      { path: 'governance/audit/:id/edit', element: <AuditFormPage /> },
-      { path: 'governance/audit/:id', element: <AuditDetailPage /> },
+      { path: 'governance/audit', lazy: () => import('@/features/governance/pages/AuditPage').then((m) => ({ Component: m.AuditPage })) },
+      { path: 'governance/audit/new', lazy: () => import('@/features/governance/pages/AuditFormPage').then((m) => ({ Component: m.AuditFormPage })) },
+      { path: 'governance/audit/:id/edit', lazy: () => import('@/features/governance/pages/AuditFormPage').then((m) => ({ Component: m.AuditFormPage })) },
+      { path: 'governance/audit/:id', lazy: () => import('@/features/governance/pages/AuditDetailPage').then((m) => ({ Component: m.AuditDetailPage })) },
 
       // Equipos
-      { path: 'teams/members', element: <MembersPage /> },
-      { path: 'teams/new', element: <TeamFormPage /> },
-      { path: 'teams/:id/edit', element: <TeamFormPage /> },
-      { path: 'teams/:id/performance', element: <PerformancePage /> },
-      { path: 'teams/:id/performance/:memberId', element: <MemberPerformancePage /> },
-      { path: 'teams/:id', element: <TeamDetailPage /> },
-      { path: 'teams', element: <TeamsPage /> },
+      { path: 'teams', lazy: () => import('@/features/teams/pages/TeamsPage').then((m) => ({ Component: m.TeamsPage })) },
+      { path: 'teams/new', lazy: () => import('@/features/teams/pages/TeamFormPage').then((m) => ({ Component: m.TeamFormPage })) },
+      { path: 'teams/:id/edit', lazy: () => import('@/features/teams/pages/TeamFormPage').then((m) => ({ Component: m.TeamFormPage })) },
+      { path: 'teams/:id', lazy: () => import('@/features/teams/pages/TeamDetailPage').then((m) => ({ Component: m.TeamDetailPage })) },
+      { path: 'teams/members', lazy: () => import('@/features/teams/pages/MembersPage').then((m) => ({ Component: m.MembersPage })) },
+      { path: 'teams/:id/performance', lazy: () => import('@/features/performance/pages/PerformancePage').then((m) => ({ Component: m.PerformancePage })) },
+      { path: 'teams/:id/performance/:memberId', lazy: () => import('@/features/performance/pages/MemberPerformancePage').then((m) => ({ Component: m.MemberPerformancePage })) },
 
       // Estrategia
-      { path: 'strategy/objectives', element: <ObjectivesPage /> },
-      { path: 'strategy/objectives/new', element: <ObjectiveFormPage /> },
-      { path: 'strategy/objectives/:id/edit', element: <ObjectiveFormPage /> },
-      { path: 'strategy/objectives/:id', element: <ObjectiveDetailPage /> },
+      { path: 'strategy/objectives', lazy: () => import('@/features/strategy/pages/ObjectivesPage').then((m) => ({ Component: m.ObjectivesPage })) },
+      { path: 'strategy/objectives/new', lazy: () => import('@/features/strategy/pages/ObjectiveFormPage').then((m) => ({ Component: m.ObjectiveFormPage })) },
+      { path: 'strategy/objectives/:id/edit', lazy: () => import('@/features/strategy/pages/ObjectiveFormPage').then((m) => ({ Component: m.ObjectiveFormPage })) },
+      { path: 'strategy/objectives/:id', lazy: () => import('@/features/strategy/pages/ObjectiveDetailPage').then((m) => ({ Component: m.ObjectiveDetailPage })) },
 
       // Administración
-      { path: 'admin', element: <AdminPage /> },
-      { path: 'admin/import', element: <ImportPage /> },
-      { path: 'admin/business-units', element: <BusinessUnitsPage /> },
-      { path: 'admin/users', element: <UsersPage /> },
-      { path: 'admin/users/new', element: <UserFormPage /> },
-      { path: 'admin/users/:id/edit', element: <UserFormPage /> },
+      { path: 'admin', lazy: () => import('@/features/admin/pages/AdminPage').then((m) => ({ Component: m.AdminPage })) },
+      { path: 'admin/import', lazy: () => import('@/features/admin/pages/ImportPage').then((m) => ({ Component: m.ImportPage })) },
+      { path: 'admin/business-units', lazy: () => import('@/features/admin/pages/BusinessUnitsPage').then((m) => ({ Component: m.BusinessUnitsPage })) },
+      { path: 'admin/users', lazy: () => import('@/features/admin/pages/UsersPage').then((m) => ({ Component: m.UsersPage })) },
+      { path: 'admin/users/new', lazy: () => import('@/features/admin/pages/UserFormPage').then((m) => ({ Component: m.UserFormPage })) },
+      { path: 'admin/users/:id/edit', lazy: () => import('@/features/admin/pages/UserFormPage').then((m) => ({ Component: m.UserFormPage })) },
 
       // Ejecución
-      { path: 'execution/daily', element: <DailyPage /> },
+      { path: 'execution/daily', lazy: () => import('@/features/execution/pages/DailyPage').then((m) => ({ Component: m.DailyPage })) },
 
-      { path: 'execution/plans', element: <PlansPage /> },
-      { path: 'execution/plans/new', element: <PlanFormPage /> },
-      { path: 'execution/plans/:id/edit', element: <PlanFormPage /> },
-      { path: 'execution/plans/:planId/activities/new', element: <ActivityFormPage /> },
-      { path: 'execution/plans/:planId/activities/:activityId/edit', element: <ActivityFormPage /> },
-      { path: 'execution/plans/:id', element: <PlanDetailPage /> },
+      { path: 'execution/plans', lazy: () => import('@/features/execution/pages/PlansPage').then((m) => ({ Component: m.PlansPage })) },
+      { path: 'execution/plans/new', lazy: () => import('@/features/execution/pages/PlanFormPage').then((m) => ({ Component: m.PlanFormPage })) },
+      { path: 'execution/plans/:id/edit', lazy: () => import('@/features/execution/pages/PlanFormPage').then((m) => ({ Component: m.PlanFormPage })) },
+      { path: 'execution/plans/:planId/activities/new', lazy: () => import('@/features/execution/pages/ActivityFormPage').then((m) => ({ Component: m.ActivityFormPage })) },
+      { path: 'execution/plans/:planId/activities/:activityId/edit', lazy: () => import('@/features/execution/pages/ActivityFormPage').then((m) => ({ Component: m.ActivityFormPage })) },
+      { path: 'execution/plans/:id', lazy: () => import('@/features/execution/pages/PlanDetailPage').then((m) => ({ Component: m.PlanDetailPage })) },
 
-      { path: 'execution/commitments', element: <CommitmentsPage /> },
-      { path: 'execution/commitments/new', element: <CommitmentFormPage /> },
-      { path: 'execution/commitments/:id/edit', element: <CommitmentFormPage /> },
-      { path: 'execution/commitments/:id', element: <CommitmentDetailPage /> },
+      { path: 'execution/commitments', lazy: () => import('@/features/execution/pages/CommitmentsPage').then((m) => ({ Component: m.CommitmentsPage })) },
+      { path: 'execution/commitments/new', lazy: () => import('@/features/execution/pages/CommitmentFormPage').then((m) => ({ Component: m.CommitmentFormPage })) },
+      { path: 'execution/commitments/:id/edit', lazy: () => import('@/features/execution/pages/CommitmentFormPage').then((m) => ({ Component: m.CommitmentFormPage })) },
+      { path: 'execution/commitments/:id', lazy: () => import('@/features/execution/pages/CommitmentDetailPage').then((m) => ({ Component: m.CommitmentDetailPage })) },
 
-      { path: 'execution/blockers', element: <BlockersPage /> },
-      { path: 'execution/blockers/new', element: <BlockerFormPage /> },
-      { path: 'execution/blockers/:id/edit', element: <BlockerFormPage /> },
+      { path: 'execution/blockers', lazy: () => import('@/features/execution/pages/BlockersPage').then((m) => ({ Component: m.BlockersPage })) },
+      { path: 'execution/blockers/new', lazy: () => import('@/features/execution/pages/BlockerFormPage').then((m) => ({ Component: m.BlockerFormPage })) },
+      { path: 'execution/blockers/:id/edit', lazy: () => import('@/features/execution/pages/BlockerFormPage').then((m) => ({ Component: m.BlockerFormPage })) },
 
-      { path: 'execution/tasks', element: <TasksPage /> },
-      { path: 'execution/tasks/new', element: <TaskFormPage /> },
-      { path: 'execution/tasks/:id/edit', element: <TaskFormPage /> },
-      { path: 'execution/tasks/:id', element: <TaskDetailPage /> },
+      { path: 'execution/tasks', lazy: () => import('@/features/execution/pages/TasksPage').then((m) => ({ Component: m.TasksPage })) },
+      { path: 'execution/tasks/new', lazy: () => import('@/features/execution/pages/TaskFormPage').then((m) => ({ Component: m.TaskFormPage })) },
+      { path: 'execution/tasks/:id/edit', lazy: () => import('@/features/execution/pages/TaskFormPage').then((m) => ({ Component: m.TaskFormPage })) },
+      { path: 'execution/tasks/:id', lazy: () => import('@/features/execution/pages/TaskDetailPage').then((m) => ({ Component: m.TaskDetailPage })) },
 
-      { path: 'execution/dependencies', element: <DependenciesPage /> },
-      { path: 'execution/predictability', element: <PredictabilityPage /> },
-
-      { path: 'reports', element: <ReportsPage /> },
+      { path: 'execution/dependencies', lazy: () => import('@/features/execution/pages/DependenciesPage').then((m) => ({ Component: m.DependenciesPage })) },
+      { path: 'execution/predictability', lazy: () => import('@/features/execution/pages/PredictabilityPage').then((m) => ({ Component: m.PredictabilityPage })) },
     ],
   },
 ])

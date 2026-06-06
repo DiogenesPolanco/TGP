@@ -3,6 +3,7 @@ import type {
   Tenant,
   BusinessUnit,
   Application,
+  ApplicationDependency,
   Technology,
   Vulnerability,
   Incident,
@@ -27,22 +28,25 @@ import type {
   TeamSprint,
 } from '@/types/domain'
 
-const SEEDED_FLAG = 'tgp-seeded'
+// Bump version to force re-seed when seed data changes
+const SEEDED_FLAG = 'tgp-seeded-v2'
 let seedingInProgress = false
 
-export async function seedDemoData() {
-  // Only seed once in the lifetime of the app
-  if (localStorage.getItem(SEEDED_FLAG)) return
+export async function seedDemoData(force = false) {
+  // Only seed once in the lifetime of the app (unless forced)
+  if (!force && localStorage.getItem(SEEDED_FLAG)) return
   // Guard against React StrictMode double-invocation
   if (seedingInProgress) return
   seedingInProgress = true
 
   // Check if data already exists (e.g. imported data on first visit)
-  const counts = await Promise.all(db.tables.map((t) => t.count()))
-  if (counts.some((c) => c > 0)) {
-    localStorage.setItem(SEEDED_FLAG, 'true')
-    seedingInProgress = false
-    return
+  if (!force) {
+    const counts = await Promise.all(db.tables.map((t) => t.count()))
+    if (counts.some((c) => c > 0)) {
+      localStorage.setItem(SEEDED_FLAG, 'true')
+      seedingInProgress = false
+      return
+    }
   }
 
   // Clear all existing data first so re-seeding always works
@@ -122,6 +126,24 @@ export async function seedDemoData() {
     { id: 'app-10', businessUnitId: 'bu-legacy', name: 'Legacy ERP', description: 'ERP antiguo sobre MySQL', ownerId: 'user-4', ownerName: 'Ana Martínez', criticality: 'critical', architecture: 'monolith', status: 'deprecated', supportEndDate: new Date('2024-06-30'), technologies: ['tech-12', 'tech-11', 'tech-18'], metadata: {}, createdAt: new Date(), updatedAt: new Date() },
   ]
 
+  // ── Application Dependencies (coherent graph) ──
+  // Core Banking depends on others
+  // Payments depends on Core Banking
+  // Portal depends on Core Banking and Payments
+  // Analytics consumes Data Lake
+  // Reporting depends on Data Lake
+  // Legacy CRM and Intranet are isolated (no deps)
+  const appDeps: ApplicationDependency[] = [
+    { id: 'dep-1', applicationId: 'app-4', dependsOnAppId: 'app-1', dependencyType: 'hard', criticality: 'critical', description: 'Payments ejecuta transacciones sobre cuentas del Core Banking', createdAt: days(365) },
+    { id: 'dep-2', applicationId: 'app-2', dependsOnAppId: 'app-1', dependencyType: 'soft', criticality: 'high', description: 'Portal consulta saldos y datos del cliente desde Core Banking', createdAt: days(365) },
+    { id: 'dep-3', applicationId: 'app-2', dependsOnAppId: 'app-4', dependencyType: 'data', criticality: 'high', description: 'Portal muestra historial de pagos desde Payments', createdAt: days(300) },
+    { id: 'dep-4', applicationId: 'app-6', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'medium', description: 'Analytics consume datasets procesados del Data Lake', createdAt: days(180) },
+    { id: 'dep-5', applicationId: 'app-7', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'low', description: 'Reporting genera reportes sobre datos del Data Lake', createdAt: days(200) },
+    { id: 'dep-6', applicationId: 'app-3', dependsOnAppId: 'app-2', dependencyType: 'network', criticality: 'high', description: 'App Móvil consume APIs del Portal Clientes', createdAt: days(180) },
+    { id: 'dep-7', applicationId: 'app-9', dependsOnAppId: 'app-6', dependencyType: 'data', criticality: 'medium', description: 'Data Lake recibe streams de datos desde Analytics', createdAt: days(150) },
+    { id: 'dep-8', applicationId: 'app-1', dependsOnAppId: 'app-9', dependencyType: 'data', criticality: 'medium', description: 'Core Banking consume reportes del Data Lake', createdAt: days(120) },
+  ]
+
   const microservices: Microservice[] = [
     // Core Banking (app-1) microservices
     { id: 'ms-1', applicationId: 'app-1', name: 'auth-service', description: 'Autenticación y autorización', technologies: ['tech-2', 'tech-4'], createdAt: new Date(), updatedAt: new Date() },
@@ -163,28 +185,45 @@ export async function seedDemoData() {
   ]
 
   // ── Vulnerabilities spread across time windows ──
-  // 7d ago (shows in 7d, 30d, 90d, ytd)
+  // --- NEGATIVE indicators (open, critical/high) ---
+  // 2d ago — critical, open (shows in 7d, 30d, 90d, ytd)
   const vuln_7d: Vulnerability = { id: 'vuln-1', applicationId: 'app-1', externalId: 'CVE-2024-001', title: 'SQL Injection en módulo de autenticación', description: 'Vulnerabilidad de inyección SQL', cvssScore: 9.8, severity: 'critical', source: 'fluid_attacks', status: 'open', slaDeadline: days(-5), detectedAt: days(2), fixedAt: null, metadata: {}, createdAt: days(2), updatedAt: days(2) }
-  // 7d ago, high
+  // 5d ago — high, open
   const vuln_7d_b: Vulnerability = { id: 'vuln-5', applicationId: 'app-3', externalId: 'CVE-2024-005', title: 'Exposición de datos sensibles', description: 'Información sensible expuesta en logs', cvssScore: 7.0, severity: 'high', source: 'sonarqube', status: 'open', slaDeadline: days(-25), detectedAt: days(5), fixedAt: null, metadata: {}, createdAt: days(5), updatedAt: days(5) }
-  // ~20d ago (shows in 30d, 90d, ytd — NOT in 7d)
+  // 3d ago — medium, in_progress
+  const vuln_7d_c: Vulnerability = { id: 'vuln-9', applicationId: 'app-6', externalId: 'CVE-2024-009', title: 'Script injection en dashboard', description: 'Posible inyección de scripts en dashboard de analytics', cvssScore: 5.5, severity: 'medium', source: 'sonarqube', status: 'in_progress', slaDeadline: days(-80), detectedAt: days(3), fixedAt: null, metadata: {}, createdAt: days(3), updatedAt: days(3) }
+  // ~20d ago — high, in_progress (shows in 30d, 90d, ytd — NOT in 7d)
   const vuln_30d: Vulnerability = { id: 'vuln-2', applicationId: 'app-2', externalId: 'CVE-2024-002', title: 'XSS en formulario de búsqueda', description: 'Cross-site scripting', cvssScore: 7.5, severity: 'high', source: 'sonarqube', status: 'in_progress', slaDeadline: days(-20), detectedAt: days(20), fixedAt: null, metadata: {}, createdAt: days(20), updatedAt: days(20) }
-  // ~60d ago (shows in 90d, ytd — NOT in 7d or 30d)
+  // ~60d ago — high, open (shows in 90d, ytd — NOT in 7d or 30d)
   const vuln_90d: Vulnerability = { id: 'vuln-3', applicationId: 'app-1', externalId: 'CVE-2024-003', title: 'Desbordamiento de buffer', description: 'Buffer overflow en servicio de pagos', cvssScore: 8.1, severity: 'high', source: 'fluid_attacks', status: 'open', slaDeadline: days(-15), detectedAt: days(60), fixedAt: null, metadata: {}, createdAt: days(60), updatedAt: days(60) }
-  // ~180d ago (shows in ytd only)
+  // ~180d ago — medium, accepted (shows in ytd only)
   const vuln_ytd: Vulnerability = { id: 'vuln-4', applicationId: 'app-5', externalId: 'CVE-2024-004', title: 'Autenticación débil', description: 'Mecanismo de autenticación vulnerable', cvssScore: 6.5, severity: 'medium', source: 'manual', status: 'accepted', slaDeadline: days(-60), detectedAt: days(180), fixedAt: null, metadata: {}, createdAt: days(180), updatedAt: days(180) }
+  // --- POSITIVE indicators (fixed/resolved) ---
+  // ~15d ago — critical, fixed (shows improvement in 30d, 90d)
+  const vuln_fixed_30d: Vulnerability = { id: 'vuln-6', applicationId: 'app-4', externalId: 'CVE-2024-006', title: 'Race condition en procesador de pagos', description: 'Condición de carrera en sistema de pagos batch', cvssScore: 8.5, severity: 'high', source: 'fluid_attacks', status: 'fixed', slaDeadline: days(-10), detectedAt: days(45), fixedAt: days(15), metadata: {}, createdAt: days(45), updatedAt: days(15) }
+  // ~45d ago — critical, fixed
+  const vuln_fixed_90d: Vulnerability = { id: 'vuln-7', applicationId: 'app-1', externalId: 'CVE-2024-007', title: 'Deserialización insegura', description: 'Vulnerabilidad de deserialización en API REST', cvssScore: 9.0, severity: 'critical', source: 'fluid_attacks', status: 'fixed', slaDeadline: days(-35), detectedAt: days(90), fixedAt: days(45), metadata: {}, createdAt: days(90), updatedAt: days(45) }
+  // ~120d ago — high, fixed
+  const vuln_fixed_ytd: Vulnerability = { id: 'vuln-8', applicationId: 'app-2', externalId: 'CVE-2024-008', title: 'IDOR en perfiles de usuario', description: 'Acceso no autorizado a perfiles de otros usuarios', cvssScore: 7.2, severity: 'high', source: 'sonarqube', status: 'fixed', slaDeadline: days(-110), detectedAt: days(150), fixedAt: days(120), metadata: {}, createdAt: days(150), updatedAt: days(120) }
 
-  const vulnerabilities = [vuln_7d, vuln_7d_b, vuln_30d, vuln_90d, vuln_ytd]
+  const vulnerabilities = [vuln_7d, vuln_7d_b, vuln_7d_c, vuln_30d, vuln_90d, vuln_ytd, vuln_fixed_30d, vuln_fixed_90d, vuln_fixed_ytd]
 
   // ── Incidents spread across time ──
   const daysAgo = (n: number, offsetMs = 0) => new Date(now - n * 24 * 60 * 60 * 1000 + offsetMs)
-  const inc_7d: Incident = { id: 'inc-2', applicationId: 'app-2', externalId: 'INC-002', title: 'Lentitud en portal', description: 'El portal presenta lentitud', severity: 'medium', status: 'resolved', detectedAt: daysAgo(3), respondedAt: daysAgo(3, 30 * 60 * 1000), resolvedAt: daysAgo(3, 3 * 60 * 60 * 1000), downtimeMinutes: 0, rca: 'Alto tráfico durante campaña', metadata: {}, createdAt: daysAgo(3), updatedAt: daysAgo(3) }
-  const inc_30d: Incident = { id: 'inc-1', applicationId: 'app-1', externalId: 'INC-001', title: 'Caída del servicio de pagos', description: 'El servicio de pagos no responde', severity: 'critical', status: 'resolved', detectedAt: daysAgo(25), respondedAt: daysAgo(25, 15 * 60 * 1000), resolvedAt: daysAgo(25, 2 * 60 * 60 * 1000), downtimeMinutes: 120, rca: 'Problema de conexión a base de datos', metadata: {}, createdAt: daysAgo(25), updatedAt: daysAgo(25) }
-  // Open incident (to show in counters) — 3d ago
+  // --- NEGATIVE: still open ---
   const inc_open: Incident = { id: 'inc-3', applicationId: 'app-3', externalId: 'INC-003', title: 'Error 500 en carrito de compras', description: 'Error intermitente en endpoint de carrito', severity: 'high', status: 'in_progress', detectedAt: daysAgo(2), respondedAt: daysAgo(2, 10 * 60 * 1000), resolvedAt: null, downtimeMinutes: 45, rca: null, metadata: {}, createdAt: daysAgo(2), updatedAt: daysAgo(2) }
   const inc_detected: Incident = { id: 'inc-4', applicationId: 'app-1', externalId: 'INC-004', title: 'Intento de acceso no autorizado', description: 'Múltiples intentos fallidos de autenticación desde IP externa', severity: 'critical', status: 'detected', detectedAt: daysAgo(0, -2 * 60 * 60 * 1000), respondedAt: null, resolvedAt: null, downtimeMinutes: 0, rca: null, metadata: {}, createdAt: daysAgo(0, -2 * 60 * 60 * 1000), updatedAt: daysAgo(0, -2 * 60 * 60 * 1000) }
+  // --- POSITIVE: resolved (show improvement) ---
+  // 3d ago — resolved (shows in 7d, 30d, 90d, ytd)
+  const inc_7d: Incident = { id: 'inc-2', applicationId: 'app-2', externalId: 'INC-002', title: 'Lentitud en portal', description: 'El portal presenta lentitud', severity: 'medium', status: 'resolved', detectedAt: daysAgo(3), respondedAt: daysAgo(3, 30 * 60 * 1000), resolvedAt: daysAgo(3, 3 * 60 * 60 * 1000), downtimeMinutes: 0, rca: 'Alto tráfico durante campaña', metadata: {}, createdAt: daysAgo(3), updatedAt: daysAgo(3) }
+  // ~25d ago — resolved (shows in 30d, 90d, ytd — NOT in 7d)
+  const inc_30d: Incident = { id: 'inc-1', applicationId: 'app-1', externalId: 'INC-001', title: 'Caída del servicio de pagos', description: 'El servicio de pagos no responde', severity: 'critical', status: 'resolved', detectedAt: daysAgo(25), respondedAt: daysAgo(25, 15 * 60 * 1000), resolvedAt: daysAgo(25, 2 * 60 * 60 * 1000), downtimeMinutes: 120, rca: 'Problema de conexión a base de datos', metadata: {}, createdAt: daysAgo(25), updatedAt: daysAgo(25) }
+  // ~75d ago — resolved (shows in 90d, ytd only)
+  const inc_90d: Incident = { id: 'inc-5', applicationId: 'app-9', externalId: 'INC-005', title: 'Caída del Data Lake', description: 'Data Lake no disponible por fallo de nodo Kafka', severity: 'high', status: 'resolved', detectedAt: daysAgo(75), respondedAt: daysAgo(75, 20 * 60 * 1000), resolvedAt: daysAgo(75, 6 * 60 * 60 * 1000), downtimeMinutes: 360, rca: 'Fallo de hardware en nodo de streaming', metadata: {}, createdAt: daysAgo(75), updatedAt: daysAgo(75) }
+  // ~200d ago — resolved (shows in ytd only)
+  const inc_ytd: Incident = { id: 'inc-6', applicationId: 'app-5', externalId: 'INC-006', title: 'Fallo en CRM Legacy', description: 'Caída del servidor SQL Server 2019', severity: 'medium', status: 'resolved', detectedAt: daysAgo(200), respondedAt: daysAgo(200, 45 * 60 * 1000), resolvedAt: daysAgo(200, 4 * 60 * 60 * 1000), downtimeMinutes: 240, rca: 'Falta de mantenimiento en base de datos legacy', metadata: {}, createdAt: daysAgo(200), updatedAt: daysAgo(200) }
 
-  const incidents = [inc_7d, inc_30d, inc_open, inc_detected]
+  const incidents = [inc_open, inc_detected, inc_7d, inc_30d, inc_90d, inc_ytd]
 
   // ── Risks spread across time ──
   // Open within 7d
@@ -267,10 +306,51 @@ export async function seedDemoData() {
     { id: 'del-7', applicationId: null, title: 'Actualización política de seguridad', description: 'Revisar y actualizar políticas de seguridad TI', dueDate: new Date('2026-10-01'), status: 'pending', objectiveId: null, createdAt: new Date(), updatedAt: new Date() },
   ]
 
-  const healthHistory: HealthIndex[] = [
-    { id: 'hi-1', businessUnitId: 'all', tenantId: 'tenant-1', deliveryScore: 75, qualityScore: 80, securityScore: 70, availabilityScore: 95, obsolescenceScore: 60, riskScore: 75, complianceScore: 85, overallScore: 78, weights: { delivery: 20, quality: 15, security: 20, availability: 15, obsolescence: 10, risk: 10, compliance: 10 }, calculatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), trend: 'stable' },
-    { id: 'hi-2', businessUnitId: 'all', tenantId: 'tenant-1', deliveryScore: 78, qualityScore: 82, securityScore: 72, availabilityScore: 96, obsolescenceScore: 62, riskScore: 76, complianceScore: 86, overallScore: 80, weights: { delivery: 20, quality: 15, security: 20, availability: 15, obsolescence: 10, risk: 10, compliance: 10 }, calculatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), trend: 'improving' },
+  // ── Health Index history: 12 entries across ~360d showing trend ──
+  // Starts low (55) 360d ago, fluctuates, ends at 78
+  // Pattern: volatile first half, improving second half (security fixes + migrations)
+  const thiEntries: { daysAgo: number; scores: [number, number, number, number, number, number, number] }[] = [
+    { daysAgo: 360, scores: [45, 55, 35, 80, 40, 50, 60] },  // Crítico: baseline bajo, muchas vulns
+    { daysAgo: 300, scores: [50, 58, 38, 82, 42, 52, 62] },  // Mejora leve
+    { daysAgo: 240, scores: [55, 60, 42, 85, 40, 55, 65] },  // Estable
+    { daysAgo: 180, scores: [48, 62, 40, 83, 38, 48, 68] },  // Caída por incidentes security
+    { daysAgo: 120, scores: [60, 65, 48, 86, 45, 58, 70] },  // Recuperación parcial
+    { daysAgo: 90, scores: [58, 68, 50, 88, 48, 60, 72] },   // 
+    { daysAgo: 60, scores: [65, 72, 55, 90, 50, 62, 75] },   // Sube por fixes de vulns
+    { daysAgo: 45, scores: [70, 75, 58, 92, 52, 65, 78] },   // 
+    { daysAgo: 30, scores: [68, 78, 60, 93, 55, 68, 80] },   // Ligera caída delivery
+    { daysAgo: 20, scores: [72, 80, 62, 94, 58, 70, 82] },   // 
+    { daysAgo: 10, scores: [74, 80, 65, 95, 58, 72, 83] },   // Security mejora
+    { daysAgo: 2, scores: [75, 80, 68, 95, 60, 74, 85] },    // Hoy: 78 overall
   ]
+
+  const healthHistory: HealthIndex[] = thiEntries.map((e, i) => {
+    const [delivery, quality, security, availability, obsolescence, risk, compliance] = e.scores
+    const overall = Math.round(
+      (delivery * 20 + quality * 15 + security * 20 + availability * 15 + obsolescence * 10 + risk * 10 + compliance * 10) / 100
+    )
+    const trend: 'stable' | 'improving' | 'declining' =
+      i > 0 && overall > thiEntries[i - 1].scores.reduce((a, b) => a + b, 0) / 7 ? 'improving'
+        : i > 0 && overall < thiEntries[i - 1].scores.reduce((a, b) => a + b, 0) / 7 ? 'declining'
+          : 'stable'
+
+    return {
+      id: `hi-${i + 1}`,
+      businessUnitId: 'all',
+      tenantId: 'tenant-1',
+      deliveryScore: delivery,
+      qualityScore: quality,
+      securityScore: security,
+      availabilityScore: availability,
+      obsolescenceScore: obsolescence,
+      riskScore: risk,
+      complianceScore: compliance,
+      overallScore: overall,
+      weights: { delivery: 20, quality: 15, security: 20, availability: 15, obsolescence: 10, risk: 10, compliance: 10 },
+      calculatedAt: days(e.daysAgo),
+      trend,
+    } satisfies HealthIndex
+  })
 
   const users: User[] = [
     { id: 'user-1', email: 'admin@tgp.demo', displayName: 'Admin', role: 'admin', businessUnitIds: ['bu-digital', 'bu-core', 'bu-legacy'], isActive: true, createdAt: new Date() },
@@ -280,6 +360,7 @@ export async function seedDemoData() {
   await db.businessUnits.bulkAdd(businessUnits)
   await db.technologies.bulkAdd(technologies)
   await db.applications.bulkAdd(applications)
+  await db.applicationDependencies.bulkAdd(appDeps)
   await db.vulnerabilities.bulkAdd(vulnerabilities)
   await db.incidents.bulkAdd(incidents)
   await db.risks.bulkAdd(risks)

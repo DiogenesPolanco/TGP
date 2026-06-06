@@ -3,6 +3,7 @@ import { useAppStore } from '@/stores/appStore'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { exportDatabase, saveBackupToStorage } from '@/services/export/exportService'
 import { getAzureConfig, uploadBackupToAzure } from '@/services/backup/azureBackupService'
+import { notifyAlerts } from '@/services/notifications/browserNotificationService'
 import type { DashboardAlert } from '@/stores/appStore'
 
 const STORAGE_KEY = 'tgp-last-automated-check'
@@ -305,6 +306,8 @@ async function checkLibraryVulnerabilities(): Promise<DashboardAlert[]> {
 
 async function runBackup(): Promise<DashboardAlert[]> {
   const alerts: DashboardAlert[] = []
+  // Only run backup if scheduler is explicitly enabled
+  if (!getSchedulerConfig().enabled) return alerts
   try {
     const backup = await exportDatabase()
     const saved = saveBackupToStorage(backup)
@@ -373,6 +376,10 @@ export async function runAutomatedChecks(): Promise<{
         duration: 8000,
       })
     }
+  }
+
+  if (alerts.length > 0) {
+    notifyAlerts(alerts)
   }
 
   // Also merge into dashboard alerts (replaces previous run)
@@ -474,10 +481,14 @@ function checkAndRun() {
 export function startAutomatedChecks() {
   if (checkIntervalId) return
 
-  // Ejecutar inmediatamente si han pasado 24h (legacy)
-  const lastRun = getLastRun()
-  if (lastRun === 0 || (Date.now() - lastRun) >= INTERVAL_MS) {
-    runAutomatedChecks().catch(console.error)
+  const config = getSchedulerConfig()
+
+  // Legacy: ejecutar inmediatamente si está habilitado y han pasado 24h
+  if (config.enabled) {
+    const lastRun = getLastRun()
+    if (lastRun === 0 || (Date.now() - lastRun) >= INTERVAL_MS) {
+      runAutomatedChecks().catch(console.error)
+    }
   }
 
   // Polling cada minuto para verificar hora programada

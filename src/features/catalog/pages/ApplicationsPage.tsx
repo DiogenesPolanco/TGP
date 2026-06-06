@@ -4,8 +4,10 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { SkeletonTable } from '@/components/ui/Skeleton'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Search, Filter, Download, Upload, Trash2, Pencil, Eye, X } from 'lucide-react'
+import { Plus, Search, Filter, Download, Upload, GitCompare, Trash2, Pencil, Eye, X, AppWindow } from 'lucide-react'
 import type { Application } from '@/types/domain'
 
 const criticalityLabel: Record<string, string> = {
@@ -197,6 +199,13 @@ export function ApplicationsPage() {
             Importar
           </button>
           <button
+            onClick={() => navigate('/compare')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <GitCompare size={16} />
+            Comparar
+          </button>
+          <button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
@@ -297,12 +306,39 @@ export function ApplicationsPage() {
         )}
       </div>
 
-      <SortableTable
-        columns={columns}
-        data={filteredApps}
-        onRowClick={(app) => navigate(`/catalog/applications/${app.id}`)}
-        emptyMessage="No se encontraron aplicaciones"
-      />
+      {!rawApplications ? (
+        <SkeletonTable rows={8} />
+      ) : filteredApps.length === 0 ? (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+          <EmptyState
+            icon={<AppWindow size={22} className="text-neutral-50" />}
+            title={searchTerm || filterCriticality || filterStatus || filterBU
+              ? 'Sin resultados'
+              : 'No hay aplicaciones registradas'}
+            description={searchTerm || filterCriticality || filterStatus || filterBU
+              ? 'Intenta con otros filtros o términos de búsqueda'
+              : 'Crea tu primera aplicación para empezar'}
+            action={
+              !searchTerm && !filterCriticality && !filterStatus && !filterBU ? (
+                <button
+                  onClick={() => navigate('new')}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+                >
+                  <Plus size={16} />
+                  Nueva Aplicación
+                </button>
+              ) : undefined
+            }
+          />
+        </div>
+      ) : (
+        <SortableTable
+          columns={columns}
+          data={filteredApps}
+          onRowClick={(app) => navigate(`/catalog/applications/${app.id}`)}
+          emptyMessage="No se encontraron aplicaciones"
+        />
+      )}
     </div>
   )
 }

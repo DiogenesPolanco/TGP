@@ -255,6 +255,27 @@ export async function importBackup(backup: DatabaseBackup): Promise<{
   }
 }
 
+export function readBackupFromFile(file: File): Promise<DatabaseBackup> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string
+        const backup = JSON.parse(text, (_key, value) => {
+          if (isDateObject(value)) return new Date(value.__date)
+          if (DATE_KEYS.has(_key) && isIsoDateString(value)) return new Date(value)
+          return value
+        }) as DatabaseBackup
+        resolve(backup)
+      } catch (err) {
+        reject(new Error('Archivo de backup inválido'))
+      }
+    }
+    reader.onerror = () => reject(new Error('Error al leer el archivo'))
+    reader.readAsText(file)
+  })
+}
+
 export function loadBackupFromStorage(): DatabaseBackup | null {
   try {
     const raw = localStorage.getItem(BACKUP_STORAGE_KEY)

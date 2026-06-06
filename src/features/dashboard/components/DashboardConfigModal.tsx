@@ -1,0 +1,91 @@
+import { DASHBOARD_WIDGETS, useDashboardConfigStore } from '@/stores/dashboardConfigStore'
+import { X, Eye, EyeOff } from 'lucide-react'
+
+interface Props {
+  onClose: () => void
+}
+
+export function DashboardConfigModal({ onClose }: Props) {
+  const { enabledWidgets, toggleWidget, enableAll, disableAll } = useDashboardConfigStore()
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 bg-black/40 transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div className="pointer-events-auto w-full max-w-lg bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl max-h-[80vh] flex flex-col">
+          <div className="flex items-center justify-between p-5 border-b border-neutral-20 dark:border-neutral-70">
+            <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
+              Personalizar Dashboard
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            >
+              <X size={20} className="text-neutral-50" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-5 space-y-1">
+            <p className="text-sm text-neutral-60 dark:text-neutral-40 mb-4">
+              Selecciona los widgets que quieres ver en el dashboard. Los cambios se guardan automáticamente.
+            </p>
+
+            {DASHBOARD_WIDGETS.map((widget) => (
+              <label
+                key={widget.id}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 cursor-pointer transition-colors"
+              >
+                <div
+                  className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+                    enabledWidgets[widget.id]
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
+                  }`}
+                >
+                  {enabledWidgets[widget.id] ? <Eye size={18} /> : <EyeOff size={18} />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-medium text-neutral-90 dark:text-white block">
+                    {widget.title}
+                  </span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={enabledWidgets[widget.id] ?? true}
+                  onChange={() => toggleWidget(widget.id)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-10 h-6 rounded-full transition-colors relative ${
+                    enabledWidgets[widget.id] ? 'bg-primary' : 'bg-neutral-30 dark:bg-neutral-60'
+                  }`}
+                >
+                  <div
+                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                      enabledWidgets[widget.id] ? 'translate-x-[18px]' : 'translate-x-0.5'
+                    }`}
+                  />
+                </div>
+              </label>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between p-4 border-t border-neutral-20 dark:border-neutral-70 bg-neutral-5 dark:bg-neutral-85 rounded-b-2xl">
+            <button
+              onClick={enableAll}
+              className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
+            >
+              Mostrar todo
+            </button>
+            <button
+              onClick={disableAll}
+              className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
+            >
+              Ocultar todo
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

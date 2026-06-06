@@ -28,3 +28,18 @@ PROMPT-*.md
 # Playwright test artifacts
 test-results/
 playwright-report/
+
+# skillfile
+.skillfile/cache/
+.skillfile/conflict
+Skillfile
+Skillfile.lock
+
+# CodeGraph
+.codegraph/
+
+# Claude memory
+.claude-memory/
+
+# Large test data
+e2e/test-data/large.xlsx

@@ -11,12 +11,14 @@ interface AppState {
   theme: 'light' | 'dark'
   notifications: Notification[]
   alerts: DashboardAlert[]
+  browserNotificationsEnabled: boolean
   toggleSidebar: () => void
   setTheme: (theme: 'light' | 'dark') => void
   addNotification: (notification: Omit<Notification, 'id'>) => void
   removeNotification: (id: string) => void
   setAlerts: (alerts: DashboardAlert[]) => void
   clearAlerts: () => void
+  setBrowserNotificationsEnabled: (enabled: boolean) => void
 }
 
 interface Notification {
@@ -35,6 +37,7 @@ export const useAppStore = create<AppState>()(
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setTheme: (theme) => set({ theme }),
       alerts: [],
+      browserNotificationsEnabled: false,
       addNotification: (notification) =>
         set((state) => ({
           notifications: [
@@ -48,6 +51,7 @@ export const useAppStore = create<AppState>()(
         })),
       setAlerts: (alerts) => set({ alerts }),
       clearAlerts: () => set({ alerts: [] }),
+      setBrowserNotificationsEnabled: (enabled) => set({ browserNotificationsEnabled: enabled }),
     }),
     {
       name: 'tgp-app-storage',
