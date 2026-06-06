@@ -58,9 +58,16 @@ export async function downloadUsingManifest(m: string): Promise<unknown | null> 
   try {
     const [v, es, c, f]: Manifest = JSON.parse(m)
     if (v !== 1) return null
-    const r = await fetch(buildBlobUrl(decrypt(es), c, f))
-    return r.ok ? r.json() : null
-  } catch { return null }
+    const sasUrl = decrypt(es)
+    const blobUrl = buildBlobUrl(sasUrl, c, f)
+    const r = await fetch(blobUrl)
+    if (r.ok) return r.json()
+    console.warn(`[AzureShare] Fetch failed: ${r.status} ${r.statusText} for ${blobUrl.slice(0, 80)}...`)
+    return null
+  } catch (err) {
+    console.error('[AzureShare] downloadUsingManifest error:', err)
+    return null
+  }
 }
 
 export function buildManifestString(hash: string): string | null {
