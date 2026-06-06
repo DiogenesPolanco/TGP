@@ -1,8 +1,9 @@
+import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getPublicDashboardData, type PublicDashboardData } from '@/services/share/publicShareService'
 import {
-  Shield, AlertTriangle, Lock, Clock, TrendingUp, TrendingDown,
+  Shield, AlertTriangle, Clock, TrendingUp, TrendingDown,
   Users, Package, Building2, AlertOctagon, Target, CheckCircle2,
 } from 'lucide-react'
 import { ThiGauge } from '@/components/charts/ThiGauge'
@@ -72,62 +73,67 @@ export function PublicDashboardPage() {
 
   const kpis = useMemo(() => {
     if (!data) return null
-    const criticalVulns = data.vulnerabilities.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length
-    const highVulns = data.vulnerabilities.filter((v) => v.severity === 'high' && v.status !== 'fixed').length
-    const openIncidents = data.incidents.filter((i) => i.status !== 'resolved' && i.status !== 'closed').length
-    const p1Incidents = data.incidents.filter((i) => i.severity === 'critical' && i.status !== 'resolved').length
-    const openRisks = data.risks.filter((r) => r.status === 'open')
-    const criticalRisks = openRisks.filter((r) => r.riskScore >= 15).length
-    const totalRisk = openRisks.reduce((s, r) => s + r.riskScore, 0)
-    const eolTechs = data.technologies.filter((t) => t.supportStatus === 'eol').length
-    const eliteTeams = data.teams.filter((t) => (t.currentMetrics?.deploymentFrequency ?? 0) >= 1).length
-    const totalTeams = data.teams.length
+    const vulnerabilities = data.vulnerabilities ?? []
+    const incidents = data.incidents ?? []
+    const risks = data.risks ?? []
+    const technologies = data.technologies ?? []
+    const teams = data.teams ?? []
+    const applications = data.applications ?? []
+    const auditFindings = data.auditFindings ?? []
+    const healthHistory = data.healthHistory ?? []
+    const criticalVulns = vulnerabilities.filter((v: any) => v.severity === 'critical' && v.status !== 'fixed').length
+    const highVulns = vulnerabilities.filter((v: any) => v.severity === 'high' && v.status !== 'fixed').length
+    const openIncidents = incidents.filter((i: any) => i.status !== 'resolved' && i.status !== 'closed').length
+    const p1Incidents = incidents.filter((i: any) => i.severity === 'critical' && i.status !== 'resolved').length
+    const openRisks = risks.filter((r: any) => r.status === 'open')
+    const criticalRisks = openRisks.filter((r: any) => r.riskScore >= 15).length
+    const totalRisk = openRisks.reduce((s: number, r: any) => s + r.riskScore, 0)
+    const eolTechs = technologies.filter((t: any) => t.supportStatus === 'eol').length
+    const eliteTeams = teams.filter((t: any) => (t.currentMetrics?.deploymentFrequency ?? 0) >= 1).length
+    const totalTeams = teams.length
 
     // THI calculation: same 7-dimension formula as main dashboard
-    const deliveryScore = data.teams.length === 0 ? 50
-      : Math.round(data.teams.reduce((s, t) => {
+    const deliveryScore = teams.length === 0 ? 50
+      : Math.round(teams.reduce((s, t) => {
           const m = t.currentMetrics
           if (!m) return s + 50
           return s + (Math.min(m.velocity / 50, 1) * 100
             + Math.max(0, 100 - (m.leadTimeHours / 168) * 100)
             + Math.max(0, 100 - m.changeFailureRate * 5)
             + Math.max(0, 100 - (m.mttrHours / 24) * 100)) / 4
-        }, 0) / data.teams.length)
+        }, 0) / teams.length)
     const qualityScore = 75
-    const criticalHighOpen = data.vulnerabilities.filter((v) =>
+    const criticalHighOpen = vulnerabilities.filter((v: any) =>
       (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed'
     ).length
-    const securityScore = data.applications.length === 0 ? 100
+    const securityScore = applications.length === 0 ? 100
       : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
-    const totalDowntime = data.incidents.filter((i) => i.status === 'resolved')
-      .reduce((s, i) => s + ((i as any).downtimeMinutes ?? 0), 0)
-    const availabilityScore = data.applications.length === 0 ? 100
+    const totalDowntime = incidents.filter((i: any) => i.status === 'resolved')
+      .reduce((s: number, i: any) => s + ((i as any).downtimeMinutes ?? 0), 0)
+    const availabilityScore = applications.length === 0 ? 100
       : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
-    const appsWithEol = data.applications.filter((a) =>
-      a.technologies?.some((tId: string) => data.technologies.some((t) => t.id === tId && t.supportStatus === 'eol'))
+    const appsWithEol = applications.filter((a: any) =>
+      a.technologies?.some((tId: string) => technologies.some((t: any) => t.id === tId && t.supportStatus === 'eol'))
     ).length
-    const obsolescenceScore = data.applications.length === 0 ? 100
-      : Math.round((1 - appsWithEol / data.applications.length) * 100)
-    const activeRiskScore = data.risks.filter((r) => r.status === 'open')
-      .reduce((s, r) => s + r.riskScore, 0)
-    const riskScore = data.applications.length === 0 ? 100
+    const obsolescenceScore = applications.length === 0 ? 100
+      : Math.round((1 - appsWithEol / applications.length) * 100)
+    const activeRiskScore = risks.filter((r: any) => r.status === 'open')
+      .reduce((s: number, r: any) => s + r.riskScore, 0)
+    const riskScore = applications.length === 0 ? 100
       : Math.max(0, 100 - Math.min(activeRiskScore / 5, 80))
-    const af = (data as any).auditFindings
-    let complianceScore = 75
-    if (af && af.length > 0) {
-      const closedOk = af.filter((f: any) =>
-        (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= new Date()
-      ).length
-      complianceScore = Math.round((closedOk / af.length) * 100)
-    }
+    const closedOnTime = auditFindings.filter((f: any) =>
+      (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= new Date()
+    ).length
+    const complianceScore = auditFindings.length === 0 ? 100
+      : Math.round((closedOnTime / auditFindings.length) * 100)
     const overallScore = Math.round(
       (deliveryScore * 20 + qualityScore * 15 + securityScore * 20
         + availabilityScore * 15 + obsolescenceScore * 10 + riskScore * 10
         + complianceScore * 10) / 100
     )
 
-    const thiTrend = data.healthHistory.length >= 2
-      ? data.healthHistory[data.healthHistory.length - 1].score - data.healthHistory[0].score
+    const thiTrend = healthHistory.length >= 2
+      ? healthHistory[healthHistory.length - 1].score - healthHistory[0].score
       : 0
 
     const redFlags: { icon: React.ReactNode; text: string; severity: 'critical' | 'warning' | 'info' }[] = []
@@ -147,7 +153,7 @@ export function PublicDashboardPage() {
   }, [data])
 
   if (loading) return <Loader />
-  if (!valid) return <InvalidLink />
+  if (!valid) return <InvalidLinkPage />
   if (!data || !kpis) {
     // Show passphrase modal if encrypted data is pending
     if (pendingEncrypted) {
@@ -385,19 +391,6 @@ function Loader() {
   )
 }
 
-function InvalidLink() {
-  return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-8 text-center space-y-4">
-        <Lock size={40} className="mx-auto text-neutral-40" />
-        <h1 className="text-lg font-bold text-neutral-90 dark:text-white">Enlace no válido</h1>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
-          Este enlace ha expirado o no es válido. Solicita uno nuevo al administrador de TGP.
-        </p>
-      </div>
-    </div>
-  )
-}
 
 function MiniMetric({ label, value, subtitle, icon, color }: {
   label: string; value: string; subtitle: string; icon: React.ReactNode; color: string

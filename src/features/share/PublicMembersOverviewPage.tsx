@@ -1,7 +1,8 @@
+import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getShareInfo, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
-import { Lock, Clock, TrendingUp, Users, Award, Star, AlertTriangle, Brain, BarChart3 } from 'lucide-react'
+import { Clock, TrendingUp, Users, Award, Star, AlertTriangle, Brain, BarChart3 } from 'lucide-react'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { cn } from '@/lib/utils'
@@ -82,7 +83,7 @@ export function PublicMembersOverviewPage() {
   }, [data])
 
   if (loading) return <Loader />
-  if (!valid) return <InvalidLink />
+  if (!valid) return <InvalidLinkPage />
   if (!data || !analytics) {
     if (pendingEncrypted) {
       return (
@@ -275,14 +276,3 @@ function Loader() {
   )
 }
 
-function InvalidLink() {
-  return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-8 text-center space-y-4">
-        <Lock size={40} className="mx-auto text-neutral-40" />
-        <h1 className="text-lg font-bold text-neutral-90 dark:text-white">Enlace no válido</h1>
-        <p className="text-sm text-neutral-60">Este enlace ha expirado o no es válido.</p>
-      </div>
-    </div>
-  )
-}
