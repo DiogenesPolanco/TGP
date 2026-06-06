@@ -26,7 +26,7 @@ export function TaskFormPage() {
   const { addNotification } = useAppStore()
   const isEdit = !!id
 
-  const task = useLiveQuery(() => (id ? db.tasks.get(id) : null), [id])
+  const task = useLiveQuery(() => (id ? db.tasks.get(id) : undefined), [id])
   const plans = useLiveQuery(() => db.plans.toArray()) ?? []
   const activities = useLiveQuery(() => db.activities.toArray()) ?? []
 
@@ -64,7 +64,7 @@ export function TaskFormPage() {
     }
 
     if (isEdit) {
-      await db.tasks.update(id!, { ...payload })
+      await db.tasks.update(id!, { ...payload } as any)
       addNotification({ type: 'success', message: 'Tarea actualizada' })
       navigate(`/execution/tasks/${id}`)
     } else {

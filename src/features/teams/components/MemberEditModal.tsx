@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/services/db/database'
 import { X, FileText, Umbrella, Zap, Target, User, Award } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { VacationsSection } from '@/features/performance/components/VacationsSection'
@@ -7,6 +8,14 @@ import { SkillsSection } from '@/features/performance/components/SkillsSection'
 import { SprintsSection } from '@/features/performance/components/SprintsSection'
 import { OneOnOneSection } from '@/features/performance/components/OneOnOneSection'
 import { AchievementsSection } from '@/features/performance/components/AchievementsSection'
+
+interface Props {
+  memberId: string
+  memberName: string
+  teamId: string
+  open: boolean
+  onClose: () => void
+}
 
 type Tab = 'profile' | 'vacations' | 'skills' | 'sprints' | 'oneonone' | 'achievements'
 

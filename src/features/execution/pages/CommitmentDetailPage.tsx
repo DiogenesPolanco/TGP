@@ -18,9 +18,9 @@ export function CommitmentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const commitment = useLiveQuery(() => db.commitments.get(id!), [id])
-  const team = useLiveQuery(() => commitment?.teamId ? db.teams.get(commitment.teamId) : null, [commitment])
-  const app = useLiveQuery(() => commitment?.applicationId ? db.applications.get(commitment.applicationId) : null, [commitment])
-  const objective = useLiveQuery(() => commitment?.objectiveId ? db.objectives.get(commitment.objectiveId) : null, [commitment])
+  const team = useLiveQuery(() => commitment?.teamId ? db.teams.get(commitment.teamId) : undefined, [commitment])
+  const app = useLiveQuery(() => commitment?.applicationId ? db.applications.get(commitment.applicationId) : undefined, [commitment])
+  const objective = useLiveQuery(() => commitment?.objectiveId ? db.objectives.get(commitment.objectiveId) : undefined, [commitment])
 
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
   const daysInfo = useMemo(() => {

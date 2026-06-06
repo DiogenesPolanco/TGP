@@ -48,7 +48,7 @@ export function TasksPage() {
 
   const handleQuickStatus = async (id: string, status: string) => {
     await db.tasks.update(id, {
-      status,
+      status: status as any,
       completedAt: status === 'done' ? new Date() : undefined,
       updatedAt: new Date(),
     })

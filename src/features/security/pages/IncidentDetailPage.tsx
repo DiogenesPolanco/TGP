@@ -11,7 +11,7 @@ export function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const incident = useLiveQuery(() => db.incidents.get(id!), [id])
-  const app = useLiveQuery(() => incident?.applicationId ? db.applications.get(incident.applicationId) : null, [incident])
+  const app = useLiveQuery(() => incident?.applicationId ? db.applications.get(incident.applicationId) : undefined, [incident])
 
   if (!incident) {
     return <DetailLayout title="Incidente no encontrado" onBack={() => navigate('/security/incidents')}><p className="text-neutral-50">El incidente no existe o ha sido eliminado.</p></DetailLayout>

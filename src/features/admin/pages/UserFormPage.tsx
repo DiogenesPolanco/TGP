@@ -27,7 +27,7 @@ export function UserFormPage() {
   const { addNotification } = useAppStore()
   const isEdit = !!id
 
-  const user = useLiveQuery(() => (id ? db.users.get(id) : null), [id])
+  const user = useLiveQuery(() => (id ? db.users.get(id) : undefined), [id])
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>()
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function UserFormPage() {
 
   const onSubmit = async (data: FormData) => {
     if (isEdit) {
-      await db.users.update(id!, data)
+      await db.users.update(id!, data as any)
       addNotification({ type: 'success', message: 'Usuario actualizado' })
     } else {
       const existing = await db.users.where('email').equals(data.email).first()

@@ -7,7 +7,7 @@ import {
   Database, Plus, Pencil, Trash2, ChevronDown, ChevronUp,
   Server, Box,
 } from 'lucide-react'
-import type { DatabaseType, EnvironmentType, SupportStatus } from '@/types/domain'
+import type { DatabaseType, EnvironmentType, SupportStatus, AppDatabase, Technology } from '@/types/domain'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',

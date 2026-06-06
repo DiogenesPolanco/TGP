@@ -355,6 +355,7 @@ function StepDashboard({ onNext, onSkip }: StepProps) {
 
 // ── Step 9: Demo Data ──
 function StepDemoData({ onNext, onSkip }: StepProps) {
+  void onSkip;
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 

@@ -12,8 +12,8 @@ export function DeliverableDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const deliverable = useLiveQuery(() => db.deliverables.get(id!), [id])
-  const app = useLiveQuery(() => deliverable?.applicationId ? db.applications.get(deliverable.applicationId) : null, [deliverable])
-  const objective = useLiveQuery(() => deliverable?.objectiveId ? db.objectives.get(deliverable.objectiveId) : null, [deliverable])
+  const app = useLiveQuery(() => deliverable?.applicationId ? db.applications.get(deliverable.applicationId) : undefined, [deliverable])
+  const objective = useLiveQuery(() => deliverable?.objectiveId ? db.objectives.get(deliverable.objectiveId) : undefined, [deliverable])
 
   if (!deliverable) {
     return <DetailLayout title="Entregable no encontrado" onBack={() => navigate('/catalog/deliverables')}><p className="text-neutral-50">El entregable no existe o ha sido eliminado.</p></DetailLayout>

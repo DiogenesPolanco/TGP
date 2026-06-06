@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getPublicDashboardData, type PublicDashboardData } from '@/services/share/publicShareService'
 import {
-  Shield, AlertTriangle, Lock, Clock, TrendingUp,
+  Shield, AlertTriangle, Lock, Clock, TrendingUp, TrendingDown,
   Users, Package, Building2, AlertOctagon, Target, CheckCircle2,
 } from 'lucide-react'
 import { ThiGauge } from '@/components/charts/ThiGauge'

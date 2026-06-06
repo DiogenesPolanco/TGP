@@ -14,8 +14,8 @@ export function TaskDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const task = useLiveQuery(() => db.tasks.get(id!), [id])
-  const plan = useLiveQuery(() => task?.planId ? db.plans.get(task.planId) : null, [task])
-  const activity = useLiveQuery(() => task?.activityId ? db.activities.get(task.activityId) : null, [task])
+  const plan = useLiveQuery(() => task?.planId ? db.plans.get(task.planId) : undefined, [task])
+  const activity = useLiveQuery(() => task?.activityId ? db.activities.get(task.activityId) : undefined, [task])
 
   if (!task) {
     return <DetailLayout title="Tarea no encontrada" onBack={() => navigate('/execution/tasks')}><p className="text-neutral-50">La tarea no existe o ha sido eliminada.</p></DetailLayout>

@@ -171,7 +171,7 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
               x1={ep.sx} y1={ep.sy} x2={ep.ax} y2={ep.ay}
               stroke={EDGE_COLORS[ep.edge.type] ?? '#DFE1E6'}
               strokeWidth={ep.edge.criticality === 'critical' ? 2.5 : 1.5}
-              strokeDasharray={ep.edge.type === 'soft' ? '6,3' : undefined}
+              strokeDasharray={ep.edge.type === 'external' ? '6,3' : undefined}
               markerEnd={`url(#arrow-${ep.edge.type})`}
               className="dark:opacity-60"
             />
@@ -195,9 +195,9 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
             cx={node.x}
             cy={node.y}
             r={node.radius}
-            fill={CRITICALITY_COLORS[node.criticality] ?? '#2684FF'}
+            fill={CRITICALITY_COLORS[node.criticality ?? 'info'] ?? '#2684FF'}
             fillOpacity={0.12}
-            stroke={CRITICALITY_COLORS[node.criticality] ?? '#2684FF'}
+            stroke={CRITICALITY_COLORS[node.criticality ?? 'info'] ?? '#2684FF'}
             strokeWidth={2.5}
             className="hover:stroke-[4px] transition-all"
           />

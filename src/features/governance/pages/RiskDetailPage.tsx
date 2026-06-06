@@ -11,8 +11,8 @@ export function RiskDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const risk = useLiveQuery(() => db.risks.get(id!), [id])
-  const app = useLiveQuery(() => risk?.applicationId ? db.applications.get(risk.applicationId) : null, [risk])
-  const bu = useLiveQuery(() => risk?.businessUnitId ? db.businessUnits.get(risk.businessUnitId) : null, [risk])
+  const app = useLiveQuery(() => risk?.applicationId ? db.applications.get(risk.applicationId) : undefined, [risk])
+  const bu = useLiveQuery(() => risk?.businessUnitId ? db.businessUnits.get(risk.businessUnitId) : undefined, [risk])
 
   if (!risk) {
     return <DetailLayout title="Riesgo no encontrado" onBack={() => navigate('/governance/risks')}><p className="text-neutral-50">El riesgo no existe o ha sido eliminado.</p></DetailLayout>

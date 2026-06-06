@@ -274,7 +274,8 @@ export function PredictabilityPage() {
                 animationDuration={1200}
                 animationEasing="ease-out"
                 shape={(props: { x?: number; y?: number; width?: number; height?: number }) => {
-                  const { x, y, width, height, payload } = props
+                  const { x, y, width, height } = props
+                  const payload = (props as any).payload
                   const fill = payload.color === 'success' ? 'url(#pred-chart-success)'
                     : payload.color === 'warning' ? 'url(#pred-chart-warning)'
                     : 'url(#pred-chart-danger)'

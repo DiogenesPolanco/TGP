@@ -1,4 +1,19 @@
 import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/services/db/database'
+import { useAppStore } from '@/stores/appStore'
+import type { SupportStatus, EnvironmentType } from '@/constants/enums'
+import type { DatabaseType } from '@/types/domain'
+import { ArrowLeft, Plus, X, Server, Box } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+
+const statusColors: Record<string, string> = {
+  active: 'border-success/30 bg-success/5 text-success',
+  extended: 'border-warning/30 bg-warning/5 text-warning',
+  eol: 'border-danger/30 bg-danger/5 text-danger',
+  unknown: 'border-neutral-30 bg-neutral-10 text-neutral-50',
+}
 
 const statusLabel: Record<SupportStatus, string> = {
   active: 'Activo',

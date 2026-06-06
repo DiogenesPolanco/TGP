@@ -117,7 +117,7 @@ export function CalendarPage() {
         onClick={() => setSelectedDate(isSelected ? null : new Date(currentYear, currentMonth, d))}
         className={cn(
           'relative p-1.5 rounded-lg text-center transition-all border',
-          isToday && 'border-primary/40 bg-primary/[0.04] font-bold',
+          isToday(d) && 'border-primary/40 bg-primary/[0.04] font-bold',
           isSelected
             ? 'bg-primary/85 text-white font-semibold border-primary/60'
             : isOverdue

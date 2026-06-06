@@ -58,7 +58,7 @@ export function ActivityFormPage() {
         setCompletedPoints(activity.completedPoints?.toString() ?? '')
         setStartDate(activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '')
         setDueDate(activity.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '')
-        setTasks(activity.tasks ?? [])
+        setTasks((activity as any).tasks ?? [])
       })
     }
   }, [activity])

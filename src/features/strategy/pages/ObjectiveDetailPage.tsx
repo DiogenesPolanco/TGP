@@ -12,8 +12,8 @@ export function ObjectiveDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const objective = useLiveQuery(() => db.objectives.get(id!), [id])
-  const team = useLiveQuery(() => objective?.teamId ? db.teams.get(objective.teamId) : null, [objective])
-  const bu = useLiveQuery(() => objective?.businessUnitId ? db.businessUnits.get(objective.businessUnitId) : null, [objective])
+  const team = useLiveQuery(() => objective?.teamId ? db.teams.get(objective.teamId) : undefined, [objective])
+  const bu = useLiveQuery(() => objective?.businessUnitId ? db.businessUnits.get(objective.businessUnitId) : undefined, [objective])
 
   if (!objective) {
     return <DetailLayout title="Objetivo no encontrado" onBack={() => navigate('/strategy/objectives')}><p className="text-neutral-50">El objetivo no existe o ha sido eliminado.</p></DetailLayout>

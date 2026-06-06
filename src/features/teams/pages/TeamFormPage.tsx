@@ -1,5 +1,19 @@
 import { useState, useEffect } from 'react'
-import type { MemberRole } from '@/constants/enums'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/services/db/database'
+import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
+import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import type { DoraLevel, MemberRole } from '@/constants/enums'
+
+interface MemberInput {
+  name: string
+  role: string
+  allocation: number
+}
 
 const doraMetricOptions = [
   { key: 'deploymentFrequency', label: 'Frecuencia Despliegue', unit: '/día' },
@@ -64,7 +78,7 @@ export function TeamFormPage() {
       id: crypto.randomUUID(),
       userPrincipal: m.name.toLowerCase().replace(/\s+/g, '.'),
       displayName: m.name,
-      role: m.role,
+      role: m.role as MemberRole,
       allocationPct: m.allocation,
       status: 'activo' as const,
     }))

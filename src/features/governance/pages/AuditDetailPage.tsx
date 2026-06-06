@@ -12,7 +12,7 @@ export function AuditDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const finding = useLiveQuery(() => db.auditFindings.get(id!), [id])
-  const app = useLiveQuery(() => finding?.applicationId ? db.applications.get(finding.applicationId) : null, [finding])
+  const app = useLiveQuery(() => finding?.applicationId ? db.applications.get(finding.applicationId) : undefined, [finding])
 
   if (!finding) {
     return <DetailLayout title="Hallazgo no encontrado" onBack={() => navigate('/governance/audit')}><p className="text-neutral-50">El hallazgo no existe o ha sido eliminado.</p></DetailLayout>

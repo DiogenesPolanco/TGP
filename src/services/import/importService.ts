@@ -94,6 +94,21 @@ type EntityTable =
   | 'risks'
   | 'auditFindings'
   | 'appDatabases'
+  | 'businessUnits'
+  | 'applicationDependencies'
+  | 'microservices'
+  | 'deliverables'
+  | 'users'
+  | 'plans'
+  | 'activities'
+  | 'tasks'
+  | 'commitments'
+  | 'blockers'
+  | 'dependencies'
+  | 'sprintRecords'
+  | 'achievements'
+  | 'vacationRecords'
+  | 'teamSprints'
 
 interface ImportConfig {
   table: EntityTable

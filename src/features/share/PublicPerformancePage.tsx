@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { isValidShareHash, getShareType, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
-import { Lock, Clock, TrendingUp, Users, Award, BarChart3, Target } from 'lucide-react'
+import { Lock, Clock, TrendingUp, Users, Award, BarChart3, Target, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function PublicPerformancePage() {
