@@ -7,7 +7,7 @@ import { DashboardCharts } from '../components/DashboardCharts'
 import { PredictionsWidget } from '../components/PredictionsWidget'
 import { DashboardConfigModal } from '../components/DashboardConfigModal'
 import { useDashboardConfigStore } from '@/stores/dashboardConfigStore'
-import { createShareLink, getSharedLinksList, getPublicDashboardData } from '@/services/share/publicShareService'
+import { createShareLink, getPublicDashboardData } from '@/services/share/publicShareService'
 
 export function DashboardPage() {
   const metrics = useDashboardMetrics()
@@ -18,11 +18,6 @@ export function DashboardPage() {
   const [copied, setCopied] = useState(false)
 
   const handleShare = useCallback(async () => {
-    const existing = getSharedLinksList().filter((l) => l.url.includes('/public/'))
-    if (existing.length > 0) {
-      setShareUrl(existing[0].url)
-      return
-    }
     const data = await getPublicDashboardData()
     const { url } = await createShareLink(48, 'dashboard', undefined, data)
     setShareUrl(url)

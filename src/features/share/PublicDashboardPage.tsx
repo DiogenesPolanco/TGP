@@ -21,22 +21,20 @@ export function PublicDashboardPage() {
 
     const load = async () => {
       // 1. Check URL hash fragment for manifest (cross-browser Azure share)
-      const fragment = window.location.hash.replace(/^#/, '')
-      if (fragment) {
-        const { parseManifestString, downloadUsingManifest } = await import('@/services/share/azureShareService')
-        const manifest = parseManifestString(decodeURIComponent(fragment))
-        if (manifest) {
-          const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
-          if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
-        }
+      const rawFragment = window.location.hash.replace(/^#/, '')
+      if (rawFragment) {
+        const { downloadUsingManifest } = await import('@/services/share/azureShareService')
+        const decodedFragment = decodeURIComponent(rawFragment)
+        const azureData = await downloadUsingManifest(decodedFragment) as PublicDashboardData | null
+        if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
       }
 
-      // 2. Try viewer's own Azure config
+      // 2. Fallback: viewer's own Azure config
       const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
       const viewerData = await downloadShareFromAzure(hash) as PublicDashboardData | null
       if (viewerData) { setData(viewerData); setValid(true); setLoading(false); return }
 
-      // 3. Fallback: localStorage (same-browser dev/testing)
+      // 3. Last fallback: localStorage (same-browser dev/testing)
       if (isValidShareHash(hash)) {
         const d = await getPublicDashboardData()
         setData(d); setValid(true)
