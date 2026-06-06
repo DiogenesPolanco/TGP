@@ -8,16 +8,25 @@ export const getAzureConfig = _getAzureConfig
 // Prevents casual exposure in URLs/logs. Not military-grade crypto.
 const CIPHER_KEY = 'TGP_SHARE_2026_XOR'
 
+function toBase64Url(b64: string): string {
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function fromBase64Url(b64u: string): string {
+  const pad = b64u.length % 4 === 3 ? '=' : b64u.length % 4 === 2 ? '==' : ''
+  return b64u.replace(/-/g, '+').replace(/_/g, '/') + pad
+}
+
 function encrypt(text: string): string {
   let out = ''
   for (let i = 0; i < text.length; i++) {
     out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))
   }
-  return btoa(out)
+  return toBase64Url(btoa(out))
 }
 
 function decrypt(encoded: string): string {
-  const text = atob(encoded)
+  const text = atob(fromBase64Url(encoded))
   let out = ''
   for (let i = 0; i < text.length; i++) {
     out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))

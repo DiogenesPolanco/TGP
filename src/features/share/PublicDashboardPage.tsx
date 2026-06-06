@@ -20,12 +20,11 @@ export function PublicDashboardPage() {
     if (!hash) { setValid(false); setLoading(false); return }
 
     const load = async () => {
-      // 1. Check URL hash fragment for manifest (cross-browser Azure share)
-      const rawFragment = window.location.hash.replace(/^#/, '')
-      if (rawFragment) {
+      // 1. Try URL hash fragment (manifest) — base64url is already URL-safe
+      const fragment = window.location.hash.replace(/^#/, '')
+      if (fragment) {
         const { downloadUsingManifest } = await import('@/services/share/azureShareService')
-        const decodedFragment = decodeURIComponent(rawFragment)
-        const azureData = await downloadUsingManifest(decodedFragment) as PublicDashboardData | null
+        const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
         if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
       }
 
