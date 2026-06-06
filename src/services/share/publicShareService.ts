@@ -1,5 +1,4 @@
 import { db } from '@/services/db/database'
-import { uploadShareToAzure, isAzureShareConfigured } from '@/services/share/azureShareService'
 
 const SHARED_LINKS_KEY = 'tgp-shared-links'
 const AZURE_LINKS_KEY = 'tgp-azure-links'
@@ -66,18 +65,28 @@ export async function createShareLink(
   links.push(link)
   saveSharedLinks(links)
 
-  // If Azure is configured and data is provided, upload to Azure
-  if (data && isAzureShareConfigured()) {
-    const azureUrl = await uploadShareToAzure(hash, data)
-    if (azureUrl) {
-      const azureLinks = getAzureLinks()
-      azureLinks.push(hash)
-      saveAzureLinks(azureLinks)
+  let manifestStr = ''
+
+  // If Azure is configured and data is provided, upload data and build manifest
+  if (data) {
+    const { uploadShareToAzure, buildManifestString, getAzureConfig } = await import('@/services/share/azureShareService')
+    const config = getAzureConfig()
+    if (config) {
+      const dataFilename = `tgp-data-${hash}.json`
+      const url = await uploadShareToAzure(hash, data)
+      if (url) {
+        const m = buildManifestString(dataFilename)
+        if (m) manifestStr = m
+        const azureLinks = getAzureLinks()
+        azureLinks.push(hash)
+        saveAzureLinks(azureLinks)
+      }
     }
   }
 
   const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : '/public'
-  return { hash, url: `${window.location.origin}${base}/${hash}` }
+  const fragment = manifestStr ? `#${encodeURIComponent(manifestStr)}` : ''
+  return { hash, url: `${window.location.origin}${base}/${hash}${fragment}` }
 }
 
 export function getShareInfo(hash: string): { type: ShareType; ref?: string } | null {

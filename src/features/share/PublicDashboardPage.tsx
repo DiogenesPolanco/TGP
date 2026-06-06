@@ -19,25 +19,33 @@ export function PublicDashboardPage() {
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
 
-    // Always try Azure first for public URLs
-    import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
-      const azureData = await downloadShareFromAzure(hash) as PublicDashboardData | null
-      if (azureData) {
-        setData(azureData)
-        setValid(true)
-        setLoading(false)
-        return
+    const load = async () => {
+      // 1. Check URL hash fragment for manifest (cross-browser Azure share)
+      const fragment = window.location.hash.replace(/^#/, '')
+      if (fragment) {
+        const { parseManifestString, downloadUsingManifest } = await import('@/services/share/azureShareService')
+        const manifest = parseManifestString(decodeURIComponent(fragment))
+        if (manifest) {
+          const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
+          if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+        }
       }
-      // Fallback: localStorage (same-browser dev/testing)
+
+      // 2. Try viewer's own Azure config
+      const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+      const viewerData = await downloadShareFromAzure(hash) as PublicDashboardData | null
+      if (viewerData) { setData(viewerData); setValid(true); setLoading(false); return }
+
+      // 3. Fallback: localStorage (same-browser dev/testing)
       if (isValidShareHash(hash)) {
         const d = await getPublicDashboardData()
-        setData(d)
-        setValid(true)
+        setData(d); setValid(true)
       } else {
         setValid(false)
       }
       setLoading(false)
-    })
+    }
+    load()
   }, [hash])
 
   const kpis = useMemo(() => {
