@@ -12,15 +12,14 @@ export function PublicMemberPage() {
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
-    const info = getShareInfo(hash)
-    if (info && info.type === 'member' && info.ref) {
-      setValid(true)
-      getPublicMemberData(info.ref).then((d) => { setData(d); setLoading(false) })
-      return
-    }
     import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
       const azureData = await downloadShareFromAzure(hash) as PublicMemberData | null
-      if (azureData) { setData(azureData); setValid(true) } else { setValid(false) }
+      if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+      const info = getShareInfo(hash)
+      if (info && info.type === 'member' && info.ref) {
+        const d = await getPublicMemberData(info.ref)
+        setData(d); setValid(true)
+      } else { setValid(false) }
       setLoading(false)
     })
   }, [hash])

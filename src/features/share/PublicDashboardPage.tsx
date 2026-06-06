@@ -19,29 +19,25 @@ export function PublicDashboardPage() {
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
 
-    const fetchData = async () => {
-      // 1. Try localStorage first (same browser)
-      if (isValidShareHash(hash)) {
+    // Always try Azure first for public URLs
+    import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
+      const azureData = await downloadShareFromAzure(hash) as PublicDashboardData | null
+      if (azureData) {
+        setData(azureData)
         setValid(true)
-        const d = await getPublicDashboardData()
-        setData(d)
         setLoading(false)
         return
       }
-
-      // 2. Try Azure (cross-browser share)
-      import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
-        const azureData = await downloadShareFromAzure(hash) as PublicDashboardData | null
-        if (azureData) {
-          setData(azureData)
-          setValid(true)
-        } else {
-          setValid(false)
-        }
-        setLoading(false)
-      })
-    }
-    fetchData()
+      // Fallback: localStorage (same-browser dev/testing)
+      if (isValidShareHash(hash)) {
+        const d = await getPublicDashboardData()
+        setData(d)
+        setValid(true)
+      } else {
+        setValid(false)
+      }
+      setLoading(false)
+    })
   }, [hash])
 
   const kpis = useMemo(() => {

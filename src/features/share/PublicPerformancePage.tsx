@@ -12,15 +12,13 @@ export function PublicPerformancePage() {
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
-    const type = getShareType(hash)
-    if (type === 'performance') {
-      setValid(true)
-      getPublicPerformanceData().then((d) => { setData(d); setLoading(false) })
-      return
-    }
     import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
       const azureData = await downloadShareFromAzure(hash) as PublicPerformanceData | null
-      if (azureData) { setData(azureData); setValid(true) } else { setValid(false) }
+      if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
+      if (getShareType(hash) === 'performance') {
+        const d = await getPublicPerformanceData()
+        setData(d); setValid(true)
+      } else { setValid(false) }
       setLoading(false)
     })
   }, [hash])
