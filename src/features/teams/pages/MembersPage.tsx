@@ -7,7 +7,7 @@ import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels
 import type { MemberStatus } from '@/types/domain'
 import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3, Share2, Check, Copy } from 'lucide-react'
 import { getGlobalMembersKPIs } from '@/services/performance/performanceService'
-import { createShareLink, getSharedLinksList } from '@/services/share/publicShareService'
+import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
 
 type TeamEntry = { id: string; name: string }
@@ -86,9 +86,8 @@ export function MembersPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento</h2>
         <button
           onClick={async () => {
-            const existing = getSharedLinksList().filter((l) => l.url.includes('/public/members/'))
-            if (existing.length > 0) { setShareUrl(existing[0].url); return }
-            const { url } = await createShareLink(48, 'members')
+            const data = await getPublicPerformanceData()
+            const { url } = await createShareLink(48, 'members', undefined, data)
             setShareUrl(url)
           }}
           className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"

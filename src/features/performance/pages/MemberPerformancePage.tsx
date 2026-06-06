@@ -4,7 +4,7 @@ import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
-import { createShareLink } from '@/services/share/publicShareService'
+import { createShareLink, getPublicMemberData } from '@/services/share/publicShareService'
 import { ArrowLeft, Loader2, Share2, Check } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
@@ -89,7 +89,8 @@ export function MemberPerformancePage() {
           <button
             onClick={async () => {
               if (shareUrl) { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); return }
-              const { url } = await createShareLink(48, 'member', memberId)
+              const data = await getPublicMemberData(memberId!)
+              const { url } = await createShareLink(48, 'member', memberId, data)
               setShareUrl(url)
               navigator.clipboard.writeText(url)
               setCopied(true)

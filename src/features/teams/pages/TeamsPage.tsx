@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { createShareLink, getSharedLinksList } from '@/services/share/publicShareService'
+import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Link } from 'react-router-dom'
@@ -65,9 +65,8 @@ export function TeamsPage() {
           </button>
           <button
             onClick={async () => {
-              const existing = getSharedLinksList().filter((l) => l.url.includes('/public/performance/'))
-              if (existing.length > 0) { setShareUrl(existing[0].url); return }
-              const { url } = await createShareLink(48, 'performance')
+              const data = await getPublicPerformanceData()
+              const { url } = await createShareLink(48, 'performance', undefined, data)
               setShareUrl(url)
             }}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"

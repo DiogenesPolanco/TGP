@@ -1,123 +1,70 @@
-import { ContainerClient } from '@azure/storage-blob'
 import { getAzureConfig as _getAzureConfig } from '@/services/backup/azureBackupService'
 export const getAzureConfig = _getAzureConfig
 
-
-
-// ── Simple XOR cipher for SAS URL obfuscation ──
-// Prevents casual exposure in URLs/logs. Not military-grade crypto.
 const CIPHER_KEY = 'TGP_SHARE_2026_XOR'
 
-function toBase64Url(b64: string): string {
-  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+function toB64u(s: string): string {
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
-
-function fromBase64Url(b64u: string): string {
-  const pad = b64u.length % 4 === 3 ? '=' : b64u.length % 4 === 2 ? '==' : ''
-  return b64u.replace(/-/g, '+').replace(/_/g, '/') + pad
+function fromB64u(s: string): string {
+  const pad = s.length % 4 === 3 ? '=' : s.length % 4 === 2 ? '==' : ''
+  return s.replace(/-/g, '+').replace(/_/g, '/') + pad
 }
 
 function encrypt(text: string): string {
   let out = ''
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < text.length; i++)
     out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))
-  }
-  return toBase64Url(btoa(out))
+  return toB64u(btoa(out))
 }
-
 function decrypt(encoded: string): string {
-  const text = atob(fromBase64Url(encoded))
+  const text = atob(fromB64u(encoded))
   let out = ''
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < text.length; i++)
     out += String.fromCharCode(text.charCodeAt(i) ^ CIPHER_KEY.charCodeAt(i % CIPHER_KEY.length))
-  }
   return out
 }
 
-// ── Manifest: array format for shorter URLs ──
-// [version, encryptedSas, containerName, dataFilename]
-type ShareManifest = [number, string, string, string]
+type Manifest = [number, string, string, string]
 
-function buildContainerClient(sasUrl: string, containerName: string): ContainerClient {
-  const qIndex = sasUrl.indexOf('?')
-  const sasParams = qIndex >= 0 ? sasUrl.substring(qIndex) : ''
-  const fullUrl = qIndex >= 0 ? sasUrl.substring(0, qIndex) : sasUrl
-  const urlObj = new URL(fullUrl)
-  const accountBase = `${urlObj.protocol}//${urlObj.hostname}`
-  const containerUrl = `${accountBase}/${containerName}${sasParams}`
-  return new ContainerClient(containerUrl)
+function buildBlobUrl(sasUrl: string, container: string, filename: string): string {
+  const qi = sasUrl.indexOf('?')
+  const params = qi >= 0 ? sasUrl.substring(qi) : ''
+  const base = qi >= 0 ? sasUrl.substring(0, qi) : sasUrl
+  const u = new URL(base)
+  return `${u.protocol}//${u.hostname}/${container}/${filename}${params}`
 }
 
-/** Upload dashboard data to Azure. Returns the blob URL. */
-export async function uploadShareToAzure(
-  hash: string,
-  data: unknown,
-): Promise<string | null> {
-  const config = getAzureConfig()
-  if (!config?.sasUrl || !config.containerName) return null
-
-  const client = buildContainerClient(config.sasUrl, config.containerName)
-  const shortHash = hash.slice(0, 16)
-  const dataFilename = `d${shortHash}.json`
-  const blobClient = client.getBlockBlobClient(dataFilename)
-  const json = JSON.stringify(data)
-
+export async function uploadShareToAzure(hash: string, data: unknown): Promise<string | null> {
+  const cfg = getAzureConfig()
+  if (!cfg?.sasUrl || !cfg.containerName) return null
+  const f = `d${hash.slice(0, 16)}.json`
+  const url = buildBlobUrl(cfg.sasUrl, cfg.containerName, f)
   try {
-    await blobClient.upload(json, json.length, {
-      blobHTTPHeaders: { blobContentType: 'application/json' },
-    })
-    return blobClient.url
-  } catch (err) {
-    console.error('[AzureShare] Error uploading data:', err)
-    return null
-  }
+    const r = await fetch(url, { method: 'PUT', body: JSON.stringify(data), headers: { 'x-ms-blob-type': 'BlockBlob', 'Content-Type': 'application/json' } })
+    return r.ok ? url : null
+  } catch { return null }
 }
 
-/** Download data from Azure using the config embedded in the URL hash. */
-export async function downloadShareFromAzure(
-  hash: string,
-): Promise<unknown | null> {
-  // Try viewer's own Azure config
-  const viewerConfig = getAzureConfig()
-  if (viewerConfig) {
-    const client = buildContainerClient(viewerConfig.sasUrl, viewerConfig.containerName)
-    const shortHash = hash.slice(0, 16)
-    try {
-      const blobClient = client.getBlockBlobClient(`d${shortHash}.json`)
-      const resp = await blobClient.download()
-      const blob = await resp.blobBody
-      if (blob) return JSON.parse(await blob.text())
-    } catch { /* data not in viewer's container */ }
-  }
-  return null
+export async function downloadShareFromAzure(hash: string): Promise<unknown | null> {
+  const cfg = getAzureConfig()
+  if (!cfg?.sasUrl || !cfg.containerName) return null
+  const url = buildBlobUrl(cfg.sasUrl, cfg.containerName, `d${hash.slice(0, 16)}.json`)
+  try { const r = await fetch(url); return r.ok ? r.json() : null }
+  catch { return null }
 }
 
-/** Download data using a manifest from the URL fragment. */
-export async function downloadUsingManifest(manifestStr: string): Promise<unknown | null> {
+export async function downloadUsingManifest(m: string): Promise<unknown | null> {
   try {
-    const [version, encryptedSas, containerName, dataFilename]: ShareManifest = JSON.parse(manifestStr)
-    if (version !== 1) return null
-    const sasUrl = decrypt(encryptedSas)
-    const client = buildContainerClient(sasUrl, containerName)
-    const blobClient = client.getBlockBlobClient(dataFilename)
-    const resp = await blobClient.download()
-    const blob = await resp.blobBody
-    if (!blob) return null
-    return JSON.parse(await blob.text())
-  } catch {
-    return null
-  }
+    const [v, es, c, f]: Manifest = JSON.parse(m)
+    if (v !== 1) return null
+    const r = await fetch(buildBlobUrl(decrypt(es), c, f))
+    return r.ok ? r.json() : null
+  } catch { return null }
 }
 
-/** Build an encrypted manifest array for the URL fragment (compact format). */
 export function buildManifestString(hash: string): string | null {
-  const config = getAzureConfig()
-  if (!config?.sasUrl || !config.containerName) return null
-  const shortHash = hash.slice(0, 16)
-  const manifest: ShareManifest = [1, encrypt(config.sasUrl), config.containerName, `d${shortHash}.json`]
-  return JSON.stringify(manifest)
-}
-
-export function deleteShareFromAzure(_hash: string): Promise<boolean> {
-  return Promise.resolve(false)
+  const cfg = getAzureConfig()
+  if (!cfg?.sasUrl || !cfg.containerName) return null
+  return JSON.stringify([1, encrypt(cfg.sasUrl), cfg.containerName, `d${hash.slice(0, 16)}.json`])
 }
