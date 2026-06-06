@@ -2,7 +2,7 @@ import { ContainerClient } from '@azure/storage-blob'
 import { getAzureConfig as _getAzureConfig } from '@/services/backup/azureBackupService'
 export const getAzureConfig = _getAzureConfig
 
-const DATA_PREFIX = 'tgp-data-'
+
 
 // ── Simple XOR cipher for SAS URL obfuscation ──
 // Prevents casual exposure in URLs/logs. Not military-grade crypto.
@@ -25,13 +25,9 @@ function decrypt(encoded: string): string {
   return out
 }
 
-// ── Manifest: carries Azure config so recipients can access data ──
-interface ShareManifest {
-  v: number           // version
-  s: string           // encrypted SAS URL
-  c: string           // container name
-  f: string           // data filename (e.g., 'tgp-data-{hash}.json')
-}
+// ── Manifest: array format for shorter URLs ──
+// [version, encryptedSas, containerName, dataFilename]
+type ShareManifest = [number, string, string, string]
 
 function buildContainerClient(sasUrl: string, containerName: string): ContainerClient {
   const qIndex = sasUrl.indexOf('?')
@@ -43,7 +39,7 @@ function buildContainerClient(sasUrl: string, containerName: string): ContainerC
   return new ContainerClient(containerUrl)
 }
 
-/** Upload dashboard data + manifest to Azure. Returns the data blob URL. */
+/** Upload dashboard data to Azure. Returns the blob URL. */
 export async function uploadShareToAzure(
   hash: string,
   data: unknown,
@@ -52,7 +48,8 @@ export async function uploadShareToAzure(
   if (!config?.sasUrl || !config.containerName) return null
 
   const client = buildContainerClient(config.sasUrl, config.containerName)
-  const dataFilename = `${DATA_PREFIX}${hash}.json`
+  const shortHash = hash.slice(0, 16)
+  const dataFilename = `d${shortHash}.json`
   const blobClient = client.getBlockBlobClient(dataFilename)
   const json = JSON.stringify(data)
 
@@ -71,12 +68,13 @@ export async function uploadShareToAzure(
 export async function downloadShareFromAzure(
   hash: string,
 ): Promise<unknown | null> {
-  // If no manifest provided, try using viewer's own Azure config
+  // Try viewer's own Azure config
   const viewerConfig = getAzureConfig()
   if (viewerConfig) {
     const client = buildContainerClient(viewerConfig.sasUrl, viewerConfig.containerName)
+    const shortHash = hash.slice(0, 16)
     try {
-      const blobClient = client.getBlockBlobClient(`${DATA_PREFIX}${hash}.json`)
+      const blobClient = client.getBlockBlobClient(`d${shortHash}.json`)
       const resp = await blobClient.download()
       const blob = await resp.blobBody
       if (blob) return JSON.parse(await blob.text())
@@ -85,13 +83,14 @@ export async function downloadShareFromAzure(
   return null
 }
 
-/** Download data using a manifest (cross-browser share). */
+/** Download data using a manifest from the URL fragment. */
 export async function downloadUsingManifest(manifestStr: string): Promise<unknown | null> {
   try {
-    const manifest: ShareManifest = JSON.parse(manifestStr)
-    const sasUrl = decrypt(manifest.s)
-    const client = buildContainerClient(sasUrl, manifest.c)
-    const blobClient = client.getBlockBlobClient(manifest.f)
+    const [version, encryptedSas, containerName, dataFilename]: ShareManifest = JSON.parse(manifestStr)
+    if (version !== 1) return null
+    const sasUrl = decrypt(encryptedSas)
+    const client = buildContainerClient(sasUrl, containerName)
+    const blobClient = client.getBlockBlobClient(dataFilename)
     const resp = await blobClient.download()
     const blob = await resp.blobBody
     if (!blob) return null
@@ -101,26 +100,13 @@ export async function downloadUsingManifest(manifestStr: string): Promise<unknow
   }
 }
 
-/** Build an encrypted manifest string that the recipient can use. */
-export function buildManifestString(dataFilename: string): string | null {
+/** Build an encrypted manifest array for the URL fragment (compact format). */
+export function buildManifestString(hash: string): string | null {
   const config = getAzureConfig()
   if (!config?.sasUrl || !config.containerName) return null
-  const manifest: ShareManifest = {
-    v: 1,
-    s: encrypt(config.sasUrl),
-    c: config.containerName,
-    f: dataFilename,
-  }
+  const shortHash = hash.slice(0, 16)
+  const manifest: ShareManifest = [1, encrypt(config.sasUrl), config.containerName, `d${shortHash}.json`]
   return JSON.stringify(manifest)
-}
-
-/** Parse a manifest string from the URL fragment. */
-export function parseManifestString(hashFragment: string): ShareManifest | null {
-  try {
-    return JSON.parse(hashFragment) as ShareManifest
-  } catch {
-    return null
-  }
 }
 
 export function deleteShareFromAzure(_hash: string): Promise<boolean> {

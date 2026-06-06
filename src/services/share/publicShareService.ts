@@ -65,6 +65,14 @@ export async function createShareLink(
   links.push(link)
   saveSharedLinks(links)
 
+  // Also store the short hash (first 16 chars) for URL matching
+  const shortHash = hash.slice(0, 16)
+  if (shortHash !== hash) {
+    const shortLink: SharedLink = { ...link, hash: shortHash }
+    links.push(shortLink)
+    saveSharedLinks(links)
+  }
+
   let manifestStr = ''
 
   // If Azure is configured and data is provided, upload data and build manifest
@@ -72,10 +80,9 @@ export async function createShareLink(
     const { uploadShareToAzure, buildManifestString, getAzureConfig } = await import('@/services/share/azureShareService')
     const config = getAzureConfig()
     if (config) {
-      const dataFilename = `tgp-data-${hash}.json`
       const url = await uploadShareToAzure(hash, data)
       if (url) {
-        const m = buildManifestString(dataFilename)
+        const m = buildManifestString(hash)
         if (m) manifestStr = m
         const azureLinks = getAzureLinks()
         azureLinks.push(hash)
@@ -86,12 +93,12 @@ export async function createShareLink(
 
   const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : '/public'
   const fragment = manifestStr ? `#${encodeURIComponent(manifestStr)}` : ''
-  return { hash, url: `${window.location.origin}${base}/${hash}${fragment}` }
+  return { hash: shortHash, url: `${window.location.origin}${base}/${shortHash}${fragment}` }
 }
 
 export function getShareInfo(hash: string): { type: ShareType; ref?: string } | null {
   const links = getSharedLinks()
-  const link = links.find((l) => l.hash === hash)
+  const link = links.find((l) => l.hash === hash || l.hash.startsWith(hash))
   if (!link) return null
   return { type: link.type, ref: link.ref }
 }
