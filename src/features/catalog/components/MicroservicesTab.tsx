@@ -11,6 +11,7 @@ import {
   Layers, ChevronDown, ChevronUp, Shield, Loader2,
   ExternalLink,
 } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Technology, SupportStatus } from '@/types/domain'
 
 const statusColors: Record<SupportStatus, string> = {
@@ -50,8 +51,8 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30">
-          Microservicios ({microservices.length})
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
+          Microservicios <span className="text-neutral-50 text-base font-normal">({microservices.length})</span>
         </h4>
         <button
           onClick={() => { setEditingMs(null); setShowForm(true) }}
@@ -376,12 +377,10 @@ function MicroserviceFormModal({
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
             Descripción
           </label>
-          <textarea
+          <RichTextEditor
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(html) => setDescription(html)}
             placeholder="Propósito del microservicio..."
-            rows={2}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
           />
         </div>
 

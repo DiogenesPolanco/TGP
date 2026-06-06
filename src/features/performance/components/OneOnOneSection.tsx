@@ -3,6 +3,7 @@ import { db } from '@/services/db/database'
 import type { OneOnOne, Oportunidad } from '@/types/domain'
 import { Plus, MessageSquare, Trash2, Target, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 
 interface Props {
   memberId: string
@@ -186,19 +187,17 @@ export function OneOnOneSection({ memberId }: Props) {
           <div className="grid gap-4 sm:grid-cols-2 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Líder</label>
-              <textarea
+              <RichTextEditor
                 value={newMeeting.feedbackDelLider}
-                onChange={(e) => setNewMeeting({ ...newMeeting, feedbackDelLider: e.target.value })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm min-h-[80px]"
+                onChange={(html) => setNewMeeting({ ...newMeeting, feedbackDelLider: html })}
                 placeholder="Retroalimentación del líder..."
               />
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Miembro</label>
-              <textarea
+              <RichTextEditor
                 value={newMeeting.feedbackDelMiembro}
-                onChange={(e) => setNewMeeting({ ...newMeeting, feedbackDelMiembro: e.target.value })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm min-h-[80px]"
+                onChange={(html) => setNewMeeting({ ...newMeeting, feedbackDelMiembro: html })}
                 placeholder="Retroalimentación del miembro..."
               />
             </div>
@@ -329,11 +328,11 @@ function MeetingCard({
         <div className="grid gap-3 sm:grid-cols-2 mb-3">
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Líder</label>
-            <textarea value={editData.feedbackDelLider} onChange={(e) => setEditData({ ...editData, feedbackDelLider: e.target.value })} className={`${inputClass} min-h-[60px]`} />
+            <RichTextEditor value={editData.feedbackDelLider} onChange={(html) => setEditData({ ...editData, feedbackDelLider: html })} placeholder="Retroalimentación del líder..." />
           </div>
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Feedback del Miembro</label>
-            <textarea value={editData.feedbackDelMiembro} onChange={(e) => setEditData({ ...editData, feedbackDelMiembro: e.target.value })} className={`${inputClass} min-h-[60px]`} />
+            <RichTextEditor value={editData.feedbackDelMiembro} onChange={(html) => setEditData({ ...editData, feedbackDelMiembro: html })} placeholder="Retroalimentación del miembro..." />
           </div>
         </div>
         <div className="flex gap-2">

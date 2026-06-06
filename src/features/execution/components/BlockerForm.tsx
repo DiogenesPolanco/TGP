@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -84,12 +85,10 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
 
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripcion</label>
-          <textarea
+          <RichTextEditor
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
+            onChange={(html) => setDescription(html)}
             placeholder="Que esta bloqueando, desde cuando, que se necesita..."
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
           />
         </div>
 
@@ -135,11 +134,10 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           {blocker && status === 'resolved' && (
             <div className="col-span-2">
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Notas de resolucion</label>
-              <textarea
+              <RichTextEditor
                 value={resolutionNotes}
-                onChange={(e) => setResolutionNotes(e.target.value)}
-                rows={2}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                onChange={(html) => setResolutionNotes(html)}
+                placeholder="Notas de resolución..."
               />
             </div>
           )}

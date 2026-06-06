@@ -3,6 +3,7 @@ import { db } from '@/services/db/database'
 import type { Achievement } from '@/types/domain'
 import { Plus, Award, Trophy, Star, BookOpen, TrendingUp, Trash2, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 
 interface Props {
   memberId: string
@@ -159,10 +160,9 @@ export function AchievementsSection({ memberId }: Props) {
           </div>
           <div className="mb-4">
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Descripción</label>
-            <textarea
+            <RichTextEditor
               value={newAchievement.description}
-              onChange={(e) => setNewAchievement({ ...newAchievement, description: e.target.value })}
-              className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm min-h-[60px]"
+              onChange={(html) => setNewAchievement({ ...newAchievement, description: html })}
               placeholder="Descripción del logro..."
             />
           </div>
@@ -236,12 +236,12 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="text-xs font-medium text-neutral-60 mb-1 block">Descripción</label>
-                  <textarea
-                    value={editData.description}
-                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                    className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm min-h-[50px]"
-                  />
+                <label className="text-xs font-medium text-neutral-60 mb-1 block">Descripción</label>
+                <RichTextEditor
+                  value={editData.description}
+                  onChange={(html) => setEditData({ ...editData, description: html })}
+                  placeholder="Descripción del logro..."
+                />
                 </div>
                 <div className="flex items-center gap-4 mb-3">
                   <div>

@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Plus, AlertTriangle, ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Technology, SupportStatus, Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
 
 const statusColors: Record<SupportStatus, string> = {
@@ -100,7 +101,7 @@ export function ApplicationFormPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate('/catalog/applications')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
@@ -124,11 +125,10 @@ export function ApplicationFormPage() {
 
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
-          <textarea
+          <RichTextEditor
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={3}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            onChange={(html) => setFormData({ ...formData, description: html })}
+            placeholder="Describe la aplicación..."
           />
         </div>
 

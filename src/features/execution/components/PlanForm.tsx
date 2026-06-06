@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Plan } from '@/types/domain'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
 
@@ -91,11 +92,10 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
 
           <div className="col-span-2">
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
-            <textarea
+            <RichTextEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+              onChange={(html) => setDescription(html)}
+              placeholder="Describe el plan..."
             />
           </div>
 

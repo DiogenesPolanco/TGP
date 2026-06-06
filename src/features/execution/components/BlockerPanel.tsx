@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -157,12 +158,10 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               </div>
               <div>
                 <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripcion</label>
-                <textarea
+                <RichTextEditor
                   value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  rows={2}
+                  onChange={(html) => setEditDescription(html)}
                   placeholder="Que esta bloqueando, desde cuando..."
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm resize-none"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -205,11 +204,10 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               {editStatus === 'resolved' && (
                 <div>
                   <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Notas de resolucion</label>
-                  <textarea
+                  <RichTextEditor
                     value={editResolutionNotes}
-                    onChange={(e) => setEditResolutionNotes(e.target.value)}
-                    rows={2}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm resize-none"
+                    onChange={(html) => setEditResolutionNotes(html)}
+                    placeholder="Notas de resolución..."
                   />
                 </div>
               )}

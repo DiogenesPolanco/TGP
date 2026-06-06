@@ -48,7 +48,7 @@ export function TechnologyFormPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate('/catalog/obsolescence')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{technology ? 'Editar Tecnología' : 'Nueva Tecnología'}</h1>

@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { Plus, ArrowLeft, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 export function ObjectiveFormPage() {
@@ -99,7 +100,7 @@ export function ObjectiveFormPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate('/strategy/objectives')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
@@ -123,11 +124,10 @@ export function ObjectiveFormPage() {
 
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
-          <textarea
+          <RichTextEditor
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={2}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            onChange={(html) => setFormData({ ...formData, description: html })}
+            placeholder="Describe el objetivo..."
           />
         </div>
 
@@ -181,7 +181,7 @@ export function ObjectiveFormPage() {
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="not_started">No iniciado</option>
-              <option value="on_track">On track</option>
+              <option value="on_track">Encaminado</option>
               <option value="at_risk">En riesgo</option>
               <option value="behind">Atrasado</option>
               <option value="achieved">Logrado</option>
@@ -264,7 +264,7 @@ export function ObjectiveFormPage() {
                   }`}
                 >
                   <option value="not_started">No iniciado</option>
-                  <option value="on_track">On track</option>
+                  <option value="on_track">Encaminado</option>
                   <option value="at_risk">En riesgo</option>
                   <option value="behind">Atrasado</option>
                   <option value="achieved">Logrado</option>

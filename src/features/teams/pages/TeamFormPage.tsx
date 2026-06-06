@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { MemberRole } from '@/types/domain'
 type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
 
@@ -125,7 +126,7 @@ export function TeamFormPage() {
           {/* Left column */}
           <div className="space-y-5">
             <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el equipo..." /></div>
             <div className="grid grid-cols-2 gap-4">
               <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Clasificación DORA</label>
                 <select value={formData.doraClassification} onChange={(e) => setFormData({ ...formData, doraClassification: e.target.value as DoraLevel })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">

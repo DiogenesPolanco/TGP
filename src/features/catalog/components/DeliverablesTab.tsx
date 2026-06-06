@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, X, Save, ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
 
 const statusColors: Record<DeliverableStatus, string> = {
@@ -31,7 +32,7 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30">
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
           Entregables
         </h4>
       </div>
@@ -118,12 +119,10 @@ function DeliverableForm({
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          <textarea
-            placeholder="Descripción (opcional)"
+          <RichTextEditor
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+            onChange={(html) => setDescription(html)}
+            placeholder="Descripción (opcional)"
           />
           <div className="flex gap-3">
             <div className="flex-1">

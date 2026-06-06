@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Incident } from '@/types/domain'
 
 interface IncidentFormProps {
@@ -73,11 +74,10 @@ export function IncidentForm({ incident, onClose, onSave }: IncidentFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
-            <textarea
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={(html) => setFormData({ ...formData, description: html })}
+              placeholder="Describe el incidente..."
             />
           </div>
 
@@ -151,11 +151,10 @@ export function IncidentForm({ incident, onClose, onSave }: IncidentFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">RCA</label>
-            <textarea
+            <RichTextEditor
               value={formData.rca}
-              onChange={(e) => setFormData({ ...formData, rca: e.target.value })}
-              rows={2}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={(html) => setFormData({ ...formData, rca: html })}
+              placeholder="Análisis de causa raíz..."
             />
           </div>
 
