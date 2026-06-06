@@ -325,56 +325,107 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               </div>
             </div>
           ) : (
-            /* ── Login: OTP input ── */
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Shield size={24} className="text-primary" />
+            /* ── Login: boarding-pass style ── */
+            <div className="flex flex-col lg:flex-row min-h-[480px]">
+              {/* Left: Brand + secure access messaging */}
+              <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
+                }} />
+                <div className="relative flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
+                    <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold tracking-tight">TGP</p>
+                    <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                  </div>
                 </div>
-                <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
-                  Autenticación OTP
-                </h2>
-                <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
-                  Ingresa el código de 6 dígitos de tu app de autenticación
-                </p>
+                <div className="relative flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Shield size={16} />
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Acceso seguro</span>
+                  </div>
+                  <h2 className="text-3xl font-bold leading-tight mb-4">
+                    Tu tablero de<br />gobierno<br />tecnológico
+                  </h2>
+                  <p className="text-base leading-relaxed opacity-85 mb-5">
+                    Accede a tu portafolio de aplicaciones, métricas DORA, riesgos,
+                    vulnerabilidades y más en un solo lugar.
+                  </p>
+                  <ul className="space-y-3 text-base">
+                    {['THI y KPIs en tiempo real', 'Alertas automáticas', 'Equipos y OKRs', 'Obsolescencia EOL'].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
+                        <span className="opacity-90">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="relative mt-6 pt-4 border-t border-white/15">
+                  <p className="text-sm opacity-60 leading-relaxed">
+                    Almacenamiento local encriptado · Sin conexión externa
+                  </p>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    value={otp}
-                    onChange={(e) => handleOtpChange(e.target.value)}
-                    placeholder="000000"
-                    className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-shadow duration-300"
-                    maxLength={6}
-                  />
+              {/* Divider: perforated line */}
+              <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70" />
+                  ))}
                 </div>
+              </div>
 
-                {error && (
-                  <div className="text-center">
-                    <p className="text-sm text-danger mb-1">{error}</p>
-                    {remaining < 25 && (
-                      <p className="text-xs text-neutral-50 flex items-center justify-center gap-1">
-                        <Clock size={12} />
-                        Espera al próximo código ({remaining}s)
-                      </p>
-                    )}
+              {/* Right: OTP input */}
+              <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
+                <div className="max-w-sm mx-auto w-full space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Autenticación OTP</h3>
+                    <p className="text-base text-neutral-60 dark:text-neutral-40 mt-1">
+                      Ingresa el código de 6 dígitos de tu app
+                    </p>
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  disabled={otp.length !== 6 || verifying}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg font-medium hover:from-primary-dark hover:to-primary-dark transition-all duration-300 disabled:opacity-50 shadow-lg shadow-primary/20"
-                >
-                  {verifying ? 'Verificando…' : 'Ingresar'}
-                  {!verifying && <ArrowRight size={18} />}
-                </button>
-              </form>
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={otp}
+                        onChange={(e) => handleOtpChange(e.target.value)}
+                        placeholder="000000"
+                        className="w-full text-center text-4xl tracking-[0.5em] font-mono px-4 py-5 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/25 transition-shadow duration-300"
+                        maxLength={6}
+                      />
+                    </div>
+
+                    {error && (
+                      <div className="text-center">
+                        <p className="text-sm text-danger mb-1">{error}</p>
+                        {remaining < 25 && (
+                          <p className="text-xs text-neutral-50 flex items-center justify-center gap-1">
+                            <Clock size={12} />
+                            Espera al próximo código ({remaining}s)
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={otp.length !== 6 || verifying}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-all disabled:opacity-50 shadow-lg shadow-primary/25"
+                    >
+                      {verifying ? 'Verificando…' : 'Ingresar'}
+                      {!verifying && <ArrowRight size={20} />}
+                    </button>
+                  </form>
+                </div>
+              </div>
             </div>
           )}
         </div>
