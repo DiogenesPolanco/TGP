@@ -23,6 +23,7 @@ const TABLE_NAMES = [
   'healthIndexHistory',
   'deliverables',
   'microservices',
+  'appDatabases',
   'users',
   'plans',
   'activities',
@@ -162,6 +163,7 @@ const IMPORT_ORDER: string[] = [
   'healthIndexHistory',
   'deliverables',
   'microservices',
+  'appDatabases',
   // Depend on applications
   'applicationDependencies',
   'vulnerabilities',
