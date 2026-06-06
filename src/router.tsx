@@ -4,6 +4,7 @@ import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { ApplicationsPage } from '@/features/catalog/pages/ApplicationsPage'
 import { ApplicationDetailPage } from '@/features/catalog/pages/ApplicationDetailPage'
 import { ApplicationFormPage } from '@/features/catalog/pages/ApplicationFormPage'
+import { DatabaseFormPage } from '@/features/catalog/pages/DatabaseFormPage'
 import { VulnerabilitiesPage } from '@/features/security/pages/VulnerabilitiesPage'
 import { VulnerabilityFormPage } from '@/features/security/pages/VulnerabilityFormPage'
 import { IncidentsPage } from '@/features/security/pages/IncidentsPage'
@@ -28,6 +29,8 @@ import { DailyPage } from '@/features/execution/pages/DailyPage'
 import { PlansPage } from '@/features/execution/pages/PlansPage'
 import { PlanFormPage } from '@/features/execution/pages/PlanFormPage'
 import { PlanDetailPage } from '@/features/execution/pages/PlanDetailPage'
+import { ActivityFormPage } from '@/features/execution/pages/ActivityFormPage'
+import { BlockerFormPage } from '@/features/execution/pages/BlockerFormPage'
 import { CommitmentsPage } from '@/features/execution/pages/CommitmentsPage'
 import { CommitmentFormPage } from '@/features/execution/pages/CommitmentFormPage'
 import { PredictabilityPage } from '@/features/execution/pages/PredictabilityPage'
@@ -45,6 +48,8 @@ export const router = createBrowserRouter([
       { path: 'catalog/applications', element: <ApplicationsPage /> },
       { path: 'catalog/applications/new', element: <ApplicationFormPage /> },
       { path: 'catalog/applications/:id/edit', element: <ApplicationFormPage /> },
+      { path: 'catalog/applications/:appId/databases/new', element: <DatabaseFormPage /> },
+      { path: 'catalog/applications/:appId/databases/:id/edit', element: <DatabaseFormPage /> },
       { path: 'catalog/applications/:id', element: <ApplicationDetailPage /> },
       { path: 'catalog/obsolescence', element: <ObsolescencePage /> },
       { path: 'catalog/obsolescence/new', element: <TechnologyFormPage /> },
@@ -79,10 +84,14 @@ export const router = createBrowserRouter([
       { path: 'execution/plans', element: <PlansPage /> },
       { path: 'execution/plans/new', element: <PlanFormPage /> },
       { path: 'execution/plans/:id/edit', element: <PlanFormPage /> },
+      { path: 'execution/plans/:planId/activities/new', element: <ActivityFormPage /> },
+      { path: 'execution/plans/:planId/activities/:activityId/edit', element: <ActivityFormPage /> },
       { path: 'execution/plans/:id', element: <PlanDetailPage /> },
       { path: 'execution/commitments', element: <CommitmentsPage /> },
       { path: 'execution/commitments/new', element: <CommitmentFormPage /> },
       { path: 'execution/commitments/:id/edit', element: <CommitmentFormPage /> },
+      { path: 'execution/blockers/new', element: <BlockerFormPage /> },
+      { path: 'execution/blockers/:id/edit', element: <BlockerFormPage /> },
       { path: 'execution/predictability', element: <PredictabilityPage /> },
       { path: 'reports', element: <ReportsPage /> },
     ],
