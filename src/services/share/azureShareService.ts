@@ -59,10 +59,16 @@ export async function downloadUsingManifest(m: string): Promise<unknown | null> 
     const [v, es, c, f]: Manifest = JSON.parse(m)
     if (v !== 1) return null
     const sasUrl = decrypt(es)
+    console.log('[AzureShare] Decrypted SAS URL starts with:', sasUrl.slice(0, 80))
+    console.log('[AzureShare] Container:', c, 'File:', f)
+    if (!sasUrl.startsWith('https://')) {
+      console.error('[AzureShare] Invalid SAS URL (no https://)')
+      return null
+    }
     const blobUrl = buildBlobUrl(sasUrl, c, f)
-    const r = await fetch(blobUrl)
-    if (r.ok) return r.json()
-    console.warn(`[AzureShare] Fetch failed: ${r.status} ${r.statusText} for ${blobUrl.slice(0, 80)}...`)
+    const resp = await fetch(blobUrl)
+    if (resp.ok) return resp.json()
+    console.warn(`[AzureShare] Fetch failed: ${resp.status} ${resp.statusText}`)
     return null
   } catch (err) {
     console.error('[AzureShare] downloadUsingManifest error:', err)
