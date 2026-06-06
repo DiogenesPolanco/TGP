@@ -8,6 +8,22 @@ import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Pencil, Trash2 } from 'lucide-react'
 
+const severityLabel: Record<string, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja',
+  info: 'Info',
+}
+
+const auditStatusLabel: Record<string, string> = {
+  open: 'Abierto',
+  in_progress: 'En Progreso',
+  overdue: 'Vencido',
+  resolved: 'Resuelto',
+  closed: 'Cerrado',
+}
+
 export function AuditPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -202,7 +218,7 @@ export function AuditPage() {
                       finding.severity === 'medium' ? 'bg-info/10 text-info' :
                       'bg-success/10 text-success'
                     }`}>
-                      {finding.severity}
+                      {severityLabel[finding.severity]}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -212,7 +228,7 @@ export function AuditPage() {
                       finding.status === 'overdue' ? 'bg-danger/10 text-danger' :
                       'bg-success/10 text-success'
                     }`}>
-                      {finding.status}
+                      {auditStatusLabel[finding.status]}
                     </span>
                   </td>
                   <td className="px-6 py-4">

@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { ArrowLeft, Plus, Pencil, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
-import { ActivityForm } from '../components/ActivityForm'
 import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
 import type { Activity } from '@/types/domain'
@@ -31,13 +30,18 @@ const priorityColor: Record<string, string> = {
   critical: 'bg-danger/10 text-danger',
 }
 
+const priorityLabel: Record<string, string> = {
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  critical: 'Crítica',
+}
+
 export function PlanDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { confirm } = useConfirm()
 
-  const [showActivityForm, setShowActivityForm] = useState(false)
-  const [editingActivity, setEditingActivity] = useState<Activity | null>(null)
   const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
 
   const plan = useLiveQuery(() => db.plans.get(id ?? ''), [id])
@@ -212,7 +216,7 @@ export function PlanDetailPage() {
             Actividades ({rootActivities.length})
           </h3>
           <button
-            onClick={() => { setEditingActivity(null); setShowActivityForm(true) }}
+            onClick={() => navigate(`/execution/plans/${plan.id}/activities/new`)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
           >
             <Plus size={16} />
@@ -236,7 +240,7 @@ export function PlanDetailPage() {
                 appMap={appMap}
                 expanded={expandedActivities.has(activity.id)}
                 onToggle={() => toggleExpand(activity.id)}
-                onEdit={() => { setEditingActivity(activity); setShowActivityForm(true) }}
+                onEdit={() => navigate(`/execution/plans/${plan.id}/activities/${activity.id}/edit`)}
                 onDelete={() => handleDeleteActivity(activity)}
                 onTaskToggle={handleTaskStatusToggle}
               />
@@ -245,14 +249,6 @@ export function PlanDetailPage() {
         </div>
       </div>
 
-      {showActivityForm && (
-        <ActivityForm
-          planId={plan.id}
-          activity={editingActivity}
-          onClose={() => { setShowActivityForm(false); setEditingActivity(null) }}
-          onSave={() => { setShowActivityForm(false); setEditingActivity(null) }}
-        />
-      )}
     </div>
   )
 }
@@ -289,7 +285,7 @@ function ActivityNode({
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-neutral-90 dark:text-white">{activity.title}</span>
               <span className={`text-xs px-1.5 py-0.5 rounded ${priorityColor[activity.priority]}`}>
-                {activity.priority}
+                {priorityLabel[activity.priority]}
               </span>
               <span className="text-xs text-neutral-50">{statusLabel[activity.status]}</span>
             </div>
@@ -335,7 +331,7 @@ function ActivityNode({
                 <div className="min-w-0">
                   <span className="text-sm text-neutral-90 dark:text-white">{child.title}</span>
                   <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${priorityColor[child.priority]}`}>
-                    {child.priority}
+                    {priorityLabel[child.priority]}
                   </span>
                   {child.assigneeId && <span className="ml-2 text-xs text-neutral-50">{child.assigneeId}</span>}
                 </div>

@@ -8,6 +8,13 @@ import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, Filter, Upload, X, Pencil, Trash2 } from 'lucide-react'
 
+const statusLabel: Record<string, string> = {
+  open: 'Abierto',
+  mitigated: 'Mitigado',
+  accepted: 'Aceptado',
+  closed: 'Cerrado',
+}
+
 export function RisksPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -235,7 +242,7 @@ export function RisksPage() {
                       risk.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
                       'bg-success/10 text-success'
                     }`}>
-                      {risk.status}
+                      {statusLabel[risk.status]}
                     </span>
                   </td>
                   <td className="px-6 py-4">

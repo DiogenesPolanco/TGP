@@ -3,16 +3,22 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { runEscalation } from '../services/escalationService'
-import { BlockerForm } from '../components/BlockerForm'
 import {
   AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight, Pencil,
   Calendar, ListTodo, Ban, Target,
 } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
 
+const severityLabel: Record<string, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja',
+  info: 'Info',
+}
+
 export function DailyPage() {
   const navigate = useNavigate()
-  const [editingBlocker, setEditingBlocker] = useState<Blocker | null>(null)
   const today = useMemo(() => {
     const d = new Date()
     d.setHours(0, 0, 0, 0)
@@ -190,7 +196,7 @@ export function DailyPage() {
                     <div
                       key={blocker.id}
                       className="px-4 py-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
-                      onClick={() => setEditingBlocker(blocker)}
+                      onClick={() => navigate(`/execution/blockers/${blocker.id}/edit`)}
                     >
                       <div className="flex items-center gap-2">
                         <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
@@ -198,7 +204,7 @@ export function DailyPage() {
                           blocker.severity === 'high' ? 'bg-warning/10 text-warning' :
                           'bg-neutral-10 text-neutral-60'
                         }`}>
-                          {blocker.severity}
+                          {severityLabel[blocker.severity]}
                         </span>
                         <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
                         <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -404,15 +410,6 @@ export function DailyPage() {
       </div>
     </div>
 
-      {editingBlocker && (
-        <BlockerForm
-          blocker={editingBlocker}
-          sourceType={editingBlocker.sourceType}
-          sourceId={editingBlocker.sourceId}
-          onClose={() => setEditingBlocker(null)}
-          onSave={() => setEditingBlocker(null)}
-        />
-      )}
     </>
   )
 }

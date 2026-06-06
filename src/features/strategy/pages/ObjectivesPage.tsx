@@ -37,7 +37,7 @@ export function ObjectivesPage() {
 
   const STATUS_LABELS: Record<string, string> = {
     not_started: 'No iniciado',
-    on_track: 'On track',
+    on_track: 'Encaminado',
     at_risk: 'En riesgo',
     behind: 'Atrasado',
     achieved: 'Logrado',
@@ -142,7 +142,7 @@ export function ObjectivesPage() {
               >
                 <option value="all">Todos</option>
                 <option value="not_started">No Iniciado</option>
-                <option value="on_track">On Track</option>
+                <option value="on_track">Encaminado</option>
                 <option value="at_risk">En Riesgo</option>
                 <option value="behind">Atrasado</option>
                 <option value="achieved">Logrado</option>
@@ -295,7 +295,7 @@ function KrRow({ objectiveId, kr }: { objectiveId: string; kr: KeyResult }) {
           className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer ${getStatusStyle(kr.status)}`}
         >
           <option value="not_started">No iniciado</option>
-          <option value="on_track">On track</option>
+          <option value="on_track">En Curso</option>
           <option value="at_risk">En riesgo</option>
           <option value="behind">Atrasado</option>
           <option value="achieved">Logrado</option>

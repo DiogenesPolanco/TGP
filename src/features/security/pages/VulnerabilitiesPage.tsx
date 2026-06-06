@@ -8,6 +8,21 @@ import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Search, Filter, Upload, X, Shield, AlertTriangle, Clock, Pencil, Trash2 } from 'lucide-react'
 
+const severityLabel: Record<string, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja',
+  info: 'Info',
+}
+
+const vulnStatusLabel: Record<string, string> = {
+  open: 'Abierta',
+  in_progress: 'En Progreso',
+  fixed: 'Corregida',
+  accepted: 'Aceptada',
+}
+
 export function VulnerabilitiesPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -189,7 +204,7 @@ export function VulnerabilitiesPage() {
                   <td className="px-6 py-4 text-sm font-medium text-neutral-90 dark:text-white">{vuln.cvssScore}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(vuln.severity)}`}>
-                      {vuln.severity}
+                      {severityLabel[vuln.severity]}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -199,7 +214,7 @@ export function VulnerabilitiesPage() {
                       vuln.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
                       'bg-danger/10 text-danger'
                     }`}>
-                      {vuln.status}
+                      {vulnStatusLabel[vuln.status]}
                     </span>
                   </td>
                   <td className="px-6 py-4">

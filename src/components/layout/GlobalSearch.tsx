@@ -2,6 +2,60 @@ import { useState, useEffect, useRef, useCallback, useMemo, startTransition } fr
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
+
+function statusLabel(status: string): string {
+  const map: Record<string, string> = {
+    open: 'Abierto',
+    mitigated: 'Mitigado',
+    accepted: 'Aceptado',
+    closed: 'Cerrado',
+    in_progress: 'En Progreso',
+    resolved: 'Resuelto',
+    overdue: 'Vencido',
+    fixed: 'Corregido',
+    detected: 'Detectado',
+    acknowledged: 'Reconocido',
+    active: 'Activo',
+    cancelled: 'Cancelado',
+    completed: 'Completado',
+    planned: 'Planificado',
+    on_hold: 'En Pausa',
+    pending: 'Pendiente',
+    todo: 'Por Hacer',
+    review: 'En Revisión',
+    done: 'Hecho',
+    at_risk: 'En Riesgo',
+    breached: 'Incumplido',
+    fulfilled: 'Cumplido',
+    escalated: 'Escalado',
+    not_started: 'No Iniciado',
+    on_track: 'En Curso',
+    behind: 'Atrasado',
+    achieved: 'Logrado',
+  }
+  return map[status] ?? status
+}
+
+function severityLabel(severity: string): string {
+  const map: Record<string, string> = {
+    critical: 'Crítica',
+    high: 'Alta',
+    medium: 'Media',
+    low: 'Baja',
+    info: 'Info',
+  }
+  return map[severity] ?? severity
+}
+
+function priorityLabel(priority: string): string {
+  const map: Record<string, string> = {
+    low: 'Baja',
+    medium: 'Media',
+    high: 'Alta',
+    critical: 'Crítica',
+  }
+  return map[priority] ?? priority
+}
 import {
   Search,
   AppWindow,
@@ -136,25 +190,25 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           searchEntity(db.vulnerabilities, ['title', 'externalId'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `CVSS ${item.cvssScore} · ${item.severity}`,
+            subtitle: `CVSS ${item.cvssScore} · ${severityLabel(item.severity)}`,
             entity: item,
           })),
           searchEntity(db.incidents, ['title', 'externalId'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: item.severity,
+            subtitle: severityLabel(item.severity),
             entity: item,
           })),
           searchEntity(db.risks, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `Score ${item.riskScore} · ${item.status}`,
+            subtitle: `Score ${item.riskScore} · ${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.auditFindings, ['title', 'auditReference'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.category} · ${item.status}`,
+            subtitle: `${item.category} · ${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.teams, ['name'], q, (item) => ({
@@ -166,7 +220,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           searchEntity(db.objectives, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.progress}% · ${item.status}`,
+            subtitle: `${item.progress}% · ${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.businessUnits, ['name'], q, (item) => ({
@@ -178,37 +232,37 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           searchEntity(db.plans, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.status} · ${item.teamId}`,
+            subtitle: `${statusLabel(item.status)} · ${item.teamId}`,
             entity: item,
           })),
           searchEntity(db.activities, ['title'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.status}`,
+            subtitle: `${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.tasks, ['title'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.status} · ${item.priority}`,
+            subtitle: `${statusLabel(item.status)} · ${priorityLabel(item.priority)}`,
             entity: item,
           })),
           searchEntity(db.commitments, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.status}`,
+            subtitle: `${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.blockers, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: `${item.severity} · ${item.status}`,
+            subtitle: `${severityLabel(item.severity)} · ${statusLabel(item.status)}`,
             entity: item,
           })),
           searchEntity(db.deliverables, ['title', 'description'], q, (item) => ({
             id: item.id,
             title: item.title,
-            subtitle: item.status,
+            subtitle: statusLabel(item.status),
             entity: item,
           })),
           searchEntity(db.microservices, ['name', 'description'], q, (item) => ({
