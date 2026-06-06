@@ -8,6 +8,8 @@ import { PredictionsWidget } from '../components/PredictionsWidget'
 import { DashboardConfigModal } from '../components/DashboardConfigModal'
 import { useDashboardConfigStore } from '@/stores/dashboardConfigStore'
 import { createShareLink, getPublicDashboardData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 
 export function DashboardPage() {
   const metrics = useDashboardMetrics()
@@ -16,11 +18,13 @@ export function DashboardPage() {
   const [showConfig, setShowConfig] = useState(false)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<unknown>(null)
 
   const handleShare = useCallback(async () => {
     const data = await getPublicDashboardData()
-    const { url } = await createShareLink(48, 'dashboard', undefined, data)
-    setShareUrl(url)
+    setSharePending(data)
+    setShowPassphrase(true)
   }, [])
 
   const cleanUrl = shareUrl?.split('#')[0] ?? ''
@@ -119,6 +123,28 @@ export function DashboardPage() {
       )}
 
       {showConfig && <DashboardConfigModal onClose={() => setShowConfig(false)} />}
+      {showPassphrase && (
+        <PassphraseModal
+          title="Proteger enlace compartido"
+          description="Opcional: agrega una contraseña para cifrar los datos. Quien reciba el enlace necesitará la contraseña para verlos."
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'dashboard', undefined, payload)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onSkip={async () => {
+            const data = sharePending
+            const { url } = await createShareLink(48, 'dashboard', undefined, data)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
     </div>
   )
 }

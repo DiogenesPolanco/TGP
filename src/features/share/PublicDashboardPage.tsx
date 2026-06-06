@@ -7,52 +7,67 @@ import {
 } from 'lucide-react'
 import { ThiGauge } from '@/components/charts/ThiGauge'
 import { cn } from '@/lib/utils'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 
-// ── Executive KPIs — what a VP/Gerente actually needs ──
+// ── Executive KPIs ──
 
 export function PublicDashboardPage() {
   const { hash } = useParams<{ hash: string }>()
   const [valid, setValid] = useState<boolean | null>(null)
   const [data, setData] = useState<PublicDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
 
   useEffect(() => {
     if (!hash) { setValid(false); setLoading(false); return }
+    ;(async () => {
 
-    const load = async () => {
-      // 1. Try URL hash fragment (manifest)
-      const rawHash = window.location.hash.replace(/^#/, '')
-      if (rawHash) {
-        try {
-          const fragment = decodeURIComponent(rawHash)
-          const { downloadUsingManifest } = await import('@/services/share/azureShareService')
-          const azureData = await downloadUsingManifest(fragment) as PublicDashboardData | null
-          if (azureData) { setData(azureData); setValid(true); setLoading(false); return }
-          console.warn('[PublicDashboard] Manifest found but Azure returned no data')
-        } catch (err) {
-          console.error('[PublicDashboard] Azure download error:', err)
-        }
-      }
-
-      // 2. Fallback: viewer's own Azure config
-      try {
-        const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
-        const viewerData = await downloadShareFromAzure(hash) as PublicDashboardData | null
-        if (viewerData) { setData(viewerData); setValid(true); setLoading(false); return }
-      } catch (err) {
-        console.warn('[PublicDashboard] Viewer Azure config error:', err)
-      }
-
-      // 3. Last fallback: localStorage (same-browser dev/testing)
-      if (isValidShareHash(hash)) {
-        const d = await getPublicDashboardData()
-        setData(d); setValid(true)
+    const tryDecryptOrShow = (raw: unknown) => {
+      if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
+        setPendingEncrypted(raw as EncryptedPayload)
+        setValid(true)
+        setLoading(false)
       } else {
-        setValid(false)
+        setData(raw as PublicDashboardData)
+        setValid(true)
+        setLoading(false)
       }
-      setLoading(false)
     }
-    load()
+
+    // 1. Try URL hash fragment (manifest)
+    const rawHash = window.location.hash.replace(/^#/, '')
+    if (rawHash) {
+      try {
+        const fragment = decodeURIComponent(rawHash)
+        const { downloadUsingManifest } = await import('@/services/share/azureShareService')
+        const azureData = await downloadUsingManifest(fragment)
+        if (azureData) { tryDecryptOrShow(azureData); return }
+        console.warn('[PublicDashboard] Manifest found but Azure returned no data')
+      } catch (err) {
+        console.error('[PublicDashboard] Azure download error:', err)
+      }
+    }
+
+    // 2. Fallback: viewer's own Azure config
+    try {
+      const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+      const viewerData = await downloadShareFromAzure(hash)
+      if (viewerData) { tryDecryptOrShow(viewerData); return }
+    } catch (err) {
+      console.warn('[PublicDashboard] Viewer Azure config error:', err)
+    }
+
+    // 3. Last fallback: localStorage
+    if (isValidShareHash(hash)) {
+      const d = await getPublicDashboardData()
+      setData(d); setValid(true)
+    } else {
+      setValid(false)
+    }
+    setLoading(false)
+
+    })()
   }, [hash])
 
   const kpis = useMemo(() => {
@@ -133,7 +148,29 @@ export function PublicDashboardPage() {
 
   if (loading) return <Loader />
   if (!valid) return <InvalidLink />
-  if (!data || !kpis) return null
+  if (!data || !kpis) {
+    // Show passphrase modal if encrypted data is pending
+    if (pendingEncrypted) {
+      return (
+        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+          <PassphraseModal
+            title="Datos protegidos con contraseña"
+            description="Este dashboard fue compartido con cifrado de extremo a extremo. Ingresa la contraseña que el creador te proporcionó."
+            onSubmit={async (pass) => {
+              const decrypted = await decryptData(pendingEncrypted, pass)
+              if (decrypted) {
+                setData(decrypted as PublicDashboardData)
+                setPendingEncrypted(null)
+              } else {
+                alert('Contraseña incorrecta. Intenta de nuevo.')
+              }
+            }}
+          />
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
