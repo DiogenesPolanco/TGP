@@ -18,6 +18,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       animate="animate"
       exit="exit"
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className="h-full"
     >
       {children}
     </motion.div>

@@ -101,10 +101,10 @@ export default function ReportsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" />
-          <h1 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Reportes</h1>
+          <h1 className="text-lg font-semibold text-neutral-90 dark:text-neutral-10">Reportes</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -134,7 +134,7 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      <div className="flex overflow-x-auto border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 px-2">
+      <div className="flex overflow-x-auto border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-85 px-2">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -142,7 +142,7 @@ export default function ReportsPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-primary text-primary'
-                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
+                : 'border-transparent text-neutral-60 dark:text-neutral-30 hover:text-neutral-90 dark:hover:text-white'
             }`}
           >
             {tab.icon}
@@ -157,7 +157,7 @@ export default function ReportsPage() {
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : !data ? (
-          <div className="flex items-center justify-center h-48 text-neutral-400">
+          <div className="flex items-center justify-center h-48 text-neutral-50 dark:text-neutral-40">
             No se pudieron cargar los datos.
           </div>
         ) : (
@@ -169,27 +169,27 @@ export default function ReportsPage() {
                     key={i}
                     className={`rounded-lg border p-4 ${colorMap[item.color || '#2563eb'] || colorMap['#2563eb']}`}
                   >
-                    <div className="text-xs font-medium opacity-70 mb-1">{item.label}</div>
-                    <div className="text-2xl font-bold">{item.value}</div>
+                    <div className="text-xs font-medium opacity-70 dark:text-white/70 mb-1">{item.label}</div>
+                    <div className="text-2xl font-bold dark:text-white">{item.value}</div>
                   </div>
                 ))}
               </div>
             )}
 
             {data.sections.map((section, si) => (
-              <div key={si} className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
-                <div className="px-5 py-3 border-b border-neutral-200 dark:border-neutral-700">
-                  <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{section.title}</h3>
-                  <p className="text-xs text-neutral-400 mt-0.5">{section.rows.length} registros</p>
+              <div key={si} className="bg-white dark:bg-neutral-80 rounded-lg border border-neutral-20 dark:border-neutral-70">
+                  <div className="px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+                    <h3 className="text-sm font-semibold text-neutral-80 dark:text-white">{section.title}</h3>
+                  <p className="text-xs text-neutral-50 dark:text-neutral-40 mt-0.5">{section.rows.length} registros</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50">
+                      <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-85">
                         {section.columns.map((col, ci) => (
                           <th
                             key={ci}
-                            className={`px-4 py-3 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ${
+                            className={`px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-30 uppercase tracking-wider ${
                               col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'
                             }`}
                           >
@@ -198,16 +198,16 @@ export default function ReportsPage() {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+                    <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
                       {section.rows.length === 0 ? (
                         <tr>
-                          <td colSpan={section.columns.length} className="px-4 py-8 text-center text-neutral-400">
+                          <td colSpan={section.columns.length} className="px-4 py-8 text-center text-neutral-40 dark:text-neutral-30">
                             No hay datos disponibles.
                           </td>
                         </tr>
                       ) : (
                         section.rows.map((row, ri) => (
-                          <tr key={ri} className="hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors">
+                          <tr key={ri} className="hover:bg-neutral-10 dark:hover:bg-neutral-85 transition-colors">
                             {section.columns.map((col, ci) => {
                               const val = row[col.dataKey]
                               const display = val != null ? String(val) : '-'
@@ -215,7 +215,7 @@ export default function ReportsPage() {
                               return (
                                 <td
                                   key={ci}
-                                  className={`px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 ${
+                                  className={`px-4 py-2.5 text-sm text-neutral-70 dark:text-white ${
                                     col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'
                                   }`}
                                 >

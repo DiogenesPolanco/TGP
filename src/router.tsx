@@ -1,11 +1,27 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
+import { PublicPerformancePage } from '@/features/share/PublicPerformancePage'
+import { PublicMemberPage } from '@/features/share/PublicMemberPage'
+import { PublicMembersOverviewPage } from '@/features/share/PublicMembersOverviewPage'
+import ReportsPage from '@/features/reports/pages/ReportsPage'
 
 export const router = createBrowserRouter([
   {
     path: '/public/:hash',
     element: <PublicDashboardPage />,
+  },
+  {
+    path: '/public/performance/:hash',
+    element: <PublicPerformancePage />,
+  },
+  {
+    path: '/public/member/:hash',
+    element: <PublicMemberPage />,
+  },
+  {
+    path: '/public/members/:hash',
+    element: <PublicMembersOverviewPage />,
   },
   {
     path: '/',
@@ -18,7 +34,7 @@ export const router = createBrowserRouter([
       { path: 'compare', lazy: () => import('@/features/comparison/ComparePage').then((m) => ({ Component: m.ComparePage })) },
       { path: 'dependencies', lazy: () => import('@/features/dependencies/DependencyMapPage').then((m) => ({ Component: m.DependencyMapPage })) },
       { path: 'predictions', lazy: () => import('@/features/predictions/PredictionsPage').then((m) => ({ Component: m.PredictionsPage })) },
-      { path: 'reports', lazy: () => import('@/features/reports/pages/ReportsPage') },
+      { path: 'reports', element: <ReportsPage /> },
 
       // Catálogo
       { path: 'catalog/applications', lazy: () => import('@/features/catalog/pages/ApplicationsPage').then((m) => ({ Component: m.ApplicationsPage })) },

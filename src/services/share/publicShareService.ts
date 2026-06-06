@@ -2,8 +2,12 @@ import { db } from '@/services/db/database'
 
 const SHARED_LINKS_KEY = 'tgp-shared-links'
 
+type ShareType = 'dashboard' | 'performance' | 'member' | 'members'
+
 interface SharedLink {
   hash: string
+  type: ShareType
+  ref?: string
   createdAt: number
   expiresAt: number
 }
@@ -26,17 +30,31 @@ function saveSharedLinks(links: SharedLink[]) {
   localStorage.setItem(SHARED_LINKS_KEY, JSON.stringify(links))
 }
 
-export function createShareLink(hoursValid = 48): { hash: string; url: string } {
+export function createShareLink(hoursValid = 48, type: ShareType = 'dashboard', ref?: string): { hash: string; url: string } {
   const links = getSharedLinks()
   const hash = generateHash()
   const link: SharedLink = {
     hash,
+    type,
+    ref,
     createdAt: Date.now(),
     expiresAt: Date.now() + hoursValid * 60 * 60 * 1000,
   }
   links.push(link)
   saveSharedLinks(links)
-  return { hash, url: `${window.location.origin}/public/${hash}` }
+  const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : '/public'
+  return { hash, url: `${window.location.origin}${base}/${hash}` }
+}
+
+export function getShareInfo(hash: string): { type: ShareType; ref?: string } | null {
+  const links = getSharedLinks()
+  const link = links.find((l) => l.hash === hash)
+  if (!link) return null
+  return { type: link.type, ref: link.ref }
+}
+
+export function getShareType(hash: string): ShareType | null {
+  return getShareInfo(hash)?.type ?? null
 }
 
 export function getSharedLinksList(): (SharedLink & { url: string })[] {
@@ -59,7 +77,7 @@ export function isValidShareHash(hash: string): boolean {
 }
 
 export async function getPublicDashboardData() {
-  const [businessUnits, applications, vulnerabilities, incidents, risks, technologies, teams, healthHistory] =
+  const [businessUnits, applications, vulnerabilities, incidents, risks, technologies, teams, auditFindings, healthHistory] =
     await Promise.all([
       db.businessUnits.toArray(),
       db.applications.toArray(),
@@ -68,6 +86,7 @@ export async function getPublicDashboardData() {
       db.risks.toArray(),
       db.technologies.toArray(),
       db.teams.toArray(),
+      db.auditFindings.toArray(),
       db.healthIndexHistory.orderBy('calculatedAt').reverse().limit(30).toArray(),
     ])
 
@@ -79,8 +98,39 @@ export async function getPublicDashboardData() {
     risks: risks.map(({ id, title, riskScore, status }) => ({ id, title, riskScore, status })),
     technologies: technologies.map(({ id, name, version, supportStatus }) => ({ id, name, version, supportStatus })),
     teams: teams.map(({ id, name, currentMetrics }) => ({ id, name, currentMetrics })),
+    auditFindings: auditFindings.map(({ id, title, severity, status, dueDate }) => ({ id, title, severity, status, dueDate })),
     healthHistory: healthHistory.map((h) => ({ date: h.calculatedAt, score: h.overallScore })),
   }
 }
 
 export type PublicDashboardData = Awaited<ReturnType<typeof getPublicDashboardData>>
+
+export async function getPublicPerformanceData() {
+  const [teams, members, sprints, oneOnOnes, achievements] = await Promise.all([
+    db.teams.toArray(),
+    db.memberProfiles.toArray(),
+    db.sprintRecords.toArray(),
+    db.oneOnOnes.toArray(),
+    db.achievements.toArray(),
+  ])
+
+  return { teams, members, sprints, oneOnOnes, achievements }
+}
+
+export type PublicPerformanceData = Awaited<ReturnType<typeof getPublicPerformanceData>>
+
+export async function getPublicMemberData(memberId: string) {
+  const [member, teams, sprints, oneOnOnes, achievements] = await Promise.all([
+    db.memberProfiles.get(memberId),
+    db.teams.toArray(),
+    db.sprintRecords.where('memberId').equals(memberId).toArray(),
+    db.oneOnOnes.where('memberId').equals(memberId).toArray(),
+    db.achievements.where('memberId').equals(memberId).toArray(),
+  ])
+  if (!member) return null
+  const memberTeam = teams.find((t) => t.id === member.teamId)
+  const displayName = memberTeam?.members?.find((tm) => tm.id === memberId)?.displayName ?? member.email.split('@')[0] ?? 'Miembro'
+  return { member, displayName, team: memberTeam ?? null, sprints, oneOnOnes, achievements }
+}
+
+export type PublicMemberData = Awaited<ReturnType<typeof getPublicMemberData>>

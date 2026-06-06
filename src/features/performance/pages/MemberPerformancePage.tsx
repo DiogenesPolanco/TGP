@@ -4,7 +4,8 @@ import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { createShareLink } from '@/services/share/publicShareService'
+import { ArrowLeft, Loader2, Share2, Check, Copy } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
 import { SprintsSection } from '@/features/performance/components/SprintsSection'
@@ -18,6 +19,8 @@ type Tab = 'perfil' | 'skills' | 'tecnologias' | 'microservicios' | 'sprints' | 
 export function MemberPerformancePage() {
   const { memberId, id: teamId } = useParams<{ memberId: string; id: string }>()
   const navigate = useNavigate()
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const [team, setTeam] = useState<Team | null>(null)
   const [profile, setProfile] = useState<MemberProfile | null>(null)
   const [kpis, setKpis] = useState<Awaited<ReturnType<typeof getMemberKPIs>> | null>(null)
@@ -83,7 +86,29 @@ export function MemberPerformancePage() {
             </h1>
             <p className="text-sm text-neutral-50">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role} · {team?.name}</p>
           </div>
+          <button
+            onClick={() => {
+              if (shareUrl) { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); return }
+              const { url } = createShareLink(48, 'member', memberId)
+              setShareUrl(url)
+              navigator.clipboard.writeText(url)
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            title="Compartir perfil"
+          >
+            {copied ? <Check size={16} className="text-success" /> : <Share2 size={16} />}
+            {copied ? 'Copiado' : 'Compartir'}
+          </button>
         </div>
+
+        {shareUrl && (
+          <div className="mb-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-2 text-sm">
+            <span className="text-neutral-50 shrink-0">Enlace:</span>
+            <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-2 py-1 rounded truncate font-mono">{shareUrl}</code>
+          </div>
+        )}
 
         {/* Mini KPIs */}
         {kpis && (

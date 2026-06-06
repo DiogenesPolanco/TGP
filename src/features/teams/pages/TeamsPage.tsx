@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { createShareLink, getSharedLinksList } from '@/services/share/publicShareService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Filter, Upload, X, Users, TrendingUp, Award, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, Users, TrendingUp, Award, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
 
 export function TeamsPage() {
   const navigate = useNavigate()
@@ -16,6 +17,8 @@ export function TeamsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -61,6 +64,18 @@ export function TeamsPage() {
             Importar
           </button>
           <button
+            onClick={() => {
+              const existing = getSharedLinksList().filter((l) => l.url.includes('/public/performance/'))
+              if (existing.length > 0) { setShareUrl(existing[0].url); return }
+              const { url } = createShareLink(48, 'performance')
+              setShareUrl(url)
+            }}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Share2 size={16} />
+            Compartir
+          </button>
+          <button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
@@ -69,6 +84,18 @@ export function TeamsPage() {
           </button>
         </div>
       </div>
+
+      {shareUrl && (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3">
+          <span className="text-sm text-neutral-50 shrink-0">Enlace compartido:</span>
+          <code className="flex-1 text-sm bg-neutral-5 dark:bg-neutral-85 px-3 py-1.5 rounded-lg text-neutral-70 dark:text-neutral-30 truncate font-mono">{shareUrl}</code>
+          <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20">
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+            {copied ? 'Copiado' : 'Copiar'}
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-4">
         <StatCard icon={<Users size={20} />} label="Total Equipos" value={teams.length} color="text-primary" onClick={() => setSearchTerm('')} />
