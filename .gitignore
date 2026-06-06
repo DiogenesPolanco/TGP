@@ -24,3 +24,7 @@ PROMPT-*.md
 .memento.json
 
 .memento/scripts/
+
+# Playwright test artifacts
+test-results/
+playwright-report/

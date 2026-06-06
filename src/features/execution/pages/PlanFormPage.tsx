@@ -30,16 +30,18 @@ export function PlanFormPage() {
 
   useEffect(() => {
     if (plan) {
-      setFormData({
-        title: plan.title ?? '',
-        description: plan.description ?? '',
-        teamId: plan.teamId ?? '',
-        businessUnitId: plan.businessUnitId ?? '',
-        objectiveId: plan.objectiveId ?? '',
-        status: (plan.status as ProjectStatus) ?? 'planned',
-        health: (plan.health as ProjectHealth) ?? 'green',
-        startDate: plan.startDate ? new Date(plan.startDate).toISOString().split('T')[0] : '',
-        endDate: plan.endDate ? new Date(plan.endDate).toISOString().split('T')[0] : '',
+      queueMicrotask(() => {
+        setFormData({
+          title: plan.title ?? '',
+          description: plan.description ?? '',
+          teamId: plan.teamId ?? '',
+          businessUnitId: plan.businessUnitId ?? '',
+          objectiveId: plan.objectiveId ?? '',
+          status: (plan.status as ProjectStatus) ?? 'planned',
+          health: (plan.health as ProjectHealth) ?? 'green',
+          startDate: plan.startDate ? new Date(plan.startDate).toISOString().split('T')[0] : '',
+          endDate: plan.endDate ? new Date(plan.endDate).toISOString().split('T')[0] : '',
+        })
       })
     }
   }, [plan])

@@ -36,6 +36,36 @@ const gradientOverlaySummary = {
   primary: 'from-primary/5',
 }
 
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: Record<string, unknown> }>; label?: string }) {
+  if (!active || !payload?.length) return null
+  const data = payload[0].payload
+  return (
+    <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
+      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+        {label}
+      </p>
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-neutral-60 dark:text-neutral-40">Predictibilidad</span>
+          <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad as string}%</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-neutral-60 dark:text-neutral-40">Planificados</span>
+          <span className="font-medium text-neutral-90 dark:text-white">{data.estimado as string} pts</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-neutral-60 dark:text-neutral-40">Completados</span>
+          <span className="font-medium text-neutral-90 dark:text-white">{data.real as string} pts</span>
+        </div>
+        <div className="flex items-center justify-between gap-4 pt-1 border-t border-neutral-20 dark:border-neutral-70">
+          <span className="text-neutral-60 dark:text-neutral-40">Planes</span>
+          <span className="font-medium text-neutral-90 dark:text-white">{data.planes as string}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
   const [granularity, setGranularity] = useState<PeriodGranularity>('monthly')
@@ -84,36 +114,6 @@ export function PredictabilityPage() {
       color: p.color,
     }))
   }, [currentPeriods])
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload?.length) return null
-    const data = payload[0].payload
-    return (
-      <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
-        <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
-          {label}
-        </p>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-neutral-60 dark:text-neutral-40">Predictibilidad</span>
-            <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad}%</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-neutral-60 dark:text-neutral-40">Planificados</span>
-            <span className="font-medium text-neutral-90 dark:text-white">{data.estimado} pts</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-neutral-60 dark:text-neutral-40">Completados</span>
-            <span className="font-medium text-neutral-90 dark:text-white">{data.real} pts</span>
-          </div>
-          <div className="flex items-center justify-between gap-4 pt-1 border-t border-neutral-20 dark:border-neutral-70">
-            <span className="text-neutral-60 dark:text-neutral-40">Planes</span>
-            <span className="font-medium text-neutral-90 dark:text-white">{data.planes}</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-6">
@@ -273,7 +273,7 @@ export function PredictabilityPage() {
                 animationBegin={0}
                 animationDuration={1200}
                 animationEasing="ease-out"
-                shape={(props: any) => {
+                shape={(props: { x?: number; y?: number; width?: number; height?: number }) => {
                   const { x, y, width, height, payload } = props
                   const fill = payload.color === 'success' ? 'url(#pred-chart-success)'
                     : payload.color === 'warning' ? 'url(#pred-chart-warning)'

@@ -44,7 +44,7 @@ export function SkillsSection({ memberId }: Props) {
       const names = new Set<string>()
       for (const p of profiles) {
         if (p.id === memberId) continue
-        for (const s of (p as any).skills ?? []) {
+        for (const s of p.skills ?? []) {
           if (s.name) names.add(s.name)
         }
       }
@@ -60,25 +60,28 @@ export function SkillsSection({ memberId }: Props) {
   }, [allExistingSkills, newName])
 
   const saveSkills = async (updated: Skill[]) => {
-    const existing = profile ?? { skills: [] }
-    await db.memberProfiles.put({
-      ...existing,
+    const defaults = {
       id: memberId,
       teamId: '',
-      email: (existing as any).email ?? '',
-      phoneCell: (existing as any).phoneCell ?? '',
-      phoneHome: (existing as any).phoneHome ?? '',
-      address: (existing as any).address ?? '',
-      role: (existing as any).role ?? 'developer',
-      technologies: (existing as any).technologies ?? [],
-      microservices: (existing as any).microservices ?? [] as string[],
-      avgStoryPoints: (existing as any).avgStoryPoints ?? 0,
-      vacationDaysPerYear: (existing as any).vacationDaysPerYear ?? 14,
-      vacationUsed: (existing as any).vacationUsed ?? 0,
-      createdAt: (existing as any).createdAt ?? new Date(),
+      email: '',
+      phoneCell: '',
+      phoneHome: '',
+      address: '',
+      role: 'developer' as const,
+      technologies: [] as string[],
+      microservices: [] as string[],
+      avgStoryPoints: 0,
+      vacationDaysPerYear: 14,
+      vacationUsed: 0,
+      createdAt: new Date(),
       updatedAt: new Date(),
+      skills: [] as Skill[],
+    }
+    await db.memberProfiles.put({
+      ...defaults,
+      ...(profile ?? {}),
       skills: updated,
-    } as any)
+    })
   }
 
   const addSkill = async (name?: string, category?: string) => {

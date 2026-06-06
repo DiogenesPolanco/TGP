@@ -4,7 +4,7 @@ import type {
   Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus,
   Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus,
   AuditCategory, AuditStatus, DatabaseType, EnvironmentType,
-  DeliverableStatus, UserRole, BusinessUnitStatus, PlanStatus,
+  DeliverableStatus, UserRole, BusinessUnitStatus,
 } from '@/types/domain'
 import type {
   TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus,
@@ -44,7 +44,8 @@ function sanitizeRecordValue(value: unknown): unknown {
   if (typeof value === 'string') {
     return value
       .slice(0, 5000) // limit length to prevent abuse
-      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '') // strip control chars except tab/newline
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
   }
   return value
 }
@@ -374,7 +375,7 @@ const importConfigs: Record<string, ImportConfig> = {
       id,
       applicationId: String(row['App ID (origen)'] ?? ''),
       dependsOnAppId: String(row['App ID (destino)'] ?? ''),
-      dependencyType: (row['Tipo Dependencia'] as any) ?? 'hard',
+      dependencyType: (row['Tipo Dependencia'] as DependencyRelation) ?? 'hard',
       criticality: (row['Criticidad'] as Criticality) ?? 'medium',
       description: String(row['Descripción'] ?? ''),
       createdAt: new Date(),
@@ -513,7 +514,7 @@ const importConfigs: Record<string, ImportConfig> = {
       teamId: String(row['Team ID'] ?? '') || null,
       applicationId: String(row['App ID'] ?? '') || null,
       priority: (row['Prioridad'] as Criticality) ?? 'medium',
-      status: (row['Estado'] as any) ?? 'pending',
+      status: (row['Estado'] as TaskStatus) ?? 'pending',
       estimatedHours: parseNumberCell(row['Horas Estimadas']),
       actualHours: null,
       plannedPoints: null,
@@ -616,6 +617,7 @@ const importConfigs: Record<string, ImportConfig> = {
     ],
     buildEntity: (row, id) => ({
       id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       sourceType: (row['Tipo Origen'] as any) ?? 'activity',
       sourceId: String(row['Source ID'] ?? ''),
       title: String(row['Título'] ?? ''),
@@ -649,13 +651,13 @@ const importConfigs: Record<string, ImportConfig> = {
     ],
     buildEntity: (row, id) => ({
       id,
-      sourceType: (row['Tipo Origen'] as any) ?? 'task',
+      sourceType: String(row['Tipo Origen'] ?? 'task'),
       sourceId: String(row['Source ID'] ?? ''),
-      targetType: (row['Tipo Destino'] as any) ?? 'task',
+      targetType: String(row['Tipo Destino'] ?? 'task'),
       targetId: String(row['Target ID'] ?? ''),
       relationType: ((row['Tipo Relación'] as string) ?? 'depends_on') as DependencyRelation,
       description: String(row['Descripción'] ?? ''),
-      status: (row['Estado'] as any) ?? 'active',
+      status: String(row['Estado'] ?? 'active'),
       expectedResolutionDate: null,
       metadata: {},
       createdAt: new Date(),
@@ -680,7 +682,7 @@ const importConfigs: Record<string, ImportConfig> = {
       id,
       memberId: String(row['Member ID'] ?? ''),
       sprintName: String(row['Sprint'] ?? ''),
-      quarter: String(row['Quarter'] ?? '') as any,
+      quarter: String(row['Quarter'] ?? ''),
       year: Number(row['Año']) || new Date().getFullYear(),
       storyPointsCompleted: parseNumberCell(row['SP Completados']) ?? 0,
       storyPointsNotCompleted: parseNumberCell(row['SP No Completados']) ?? 0,
@@ -706,7 +708,7 @@ const importConfigs: Record<string, ImportConfig> = {
       title: String(row['Título'] ?? ''),
       description: String(row['Descripción'] ?? ''),
       date: parseDateCell(row['Fecha']) ?? new Date(),
-      type: String(row['Tipo'] ?? 'logro') as any,
+      type: String(row['Tipo'] ?? 'logro'),
       linkedToPromotion: false,
       createdAt: new Date(),
     }),
@@ -729,8 +731,8 @@ const importConfigs: Record<string, ImportConfig> = {
       memberId: String(row['Member ID'] ?? ''),
       startDate: parseDateCell(row['Fecha Inicio']) ?? new Date(),
       endDate: parseDateCell(row['Fecha Fin']) ?? new Date(),
-      type: String(row['Tipo'] ?? 'vacation') as any,
-      status: String(row['Estado'] ?? 'approved') as any,
+      type: String(row['Tipo'] ?? 'vacation'),
+      status: String(row['Estado'] ?? 'approved'),
       createdAt: new Date(),
     }),
     matchKey: (row) => ({ memberId: String(row['Member ID'] ?? ''), startDate: parseDateCell(row['Fecha Inicio']) }),
@@ -755,7 +757,7 @@ const importConfigs: Record<string, ImportConfig> = {
       id,
       teamId: String(row['Team ID'] ?? ''),
       sprintName: String(row['Sprint'] ?? ''),
-      quarter: String(row['Quarter'] ?? '') as any,
+      quarter: String(row['Quarter'] ?? ''),
       year: Number(row['Año']) || new Date().getFullYear(),
       plannedSP: parseNumberCell(row['SP Planificados']) ?? 0,
       completedSP: parseNumberCell(row['SP Completados']) ?? 0,
@@ -894,7 +896,8 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
     errors: [],
   }
 
-  const table = db[config.table] as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const table = db[config.table as keyof typeof db] as any
 
   for (const row of parsedRows) {
     if (row.errors.length > 0) {
@@ -906,6 +909,7 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
     try {
       const matchFields = config.matchKey(row.data)
       const matchKeys = Object.keys(matchFields)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let existing: any = null
 
       if (matchKeys.length === 1) {
@@ -914,15 +918,18 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
         } catch {
           // Fallback if the field isn't indexed (e.g. schema not yet migrated)
           const all = await table.toArray()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           existing = all.find((item: any) => item[matchKeys[0]] === matchFields[matchKeys[0]])
         }
       } else {
         const all = await table.toArray()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         existing = all.find((item: any) =>
           matchKeys.every((k) => item[k] === matchFields[k]),
         )
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entity = config.buildEntity(row.data, existing?.id ?? generateId()) as any
 
       if (existing) {

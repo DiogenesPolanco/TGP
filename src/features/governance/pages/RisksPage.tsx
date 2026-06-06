@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Plus, Search, Filter, Upload, X, Pencil, Trash2 } from 'lucide-react'
+import type { Risk } from '@/types/domain'
 
 const statusLabel: Record<string, string> = {
   open: 'Abierto',
@@ -35,8 +35,6 @@ export function RisksPage() {
     (!selectedCell || (r.probability === selectedCell.prob && r.impact === selectedCell.impact))
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedRisks } = usePagination(filteredRisks, 5)
-
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar riesgo?')) {
       await db.risks.delete(id)
@@ -56,6 +54,100 @@ export function RisksPage() {
   const getCellRisks = (prob: number, impact: number) => {
     return risks.filter((r) => r.probability === prob && r.impact === impact)
   }
+
+  const columns: Column<Risk>[] = [
+    {
+      key: 'title',
+      label: 'Título',
+      sortable: true,
+      render: (risk) => (
+        <>
+          <p className="text-sm font-medium text-neutral-90 dark:text-white">{risk.title}</p>
+          <p className="text-xs text-neutral-50 dark:text-neutral-50">{risk.description}</p>
+        </>
+      ),
+    },
+    {
+      key: 'applicationId',
+      label: 'App',
+      render: (risk) => {
+        const app = applications.find((a) => a.id === risk.applicationId)
+        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+      },
+    },
+    {
+      key: 'category',
+      label: 'Categoría',
+      sortable: true,
+      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.category}</span>,
+    },
+    {
+      key: 'probability',
+      label: 'Prob',
+      sortable: true,
+      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.probability}</span>,
+    },
+    {
+      key: 'impact',
+      label: 'Impacto',
+      sortable: true,
+      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.impact}</span>,
+    },
+    {
+      key: 'riskScore',
+      label: 'Score',
+      sortable: true,
+      render: (risk) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          risk.riskScore >= 20 ? 'bg-danger/10 text-danger' :
+          risk.riskScore >= 15 ? 'bg-warning/10 text-warning' :
+          risk.riskScore >= 10 ? 'bg-orange-100 text-orange-700' :
+          'bg-success/10 text-success'
+        }`}>
+          {risk.riskScore}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (risk) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          risk.status === 'open' ? 'bg-danger/10 text-danger' :
+          risk.status === 'mitigated' ? 'bg-info/10 text-info' :
+          risk.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
+          'bg-success/10 text-success'
+        }`}>
+          {statusLabel[risk.status]}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (risk) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -196,92 +288,12 @@ export function RisksPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Categoría</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Prob</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Impacto</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Score</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedRisks.map((risk) => {
-              const app = applications.find((a) => a.id === risk.applicationId)
-              return (
-                <tr key={risk.id}
-                  onClick={() => navigate(`${risk.id}/edit`)}
-                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{risk.title}</p>
-                    <p className="text-xs text-neutral-50 dark:text-neutral-50">{risk.description}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{risk.category}</td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{risk.probability}</td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{risk.impact}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      risk.riskScore >= 20 ? 'bg-danger/10 text-danger' :
-                      risk.riskScore >= 15 ? 'bg-warning/10 text-warning' :
-                      risk.riskScore >= 10 ? 'bg-orange-100 text-orange-700' :
-                      'bg-success/10 text-success'
-                    }`}>
-                      {risk.riskScore}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      risk.status === 'open' ? 'bg-danger/10 text-danger' :
-                      risk.status === 'mitigated' ? 'bg-info/10 text-info' :
-                      risk.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
-                      'bg-success/10 text-success'
-                    }`}>
-                      {statusLabel[risk.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredRisks.length}
-          pageSize={5}
-          onPageChange={setPage}
-        />
-        {filteredRisks.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron riesgos</p>
-          </div>
-        )}
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredRisks}
+        onRowClick={(risk) => navigate(`${risk.id}/edit`)}
+        emptyMessage="No se encontraron riesgos"
+      />
     </div>
   )
 }

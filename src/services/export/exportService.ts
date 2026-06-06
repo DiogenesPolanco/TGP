@@ -1,3 +1,4 @@
+import Dexie from 'dexie'
 import { db } from '@/services/db/database'
 
 const BACKUP_STORAGE_KEY = 'tgp-db-backup'
@@ -40,11 +41,11 @@ const TABLE_NAMES = [
 ] as const
 
 async function getTableData(tableName: string): Promise<Record<string, unknown>[]> {
-  const dbAny = db as any
-  if (typeof dbAny[tableName]?.toArray === 'function') {
-    return await dbAny[tableName].toArray()
+  try {
+    return await db.table(tableName).toArray() as Record<string, unknown>[]
+  } catch {
+    return []
   }
-  return []
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────
@@ -208,9 +209,10 @@ export async function importBackup(backup: DatabaseBackup): Promise<{
 
     // Revive dates deeply and cast
     const records = rawRecords.map((r) => reviveDatesDeep(r)) as Record<string, unknown>[]
-    const dbAny = db as any
-    const table = dbAny[tableName]
-    if (!table || typeof table.put !== 'function') {
+    let table: Dexie.Table
+    try {
+      table = db.table(tableName)
+    } catch {
       errors.push(`${tableName}: table not found or no put() method`)
       continue
     }
@@ -222,7 +224,7 @@ export async function importBackup(backup: DatabaseBackup): Promise<{
     try {
       await table.bulkPut(records)
       restoredCount = records.length
-    } catch (_bulkErr) {
+    } catch {
       // Fall back to individual puts for maximum recovery
       for (const record of records) {
         try {

@@ -3,10 +3,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, Trash2, Pencil, Eye, X } from 'lucide-react'
+import type { Application } from '@/types/domain'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -32,8 +32,10 @@ export function ApplicationsPage() {
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
-  const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
+  const rawBusinessUnits = useLiveQuery(() => db.businessUnits.toArray())
+  const businessUnits = useMemo(() => rawBusinessUnits ?? [], [rawBusinessUnits])
 
   const filteredApps = useMemo(() => {
     return applications.filter((app) => {
@@ -47,8 +49,6 @@ export function ApplicationsPage() {
       return matchesSearch && matchesCriticality && matchesStatus && matchesBU
     })
   }, [applications, searchTerm, filterCriticality, filterStatus, filterBU])
-
-  const { page, setPage, totalPages, paginatedItems: paginatedApps } = usePagination(filteredApps, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Está seguro de eliminar esta aplicación?')) {
@@ -101,6 +101,88 @@ export function ApplicationsPage() {
     }
     return colors[status] || 'bg-neutral-10 text-neutral-60'
   }
+
+  const columns: Column<Application>[] = [
+    {
+      key: 'name',
+      label: 'Nombre',
+      sortable: true,
+      render: (app) => (
+        <>
+          <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline">
+            {app.name}
+          </Link>
+          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{app.description}</p>
+        </>
+      ),
+    },
+    {
+      key: 'ownerName',
+      label: 'Owner',
+      sortable: true,
+      render: (app) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{app.ownerName}</span>,
+    },
+    {
+      key: 'businessUnitId',
+      label: 'BU',
+      render: (app) => (
+        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+          {businessUnits.find((bu) => bu.id === app.businessUnitId)?.name || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'criticality',
+      label: 'Criticidad',
+      sortable: true,
+      render: (app) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCriticalityColor(app.criticality)}`}>
+          {criticalityLabel[app.criticality]}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (app) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
+          {appStatusLabel[app.status]}
+        </span>
+      ),
+    },
+    {
+      key: 'architecture',
+      label: 'Arquitectura',
+      sortable: true,
+      render: (app) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{app.architecture}</span>,
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (app) => (
+        <div className="flex items-center justify-end gap-2">
+          <Link to={`/catalog/applications/${app.id}`} className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+            <Eye size={16} className="text-neutral-60 dark:text-neutral-40" />
+          </Link>
+          <Link
+            to={`/catalog/applications/${app.id}/edit`}
+            className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+          >
+            <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
+          </Link>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
+            className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
+          >
+            <Trash2 size={16} className="text-danger" />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -215,82 +297,12 @@ export function ApplicationsPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Nombre</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Owner</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">BU</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Criticidad</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Estado</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Arquitectura</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedApps.map((app) => (
-              <tr key={app.id}
-                onClick={() => navigate(`/catalog/applications/${app.id}`)}
-                className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                <td className="px-6 py-4">
-                  <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline">
-                    {app.name}
-                  </Link>
-                  <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{app.description}</p>
-                </td>
-                <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app.ownerName}</td>
-                <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">
-                  {businessUnits.find((bu) => bu.id === app.businessUnitId)?.name || '-'}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCriticalityColor(app.criticality)}`}>
-                    {criticalityLabel[app.criticality]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
-                      {appStatusLabel[app.status]}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app.architecture}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link to={`/catalog/applications/${app.id}`} className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
-                      <Eye size={16} className="text-neutral-60 dark:text-neutral-40" />
-                    </Link>
-                    <Link
-                      to={`/catalog/applications/${app.id}/edit`}
-                      className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
-                    >
-                      <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
-                    </Link>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
-                      className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
-                    >
-                      <Trash2 size={16} className="text-danger" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredApps.length}
-          pageSize={5}
-          onPageChange={setPage}
-        />
-        {filteredApps.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron aplicaciones</p>
-          </div>
-        )}
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredApps}
+        onRowClick={(app) => navigate(`/catalog/applications/${app.id}`)}
+        emptyMessage="No se encontraron aplicaciones"
+      />
     </div>
   )
 }

@@ -26,14 +26,16 @@ export function RiskFormPage() {
 
   useEffect(() => {
     if (risk) {
-      setFormData({
-        title: risk.title ?? '',
-        description: risk.description ?? '',
-        probability: risk.probability ?? 1,
-        impact: risk.impact ?? 1,
-        status: risk.status ?? 'open',
-        mitigationPlan: risk.mitigationPlan ?? '',
-        applicationId: risk.applicationId ?? '',
+      queueMicrotask(() => {
+        setFormData({
+          title: risk.title ?? '',
+          description: risk.description ?? '',
+          probability: risk.probability ?? 1,
+          impact: risk.impact ?? 1,
+          status: risk.status ?? 'open',
+          mitigationPlan: risk.mitigationPlan ?? '',
+          applicationId: risk.applicationId ?? '',
+        })
       })
     }
   }, [risk])

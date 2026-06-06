@@ -5,7 +5,7 @@ import type { Table } from 'dexie'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/services/db/database'
 import {
-  ArrowLeft, Pencil, Shield, AlertTriangle, Activity, FileWarning,
+  Pencil, Shield, AlertTriangle, Activity, FileWarning,
   Plus, X, Unlink, Search, FileText, Building2, Layers, Server,
   Database, Package, ChevronRight,
 } from 'lucide-react'
@@ -99,16 +99,6 @@ export function ApplicationDetailPage() {
     incidents: incidents?.length,
     audit: findings?.length,
     deliverables: deliverables?.length,
-  }
-
-  const getCriticalityColor = (criticality: string) => {
-    const colors: Record<string, string> = {
-      critical: 'bg-danger text-white',
-      high: 'bg-warning text-white',
-      medium: 'bg-info text-white',
-      low: 'bg-success text-white',
-    }
-    return colors[criticality] || 'bg-neutral-10 text-neutral-60'
   }
 
   return (

@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Plus, Search, Filter, Upload, X, Shield, AlertTriangle, Clock, Pencil, Trash2 } from 'lucide-react'
+import type { Vulnerability } from '@/types/domain'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -41,8 +41,6 @@ export function VulnerabilitiesPage() {
     (statusFilter === 'all' || v.status === statusFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedVulns } = usePagination(filteredVulns, 5)
-
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar vulnerabilidad?')) {
       await db.vulnerabilities.delete(id)
@@ -74,6 +72,92 @@ export function VulnerabilitiesPage() {
     high: vulnerabilities.filter((v) => v.severity === 'high' && v.status !== 'fixed').length,
     slaBreached: vulnerabilities.filter((v) => v.status !== 'fixed' && new Date(v.slaDeadline) < new Date()).length,
   }
+
+  const columns: Column<Vulnerability>[] = [
+    {
+      key: 'title',
+      label: 'Título',
+      sortable: true,
+      render: (vuln) => (
+        <>
+          <p className="text-sm font-medium text-neutral-90 dark:text-white">{vuln.title}</p>
+          <p className="text-xs text-neutral-50 dark:text-neutral-50">{vuln.externalId}</p>
+        </>
+      ),
+    },
+    {
+      key: 'applicationId',
+      label: 'App',
+      render: (vuln) => {
+        const app = applications.find((a) => a.id === vuln.applicationId)
+        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+      },
+    },
+    {
+      key: 'cvssScore',
+      label: 'CVSS',
+      sortable: true,
+      render: (vuln) => <span className="text-sm font-medium text-neutral-90 dark:text-white">{vuln.cvssScore}</span>,
+    },
+    {
+      key: 'severity',
+      label: 'Severidad',
+      sortable: true,
+      render: (vuln) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(vuln.severity)}`}>
+          {severityLabel[vuln.severity]}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (vuln) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          vuln.status === 'fixed' ? 'bg-success/10 text-success' :
+          vuln.status === 'in_progress' ? 'bg-info/10 text-info' :
+          vuln.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
+          'bg-danger/10 text-danger'
+        }`}>
+          {vulnStatusLabel[vuln.status]}
+        </span>
+      ),
+    },
+    {
+      key: 'slaDeadline',
+      label: 'SLA',
+      sortable: true,
+      render: (vuln) => {
+        const sla = getSlaStatus(vuln.slaDeadline)
+        return <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
+      },
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (vuln) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}/edit`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(vuln.id) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -175,88 +259,12 @@ export function VulnerabilitiesPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">CVSS</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Severidad</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">SLA</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedVulns.map((vuln) => {
-              const sla = getSlaStatus(vuln.slaDeadline)
-              const app = applications.find((a) => a.id === vuln.applicationId)
-              return (
-                <tr key={vuln.id}
-                  onClick={() => navigate(`${vuln.id}/edit`)}
-                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{vuln.title}</p>
-                    <p className="text-xs text-neutral-50 dark:text-neutral-50">{vuln.externalId}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-neutral-90 dark:text-white">{vuln.cvssScore}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(vuln.severity)}`}>
-                      {severityLabel[vuln.severity]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      vuln.status === 'fixed' ? 'bg-success/10 text-success' :
-                      vuln.status === 'in_progress' ? 'bg-info/10 text-info' :
-                      vuln.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
-                      'bg-danger/10 text-danger'
-                    }`}>
-                      {vulnStatusLabel[vuln.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}/edit`) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(vuln.id) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredVulns.length}
-          pageSize={5}
-          onPageChange={setPage}
-        />
-        {filteredVulns.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron vulnerabilidades</p>
-          </div>
-        )}
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredVulns}
+        onRowClick={(vuln) => navigate(`${vuln.id}/edit`)}
+        emptyMessage="No se encontraron vulnerabilidades"
+      />
     </div>
   )
 }

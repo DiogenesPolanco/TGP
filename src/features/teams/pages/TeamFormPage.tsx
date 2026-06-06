@@ -1,20 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '@/services/db/database'
-import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
-import { useAppStore } from '@/stores/appStore'
-import { useConfirm } from '@/hooks/useConfirm'
-import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
-import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { MemberRole } from '@/types/domain'
-type DoraLevel = 'elite' | 'high' | 'medium' | 'low'
-
-interface MemberInput {
-  name: string
-  role: MemberRole
-  allocation: number
-}
+import type { MemberRole } from '@/constants/enums'
 
 const doraMetricOptions = [
   { key: 'deploymentFrequency', label: 'Frecuencia Despliegue', unit: '/día' },
@@ -44,15 +29,17 @@ export function TeamFormPage() {
 
   useEffect(() => {
     if (team) {
-      const meta = team.metadata ?? {}
-      setFormData({
-        name: team.name ?? '',
-        description: (meta.description as string) ?? '',
-        doraClassification: (meta.doraClassification as DoraLevel) ?? 'medium',
-        businessUnitId: team.businessUnitId ?? '',
-        doraMetrics: (meta.doraMetrics as Record<string, number>) ?? { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 },
+      queueMicrotask(() => {
+        const meta = team.metadata ?? {}
+        setFormData({
+          name: team.name ?? '',
+          description: (meta.description as string) ?? '',
+          doraClassification: (meta.doraClassification as DoraLevel) ?? 'medium',
+          businessUnitId: team.businessUnitId ?? '',
+          doraMetrics: (meta.doraMetrics as Record<string, number>) ?? { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 },
+        })
+        setMembers(team.members?.map((m) => ({ name: m.displayName || m.id, role: m.role as MemberRole, allocation: m.allocationPct ?? 100 })) ?? [{ name: '', role: 'developer' as MemberRole, allocation: 100 }])
       })
-      setMembers(team.members?.map((m) => ({ name: m.displayName || m.id, role: m.role as MemberRole, allocation: m.allocationPct ?? 100 })) ?? [{ name: '', role: 'developer' as MemberRole, allocation: 100 }])
     }
   }, [team])
 
@@ -103,7 +90,7 @@ export function TeamFormPage() {
       for (const m of teamMembers) {
         const profile = await db.memberProfiles.get(m.id)
         if (profile && profile.role !== m.role) {
-          await db.memberProfiles.put({ ...profile, role: m.role as any, updatedAt: new Date() })
+          await db.memberProfiles.put({ ...profile, role: m.role as MemberRole, updatedAt: new Date() })
         }
       }
       addNotification({ type: 'success', message: 'Equipo actualizado' })
@@ -145,7 +132,7 @@ export function TeamFormPage() {
             <div>
               <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30 block mb-2">Métricas DORA</label>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as any)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span></div></div>))}
+                {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as Record<string, number>)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span></div></div>))}
               </div>
             </div>
           </div>

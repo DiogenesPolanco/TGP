@@ -18,7 +18,9 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
   const [mode, setMode] = useState<'setup' | 'login'>(
     isConfigured() ? 'login' : 'setup',
   )
-  const [secret, setSecret] = useState<{ base32: string; uri: string } | null>(null)
+  const [secret] = useState<{ base32: string; uri: string } | null>(
+    () => mode === 'setup' ? generateSecret() : null
+  )
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
@@ -27,12 +29,6 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
   const [locked, setLocked] = useState(false)
   const [lockoutMs, setLockoutMs] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (mode === 'setup' && !secret) {
-      setSecret(generateSecret())
-    }
-  }, [mode, secret])
 
   useEffect(() => {
     if (mode === 'login') {
@@ -67,12 +63,13 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
     return () => clearInterval(timer)
   }, [locked])
 
-  // Check lockout on mount when in login mode
   useEffect(() => {
     if (mode === 'login') {
-      const status = getLockoutStatus()
-      setLocked(status.locked)
-      setLockoutMs(status.remainingMs)
+      queueMicrotask(() => {
+        const status = getLockoutStatus()
+        setLocked(status.locked)
+        setLockoutMs(status.remainingMs)
+      })
     }
   }, [mode])
 

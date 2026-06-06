@@ -31,8 +31,10 @@ export interface PredictabilityPeriod {
 export type PeriodGranularity = 'monthly' | 'quarterly' | 'yearly'
 
 export function usePredictability(teamId?: string | null) {
-  const teamSprints = useLiveQuery(() => db.teamSprints.toArray()) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
+  const rawTeamSprints = useLiveQuery(() => db.teamSprints.toArray())
+  const teamSprints = useMemo(() => rawTeamSprints ?? [], [rawTeamSprints])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
 
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
 

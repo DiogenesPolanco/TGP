@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Pencil, Trash2 } from 'lucide-react'
+import type { AuditFinding } from '@/types/domain'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -42,8 +42,6 @@ export function AuditPage() {
     (severityFilter === 'all' || f.severity === severityFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedFindings } = usePagination(filteredFindings, 5)
-
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar hallazgo?')) {
       await db.auditFindings.delete(id)
@@ -64,6 +62,131 @@ export function AuditPage() {
     if (days <= 7) return { label: `${days}d`, color: 'text-warning' }
     return { label: `${days}d`, color: 'text-success' }
   }
+
+  const categoryBadge = (category: string) => {
+    const styles: Record<string, string> = {
+      compliance: 'bg-info/10 text-info',
+      security: 'bg-danger/10 text-danger',
+      architecture: 'bg-primary/10 text-primary',
+      data_governance: 'bg-warning/10 text-warning',
+    }
+    const labels: Record<string, string> = {
+      compliance: 'Cumplimiento',
+      security: 'Seguridad',
+      architecture: 'Arquitectura',
+      process: 'Proceso',
+      data_governance: 'Data Gov.',
+      access_control: 'Acceso',
+      business_continuity: 'Continuidad',
+    }
+    return {
+      className: styles[category] || 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40',
+      label: labels[category] || category,
+    }
+  }
+
+  const columns: Column<AuditFinding>[] = [
+    {
+      key: 'auditReference',
+      label: 'Referencia',
+      sortable: true,
+      render: (finding) => (
+        <span className="text-sm font-medium text-neutral-90 dark:text-white">{finding.auditReference}</span>
+      ),
+    },
+    {
+      key: 'title',
+      label: 'Título',
+      sortable: true,
+      render: (finding) => (
+        <p className="text-sm font-medium text-neutral-90 dark:text-white">{finding.title}</p>
+      ),
+    },
+    {
+      key: 'category',
+      label: 'Categoría',
+      sortable: true,
+      render: (finding) => {
+        const b = categoryBadge(finding.category)
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${b.className}`}>
+            {b.label}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'applicationId',
+      label: 'App',
+      render: (finding) => {
+        const app = applications.find((a) => a.id === finding.applicationId)
+        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+      },
+    },
+    {
+      key: 'severity',
+      label: 'Severidad',
+      sortable: true,
+      render: (finding) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          finding.severity === 'critical' ? 'bg-danger/10 text-danger' :
+          finding.severity === 'high' ? 'bg-warning/10 text-warning' :
+          finding.severity === 'medium' ? 'bg-info/10 text-info' :
+          'bg-success/10 text-success'
+        }`}>
+          {severityLabel[finding.severity]}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (finding) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          finding.status === 'open' ? 'bg-danger/10 text-danger' :
+          finding.status === 'in_progress' ? 'bg-info/10 text-info' :
+          finding.status === 'overdue' ? 'bg-danger/10 text-danger' :
+          'bg-success/10 text-success'
+        }`}>
+          {auditStatusLabel[finding.status]}
+        </span>
+      ),
+    },
+    {
+      key: 'dueDate',
+      label: 'Vencimiento',
+      sortable: true,
+      render: (finding) => {
+        const sla = getSlaStatus(finding.dueDate)
+        return <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
+      },
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (finding) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -166,111 +289,12 @@ export function AuditPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Referencia</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Categoría</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Severidad</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Vencimiento</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedFindings.map((finding) => {
-              const sla = getSlaStatus(finding.dueDate)
-              const app = applications.find((a) => a.id === finding.applicationId)
-              return (
-                <tr key={finding.id}
-                  onClick={() => navigate(`${finding.id}/edit`)}
-                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                  <td className="px-6 py-4 text-sm font-medium text-neutral-90 dark:text-white">{finding.auditReference}</td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{finding.title}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      finding.category === 'compliance' ? 'bg-info/10 text-info' :
-                      finding.category === 'security' ? 'bg-danger/10 text-danger' :
-                      finding.category === 'architecture' ? 'bg-primary/10 text-primary' :
-                      finding.category === 'data_governance' ? 'bg-warning/10 text-warning' :
-                      'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40'
-                    }`}>
-                      {finding.category === 'compliance' ? 'Cumplimiento' :
-                       finding.category === 'security' ? 'Seguridad' :
-                       finding.category === 'architecture' ? 'Arquitectura' :
-                       finding.category === 'process' ? 'Proceso' :
-                       finding.category === 'data_governance' ? 'Data Gov.' :
-                       finding.category === 'access_control' ? 'Acceso' :
-                       finding.category === 'business_continuity' ? 'Continuidad' :
-                       finding.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      finding.severity === 'critical' ? 'bg-danger/10 text-danger' :
-                      finding.severity === 'high' ? 'bg-warning/10 text-warning' :
-                      finding.severity === 'medium' ? 'bg-info/10 text-info' :
-                      'bg-success/10 text-success'
-                    }`}>
-                      {severityLabel[finding.severity]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      finding.status === 'open' ? 'bg-danger/10 text-danger' :
-                      finding.status === 'in_progress' ? 'bg-info/10 text-info' :
-                      finding.status === 'overdue' ? 'bg-danger/10 text-danger' :
-                      'bg-success/10 text-success'
-                    }`}>
-                      {auditStatusLabel[finding.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredFindings.length}
-          pageSize={5}
-          onPageChange={setPage}
-        />
-        {filteredFindings.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron hallazgos</p>
-          </div>
-        )}
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredFindings}
+        onRowClick={(finding) => navigate(`${finding.id}/edit`)}
+        emptyMessage="No se encontraron hallazgos"
+      />
     </div>
   )
 }

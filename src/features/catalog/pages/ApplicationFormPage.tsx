@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X, Plus, AlertTriangle, ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { ArrowLeft, Plus, AlertTriangle, X } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { Technology, SupportStatus, Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
-
-const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-success/10 text-success border-success/30',
-  extended: 'bg-warning/10 text-warning border-warning/30',
-  eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
-}
+import type { SupportStatus, Criticality, ArchitectureType, ApplicationStatus, Technology } from '@/types/domain'
 
 const statusLabel: Record<SupportStatus, string> = {
   active: 'Activo',
   extended: 'S. Extendido',
   eol: 'EOL',
   unknown: '?',
+}
+
+const statusColors: Record<SupportStatus, string> = {
+  active: 'bg-success/10 text-success border-success/30',
+  extended: 'bg-warning/10 text-warning border-warning/30',
+  eol: 'bg-danger/10 text-danger border-danger/30',
+  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30',
 }
 
 export function ApplicationFormPage() {
@@ -45,17 +45,19 @@ export function ApplicationFormPage() {
 
   useEffect(() => {
     if (application) {
-      setFormData({
-        name: application.name ?? '',
-        description: application.description ?? '',
-        ownerName: application.ownerName ?? '',
-        businessUnitId: application.businessUnitId ?? '',
-        criticality: application.criticality ?? 'medium',
-        architecture: application.architecture ?? 'monolith',
-        status: application.status ?? 'active',
-        supportEndDate: application.supportEndDate ? new Date(application.supportEndDate).toISOString().split('T')[0] : '',
+      queueMicrotask(() => {
+        setFormData({
+          name: application.name ?? '',
+          description: application.description ?? '',
+          ownerName: application.ownerName ?? '',
+          businessUnitId: application.businessUnitId ?? '',
+          criticality: application.criticality ?? 'medium',
+          architecture: application.architecture ?? 'monolith',
+          status: application.status ?? 'active',
+          supportEndDate: application.supportEndDate ? new Date(application.supportEndDate).toISOString().split('T')[0] : '',
+        })
+        setSelectedTechIds(application.technologies ?? [])
       })
-      setSelectedTechIds(application.technologies ?? [])
     }
   }, [application])
 

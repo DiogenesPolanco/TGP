@@ -25,13 +25,15 @@ export function IncidentFormPage() {
 
   useEffect(() => {
     if (incident) {
-      setFormData({
-        title: incident.title ?? '',
-        description: incident.description ?? '',
-        severity: incident.severity ?? 'medium',
-        status: incident.status ?? 'detected',
-        downtimeMinutes: incident.downtimeMinutes ?? null,
-        applicationId: incident.applicationId ?? '',
+      queueMicrotask(() => {
+        setFormData({
+          title: incident.title ?? '',
+          description: incident.description ?? '',
+          severity: incident.severity ?? 'medium',
+          status: incident.status ?? 'detected',
+          downtimeMinutes: incident.downtimeMinutes ?? null,
+          applicationId: incident.applicationId ?? '',
+        })
       })
     }
   }, [incident])

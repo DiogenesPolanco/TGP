@@ -20,7 +20,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
     phoneHome: profile?.phoneHome ?? '',
     address: profile?.address ?? '',
     role: profile?.role ?? 'developer',
-    status: (profile as any)?.status ?? 'activo',
+    status: profile?.status ?? 'activo',
     vacationDaysPerYear: profile?.vacationDaysPerYear ?? 14,
     vacationUsed: profile?.vacationUsed ?? 0,
   })
@@ -35,7 +35,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       teamId: '',
       skills: profile?.skills ?? [],
       technologies: profile?.technologies ?? [],
-      microservices: (profile as any)?.microservices ?? [],
+      microservices: profile?.microservices ?? [],
       avgStoryPoints: profile?.avgStoryPoints ?? 0,
       createdAt: profile?.createdAt ?? now,
       updatedAt: now,
@@ -50,7 +50,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       if (member) {
         const updatedMembers = t.members.map((m) =>
           m.id === memberId
-            ? { ...m, role: data.role as any, status: (form.status as MemberStatus) }
+            ? { ...m, role: data.role, status: form.status as MemberStatus }
             : m
         )
         await db.teams.update(t.id, { members: updatedMembers })

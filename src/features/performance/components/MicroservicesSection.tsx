@@ -22,7 +22,7 @@ export function MicroservicesSection({ memberId }: Props) {
     ]).then(([profile, mss, techs]) => {
       setAllMicroservices(mss)
       setAllTechnologies(techs)
-      setSelectedIds((profile as any)?.microservices ?? [])
+      setSelectedIds(profile?.microservices ?? [])
     })
   }, [memberId])
 
@@ -41,8 +41,14 @@ export function MicroservicesSection({ memberId }: Props) {
     setShowDropdown(false)
 
     const profile = await db.memberProfiles.get(memberId)
-    const base = profile ?? { id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '', address: '', role: 'developer' as const, skills: [], technologies: [], avgStoryPoints: 0, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: new Date() }
-    await db.memberProfiles.put({ ...base, microservices: updated, updatedAt: new Date() } as any)
+    const base = profile ?? {
+      id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '',
+      address: '', role: 'developer' as const, status: 'activo' as const,
+      skills: [] as { id: string; name: string; level: 'beginner' | 'intermediate' | 'advanced' | 'expert'; category: string }[],
+      technologies: [] as string[], avgStoryPoints: 0,
+      vacationDaysPerYear: 14, vacationUsed: 0, createdAt: new Date(), updatedAt: new Date(),
+    }
+    await db.memberProfiles.put({ ...base, microservices: updated, updatedAt: new Date() })
   }
 
   return (

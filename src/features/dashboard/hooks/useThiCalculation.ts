@@ -6,14 +6,22 @@ import { computeAppTechMap } from '@/utils/technologyUtils'
 import type { HealthIndex, HealthWeights } from '@/types/domain'
 
 export function useThiCalculation(businessUnitId?: string | null) {
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
-  const vulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray()) ?? []
-  const incidents = useLiveQuery(() => db.incidents.toArray()) ?? []
-  const risks = useLiveQuery(() => db.risks.toArray()) ?? []
-  const auditFindings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
-  const microservices = useLiveQuery(() => db.microservices.toArray()) ?? []
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
+  const rawVulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray())
+  const vulnerabilities = useMemo(() => rawVulnerabilities ?? [], [rawVulnerabilities])
+  const rawIncidents = useLiveQuery(() => db.incidents.toArray())
+  const incidents = useMemo(() => rawIncidents ?? [], [rawIncidents])
+  const rawRisks = useLiveQuery(() => db.risks.toArray())
+  const risks = useMemo(() => rawRisks ?? [], [rawRisks])
+  const rawAuditFindings = useLiveQuery(() => db.auditFindings.toArray())
+  const auditFindings = useMemo(() => rawAuditFindings ?? [], [rawAuditFindings])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
+  const rawTechnologies = useLiveQuery(() => db.technologies.toArray())
+  const technologies = useMemo(() => rawTechnologies ?? [], [rawTechnologies])
+  const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
+  const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
 
   const thi = useMemo(() => {
     const apps = businessUnitId
@@ -25,7 +33,7 @@ export function useThiCalculation(businessUnitId?: string | null) {
     const weights: HealthWeights = DEFAULT_HEALTH_WEIGHTS
 
     const deliveryScore = calculateDeliveryScore(teams)
-    const qualityScore = calculateQualityScore(apps)
+    const qualityScore = calculateQualityScore()
     const securityScore = calculateSecurityScore(apps, vulnerabilities)
     const availabilityScore = calculateAvailabilityScore(apps, incidents)
     const appTechMap = computeAppTechMap(apps, microservices)
@@ -79,7 +87,7 @@ function calculateDeliveryScore(teams: { currentMetrics: { velocity: number; lea
   return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
 }
 
-function calculateQualityScore(_apps: unknown[]): number {
+function calculateQualityScore(): number {
   return 75
 }
 

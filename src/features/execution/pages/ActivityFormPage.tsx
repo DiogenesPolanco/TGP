@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { Activity, Task } from '@/types/domain'
+import type { Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
 
 export function ActivityFormPage() {
@@ -45,22 +45,21 @@ export function ActivityFormPage() {
 
   useEffect(() => {
     if (activity) {
-      setTitle(activity.title ?? '')
-      setDescription(activity.description ?? '')
-      setAssigneeId(activity.assigneeId ?? '')
-      setTeamId(activity.teamId ?? '')
-      setApplicationId(activity.applicationId ?? '')
-      setParentActivityId(activity.parentActivityId ?? '')
-      setPriority(activity.priority ?? 'medium')
-      setStatus(activity.status ?? 'pending')
-      setPlannedPoints(activity.plannedPoints?.toString() ?? '')
-      setCompletedPoints(activity.completedPoints?.toString() ?? '')
-      setStartDate(
-        activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '',
-      )
-      setDueDate(
-        activity.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '',
-      )
+      queueMicrotask(() => {
+        setTitle(activity.title ?? '')
+        setDescription(activity.description ?? '')
+        setAssigneeId(activity.assigneeId ?? '')
+        setTeamId(activity.teamId ?? '')
+        setApplicationId(activity.applicationId ?? '')
+        setParentActivityId(activity.parentActivityId ?? '')
+        setPriority(activity.priority ?? 'medium')
+        setStatus(activity.status ?? 'pending')
+        setPlannedPoints(activity.plannedPoints?.toString() ?? '')
+        setCompletedPoints(activity.completedPoints?.toString() ?? '')
+        setStartDate(activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '')
+        setDueDate(activity.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '')
+        setTasks(activity.tasks ?? [])
+      })
     }
   }, [activity])
 

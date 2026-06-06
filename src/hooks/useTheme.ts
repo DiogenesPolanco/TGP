@@ -21,7 +21,7 @@ export function useTheme() {
         if (parsed.state?.theme === 'dark') {
           window.document.documentElement.classList.add('dark')
         }
-      } catch {}
+      } catch { /* empty */ }
     }
   }, [])
 }

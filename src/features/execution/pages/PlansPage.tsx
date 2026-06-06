@@ -29,10 +29,14 @@ export function PlansPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all')
 
-  const plans = useLiveQuery(() => db.plans.toArray()) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
-  const activities = useLiveQuery(() => db.activities.toArray()) ?? []
+  const rawPlans = useLiveQuery(() => db.plans.toArray())
+  const plans = useMemo(() => rawPlans ?? [], [rawPlans])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
+  const rawBusinessUnits = useLiveQuery(() => db.businessUnits.toArray())
+  const businessUnits = useMemo(() => rawBusinessUnits ?? [], [rawBusinessUnits])
+  const rawActivities = useLiveQuery(() => db.activities.toArray())
+  const activities = useMemo(() => rawActivities ?? [], [rawActivities])
 
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
   const buMap = useMemo(() => new Map(businessUnits.map((b) => [b.id, b])), [businessUnits])
@@ -131,6 +135,7 @@ export function PlansPage() {
         {paginatedPlans.map((plan) => {
           const stats = getActivityStats(plan.id)
           const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+          // eslint-disable-next-line react-hooks/purity
           const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
           const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
           const cfg = statusConfig[plan.status]

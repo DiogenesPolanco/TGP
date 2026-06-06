@@ -57,7 +57,7 @@ export function getAzureBackupInfo(): AzureBackupInfo {
       const parsed = JSON.parse(lastRaw) as { date: string; name: string }
       lastBackup = parsed.date
       lastBackupName = parsed.name
-    } catch {
+    } catch { /* empty */
     }
   }
   return {

@@ -4,10 +4,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import {
-  Database, Plus, Search, Pencil, Trash2, ChevronDown, ChevronUp,
-  Server, Globe, Box, AlertTriangle, Wifi, Wrench, Cpu,
+  Database, Plus, Pencil, Trash2, ChevronDown, ChevronUp,
+  Server, Box,
 } from 'lucide-react'
-import type { AppDatabase, DatabaseType, EnvironmentType, Technology, SupportStatus } from '@/types/domain'
+import type { DatabaseType, EnvironmentType, SupportStatus } from '@/types/domain'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',

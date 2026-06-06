@@ -1,18 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '@/services/db/database'
-import { ArrowLeft, Plus, X, Server, Box } from 'lucide-react'
-import { useAppStore } from '@/stores/appStore'
-import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { AppDatabase, DatabaseType, EnvironmentType, Technology, SupportStatus } from '@/types/domain'
-
-const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-success/10 text-success border-success/30',
-  extended: 'bg-warning/10 text-warning border-warning/30',
-  eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
-}
 
 const statusLabel: Record<SupportStatus, string> = {
   active: 'Activo',
@@ -95,17 +81,19 @@ export function DatabaseFormPage() {
 
   useEffect(() => {
     if (existing) {
-      setName(existing.name)
-      setDescription(existing.description)
-      setEngine(existing.engine)
-      setVersion(existing.version)
-      setDbType(existing.dbType)
-      setEnvironment(existing.environment)
-      setHost(existing.host ?? '')
-      setPort(existing.port)
-      setIsManaged(existing.isManaged)
-      setSelectedTechIds(existing.technologies)
-      setSelectedMsIds(existing.microserviceIds)
+      queueMicrotask(() => {
+        setName(existing.name)
+        setDescription(existing.description)
+        setEngine(existing.engine)
+        setVersion(existing.version)
+        setDbType(existing.dbType)
+        setEnvironment(existing.environment)
+        setHost(existing.host ?? '')
+        setPort(existing.port)
+        setIsManaged(existing.isManaged)
+        setSelectedTechIds(existing.technologies)
+        setSelectedMsIds(existing.microserviceIds)
+      })
     }
   }, [existing])
 

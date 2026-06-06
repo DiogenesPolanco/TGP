@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
@@ -27,12 +27,18 @@ export function DailyPage() {
 
   useEffect(() => { runEscalation() }, [])
 
-  const plans = useLiveQuery(() => db.plans.toArray()) ?? []
-  const activities = useLiveQuery(() => db.activities.toArray()) ?? []
-  const tasks = useLiveQuery(() => db.tasks.toArray()) ?? []
-  const blockers = useLiveQuery(() => db.blockers.toArray()) ?? []
-  const commitments = useLiveQuery(() => db.commitments.toArray()) ?? []
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
+  const rawPlans = useLiveQuery(() => db.plans.toArray())
+  const plans = useMemo(() => rawPlans ?? [], [rawPlans])
+  const rawActivities = useLiveQuery(() => db.activities.toArray())
+  const activities = useMemo(() => rawActivities ?? [], [rawActivities])
+  const rawTasks = useLiveQuery(() => db.tasks.toArray())
+  const tasks = useMemo(() => rawTasks ?? [], [rawTasks])
+  const rawBlockers = useLiveQuery(() => db.blockers.toArray())
+  const blockers = useMemo(() => rawBlockers ?? [], [rawBlockers])
+  const rawCommitments = useLiveQuery(() => db.commitments.toArray())
+  const commitments = useMemo(() => rawCommitments ?? [], [rawCommitments])
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
 
   const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])
   const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p])), [plans])
@@ -52,7 +58,7 @@ export function DailyPage() {
       return task?.planId ? planMap.get(task.planId) : undefined
     }
     return undefined
-  }, [planMap, activityMap, commitments, tasks])
+  }, [planMap, activityMap, tasks])
 
   const agenda = useMemo(() => {
     const tomorrow = new Date(today)
@@ -371,6 +377,7 @@ export function DailyPage() {
               const healthColor = plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
 
               const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+              // eslint-disable-next-line react-hooks/purity
               const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
               const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
 

@@ -31,16 +31,18 @@ export function ObjectiveFormPage() {
 
   useEffect(() => {
     if (objective) {
-      setFormData({
-        title: objective.title ?? '',
-        description: objective.description ?? '',
-        type: objective.type ?? 'okr',
-        teamId: objective.teamId ?? '',
-        businessUnitId: objective.businessUnitId ?? '',
-        periodStart: objective.periodStart && !isNaN(new Date(objective.periodStart).getTime()) ? new Date(objective.periodStart).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        periodEnd: objective.periodEnd && !isNaN(new Date(objective.periodEnd).getTime()) ? new Date(objective.periodEnd).toISOString().split('T')[0] : '',
-        status: objective.status ?? 'not_started',
-        keyResults: objective.keyResults ?? [],
+      queueMicrotask(() => {
+        setFormData({
+          title: objective.title ?? '',
+          description: objective.description ?? '',
+          type: objective.type ?? 'okr',
+          teamId: objective.teamId ?? '',
+          businessUnitId: objective.businessUnitId ?? '',
+          periodStart: objective.periodStart && !isNaN(new Date(objective.periodStart).getTime()) ? new Date(objective.periodStart).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          periodEnd: objective.periodEnd && !isNaN(new Date(objective.periodEnd).getTime()) ? new Date(objective.periodEnd).toISOString().split('T')[0] : '',
+          status: objective.status ?? 'not_started',
+          keyResults: objective.keyResults ?? [],
+        })
       })
     }
   }, [objective])

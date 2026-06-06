@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Save } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { Blocker } from '@/types/domain'
+
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
 export function BlockerFormPage() {
@@ -30,20 +30,24 @@ export function BlockerFormPage() {
 
   useEffect(() => {
     if (blocker) {
-      setTitle(blocker.title ?? '')
-      setDescription(blocker.description ?? '')
-      setSeverity(blocker.severity ?? 'medium')
-      setStatus(blocker.status ?? 'open')
-      setAssigneeId(blocker.assigneeId ?? '')
-      setResolutionNotes(blocker.resolutionNotes ?? '')
-      setSourceType(blocker.sourceType)
-      setSourceId(blocker.sourceId)
+      queueMicrotask(() => {
+        setTitle(blocker.title ?? '')
+        setDescription(blocker.description ?? '')
+        setSeverity(blocker.severity ?? 'medium')
+        setStatus(blocker.status ?? 'open')
+        setAssigneeId(blocker.assigneeId ?? '')
+        setResolutionNotes(blocker.resolutionNotes ?? '')
+        setSourceType(blocker.sourceType)
+        setSourceId(blocker.sourceId)
+      })
     } else if (isNew) {
       const urlSourceType = searchParams.get('sourceType') as 'task' | 'activity' | 'plan' | 'commitment' | null
       const urlSourceId = searchParams.get('sourceId')
       if (urlSourceType && urlSourceId) {
-        setSourceType(urlSourceType)
-        setSourceId(urlSourceId)
+        queueMicrotask(() => {
+          setSourceType(urlSourceType)
+          setSourceId(urlSourceId)
+        })
       }
     }
   }, [blocker, isNew, searchParams])

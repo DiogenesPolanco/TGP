@@ -40,17 +40,19 @@ export function CommitmentFormPage() {
 
   useEffect(() => {
     if (commitment) {
-      setFormData({
-        title: commitment.title ?? '',
-        description: commitment.description ?? '',
-        ownerId: commitment.ownerId ?? '',
-        accountableId: commitment.accountableId ?? '',
-        teamId: commitment.teamId ?? '',
-        applicationId: commitment.applicationId ?? '',
-        objectiveId: commitment.objectiveId ?? '',
-        deliverableId: commitment.deliverableId ?? '',
-        status: (commitment.status as CommitmentStatus) ?? 'active',
-        commitmentDate: commitment.commitmentDate ? new Date(commitment.commitmentDate).toISOString().split('T')[0] : '',
+      queueMicrotask(() => {
+        setFormData({
+          title: commitment.title ?? '',
+          description: commitment.description ?? '',
+          ownerId: commitment.ownerId ?? '',
+          accountableId: commitment.accountableId ?? '',
+          teamId: commitment.teamId ?? '',
+          applicationId: commitment.applicationId ?? '',
+          objectiveId: commitment.objectiveId ?? '',
+          deliverableId: commitment.deliverableId ?? '',
+          status: (commitment.status as CommitmentStatus) ?? 'active',
+          commitmentDate: commitment.commitmentDate ? new Date(commitment.commitmentDate).toISOString().split('T')[0] : '',
+        })
       })
     }
   }, [commitment])

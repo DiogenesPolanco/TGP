@@ -24,7 +24,6 @@ export function PerformancePage() {
 
   useEffect(() => {
     if (!teamId) return
-    setLoading(true)
     db.teams.get(teamId).then(async (t) => {
       if (!t) { setLoading(false); return }
       setTeam(t)

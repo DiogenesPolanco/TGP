@@ -78,7 +78,10 @@ import {
   Stamp,
 } from 'lucide-react'
 
+/* ─── Types ─── */
+
 interface SearchGroup {
+  key: string
   label: string
   icon: typeof Search
   route: (item: SearchResult) => string
@@ -92,6 +95,36 @@ interface SearchResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entity: any
 }
+
+interface CategoryMeta {
+  key: string
+  label: string
+  icon: typeof Search
+  description: string
+}
+
+const CATEGORIES: CategoryMeta[] = [
+  { key: 'applications', label: 'Aplicaciones', icon: AppWindow, description: 'Aplicaciones del portafolio' },
+  { key: 'technologies', label: 'Tecnologías', icon: Cpu, description: 'Tecnologías con tracking EOL' },
+  { key: 'vulnerabilities', label: 'Vulnerabilidades', icon: Bug, description: 'Vulnerabilidades con SLA' },
+  { key: 'incidents', label: 'Incidentes', icon: AlertTriangle, description: 'Incidentes de seguridad' },
+  { key: 'risks', label: 'Riesgos', icon: ShieldAlert, description: 'Riesgos con matriz probabilidad/impacto' },
+  { key: 'auditFindings', label: 'Hallazgos', icon: ClipboardCheck, description: 'Hallazgos de auditoría' },
+  { key: 'teams', label: 'Equipos', icon: Users, description: 'Equipos con métricas DORA' },
+  { key: 'objectives', label: 'Objetivos', icon: Target, description: 'OKRs con Key Results' },
+  { key: 'businessUnits', label: 'Unidades de Negocio', icon: Building2, description: 'Unidades organizativas' },
+  { key: 'plans', label: 'Planes', icon: FileText, description: 'Planes de ejecución' },
+  { key: 'commitments', label: 'Compromisos', icon: Stamp, description: 'Compromisos con tracking' },
+  { key: 'activities', label: 'Actividades', icon: CheckSquare, description: 'Actividades de planes' },
+  { key: 'tasks', label: 'Tareas', icon: CheckSquare, description: 'Tareas operativas' },
+  { key: 'blockers', label: 'Bloqueos', icon: Ban, description: 'Bloqueos con escalamiento' },
+  { key: 'deliverables', label: 'Entregables', icon: Package, description: 'Entregables vinculados' },
+  { key: 'microservices', label: 'Microservicios', icon: Box, description: 'Microservicios por aplicación' },
+  { key: 'members', label: 'Miembros', icon: User, description: 'Perfiles de miembros' },
+  { key: 'teamSprints', label: 'Sprints', icon: CalendarDays, description: 'Sprints de equipo' },
+]
+
+/* ─── Search helpers ─── */
 
 function score(query: string, text: string): number {
   const lower = text.toLowerCase()
@@ -140,6 +173,221 @@ async function searchEntity(
     .map((s) => s.result)
 }
 
+/* ─── Search registry (maps category key → query config) ─── */
+
+interface SearchConfig {
+  table: { toArray: () => Promise<unknown[]> }
+  fields: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  buildResult: (item: any) => SearchResult
+}
+
+const SEARCH_REGISTRY: Record<string, SearchConfig> = {
+  applications: {
+    table: db.applications,
+    fields: ['name', 'description', 'ownerName'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.name,
+      subtitle: item.ownerName,
+      entity: item,
+    }),
+  },
+  technologies: {
+    table: db.technologies,
+    fields: ['name', 'version', 'vendor'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: `${item.name} ${item.version}`,
+      subtitle: item.vendor,
+      entity: item,
+    }),
+  },
+  vulnerabilities: {
+    table: db.vulnerabilities,
+    fields: ['title', 'externalId'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `CVSS ${item.cvssScore} · ${severityLabel(item.severity)}`,
+      entity: item,
+    }),
+  },
+  incidents: {
+    table: db.incidents,
+    fields: ['title', 'externalId'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: severityLabel(item.severity),
+      entity: item,
+    }),
+  },
+  risks: {
+    table: db.risks,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `Score ${item.riskScore} · ${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  auditFindings: {
+    table: db.auditFindings,
+    fields: ['title', 'auditReference'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${item.category} · ${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  teams: {
+    table: db.teams,
+    fields: ['name'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.name,
+      subtitle: `${item.members.length} miembros`,
+      entity: item,
+    }),
+  },
+  objectives: {
+    table: db.objectives,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${item.progress}% · ${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  businessUnits: {
+    table: db.businessUnits,
+    fields: ['name'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.name,
+      subtitle: '',
+      entity: item,
+    }),
+  },
+  plans: {
+    table: db.plans,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${statusLabel(item.status)} · ${item.teamId}`,
+      entity: item,
+    }),
+  },
+  activities: {
+    table: db.activities,
+    fields: ['title'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  tasks: {
+    table: db.tasks,
+    fields: ['title'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${statusLabel(item.status)} · ${priorityLabel(item.priority)}`,
+      entity: item,
+    }),
+  },
+  commitments: {
+    table: db.commitments,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  blockers: {
+    table: db.blockers,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: `${severityLabel(item.severity)} · ${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
+  deliverables: {
+    table: db.deliverables,
+    fields: ['title', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: statusLabel(item.status),
+      entity: item,
+    }),
+  },
+  microservices: {
+    table: db.microservices,
+    fields: ['name', 'description'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.name,
+      subtitle: item.description ?? '',
+      entity: item,
+    }),
+  },
+  members: {
+    table: db.memberProfiles,
+    fields: ['email', 'role'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.email,
+      subtitle: `Rol: ${item.role}`,
+      entity: item,
+    }),
+  },
+  teamSprints: {
+    table: db.teamSprints,
+    fields: ['sprintName'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.sprintName,
+      subtitle: `${item.quarter} ${item.year}`,
+      entity: item,
+    }),
+  },
+}
+
+/* ─── Route mapping ─── */
+
+const ROUTE_MAP: Record<string, (item: SearchResult) => string> = {
+  applications: (item) => `/catalog/applications/${item.id}/edit`,
+  technologies: (item) => `/catalog/obsolescence/${item.id}/edit`,
+  vulnerabilities: (item) => `/security/vulnerabilities/${item.id}/edit`,
+  incidents: (item) => `/security/incidents/${item.id}/edit`,
+  risks: (item) => `/governance/risks/${item.id}/edit`,
+  auditFindings: (item) => `/governance/audit/${item.id}/edit`,
+  teams: (item) => `/teams/${item.id}/edit`,
+  objectives: (item) => `/strategy/objectives/${item.id}/edit`,
+  businessUnits: () => `/admin/business-units`,
+  plans: (item) => `/execution/plans/${item.id}`,
+  commitments: (item) => `/execution/commitments/${item.id}/edit`,
+  activities: (item) => `/execution/plans/${item.entity.planId}`,
+  tasks: (item) => `/execution/plans/${item.entity.planId}`,
+  blockers: (item) => `/execution/plans/${item.id}`,
+  deliverables: () => `/catalog/deliverables`,
+  microservices: (item) => `/catalog/applications/${item.entity.applicationId}`,
+  members: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
+  teamSprints: (item) => `/teams/${item.entity.teamId}`,
+}
+
 /* ─── Component ─── */
 
 interface GlobalSearchProps {
@@ -154,267 +402,48 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const [groups, setGroups] = useState<SearchGroup[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const flatResults = useMemo(() => {
     const items: { route: string; group: SearchGroup; result: SearchResult }[] = []
     for (const group of groups) {
       for (const item of group.items) {
-        items.push({
-          route: group.route(item),
-          group,
-          result: item,
-        })
+        items.push({ route: group.route(item), group, result: item })
       }
     }
     return items
   }, [groups])
 
-  const runSearch = useCallback(async (q: string) => {
+  const runSearch = useCallback(async (q: string, category: string | null) => {
     setLoading(true)
     try {
-      const [applications, technologies, vulnerabilities, incidents, risks, auditFindings, teams, objectives, businessUnits, plans, activities, tasks, commitments, blockers, deliverables, microservices, members, teamSprints] =
-        await Promise.all([
-          searchEntity(db.applications, ['name', 'description', 'ownerName'], q, (item) => ({
-            id: item.id,
-            title: item.name,
-            subtitle: item.ownerName,
-            entity: item,
-          })),
-          searchEntity(db.technologies, ['name', 'version', 'vendor'], q, (item) => ({
-            id: item.id,
-            title: `${item.name} ${item.version}`,
-            subtitle: item.vendor,
-            entity: item,
-          })),
-          searchEntity(db.vulnerabilities, ['title', 'externalId'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `CVSS ${item.cvssScore} · ${severityLabel(item.severity)}`,
-            entity: item,
-          })),
-          searchEntity(db.incidents, ['title', 'externalId'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: severityLabel(item.severity),
-            entity: item,
-          })),
-          searchEntity(db.risks, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `Score ${item.riskScore} · ${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.auditFindings, ['title', 'auditReference'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${item.category} · ${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.teams, ['name'], q, (item) => ({
-            id: item.id,
-            title: item.name,
-            subtitle: `${item.members.length} miembros`,
-            entity: item,
-          })),
-          searchEntity(db.objectives, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${item.progress}% · ${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.businessUnits, ['name'], q, (item) => ({
-            id: item.id,
-            title: item.name,
-            subtitle: '',
-            entity: item,
-          })),
-          searchEntity(db.plans, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${statusLabel(item.status)} · ${item.teamId}`,
-            entity: item,
-          })),
-          searchEntity(db.activities, ['title'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.tasks, ['title'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${statusLabel(item.status)} · ${priorityLabel(item.priority)}`,
-            entity: item,
-          })),
-          searchEntity(db.commitments, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.blockers, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: `${severityLabel(item.severity)} · ${statusLabel(item.status)}`,
-            entity: item,
-          })),
-          searchEntity(db.deliverables, ['title', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.title,
-            subtitle: statusLabel(item.status),
-            entity: item,
-          })),
-          searchEntity(db.microservices, ['name', 'description'], q, (item) => ({
-            id: item.id,
-            title: item.name,
-            subtitle: item.description ?? '',
-            entity: item,
-          })),
-          searchEntity(db.memberProfiles, ['email', 'role'], q, (item) => ({
-            id: item.id,
-            title: item.email,
-            subtitle: `Rol: ${item.role}`,
-            entity: item,
-          })),
-          searchEntity(db.teamSprints, ['sprintName'], q, (item) => ({
-            id: item.id,
-            title: item.sprintName,
-            subtitle: `${item.quarter} ${item.year}`,
-            entity: item,
-          })),
-        ])
+      const keysToSearch = category
+        ? [category]
+        : Object.keys(SEARCH_REGISTRY)
 
-      const result: SearchGroup[] = []
+      const results = await Promise.all(
+        keysToSearch.map(async (key) => {
+          const config = SEARCH_REGISTRY[key]
+          const items = await searchEntity(config.table, config.fields, q, config.buildResult)
+          return { key, items }
+        }),
+      )
 
-      if (applications.length > 0)
-        result.push({
-          label: 'Aplicaciones',
-          icon: AppWindow,
-          route: (item) => `/catalog/applications/${item.id}/edit`,
-          items: applications,
+      const resultGroups: SearchGroup[] = []
+      for (const { key, items } of results) {
+        if (items.length === 0) continue
+        const meta = CATEGORIES.find((c) => c.key === key)
+        resultGroups.push({
+          key,
+          label: meta?.label ?? key,
+          icon: meta?.icon ?? Search,
+          route: ROUTE_MAP[key],
+          items,
         })
-      if (technologies.length > 0)
-        result.push({
-          label: 'Tecnologías',
-          icon: Cpu,
-          route: (item) => `/catalog/obsolescence/${item.id}/edit`,
-          items: technologies,
-        })
-      if (vulnerabilities.length > 0)
-        result.push({
-          label: 'Vulnerabilidades',
-          icon: Bug,
-          route: (item) => `/security/vulnerabilities/${item.id}/edit`,
-          items: vulnerabilities,
-        })
-      if (incidents.length > 0)
-        result.push({
-          label: 'Incidentes',
-          icon: AlertTriangle,
-          route: (item) => `/security/incidents/${item.id}/edit`,
-          items: incidents,
-        })
-      if (risks.length > 0)
-        result.push({
-          label: 'Riesgos',
-          icon: ShieldAlert,
-          route: (item) => `/governance/risks/${item.id}/edit`,
-          items: risks,
-        })
-      if (auditFindings.length > 0)
-        result.push({
-          label: 'Hallazgos',
-          icon: ClipboardCheck,
-          route: (item) => `/governance/audit/${item.id}/edit`,
-          items: auditFindings,
-        })
-      if (teams.length > 0)
-        result.push({
-          label: 'Equipos',
-          icon: Users,
-          route: (item) => `/teams/${item.id}/edit`,
-          items: teams,
-        })
-      if (objectives.length > 0)
-        result.push({
-          label: 'Objetivos',
-          icon: Target,
-          route: (item) => `/strategy/objectives/${item.id}/edit`,
-          items: objectives,
-        })
-      if (businessUnits.length > 0)
-        result.push({
-          label: 'Unidades de Negocio',
-          icon: Building2,
-          route: () => `/admin/business-units`,
-          items: businessUnits,
-        })
-      if (plans.length > 0)
-        result.push({
-          label: 'Planes',
-          icon: FileText,
-          route: (item) => `/execution/plans/${item.id}`,
-          items: plans,
-        })
-      if (commitments.length > 0)
-        result.push({
-          label: 'Compromisos',
-          icon: Stamp,
-          route: (item) => `/execution/commitments/${item.id}/edit`,
-          items: commitments,
-        })
-      if (activities.length > 0)
-        result.push({
-          label: 'Actividades',
-          icon: CheckSquare,
-          route: (item) => `/execution/plans/${item.entity.planId}`,
-          items: activities,
-        })
-      if (tasks.length > 0)
-        result.push({
-          label: 'Tareas',
-          icon: CheckSquare,
-          route: (item) => `/execution/plans/${item.entity.planId}`,
-          items: tasks,
-        })
-      if (blockers.length > 0)
-        result.push({
-          label: 'Bloqueos',
-          icon: Ban,
-          route: (item) => `/execution/plans/${item.id}`,
-          items: blockers,
-        })
-      if (deliverables.length > 0)
-        result.push({
-          label: 'Entregables',
-          icon: Package,
-          route: () => `/catalog/deliverables`,
-          items: deliverables,
-        })
-      if (microservices.length > 0)
-        result.push({
-          label: 'Microservicios',
-          icon: Box,
-          route: (item) => `/catalog/applications/${item.entity.applicationId}`,
-          items: microservices,
-        })
-      if (members.length > 0)
-        result.push({
-          label: 'Miembros',
-          icon: User,
-          route: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
-          items: members,
-        })
-      if (teamSprints.length > 0)
-        result.push({
-          label: 'Sprints de Equipo',
-          icon: CalendarDays,
-          route: (item) => `/teams/${item.entity.teamId}`,
-          items: teamSprints,
-        })
+      }
 
-      setGroups(result)
+      setGroups(resultGroups)
       setSelectedIndex(0)
     } finally {
       setLoading(false)
@@ -458,6 +487,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
         setQuery('')
         setGroups([])
         setSelectedIndex(0)
+        setActiveCategory(null)
       })
       setTimeout(() => inputRef.current?.focus(), 50)
     }
@@ -470,15 +500,27 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
     }
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => runSearch(query.trim()), 200)
+    debounceRef.current = setTimeout(() => runSearch(query.trim(), activeCategory), 200)
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query, runSearch])
+  }, [query, activeCategory, runSearch])
 
   const handleSelect = (route: string) => {
     navigate(route)
     onClose()
+  }
+
+  const handleCategoryClick = (key: string) => {
+    if (activeCategory === key) {
+      setActiveCategory(null) // deselect = search all
+    } else {
+      setActiveCategory(key)
+    }
+    // Re-run search with new category filter
+    if (query.trim()) {
+      runSearch(query.trim(), activeCategory === key ? null : key)
+    }
   }
 
   if (!open) return null
@@ -498,7 +540,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar aplicaciones, vulnerabilidades, equipos..."
+            placeholder="Buscar en todos los datos..."
             className="flex-1 bg-transparent text-neutral-90 dark:text-white text-lg outline-none placeholder:text-neutral-40"
           />
           {loading && (
@@ -512,19 +554,60 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           </button>
         </div>
 
-        {/* Results */}
+        {/* Category chips (when searching) */}
+        {query.trim() && groups.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3 pb-1 border-b border-neutral-10 dark:border-neutral-75">
+            <span className="text-xs text-neutral-50 font-medium mr-1">Filtrar:</span>
+            <button
+              onClick={() => {
+                setActiveCategory(null)
+                if (query.trim()) runSearch(query.trim(), null)
+              }}
+              className={cn(
+                'px-2.5 py-1 text-xs rounded-full font-medium transition-colors',
+                activeCategory === null
+                  ? 'bg-primary/15 text-primary-dark dark:text-primary-light'
+                  : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 hover:bg-neutral-20 dark:hover:bg-neutral-65',
+              )}
+            >
+              Todas
+            </button>
+            {CATEGORIES.map((cat) => {
+              const hasItems = groups.some((g) => g.key === cat.key)
+              if (!hasItems) return null
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => handleCategoryClick(cat.key)}
+                  className={cn(
+                    'flex items-center gap-1 px-2.5 py-1 text-xs rounded-full font-medium transition-colors',
+                    activeCategory === cat.key
+                      ? 'bg-primary/15 text-primary-dark dark:text-primary-light'
+                      : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 hover:bg-neutral-20 dark:hover:bg-neutral-65',
+                  )}
+                >
+                  <cat.icon size={12} />
+                  {cat.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* No results */}
         {query.trim() && groups.length === 0 && !loading && (
           <div className="px-5 py-12 text-center text-neutral-50">
             <Search size={32} className="mx-auto mb-3 opacity-40" />
             <p className="text-sm">Sin resultados para <span className="font-medium text-neutral-70 dark:text-neutral-30">"{query}"</span></p>
-            <p className="text-xs mt-1">Prueba con otro término</p>
+            <p className="text-xs mt-1">Prueba con otro término o selecciona una categoría específica</p>
           </div>
         )}
 
+        {/* Results */}
         {groups.length > 0 && (
           <div className="max-h-[50vh] overflow-y-auto p-2">
             {groups.map((group) => (
-              <div key={group.label}>
+              <div key={group.key}>
                 <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider">
                   <group.icon size={14} />
                   {group.label}
@@ -534,14 +617,14 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                 </div>
                 {group.items.map((item) => {
                   const idx = flatResults.findIndex(
-                    (fr) => fr.result.id === item.id && fr.group.label === group.label,
+                    (fr) => fr.result.id === item.id && fr.group.key === group.key,
                   )
                   const isSelected = idx === selectedIndex
                   const route = group.route(item)
 
                   return (
                     <button
-                      key={`${group.label}-${item.id}`}
+                      key={`${group.key}-${item.id}`}
                       onClick={() => handleSelect(route)}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={cn(
@@ -582,12 +665,32 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty state — category grid */}
         {!query.trim() && (
-          <div className="px-5 py-12 text-center text-neutral-50">
-            <Search size={40} className="mx-auto mb-3 opacity-20" />
-            <p className="text-sm">Escribe para buscar en todos los datos</p>
-            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-neutral-40">
+          <div className="px-4 py-5">
+            <p className="text-xs font-semibold text-neutral-50 uppercase tracking-wider px-1 mb-3">
+              Selecciona una categoría para buscar
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => {
+                    setActiveCategory(cat.key)
+                    inputRef.current?.focus()
+                  }}
+                  className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors text-center group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-neutral-65 flex items-center justify-center text-neutral-60 group-hover:text-primary transition-colors">
+                    <cat.icon size={16} />
+                  </div>
+                  <span className="text-xs font-medium text-neutral-70 dark:text-neutral-30 group-hover:text-neutral-90 dark:group-hover:text-white transition-colors leading-tight">
+                    {cat.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-5 text-xs text-neutral-40">
               <span>⌘K  abrir</span>
               <span>↓↑  navegar</span>
               <span>⏎  ir</span>

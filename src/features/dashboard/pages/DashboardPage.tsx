@@ -50,18 +50,30 @@ export function DashboardPage() {
   const periodStart = getPeriodStartDate(selectedPeriod)
   const thi = useThiCalculation(selectedBusinessUnitId)
 
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
-  const vulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray()) ?? []
-  const incidents = useLiveQuery(() => db.incidents.toArray()) ?? []
-  const risks = useLiveQuery(() => db.risks.toArray()) ?? []
-  const auditFindings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
-  const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
-  const blockers = useLiveQuery(() => db.blockers.toArray()) ?? []
-  const plans = useLiveQuery(() => db.plans.toArray()) ?? []
-  const commitments = useLiveQuery(() => db.commitments.toArray()) ?? []
-  const activities = useLiveQuery(() => db.activities.toArray()) ?? []
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
+  const rawVulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray())
+  const vulnerabilities = useMemo(() => rawVulnerabilities ?? [], [rawVulnerabilities])
+  const rawIncidents = useLiveQuery(() => db.incidents.toArray())
+  const incidents = useMemo(() => rawIncidents ?? [], [rawIncidents])
+  const rawRisks = useLiveQuery(() => db.risks.toArray())
+  const risks = useMemo(() => rawRisks ?? [], [rawRisks])
+  const rawAuditFindings = useLiveQuery(() => db.auditFindings.toArray())
+  const auditFindings = useMemo(() => rawAuditFindings ?? [], [rawAuditFindings])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
+  const rawTechnologies = useLiveQuery(() => db.technologies.toArray())
+  const technologies = useMemo(() => rawTechnologies ?? [], [rawTechnologies])
+  const rawBusinessUnits = useLiveQuery(() => db.businessUnits.toArray())
+  const businessUnits = useMemo(() => rawBusinessUnits ?? [], [rawBusinessUnits])
+  const rawBlockers = useLiveQuery(() => db.blockers.toArray())
+  const blockers = useMemo(() => rawBlockers ?? [], [rawBlockers])
+  const rawPlans = useLiveQuery(() => db.plans.toArray())
+  const plans = useMemo(() => rawPlans ?? [], [rawPlans])
+  const rawCommitments = useLiveQuery(() => db.commitments.toArray())
+  const commitments = useMemo(() => rawCommitments ?? [], [rawCommitments])
+  const rawActivities = useLiveQuery(() => db.activities.toArray())
+  const activities = useMemo(() => rawActivities ?? [], [rawActivities])
 
   const vulnsInPeriod = vulnerabilities.filter((v) => v.createdAt >= periodStart)
   const incidentsInPeriod = incidents.filter((i) => i.createdAt >= periodStart)

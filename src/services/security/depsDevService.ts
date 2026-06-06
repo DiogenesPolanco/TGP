@@ -122,15 +122,18 @@ export async function lookupDepsPackage(
     pkgVersion = searchTerm.slice(atIdx + 1)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pkg = await apiFetch<any>(`/systems/${system}/packages/${encodePackageName(pkgName)}`)
   if (!pkg) return null
 
   if (!pkgVersion) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const defaultVer = pkg.versions?.find((v: any) => v.isDefault)
     pkgVersion = defaultVer?.versionKey?.version ?? ''
   }
   if (!pkgVersion) return null
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ver = await apiFetch<any>(
     `/systems/${system}/packages/${encodePackageName(pkgName)}/versions/${encodeURIComponent(pkgVersion)}`,
   )
@@ -140,6 +143,7 @@ export async function lookupDepsPackage(
   const advisoryResults: DepsAdvisory[] = []
 
   for (const adv of rawAdvisoryKeys) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const detail = await apiFetch<any>(`/advisories/${adv.id}`)
     if (detail) {
       advisoryResults.push({

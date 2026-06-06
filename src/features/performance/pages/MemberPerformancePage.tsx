@@ -28,7 +28,6 @@ export function MemberPerformancePage() {
 
   useEffect(() => {
     if (!teamId || !memberId) return
-    setLoading(true)
     Promise.all([
       db.teams.get(teamId),
       db.memberProfiles.get(memberId),

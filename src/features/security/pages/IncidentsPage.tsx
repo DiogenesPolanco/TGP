@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Plus, Search, Filter, Upload, X, Clock, Activity, AlertOctagon, Pencil, Trash2 } from 'lucide-react'
+import type { Incident } from '@/types/domain'
+
 function statusLabel(status: string | null | undefined): string {
   const map: Record<string, string> = {
     detected: 'Detectado',
@@ -45,8 +46,6 @@ export function IncidentsPage() {
     (statusFilter === 'all' || i.status === statusFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedIncidents } = usePagination(filteredIncidents, 5)
-
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar incidente?')) {
       await db.incidents.delete(id)
@@ -62,6 +61,100 @@ export function IncidentsPage() {
       ? Math.round(incidents.filter((i) => i.status === 'resolved').reduce((sum, i) => sum + (i.downtimeMinutes ?? 0), 0) / incidents.filter((i) => i.status === 'resolved').length)
       : 0,
   }
+
+  const columns: Column<Incident>[] = [
+    {
+      key: 'title',
+      label: 'Título',
+      sortable: true,
+      render: (incident) => (
+        <>
+          <p className="text-sm font-medium text-neutral-90 dark:text-white">{incident.title}</p>
+          <p className="text-xs text-neutral-50 dark:text-neutral-50">{incident.externalId}</p>
+        </>
+      ),
+    },
+    {
+      key: 'applicationId',
+      label: 'App',
+      render: (incident) => {
+        const app = applications.find((a) => a.id === incident.applicationId)
+        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+      },
+    },
+    {
+      key: 'severity',
+      label: 'Severidad',
+      sortable: true,
+      render: (incident) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          incident.severity === 'critical' ? 'bg-danger/10 text-danger' :
+          incident.severity === 'high' ? 'bg-warning/10 text-warning' :
+          incident.severity === 'medium' ? 'bg-info/10 text-info' :
+          'bg-success/10 text-success'
+        }`}>
+          {incident.severity === 'critical' ? 'Crítica' :
+           incident.severity === 'high' ? 'Alta' :
+           incident.severity === 'medium' ? 'Media' :
+           'Baja'}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (incident) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColor(incident.status)}`}>
+          {statusLabel(incident.status)}
+        </span>
+      ),
+    },
+    {
+      key: 'detectedAt',
+      label: 'Detectado',
+      sortable: true,
+      render: (incident) => (
+        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+          {new Date(incident.detectedAt).toLocaleDateString('es-ES')}
+        </span>
+      ),
+    },
+    {
+      key: 'downtimeMinutes',
+      label: 'Downtime',
+      sortable: true,
+      render: (incident) => (
+        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+          {incident.downtimeMinutes ? `${incident.downtimeMinutes} min` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (incident) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${incident.id}/edit`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(incident.id) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -164,92 +257,12 @@ export function IncidentsPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-80">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Título</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">App</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Severidad</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Detectado</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Downtime</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {paginatedIncidents.map((incident) => {
-              const app = applications.find((a) => a.id === incident.applicationId)
-              return (
-                <tr key={incident.id}
-                  onClick={() => navigate(`${incident.id}/edit`)}
-                  className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-neutral-90 dark:text-white">{incident.title}</p>
-                    <p className="text-xs text-neutral-50 dark:text-neutral-50">{incident.externalId}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</td>
-                    <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      incident.severity === 'critical' ? 'bg-danger/10 text-danger' :
-                      incident.severity === 'high' ? 'bg-warning/10 text-warning' :
-                      incident.severity === 'medium' ? 'bg-info/10 text-info' :
-                      'bg-success/10 text-success'
-                    }`}>
-                      {incident.severity === 'critical' ? 'Crítica' :
-                       incident.severity === 'high' ? 'Alta' :
-                       incident.severity === 'medium' ? 'Media' :
-                       'Baja'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColor(incident.status)}`}>
-                      {statusLabel(incident.status)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">
-                    {new Date(incident.detectedAt).toLocaleDateString('es-ES')}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">
-                    {incident.downtimeMinutes ? `${incident.downtimeMinutes} min` : '-'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`${incident.id}/edit`) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(incident.id) }}
-                        className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredIncidents.length}
-          pageSize={5}
-          onPageChange={setPage}
-        />
-        {filteredIncidents.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-50 dark:text-neutral-50">No se encontraron incidentes</p>
-          </div>
-        )}
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredIncidents}
+        onRowClick={(incident) => navigate(`${incident.id}/edit`)}
+        emptyMessage="No se encontraron incidentes"
+      />
     </div>
   )
 }

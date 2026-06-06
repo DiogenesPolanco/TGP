@@ -24,14 +24,16 @@ export function TechnologyFormPage() {
 
   useEffect(() => {
     if (technology) {
-      setFormData({
-        name: technology.name ?? '',
-        version: technology.version ?? '',
-        vendor: technology.vendor ?? '',
-        category: technology.category ?? '',
-        supportStatus: technology.supportStatus ?? 'active',
-        eolDate: technology.eolDate ? new Date(technology.eolDate).toISOString().split('T')[0] : '',
-        cveList: technology.cveList?.join(', ') ?? '',
+      queueMicrotask(() => {
+        setFormData({
+          name: technology.name ?? '',
+          version: technology.version ?? '',
+          vendor: technology.vendor ?? '',
+          category: technology.category ?? '',
+          supportStatus: technology.supportStatus ?? 'active',
+          eolDate: technology.eolDate ? new Date(technology.eolDate).toISOString().split('T')[0] : '',
+          cveList: technology.cveList?.join(', ') ?? '',
+        })
       })
     }
   }, [technology])

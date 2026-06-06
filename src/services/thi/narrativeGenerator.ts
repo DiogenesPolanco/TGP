@@ -224,7 +224,7 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   // ── Flash Briefing ──
   const totalApps = applications.length
   const totalTeams = teams.length
-  let briefingParts: string[] = []
+  const briefingParts: string[] = []
 
   if (thi) {
     const weakDim = [

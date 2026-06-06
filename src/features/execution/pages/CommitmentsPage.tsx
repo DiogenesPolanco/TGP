@@ -27,9 +27,12 @@ export function CommitmentsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<CommitmentStatus | 'all'>('all')
 
-  const commitments = useLiveQuery(() => db.commitments.toArray()) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
+  const rawCommitments = useLiveQuery(() => db.commitments.toArray())
+  const commitments = useMemo(() => rawCommitments ?? [], [rawCommitments])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
 
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
   const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])

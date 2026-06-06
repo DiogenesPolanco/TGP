@@ -5,6 +5,7 @@ import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
+import type { MemberRole } from '@/constants/enums'
 
 interface TeamFormProps {
   team: Team | null
@@ -48,7 +49,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
       for (const m of formData.members) {
         const profile = await db.memberProfiles.get(m.id)
         if (profile && profile.role !== m.role) {
-          await db.memberProfiles.put({ ...profile, role: m.role as any, updatedAt: new Date() })
+          await db.memberProfiles.put({ ...profile, role: m.role as MemberRole, updatedAt: new Date() })
         }
       }
     } else {

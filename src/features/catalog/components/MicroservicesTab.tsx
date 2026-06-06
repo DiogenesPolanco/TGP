@@ -308,7 +308,7 @@ function MicroserviceFormModal({
           (vulnCount > 0 ? ` · ${vulnCount} CVE, ${advisoryCount} advisories` : ' · sin vulnerabilidades'),
         duration: 5000,
       })
-    } catch (err) {
+    } catch {
       addNotification({
         type: 'error',
         message: 'Error al crear la tecnología desde deps.dev',

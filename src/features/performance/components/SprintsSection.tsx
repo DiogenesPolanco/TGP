@@ -36,7 +36,6 @@ export function SprintsSection({ memberId, teamId }: Props) {
   }, [memberId])
 
   useEffect(() => {
-    setLoadingTeamSprints(true)
     db.teamSprints.where('teamId').equals(teamId).toArray().then((data) => {
       setTeamSprints(data)
       setLoadingTeamSprints(false)

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { usePagination } from '@/hooks/usePagination'
@@ -20,12 +20,12 @@ export function MembersPage() {
   const [editMemberName, setEditMemberName] = useState('')
   const [editMemberTeamId, setEditMemberTeamId] = useState<string>('')
 
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
   const [globalData, setGlobalData] = useState<Awaited<ReturnType<typeof getGlobalMembersKPIs>> | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useMemo(() => {
-    setLoading(true)
+  useEffect(() => {
     getGlobalMembersKPIs().then((d) => { setGlobalData(d); setLoading(false) })
   }, [])
 

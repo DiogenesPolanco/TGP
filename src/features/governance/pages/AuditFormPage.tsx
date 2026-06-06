@@ -37,15 +37,17 @@ export function AuditFormPage() {
 
   useEffect(() => {
     if (finding) {
-      setFormData({
-        title: finding.title ?? '',
-        description: finding.description ?? '',
-        severity: finding.severity ?? 'medium',
-        category: finding.category ?? 'compliance',
-        status: finding.status ?? 'open',
-        dueDate: finding.dueDate ? new Date(finding.dueDate).toISOString().split('T')[0] : '',
-        actionPlan: (finding.metadata?.actionPlanNotes as string) ?? '',
-        applicationId: finding.applicationId ?? '',
+      queueMicrotask(() => {
+        setFormData({
+          title: finding.title ?? '',
+          description: finding.description ?? '',
+          severity: finding.severity ?? 'medium',
+          category: finding.category ?? 'compliance',
+          status: finding.status ?? 'open',
+          dueDate: finding.dueDate ? new Date(finding.dueDate).toISOString().split('T')[0] : '',
+          actionPlan: (finding.metadata?.actionPlanNotes as string) ?? '',
+          applicationId: finding.applicationId ?? '',
+        })
       })
     }
   }, [finding])

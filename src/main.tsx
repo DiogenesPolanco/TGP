@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { StrictMode, useState, useEffect, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -14,9 +16,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const [sessionExpired, setSessionExpired] = useState(false)
 
   useEffect(() => {
-    const session = getSession()
-    if (session) setAuthed(true)
-    setChecking(false)
+    queueMicrotask(() => {
+      const session = getSession()
+      if (session) setAuthed(true)
+      setChecking(false)
+    })
   }, [sessionExpired])
 
   const handleInactivityExpired = useCallback(() => {

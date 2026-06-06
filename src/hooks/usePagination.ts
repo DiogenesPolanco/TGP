@@ -6,7 +6,7 @@ export function usePagination<T>(items: T[], pageSize = 5) {
 
   useEffect(() => {
     if (page > totalPages) {
-      setPage(totalPages)
+      queueMicrotask(() => setPage(totalPages))
     }
   }, [items.length, page, totalPages])
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import {
   Plus,
   Search,
@@ -17,8 +18,6 @@ import {
   Shield,
 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
 import type { Technology, SupportStatus, TechCategory } from '@/types/domain'
 import { computeAppTechMap } from '@/utils/technologyUtils'
 
@@ -29,9 +28,12 @@ export function ObsolescencePage() {
   const [statusFilter, setStatusFilter] = useState<SupportStatus | 'all'>('all')
   const [categoryFilter, setCategoryFilter] = useState<TechCategory | 'all'>('all')
 
-  const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
-  const microservices = useLiveQuery(() => db.microservices.toArray()) ?? []
+  const rawTechnologies = useLiveQuery(() => db.technologies.toArray())
+  const technologies = useMemo(() => rawTechnologies ?? [], [rawTechnologies])
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
+  const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
+  const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
 
   const filteredTechs = useMemo(() => {
     return technologies.filter((t) => {
@@ -41,8 +43,6 @@ export function ObsolescencePage() {
       return true
     })
   }, [technologies, search, statusFilter, categoryFilter])
-
-  const { page, setPage, totalPages, paginatedItems: paginatedTechs } = usePagination(filteredTechs, 5)
 
   const appTechMap = useMemo(
     () => computeAppTechMap(applications, microservices),
@@ -59,7 +59,6 @@ export function ObsolescencePage() {
       technologies.filter((t) => t.supportStatus === 'eol').map((t) => t.id),
     )
 
-    // Check app technologies INCLUDING inherited from microservices
     const appTechMap = computeAppTechMap(applications, microservices)
     const criticalAppsWithEol = applications.filter((app) => {
       const allTechIds = appTechMap.get(app.id) ?? app.technologies
@@ -133,6 +132,124 @@ export function ObsolescencePage() {
     library: 'Librería', tool: 'Herramienta', os: 'SO',
     web_server: 'Servidor Web', cloud_service: 'Cloud', other: 'Otro',
   }
+
+  const columns: Column<Technology>[] = [
+    {
+      key: 'name',
+      label: 'Tecnología',
+      sortable: true,
+      render: (tech) => <span className="text-sm font-medium text-neutral-90 dark:text-white">{tech.name}</span>,
+    },
+    {
+      key: 'version',
+      label: 'Versión',
+      sortable: true,
+      render: (tech) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.version}</span>,
+    },
+    {
+      key: 'category',
+      label: 'Categoría',
+      sortable: true,
+      render: (tech) => (
+        <span className="text-xs px-2 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
+          {categoryLabels[tech.category] || tech.category}
+        </span>
+      ),
+    },
+    {
+      key: 'vendor',
+      label: 'Vendor',
+      sortable: true,
+      render: (tech) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.vendor}</span>,
+    },
+    {
+      key: 'supportStatus',
+      label: 'Estado',
+      sortable: true,
+      render: (tech) => {
+        const urgency = getEolUrgency(tech)
+        return (
+          <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${getStatusStyle(tech.supportStatus)}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${urgency.dot}`} />
+            {getStatusLabel(tech.supportStatus)}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'eolDate',
+      label: 'EOL Date',
+      sortable: true,
+      render: (tech) => {
+        const urgency = getEolUrgency(tech)
+        return (
+          <div>
+            <div className="flex items-center gap-2">
+              <Calendar size={14} className="text-neutral-50" />
+              <span className={`text-sm ${urgency.color}`}>
+                {tech.eolDate ? new Date(tech.eolDate).toLocaleDateString('es-ES') : '-'}
+              </span>
+            </div>
+            {tech.eolDate && (
+              <p className={`text-xs ${urgency.color} mt-0.5`}>{urgency.label}</p>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      key: 'apps',
+      label: 'Apps',
+      headerClassName: 'text-center',
+      className: 'text-center',
+      render: (tech) => {
+        const appCount = applications.filter((app) => {
+          const techIds = appTechMap.get(app.id) ?? app.technologies
+          return techIds.includes(tech.id)
+        }).length
+        return (
+          <span className={`text-sm font-medium ${appCount > 0 ? 'text-neutral-90 dark:text-white' : 'text-neutral-50'}`}>
+            {appCount}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'cveList',
+      label: 'CVEs',
+      headerClassName: 'text-center',
+      className: 'text-center',
+      render: (tech) => (
+        <span className={`text-sm font-medium ${tech.cveList.length > 0 ? 'text-danger' : 'text-neutral-50'}`}>
+          {tech.cveList.length || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (tech) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${tech.id}/edit`) }}
+            className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(tech.id) }}
+            className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -273,119 +390,17 @@ export function ObsolescencePage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Tecnología</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Versión</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Categoría</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Vendor</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">EOL Date</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Apps</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">CVEs</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {paginatedTechs.map((tech) => {
-                const urgency = getEolUrgency(tech)
-                const appCount = applications.filter((app) => {
-                  const techIds = appTechMap.get(app.id) ?? app.technologies
-                  return techIds.includes(tech.id)
-                }).length
-                return (
-                  <tr key={tech.id}
-                    onClick={() => navigate(`${tech.id}/edit`)}
-                    className="hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors cursor-pointer">
-                    <td className="px-4 py-3">
-                      <span className="text-sm font-medium text-neutral-90 dark:text-white">{tech.name}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.version}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs px-2 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
-                        {categoryLabels[tech.category] || tech.category}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.vendor}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${getStatusStyle(tech.supportStatus)}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${urgency.dot}`} />
-                        {getStatusLabel(tech.supportStatus)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-neutral-50" />
-                        <span className={`text-sm ${urgency.color}`}>
-                          {tech.eolDate ? new Date(tech.eolDate).toLocaleDateString('es-ES') : '-'}
-                        </span>
-                      </div>
-                      {tech.eolDate && (
-                        <p className={`text-xs ${urgency.color} mt-0.5`}>{urgency.label}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`text-sm font-medium ${appCount > 0 ? 'text-neutral-90 dark:text-white' : 'text-neutral-50'}`}>
-                        {appCount}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`text-sm font-medium ${tech.cveList.length > 0 ? 'text-danger' : 'text-neutral-50'}`}>
-                        {tech.cveList.length || '-'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`${tech.id}/edit`) }}
-                          className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
-                          title="Editar"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDelete(tech.id) }}
-                          className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-danger transition-colors"
-                          title="Eliminar"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-              {filteredTechs.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center">
-                    <Layers size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
-                    <p className="text-sm text-neutral-50">
-                      {technologies.length === 0
-                        ? 'No hay tecnologías registradas. Crea la primera.'
-                        : 'No se encontraron tecnologías con los filtros seleccionados.'}
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            totalItems={filteredTechs.length}
-            pageSize={5}
-            onPageChange={setPage}
-          />
-        </div>
-      </div>
-
+      <SortableTable
+        columns={columns}
+        data={filteredTechs}
+        onRowClick={(tech) => navigate(`${tech.id}/edit`)}
+        pageSize={5}
+        emptyMessage={
+          technologies.length === 0
+            ? 'No hay tecnologías registradas. Crea la primera.'
+            : 'No se encontraron tecnologías con los filtros seleccionados.'
+        }
+      />
     </div>
   )
 }

@@ -45,11 +45,16 @@ export function PlanDetailPage() {
   const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
 
   const plan = useLiveQuery(() => db.plans.get(id ?? ''), [id])
-  const activities = useLiveQuery(() => db.activities.where('planId').equals(id ?? '').toArray(), [id]) ?? []
-  const tasks = useLiveQuery(() => db.tasks.where('planId').equals(id ?? '').toArray(), [id]) ?? []
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const applications = useLiveQuery(() => db.applications.toArray()) ?? []
-  const objectives = useLiveQuery(() => db.objectives.toArray()) ?? []
+  const rawActivities = useLiveQuery(() => db.activities.where('planId').equals(id ?? '').toArray(), [id])
+  const activities = useMemo(() => rawActivities ?? [], [rawActivities])
+  const rawTasks = useLiveQuery(() => db.tasks.where('planId').equals(id ?? '').toArray(), [id])
+  const tasks = useMemo(() => rawTasks ?? [], [rawTasks])
+  const rawTeams = useLiveQuery(() => db.teams.toArray())
+  const teams = useMemo(() => rawTeams ?? [], [rawTeams])
+  const rawApplications = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
+  const rawObjectives = useLiveQuery(() => db.objectives.toArray())
+  const objectives = useMemo(() => rawObjectives ?? [], [rawObjectives])
 
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
   const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])
@@ -122,6 +127,7 @@ export function PlanDetailPage() {
   }
 
   const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
+  // eslint-disable-next-line react-hooks/purity
   const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
 
