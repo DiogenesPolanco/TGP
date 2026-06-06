@@ -2,14 +2,17 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import type { Table } from 'dexie'
+import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/services/db/database'
 import {
   ArrowLeft, Pencil, Shield, AlertTriangle, Activity, FileWarning,
-  Plus, X, Unlink, Search,
+  Plus, X, Unlink, Search, FileText, Building2, Layers, Server,
+  Database, Package, ChevronRight,
 } from 'lucide-react'
 import type { Technology, Vulnerability, Risk, Incident, AuditFinding, SupportStatus } from '@/types/domain'
 import { DeliverablesTab } from '../components/DeliverablesTab'
 import { MicroservicesTab } from '../components/MicroservicesTab'
+import { DatabasesTab } from '../components/DatabasesTab'
 import { ArchitectureTab } from '../components/ArchitectureTab'
 
 const statusColors: Record<SupportStatus, string> = {
@@ -26,6 +29,40 @@ const statusLabel: Record<SupportStatus, string> = {
   unknown: '?',
 }
 
+const criticalityLabel: Record<string, string> = {
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  critical: 'Crítica',
+}
+
+const appStatusLabel: Record<string, string> = {
+  active: 'Activa',
+  deprecated: 'Deprecada',
+  retired: 'Retirada',
+  planned: 'Planificada',
+}
+
+const criticalityColor: Record<string, string> = {
+  critical: 'bg-danger/10 text-danger border-danger/30',
+  high: 'bg-warning/10 text-warning border-warning/30',
+  medium: 'bg-info/10 text-info border-info/30',
+  low: 'bg-success/10 text-success border-success/30',
+}
+
+const tabConfig = [
+  { id: 'summary', label: 'Resumen', icon: FileText },
+  { id: 'architecture', label: 'Arquitectura', icon: Building2 },
+  { id: 'tech', label: 'Tech Stack', icon: Layers },
+  { id: 'microservices', label: 'Microservicios', icon: Server },
+  { id: 'databases', label: 'Bases de Datos', icon: Database },
+  { id: 'vulns', label: 'Vulnerabilidades', icon: Shield },
+  { id: 'risks', label: 'Riesgos', icon: AlertTriangle },
+  { id: 'incidents', label: 'Incidentes', icon: Activity },
+  { id: 'audit', label: 'Auditoría', icon: FileWarning },
+  { id: 'deliverables', label: 'Entregables', icon: Package },
+] as const
+
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -40,6 +77,7 @@ export function ApplicationDetailPage() {
   const findings = useLiveQuery(() => db.auditFindings.where('applicationId').equals(id!).toArray(), [id])
   const deliverables = useLiveQuery(() => db.deliverables.where('applicationId').equals(id!).toArray(), [id])
   const microservices = useLiveQuery(() => db.microservices.where('applicationId').equals(id!).toArray(), [id])
+  const databases = useLiveQuery(() => db.appDatabases.where('applicationId').equals(id!).toArray(), [id])
 
   if (!application) {
     return (
@@ -52,17 +90,16 @@ export function ApplicationDetailPage() {
   const bu = businessUnits?.find((b) => b.id === application.businessUnitId)
   const appTechnologies = allTechnologies.filter((t) => application.technologies.includes(t.id))
 
-  const tabs = [
-    { id: 'summary', label: 'Resumen' },
-    { id: 'architecture', label: `Arquitectura` },
-    { id: 'tech', label: `Tech Stack (${appTechnologies.length})` },
-    { id: 'microservices', label: `Microservicios (${microservices?.length ?? 0})` },
-    { id: 'vulns', label: `Vulnerabilidades (${vulnerabilities?.length ?? 0})` },
-    { id: 'risks', label: `Riesgos (${risks?.length ?? 0})` },
-    { id: 'incidents', label: `Incidentes (${incidents?.length ?? 0})` },
-    { id: 'audit', label: `Auditoría (${findings?.length ?? 0})` },
-    { id: 'deliverables', label: `Entregables (${deliverables?.length ?? 0})` },
-  ]
+  const tabCounts: Record<string, number | undefined> = {
+    tech: appTechnologies.length,
+    microservices: microservices?.length,
+    databases: databases?.length,
+    vulns: vulnerabilities?.length,
+    risks: risks?.length,
+    incidents: incidents?.length,
+    audit: findings?.length,
+    deliverables: deliverables?.length,
+  }
 
   const getCriticalityColor = (criticality: string) => {
     const colors: Record<string, string> = {
@@ -76,176 +113,278 @@ export function ApplicationDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/catalog/applications')}
-            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{application.name}</h2>
-            <p className="text-sm text-neutral-60 dark:text-neutral-40">{application.description}</p>
+
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm text-neutral-50">
+        <button
+          onClick={() => navigate('/catalog/applications')}
+          className="hover:text-neutral-90 dark:hover:text-white transition-colors"
+        >
+          Aplicaciones
+        </button>
+        <ChevronRight size={14} className="text-neutral-40" />
+        <span className="text-neutral-90 dark:text-white font-medium truncate max-w-[200px]">
+          {application.name}
+        </span>
+      </nav>
+
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-neutral-90 dark:text-white leading-tight">
+            {application.name}
+          </h1>
+          {application.description && (
+            <p className="text-base text-neutral-60 dark:text-neutral-40 leading-relaxed max-w-2xl">
+              {application.description}
+            </p>
+          )}
+          <div className="flex items-center gap-3 pt-1">
+            <span className={`px-3 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`}>
+              {criticalityLabel[application.criticality]}
+            </span>
+            <span className="px-3 py-0.5 rounded-full text-xs font-medium bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
+              {appStatusLabel[application.status]}
+            </span>
+            <span className="text-sm text-neutral-50">
+              {bu?.name && `${bu.name} · `}{application.ownerName} · {application.architecture}
+            </span>
           </div>
         </div>
         <button
           onClick={() => navigate(`/catalog/applications/${id}/edit`)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm shrink-0"
         >
-          <Pencil size={18} />
+          <Pencil size={16} />
+          Editar
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCriticalityColor(application.criticality)}`}>
-          {application.criticality}
-        </span>
-        <span className="px-3 py-1 rounded-full text-xs font-medium bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
-          {application.status}
-        </span>
-        <span className="text-sm text-neutral-60 dark:text-neutral-40">
-          {bu?.name} • {application.ownerName} • {application.architecture}
-        </span>
-      </div>
-
-      <div className="border-b border-neutral-20 dark:border-neutral-70">
-        <div className="flex gap-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-                activeTab === tab.id
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        {activeTab === 'summary' && (
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 mb-3">Información General</h4>
-              <dl className="space-y-2">
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Nombre</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{application.name}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Owner</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{application.ownerName}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Business Unit</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{bu?.name || '-'}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Arquitectura</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{application.architecture}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Estado</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{application.status}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-neutral-60 dark:text-neutral-40">Criticidad</dt>
-                  <dd className="text-sm font-medium text-neutral-90 dark:text-white">{application.criticality}</dd>
-                </div>
-                {application.supportEndDate && (
-                  <div className="flex justify-between">
-                    <dt className="text-sm text-neutral-60 dark:text-neutral-40">Fin de soporte</dt>
-                    <dd className="text-sm font-medium text-neutral-90 dark:text-white">
-                      {new Date(application.supportEndDate).toLocaleDateString('es-ES')}
-                    </dd>
-                  </div>
+      {/* Tabs + Content */}
+      <div className="flex gap-8">
+        {/* Vertical Tabs */}
+        <nav className="w-44 shrink-0 space-y-1">
+          {tabConfig.map((tab) => {
+            const Icon = tab.icon
+            const count = tabCounts[tab.id]
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-accent/10 text-accent font-medium shadow-sm'
+                    : 'text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                }`}
+              >
+                <Icon size={18} className="shrink-0" />
+                <span className="truncate">{tab.label}</span>
+                {count !== undefined && (
+                  <span className={`ml-auto text-xs font-medium ${
+                    activeTab === tab.id ? 'text-accent' : 'text-neutral-50'
+                  }`}>
+                    {count}
+                  </span>
                 )}
-              </dl>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 mb-3">Métricas</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <MetricCard icon={<Shield size={20} />} label="Vulnerabilidades" value={vulnerabilities?.length ?? 0} color="text-danger" />
-                <MetricCard icon={<AlertTriangle size={20} />} label="Riesgos" value={risks?.length ?? 0} color="text-warning" />
-                <MetricCard icon={<Activity size={20} />} label="Incidentes" value={incidents?.length ?? 0} color="text-info" />
-                <MetricCard icon={<FileWarning size={20} />} label="Hallazgos" value={findings?.length ?? 0} color="text-neutral-60" />
-              </div>
-            </div>
-          </div>
-        )}
+              </button>
+            )
+          })}
+        </nav>
 
-        {activeTab === 'architecture' && (
-          <ArchitectureTab applicationId={id!} />
-        )}
+        {/* Content Area */}
+        <div className="flex-1 min-w-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-8"
+            >
+              {activeTab === 'summary' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-2xl font-bold text-neutral-90 dark:text-white mb-6">
+                      Resumen
+                    </h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      {/* Left: Info */}
+                      <div className="lg:col-span-2 space-y-4">
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                          {([
+                            ['Nombre', application.name],
+                            ['Owner', application.ownerName],
+                            ['Business Unit', bu?.name || '-'],
+                            ['Arquitectura', application.architecture],
+                            ['Estado', appStatusLabel[application.status]],
+                            ['Criticidad', criticalityLabel[application.criticality]],
+                            ...(application.supportEndDate
+                              ? [['Fin de soporte', new Date(application.supportEndDate).toLocaleDateString('es-ES')]]
+                              : [] as string[][]),
+                          ] as const).map(([label, value]) => (
+                            <div key={label}>
+                              <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-0.5">{label}</dt>
+                              <dd className="text-sm font-medium text-neutral-90 dark:text-white">{value}</dd>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-        {activeTab === 'tech' && (
-          <TechStackManager
-            applicationId={application.id}
-            selectedIds={application.technologies}
-            allTechnologies={allTechnologies}
-          />
-        )}
+                      {/* Right: Metrics */}
+                      <div className="space-y-3">
+                        <h3 className="text-xs font-medium text-neutral-50 uppercase tracking-wider">Métricas</h3>
+                        <MetricHighlight icon={Shield} label="Vulnerabilidades" value={vulnerabilities?.length ?? 0} color="text-danger" />
+                        <MetricHighlight icon={AlertTriangle} label="Riesgos" value={risks?.length ?? 0} color="text-warning" />
+                        <MetricHighlight icon={Activity} label="Incidentes" value={incidents?.length ?? 0} color="text-info" />
+                        <MetricHighlight icon={FileWarning} label="Hallazgos" value={findings?.length ?? 0} color="text-neutral-60" />
+                      </div>
+                    </div>
+                  </div>
 
-        {activeTab === 'microservices' && (
-          <MicroservicesTab applicationId={id!} />
-        )}
+                  {/* Tech Stack Preview */}
+                  {appTechnologies.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                          Stack Tecnológico
+                        </h3>
+                        <button
+                          onClick={() => setActiveTab('tech')}
+                          className="text-xs text-primary hover:text-primary-dark transition-colors font-medium"
+                        >
+                          Gestionar →
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {appTechnologies.slice(0, 8).map((tech) => (
+                          <span
+                            key={tech.id}
+                            className={`inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full border ${
+                              tech.supportStatus === 'eol'
+                                ? 'bg-danger/5 text-danger border-danger/20'
+                                : tech.supportStatus === 'extended'
+                                  ? 'bg-warning/5 text-warning border-warning/20'
+                                  : 'bg-success/5 text-success border-success/20'
+                            }`}
+                          >
+                            {tech.name}
+                            <span className="opacity-60 text-xs">{tech.version}</span>
+                          </span>
+                        ))}
+                        {appTechnologies.length > 8 && (
+                          <span className="text-sm text-neutral-50 self-center">
+                            +{appTechnologies.length - 8} más
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-        {activeTab === 'vulns' && (
-          <EntityList
-            title="Vulnerabilidades"
-            entityType="vulnerabilities"
-            items={vulnerabilities ?? []}
-            applicationId={id!}
-            headers={['Título', 'Severidad', 'CVSS']}
-            renderCells={(v) => [v.title, v.severity, v.cvssScore.toString()]}
-            severityColor={(v) => v.severity}
-          />
-        )}
+                  {/* Quick Links */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <QuickLinkCard
+                      icon={Server}
+                      label="Microservicios"
+                      value={microservices?.length ?? 0}
+                      onClick={() => setActiveTab('microservices')}
+                    />
+                    <QuickLinkCard
+                      icon={Database}
+                      label="Bases de Datos"
+                      value={databases?.length ?? 0}
+                      onClick={() => setActiveTab('databases')}
+                    />
+                    <QuickLinkCard
+                      icon={Package}
+                      label="Entregables"
+                      value={deliverables?.length ?? 0}
+                      onClick={() => setActiveTab('deliverables')}
+                    />
+                    <QuickLinkCard
+                      icon={Building2}
+                      label="Arquitectura"
+                      value={`${microservices?.length ?? 0} cont.`}
+                      onClick={() => setActiveTab('architecture')}
+                    />
+                  </div>
+                </div>
+              )}
 
-        {activeTab === 'risks' && (
-          <EntityList
-            title="Riesgos"
-            entityType="risks"
-            items={risks ?? []}
-            applicationId={id!}
-            headers={['Título', 'Categoría', 'Score', 'Estado']}
-            renderCells={(r) => [r.title, r.category, r.riskScore.toString(), r.status]}
-            severityColor={() => null}
-          />
-        )}
+              {activeTab === 'architecture' && (
+                <ArchitectureTab applicationId={id!} />
+              )}
 
-        {activeTab === 'incidents' && (
-          <EntityList
-            title="Incidentes"
-            entityType="incidents"
-            items={incidents ?? []}
-            applicationId={id!}
-            headers={['Título', 'Severidad', 'Estado', 'Downtime']}
-            renderCells={(i) => [i.title, i.severity, i.status, `${i.downtimeMinutes ?? 0} min`]}
-            severityColor={(i) => i.severity}
-          />
-        )}
+              {activeTab === 'tech' && (
+                <TechStackManager
+                  applicationId={application.id}
+                  selectedIds={application.technologies}
+                  allTechnologies={allTechnologies}
+                />
+              )}
 
-        {activeTab === 'audit' && (
-          <EntityList
-            title="Hallazgos de Auditoría"
-            entityType="auditFindings"
-            items={findings ?? []}
-            applicationId={id!}
-            headers={['Título', 'Severidad', 'Estado', 'Vencimiento']}
-            renderCells={(f) => [f.title, f.severity, f.status, new Date(f.dueDate).toLocaleDateString('es-ES')]}
-            severityColor={(f) => f.severity}
-          />
-        )}
+              {activeTab === 'microservices' && (
+                <MicroservicesTab applicationId={id!} />
+              )}
 
-        {activeTab === 'deliverables' && (
-          <DeliverablesTab applicationId={id!} />
-        )}
+              {activeTab === 'databases' && (
+                <DatabasesTab applicationId={id!} />
+              )}
+
+              {activeTab === 'vulns' && (
+                <EntityList
+                  title="Vulnerabilidades"
+                  entityType="vulnerabilities"
+                  items={vulnerabilities ?? []}
+                  applicationId={id!}
+                  headers={['Título', 'Severidad', 'CVSS']}
+                  renderCells={(v: Vulnerability) => [v.title, v.severity, v.cvssScore.toString()]}
+                  severityColor={(v: Vulnerability) => v.severity}
+                />
+              )}
+
+              {activeTab === 'risks' && (
+                <EntityList
+                  title="Riesgos"
+                  entityType="risks"
+                  items={risks ?? []}
+                  applicationId={id!}
+                  headers={['Título', 'Categoría', 'Score', 'Estado']}
+                  renderCells={(r: Risk) => [r.title, r.category, r.riskScore.toString(), r.status]}
+                  severityColor={() => null}
+                />
+              )}
+
+              {activeTab === 'incidents' && (
+                <EntityList
+                  title="Incidentes"
+                  entityType="incidents"
+                  items={incidents ?? []}
+                  applicationId={id!}
+                  headers={['Título', 'Severidad', 'Estado', 'Downtime']}
+                  renderCells={(i: Incident) => [i.title, i.severity, i.status, `${i.downtimeMinutes ?? 0} min`]}
+                  severityColor={(i: Incident) => i.severity}
+                />
+              )}
+
+              {activeTab === 'audit' && (
+                <EntityList
+                  title="Hallazgos de Auditoría"
+                  entityType="auditFindings"
+                  items={findings ?? []}
+                  applicationId={id!}
+                  headers={['Título', 'Severidad', 'Estado', 'Vencimiento']}
+                  renderCells={(f: AuditFinding) => [f.title, f.severity, f.status, new Date(f.dueDate).toLocaleDateString('es-ES')]}
+                  severityColor={(f: AuditFinding) => f.severity}
+                />
+              )}
+
+              {activeTab === 'deliverables' && (
+                <DeliverablesTab applicationId={id!} />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
     </div>
@@ -289,7 +428,7 @@ function TechStackManager({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30">Tecnologías</h4>
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">Stack Tecnológico</h4>
       </div>
 
       <div className="space-y-2 mb-4">
@@ -433,7 +572,7 @@ function EntityList<T extends EntityForList>({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30">{title}</h4>
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">{title}</h4>
       </div>
 
       {items.length === 0 ? (
@@ -530,14 +669,53 @@ function EntityList<T extends EntityForList>({
   )
 }
 
-/* ─── Shared components ─── */
+/* ─── Editorial Components ─── */
 
-function MetricCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function MetricHighlight({
+  icon: Icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.FC<{ size?: number }>
+  label: string
+  value: number
+  color: string
+}) {
   return (
-    <div className="bg-neutral-10 dark:bg-neutral-70 rounded-lg p-4">
-      <div className={`${color} mb-2`}>{icon}</div>
-      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-neutral-10 dark:bg-neutral-70/50">
+      <div className={`p-2 rounded-lg bg-white dark:bg-neutral-70 shadow-sm ${color}`}>
+        <Icon size={18} />
+      </div>
+      <div>
+        <p className="text-xl font-bold text-neutral-90 dark:text-white leading-none">{value}</p>
+        <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{label}</p>
+      </div>
     </div>
+  )
+}
+
+function QuickLinkCard({
+  icon: Icon,
+  label,
+  value,
+  onClick,
+}: {
+  icon: React.FC<{ size?: number }>
+  label: string
+  value: number | string
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-1.5 p-4 rounded-xl border border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70/50 hover:border-accent/30 hover:bg-accent/5 transition-all group text-center"
+    >
+      <div className="p-2 rounded-lg bg-white dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 group-hover:text-accent transition-colors shadow-sm">
+        <Icon size={20} />
+      </div>
+      <span className="text-xs text-neutral-60 dark:text-neutral-40">{label}</span>
+          <span className="text-xl font-bold text-neutral-90 dark:text-white leading-none">{value}</span>
+    </button>
   )
 }

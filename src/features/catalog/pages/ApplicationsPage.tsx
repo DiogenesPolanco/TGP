@@ -8,6 +8,20 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, Trash2, Pencil, Eye, X } from 'lucide-react'
 
+const criticalityLabel: Record<string, string> = {
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  critical: 'Crítica',
+}
+
+const appStatusLabel: Record<string, string> = {
+  active: 'Activa',
+  deprecated: 'Deprecada',
+  retired: 'Retirada',
+  planned: 'Planificada',
+}
+
 export function ApplicationsPage() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -231,12 +245,12 @@ export function ApplicationsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCriticalityColor(app.criticality)}`}>
-                    {app.criticality}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
-                    {app.status}
+                    {criticalityLabel[app.criticality]}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
+                      {appStatusLabel[app.status]}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-neutral-70 dark:text-neutral-30">{app.architecture}</td>

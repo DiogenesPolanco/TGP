@@ -6,6 +6,20 @@ import { Server, ExternalLink, Layers, Box, Cpu, Database, Globe, Shield, ArrowR
 import type { SupportStatus, Criticality } from '@/types/domain'
 import type { DependencyType } from '@/constants/enums'
 
+const criticalityLabel: Record<string, string> = {
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  critical: 'Crítica',
+}
+
+const appStatusLabel: Record<string, string> = {
+  active: 'Activa',
+  deprecated: 'Deprecada',
+  retired: 'Retirada',
+  planned: 'Planificada',
+}
+
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
   extended: 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',
@@ -104,7 +118,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       {/* Header info */}
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 mb-1">Diagrama de Arquitectura C4</h4>
+          <h4 className="text-xl font-bold text-neutral-90 dark:text-white mb-1">Diagrama de Arquitectura C4</h4>
           <p className="text-xs text-neutral-50">
             {microservices.length} contenedores · {depApps.length} dependencias externas · {appTechnologies.length} tecnologías
             {eolCount > 0 && (
@@ -144,7 +158,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
 
               {/* Metadata badge */}
               <div className="absolute -top-3.5 right-6 px-3 py-1 bg-white dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 text-xs rounded-full border border-neutral-20 dark:border-neutral-60 shadow-sm">
-                {application.architecture} · {application.criticality}
+                {application.architecture} · {criticalityLabel[application.criticality]}
               </div>
 
               {/* Tech tags row */}
@@ -309,14 +323,14 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                         )}
                         <div className="flex items-center gap-2 text-[10px] text-neutral-50">
                           <Shield size={12} />
-                          <span>{dep.architecture} · {dep.status}</span>
+                          <span>{dep.architecture} · {appStatusLabel[dep.status]}</span>
                           {dep.criticality && (
                             <span className={`ml-auto px-1.5 py-0.5 rounded-full ${
                               dep.criticality === 'critical' ? 'bg-red-500/10 text-red-500' :
                               dep.criticality === 'high' ? 'bg-amber-500/10 text-amber-500' :
                               'bg-emerald-500/10 text-emerald-500'
                             }`}>
-                              {dep.criticality}
+                              {criticalityLabel[dep.criticality]}
                             </span>
                           )}
                         </div>
@@ -347,7 +361,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
         <div className="px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">
+            <h4 className="text-lg font-bold text-neutral-90 dark:text-white">
               Dependencias de Aplicación
             </h4>
             <p className="text-xs text-neutral-50 mt-0.5">{dependencies.length} registradas</p>
@@ -386,7 +400,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                         className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                       >
                         <span className="text-neutral-90 dark:text-white">{app.name}</span>
-                        <span className="text-xs text-neutral-50">{app.architecture} · {app.status}</span>
+                        <span className="text-xs text-neutral-50">{app.architecture} · {appStatusLabel[app.status]}</span>
                       </button>
                     ))}
                   </div>
@@ -471,7 +485,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                               depRel.criticality === 'medium' ? 'bg-info/10 text-info' :
                               'bg-emerald-500/10 text-emerald-500'
                             }`}>
-                              {depRel.criticality}
+                              {criticalityLabel[depRel.criticality]}
                             </span>
                           )}
                         </div>
