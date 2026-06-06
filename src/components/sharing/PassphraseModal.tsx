@@ -24,10 +24,10 @@ export function PassphraseModal({ title = 'Proteger con contraseña', descriptio
               <div className="absolute inset-0 opacity-10" style={{
                 background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
               }} />
-              <div className="relative flex items-center gap-2.5 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center p-1">
-                  <img src="/favicon.svg" alt="TGP" className="w-full h-full brightness-0 invert" />
-                </div>
+                <div className="relative flex items-center gap-2.5 mb-5">
+                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-1 shadow-sm">
+                    <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
+                  </div>
                 <div>
                   <p className="text-base font-bold">TGP</p>
                   <p className="text-[10px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
