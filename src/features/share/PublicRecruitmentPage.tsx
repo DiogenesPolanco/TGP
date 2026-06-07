@@ -114,11 +114,26 @@ export function PublicRecruitmentPage() {
   const getTechs = (candidateId: string) => technologies.filter((t) => t.candidateId === candidateId)
   const getEvals = (candidateId: string) => evaluations.filter((e) => e.candidateId === candidateId)
 
+  const candidateStats = candidates.map((c) => {
+    const techs = getTechs(c.id)
+    const evals = getEvals(c.id)
+    return {
+      ...c,
+      techAvg: techs.length > 0 ? Math.round(techs.reduce((s, t) => s + t.points, 0) / techs.length) : 0,
+      evalAvg: evals.length > 0 ? Math.round(evals.reduce((s, e) => s + e.points, 0) / evals.length) : 0,
+    }
+  })
+
+  const techLeader = [...candidateStats].sort((a, b) => b.techAvg - a.techAvg)[0]
+  const evalLeader = [...candidateStats].sort((a, b) => b.evalAvg - a.evalAvg)[0]
+  const worstCandidate = [...candidateStats].sort((a, b) => a.totalScore - b.totalScore)[0]
+  const selectedCount = candidates.filter((c) => c.status === 'selected').length
+
   const stats = [
-    { label: 'Total', value: candidates.length, icon: <Users size={18} />, color: 'text-primary' },
-    { label: 'Pendientes', value: candidates.filter((c) => c.status === 'pending').length, icon: <Calendar size={18} />, color: 'text-warning' },
-    { label: 'Entrevistados', value: candidates.filter((c) => c.status === 'interviewed').length, icon: <UserCheck size={18} />, color: 'text-info' },
-    { label: 'Seleccionados', value: candidates.filter((c) => c.status === 'selected').length, icon: <Star size={18} />, color: 'text-success' },
+    { label: 'Seleccionados', value: selectedCount, sub: selectedCount > 0 ? techLeader?.name : '', icon: <Star size={18} />, color: 'text-success' },
+    { label: 'Líder Tecnologías', value: `${techLeader?.techAvg ?? 0}%`, sub: techLeader?.name ?? '', icon: <Users size={18} />, color: 'text-primary' },
+    { label: 'Líder Evaluación', value: `${evalLeader?.evalAvg ?? 0}%`, sub: evalLeader?.name ?? '', icon: <UserCheck size={18} />, color: 'text-info' },
+    { label: 'Menor Score', value: `${worstCandidate?.totalScore ?? 0}%`, sub: worstCandidate?.name ?? '', icon: <Calendar size={18} />, color: 'text-danger' },
   ]
 
   return (
@@ -146,6 +161,7 @@ export function PublicRecruitmentPage() {
               <div className={`${s.color} mb-2`}>{s.icon}</div>
               <p className="text-2xl font-bold text-neutral-90 dark:text-white">{s.value}</p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40">{s.label}</p>
+              {s.sub && <p className="text-[11px] font-medium text-neutral-50 mt-1 truncate">{s.sub}</p>}
             </div>
           ))}
         </div>
