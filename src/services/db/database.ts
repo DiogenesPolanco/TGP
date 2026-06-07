@@ -28,6 +28,8 @@ import type {
   Achievement,
   VacationRecord,
   TeamSprint,
+  Candidate,
+  CandidateTechnology,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -63,6 +65,10 @@ export class TGPDatabase extends Dexie {
   achievements!: Table<Achievement, string>
   vacationRecords!: Table<VacationRecord, string>
   teamSprints!: Table<TeamSprint, string>
+
+  // Reclutamiento
+  candidates!: Table<Candidate, string>
+  candidateTechnologies!: Table<CandidateTechnology, string>
 
   constructor() {
     super('TGPDatabase')
@@ -103,6 +109,10 @@ export class TGPDatabase extends Dexie {
     })
     this.version(9).stores({
       appDatabases: 'id, applicationId, dbType, engine, environment',
+    })
+    this.version(10).stores({
+      candidates: 'id, name, position, status, teamId, interviewDate',
+      candidateTechnologies: 'id, candidateId, name, points',
     })
   }
 }

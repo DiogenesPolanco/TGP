@@ -466,3 +466,27 @@ export interface Blocker {
   createdAt: Date
   updatedAt: Date
 }
+
+/* ─── Reclutamiento ─── */
+
+export interface Candidate {
+  id: string
+  name: string
+  email: string
+  phone: string
+  position: string
+  interviewDate: Date | null
+  comments: string
+  status: 'pending' | 'interviewed' | 'selected' | 'rejected'
+  teamId: string | null
+  totalScore: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CandidateTechnology {
+  id: string
+  candidateId: string
+  name: string
+  points: number
+}

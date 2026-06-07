@@ -77,6 +77,7 @@ const navItems: NavItem[] = [
     children: [
       { label: 'Rendimiento', path: '/teams' },
       { label: 'Miembros', path: '/teams/members' },
+      { label: 'Reclutamiento', path: '/teams/recruitment' },
     ],
   },
   { label: 'Reportes', icon: <FileText size={20} />, path: '/reports' },

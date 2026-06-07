@@ -80,6 +80,10 @@ export const router = createBrowserRouter([
       { path: 'teams/:id/edit', lazy: () => import('@/features/teams/pages/TeamFormPage').then((m) => ({ Component: m.TeamFormPage })) },
       { path: 'teams/:id', lazy: () => import('@/features/teams/pages/TeamDetailPage').then((m) => ({ Component: m.TeamDetailPage })) },
       { path: 'teams/members', lazy: () => import('@/features/teams/pages/MembersPage').then((m) => ({ Component: m.MembersPage })) },
+      { path: 'teams/recruitment', lazy: () => import('@/features/recruitment/pages/RecruitmentPage').then((m) => ({ Component: m.RecruitmentPage })) },
+      { path: 'teams/recruitment/new', lazy: () => import('@/features/recruitment/pages/CandidateFormPage').then((m) => ({ Component: m.CandidateFormPage })) },
+      { path: 'teams/recruitment/:id/edit', lazy: () => import('@/features/recruitment/pages/CandidateFormPage').then((m) => ({ Component: m.CandidateFormPage })) },
+      { path: 'teams/recruitment/:id', lazy: () => import('@/features/recruitment/pages/CandidateDetailPage').then((m) => ({ Component: m.CandidateDetailPage })) },
       { path: 'teams/:id/performance', lazy: () => import('@/features/performance/pages/PerformancePage').then((m) => ({ Component: m.PerformancePage })) },
       { path: 'teams/:id/performance/:memberId', lazy: () => import('@/features/performance/pages/MemberPerformancePage').then((m) => ({ Component: m.MemberPerformancePage })) },
 
