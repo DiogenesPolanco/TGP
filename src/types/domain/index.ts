@@ -490,3 +490,12 @@ export interface CandidateTechnology {
   name: string
   points: number
 }
+
+export type EvalCategory = 'technical_knowledge' | 'experience' | 'communication' | 'attitude' | 'problem_solving' | 'teamwork' | 'leadership'
+
+export interface CandidateEvaluation {
+  id: string
+  candidateId: string
+  category: EvalCategory
+  points: number
+}

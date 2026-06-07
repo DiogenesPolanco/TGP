@@ -30,6 +30,7 @@ import type {
   TeamSprint,
   Candidate,
   CandidateTechnology,
+  CandidateEvaluation,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -69,6 +70,7 @@ export class TGPDatabase extends Dexie {
   // Reclutamiento
   candidates!: Table<Candidate, string>
   candidateTechnologies!: Table<CandidateTechnology, string>
+  candidateEvaluations!: Table<CandidateEvaluation, string>
 
   constructor() {
     super('TGPDatabase')
@@ -113,6 +115,9 @@ export class TGPDatabase extends Dexie {
     this.version(11).stores({
       candidates: 'id, name, position, status, teamId, interviewDate, createdAt',
       candidateTechnologies: 'id, candidateId, name, points',
+    })
+    this.version(12).stores({
+      candidateEvaluations: 'id, candidateId, category',
     })
   }
 }

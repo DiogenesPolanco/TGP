@@ -1,14 +1,25 @@
 import { db } from '@/services/db/database'
-import type { Candidate, CandidateTechnology } from '@/types/domain'
+import type { Candidate, CandidateTechnology, CandidateEvaluation, EvalCategory } from '@/types/domain'
+import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 
 function generateId(): string {
   return crypto.randomUUID()
 }
 
-function calculateScore(technologies: { points: number }[]): number {
+function calculateTechScore(technologies: { points: number }[]): number {
   if (technologies.length === 0) return 0
   const total = technologies.reduce((sum, t) => sum + t.points, 0)
   return Math.round((total / (technologies.length * 100)) * 100)
+}
+
+function calculateEvalScore(evaluations: { points: number }[]): number {
+  if (evaluations.length === 0) return 0
+  const total = evaluations.reduce((sum, e) => sum + e.points, 0)
+  return Math.round((total / (evaluations.length * 100)) * 100)
+}
+
+function calculateTotalScore(techScore: number, evalScore: number): number {
+  return Math.round(techScore * 0.5 + evalScore * 0.5)
 }
 
 export async function getCandidates(): Promise<Candidate[]> {
@@ -23,24 +34,27 @@ export async function getCandidateTechnologies(candidateId: string): Promise<Can
   return db.candidateTechnologies.where('candidateId').equals(candidateId).toArray()
 }
 
+export async function getCandidateEvaluations(candidateId: string): Promise<CandidateEvaluation[]> {
+  return db.candidateEvaluations.where('candidateId').equals(candidateId).toArray()
+}
+
 export async function createCandidate(
   data: Omit<Candidate, 'id' | 'totalScore' | 'createdAt' | 'updatedAt'>,
   technologies: Omit<CandidateTechnology, 'id' | 'candidateId'>[],
+  evaluations: Omit<CandidateEvaluation, 'id' | 'candidateId'>[],
 ): Promise<string> {
   const id = generateId()
   const now = new Date()
-  const techs = technologies.map((t) => ({
-    ...t,
-    id: generateId(),
-    candidateId: id,
-  }))
-  const totalScore = calculateScore(techs)
+  const techs = technologies.map((t) => ({ ...t, id: generateId(), candidateId: id }))
+  const evals = evaluations.map((e) => ({ ...e, id: generateId(), candidateId: id }))
+  const techScore = calculateTechScore(techs)
+  const evalScore = calculateEvalScore(evals)
+  const totalScore = calculateTotalScore(techScore, evalScore)
 
-  await db.transaction('rw', db.candidates, db.candidateTechnologies, async () => {
+  await db.transaction('rw', db.candidates, db.candidateTechnologies, db.candidateEvaluations, async () => {
     await db.candidates.add({ ...data, id, totalScore, createdAt: now, updatedAt: now })
-    if (techs.length > 0) {
-      await db.candidateTechnologies.bulkAdd(techs)
-    }
+    if (techs.length > 0) await db.candidateTechnologies.bulkAdd(techs)
+    if (evals.length > 0) await db.candidateEvaluations.bulkAdd(evals)
   })
 
   return id
@@ -50,31 +64,45 @@ export async function updateCandidate(
   id: string,
   data: Partial<Omit<Candidate, 'id' | 'createdAt'>>,
   technologies?: Omit<CandidateTechnology, 'id' | 'candidateId'>[],
+  evaluations?: Omit<CandidateEvaluation, 'id' | 'candidateId'>[],
 ): Promise<void> {
   const now = new Date()
 
-  await db.transaction('rw', db.candidates, db.candidateTechnologies, async () => {
+  await db.transaction('rw', db.candidates, db.candidateTechnologies, db.candidateEvaluations, async () => {
     await db.candidates.update(id, { ...data, updatedAt: now })
 
+    let techScore = 0
+    let evalScore = 0
+
     if (technologies !== undefined) {
-      const techs = technologies.map((t) => ({
-        ...t,
-        id: generateId(),
-        candidateId: id,
-      }))
+      const techs = technologies.map((t) => ({ ...t, id: generateId(), candidateId: id }))
       await db.candidateTechnologies.where('candidateId').equals(id).delete()
-      if (techs.length > 0) {
-        await db.candidateTechnologies.bulkAdd(techs)
-      }
-      const totalScore = calculateScore(techs)
-      await db.candidates.update(id, { totalScore, updatedAt: now })
+      if (techs.length > 0) await db.candidateTechnologies.bulkAdd(techs)
+      techScore = calculateTechScore(techs)
+    } else {
+      const existing = await db.candidateTechnologies.where('candidateId').equals(id).toArray()
+      techScore = calculateTechScore(existing)
     }
+
+    if (evaluations !== undefined) {
+      const evals = evaluations.map((e) => ({ ...e, id: generateId(), candidateId: id }))
+      await db.candidateEvaluations.where('candidateId').equals(id).delete()
+      if (evals.length > 0) await db.candidateEvaluations.bulkAdd(evals)
+      evalScore = calculateEvalScore(evals)
+    } else {
+      const existing = await db.candidateEvaluations.where('candidateId').equals(id).toArray()
+      evalScore = calculateEvalScore(existing)
+    }
+
+    const totalScore = calculateTotalScore(techScore, evalScore)
+    await db.candidates.update(id, { totalScore, updatedAt: now })
   })
 }
 
 export async function deleteCandidate(id: string): Promise<void> {
-  await db.transaction('rw', db.candidates, db.candidateTechnologies, async () => {
+  await db.transaction('rw', db.candidates, db.candidateTechnologies, db.candidateEvaluations, async () => {
     await db.candidateTechnologies.where('candidateId').equals(id).delete()
+    await db.candidateEvaluations.where('candidateId').equals(id).delete()
     await db.candidates.delete(id)
   })
 }

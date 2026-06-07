@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
-import { createCandidate, updateCandidate, getCandidate, getCandidateTechnologies } from '@/services/recruitment/candidateService'
+import { createCandidate, updateCandidate, getCandidate, getCandidateTechnologies, getCandidateEvaluations } from '@/services/recruitment/candidateService'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
+import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { Plus, X, ArrowLeft, AlertTriangle } from 'lucide-react'
-import type { SupportStatus } from '@/types/domain'
+import type { SupportStatus, EvalCategory } from '@/types/domain'
 
 const statusLabel: Record<SupportStatus, string> = {
   active: 'Activo',
@@ -47,6 +48,10 @@ export function CandidateFormPage() {
   const [techSearch, setTechSearch] = useState('')
   const [showTechDropdown, setShowTechDropdown] = useState(false)
 
+  const [evalScores, setEvalScores] = useState<Record<EvalCategory, number>>(() =>
+    Object.fromEntries(EVALUATION_CATEGORIES.map((c) => [c.key, 50])) as Record<EvalCategory, number>,
+  )
+
   useEffect(() => {
     if (!isEdit) return
     ;(async () => {
@@ -73,6 +78,16 @@ export function CandidateFormPage() {
         }
         setSelectedTechIds(ids)
         setTechScores(techMap)
+      }
+      const evalList = await getCandidateEvaluations(id!)
+      if (evalList.length > 0) {
+        setEvalScores((prev) => {
+          const next = { ...prev }
+          for (const e of evalList) {
+            next[e.category] = e.points
+          }
+          return next
+        })
       }
     })()
   }, [isEdit, id, allTechnologies, comments])
@@ -122,12 +137,17 @@ export function CandidateFormPage() {
       return { name: tech?.name ?? techId, points: techScores[techId] ?? 50 }
     })
 
+    const cleanEvals = EVALUATION_CATEGORIES.map((c) => ({
+      category: c.key,
+      points: evalScores[c.key],
+    }))
+
     try {
       if (isEdit) {
-        await updateCandidate(id!, base, cleanTechs)
+        await updateCandidate(id!, base, cleanTechs, cleanEvals)
         addNotification({ type: 'success', message: 'Candidato actualizado' })
       } else {
-        await createCandidate(base, cleanTechs)
+        await createCandidate(base, cleanTechs, cleanEvals)
         addNotification({ type: 'success', message: 'Candidato registrado' })
       }
       navigate('/teams/recruitment')
@@ -290,6 +310,24 @@ export function CandidateFormPage() {
               El candidato con tecnologías EOL puede no ser ideal
             </p>
           )}
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-neutral-70 dark:text-neutral-30">
+            Evaluación del Candidato
+          </label>
+          <p className="text-xs text-neutral-50">Puntúa cada dimensión del 0 al 100 para calcular el score final</p>
+          <div className="space-y-3">
+            {EVALUATION_CATEGORIES.map((cat) => (
+              <div key={cat.key} className="flex items-center gap-3">
+                <span className="text-sm text-neutral-70 dark:text-neutral-30 w-44 shrink-0">{cat.label}</span>
+                <input type="range" min={0} max={100} value={evalScores[cat.key]}
+                  onChange={(e) => setEvalScores({ ...evalScores, [cat.key]: parseInt(e.target.value) })}
+                  className="flex-1 accent-primary" />
+                <span className="text-sm font-semibold text-primary w-10 text-right">{evalScores[cat.key]}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-3">

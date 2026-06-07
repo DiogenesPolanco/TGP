@@ -4,8 +4,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { getCandidateTechnologies, deleteCandidate, selectCandidate } from '@/services/recruitment/candidateService'
+import { getCandidateTechnologies, getCandidateEvaluations, deleteCandidate, selectCandidate } from '@/services/recruitment/candidateService'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -24,6 +25,7 @@ export function CandidateDetailPage() {
 
   const candidate = useLiveQuery(() => db.candidates.get(id!), [id])
   const technologies = useLiveQuery(() => id ? getCandidateTechnologies(id) : [], [id]) ?? []
+  const evaluations = useLiveQuery(() => id ? getCandidateEvaluations(id) : [], [id]) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const team = candidate?.teamId ? teams.find((t) => t.id === candidate.teamId) : null
 
@@ -128,6 +130,34 @@ export function CandidateDetailPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+        <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Evaluación</h3>
+        {evaluations.length === 0 ? (
+          <p className="text-sm text-neutral-50">Sin evaluación registrada</p>
+        ) : (
+          <div className="space-y-3">
+            {EVALUATION_CATEGORIES.map((cat) => {
+              const e = evaluations.find((ev) => ev.category === cat.key)
+              const pts = e?.points ?? 0
+              return (
+                <div key={cat.key}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-neutral-70 dark:text-neutral-30">{cat.label}</span>
+                    <span className="text-sm font-semibold" style={{ color: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444' }}>{pts}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{
+                      width: `${pts}%`,
+                      backgroundColor: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444',
+                    }} />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
