@@ -284,6 +284,7 @@ export function MembersPage() {
                 {paginatedItems.map(({ member, team, kpis }) => {
                   const statusColors: Record<MemberStatus, string> = {
                     activo: 'bg-success/10 text-success',
+                    incorporacion: 'bg-primary/10 text-primary',
                     licencia: 'bg-warning/10 text-warning',
                     vacaciones: 'bg-info/10 text-info',
                     desvinculado: 'bg-danger/10 text-danger',

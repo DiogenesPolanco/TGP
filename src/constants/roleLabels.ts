@@ -20,6 +20,7 @@ export const MEMBER_ROLES = Object.keys(MEMBER_ROLE_LABELS) as MemberRole[]
 
 export const MEMBER_STATUS_LABELS: Record<MemberStatus, string> = {
   activo: 'Activo',
+  incorporacion: 'Incorporación',
   licencia: 'Licencia',
   vacaciones: 'Vacaciones',
   desvinculado: 'Desvinculado',

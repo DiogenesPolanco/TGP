@@ -122,7 +122,7 @@ export async function selectCandidate(id: string, teamId: string): Promise<void>
         displayName: candidate.name,
         role: candidate.position as MemberRole,
         allocationPct: 100,
-        status: 'activo',
+        status: 'incorporacion',
       }
       await db.teams.update(teamId, { members: [...team.members, member], updatedAt: new Date() })
     }
