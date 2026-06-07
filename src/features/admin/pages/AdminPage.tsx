@@ -122,9 +122,6 @@ export function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Administración</h1>
-      </div>
 
       {/* Grid de acciones rápidas */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

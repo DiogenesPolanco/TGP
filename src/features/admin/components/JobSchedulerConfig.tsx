@@ -94,7 +94,7 @@ export function JobSchedulerConfig() {
 
       <p className="text-sm text-neutral-60 dark:text-neutral-40">
         El programador ejecuta verificaciones automáticas del sistema (obsolescencia, vencimientos,
-        bloqueos, backups) y genera alertas en el dashboard.
+        bloqueos, backups, limpieza de shares) y genera alertas en el dashboard.
       </p>
 
       <div className="space-y-3">
@@ -209,6 +209,7 @@ export function JobSchedulerConfig() {
           <li>Entregables vencidos — alerta entregables no completados</li>
           <li>Vulnerabilidades en librerías — alerta si alguna librería con CVEs está en uso</li>
           <li>Backup automático — guarda copia local y, si está configurado, sube a Azure</li>
+          <li>Limpieza de enlaces compartidos — elimina de Azure archivos con más de 48h</li>
         </ul>
       </details>
     </div>
