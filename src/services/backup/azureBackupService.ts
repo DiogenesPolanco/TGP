@@ -133,13 +133,16 @@ export async function listAzureBackups(): Promise<BackupBlobInfo[]> {
   const client = getClient()
   const blobs: BackupBlobInfo[] = []
 
-  for await (const blob of client.listBlobsFlat()) {
-    blobs.push({
-      name: blob.name,
-      size: blob.properties.contentLength ?? 0,
-      lastModified: blob.properties.lastModified?.toISOString() ?? '',
-    })
-  }
+  try {
+    // Only list backup blobs (prefix filter), skip share blobs
+    for await (const blob of client.listBlobsFlat({ prefix: 'tgp-backup-' })) {
+      blobs.push({
+        name: blob.name,
+        size: blob.properties.contentLength ?? 0,
+        lastModified: blob.properties.lastModified?.toISOString() ?? '',
+      })
+    }
+  } catch { /* noop */ }
 
   return blobs.sort((a, b) => b.lastModified.localeCompare(a.lastModified))
 }

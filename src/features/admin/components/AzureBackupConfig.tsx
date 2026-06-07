@@ -30,6 +30,7 @@ export function AzureBackupConfig() {
   const [backups, setBackups] = useState<BackupBlobInfo[]>([])
   const [loadingBackups, setLoadingBackups] = useState(false)
   const [restoring, setRestoring] = useState<string | null>(null)
+  const [visibleCount, setVisibleCount] = useState(10)
   const [info, setInfo] = useState(initialInfo)
 
   const refreshInfo = useCallback(() => {
@@ -40,6 +41,7 @@ export function AzureBackupConfig() {
     setLoadingBackups(true)
     try {
       const list = await listAzureBackups()
+      setVisibleCount(10)
       setBackups(list)
     } catch {
       setBackups([])
@@ -260,33 +262,30 @@ export function AzureBackupConfig() {
 
           {backups.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-neutral-60">Backups disponibles en Azure:</p>
-              {backups.map((b) => (
+              <p className="text-xs font-medium text-neutral-60">{backups.length} backups disponibles en Azure:</p>
+              {backups.slice(0, visibleCount).map((b) => (
                 <div key={b.name} className={`${cardClass} flex items-center justify-between`}>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{b.name}</p>
                     <p className="text-xs text-neutral-50">
-                      {b.size > 1024
-                        ? `${(b.size / 1024).toFixed(1)} KB`
-                        : `${b.size} B`}
+                      {b.size > 1024 ? `${(b.size / 1024).toFixed(1)} KB` : `${b.size} B`}
                       {' · '}
                       {new Date(b.lastModified).toLocaleString('es-ES')}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleRestore(b.name)}
-                    disabled={restoring === b.name}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-warning/10 text-warning hover:bg-warning/20 transition-colors disabled:opacity-50 shrink-0 ml-3"
-                  >
-                    {restoring === b.name ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <ExternalLink size={12} />
-                    )}
+                  <button onClick={() => handleRestore(b.name)} disabled={restoring === b.name}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-warning/10 text-warning hover:bg-warning/20 transition-colors disabled:opacity-50 shrink-0 ml-3">
+                    {restoring === b.name ? <Loader2 size={12} className="animate-spin" /> : <ExternalLink size={12} />}
                     {restoring === b.name ? 'Restaurando...' : 'Restaurar'}
                   </button>
                 </div>
               ))}
+              {backups.length > visibleCount && (
+                <button onClick={() => setVisibleCount((c) => c + 20)}
+                  className="w-full text-xs font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white py-2 transition-colors">
+                  Mostrar {Math.min(20, backups.length - visibleCount)} más ({backups.length - visibleCount} restantes)
+                </button>
+              )}
             </div>
           )}
 
