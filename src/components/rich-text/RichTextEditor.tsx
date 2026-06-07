@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -94,6 +94,15 @@ export function RichTextEditor({
     },
     immediatelyRender: false,
   })
+
+  // Sync external value changes to editor (e.g. edit form loading async data)
+  useEffect(() => {
+    if (!editor || !value) return
+    const current = editor.getHTML()
+    if (current !== value) {
+      editor.commands.setContent(value)
+    }
+  }, [editor, value])
 
   const setLink = useCallback(() => {
     if (!editor) return

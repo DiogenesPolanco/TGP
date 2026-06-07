@@ -90,7 +90,7 @@ export function CandidateFormPage() {
         })
       }
     })()
-  }, [isEdit, id, allTechnologies, comments])
+  }, [isEdit, id, allTechnologies])
 
   const addTechnology = (techId: string) => {
     if (selectedTechIds.includes(techId)) return
