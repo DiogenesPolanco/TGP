@@ -1,14 +1,6 @@
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
-import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { isValidShareHash, getPublicDashboardData, type PublicDashboardData } from '@/services/share/publicShareService'
-import {
-  Shield, AlertTriangle, Clock, TrendingUp, TrendingDown,
-  Users, Package, Building2, AlertOctagon, Target, CheckCircle2,
-} from 'lucide-react'
-import { ThiGauge } from '@/components/charts/ThiGauge'
-import { cn } from '@/lib/utils'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { PrintButton } from '@/components/ui/PrintButton'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 
 // ── Executive KPIs ──
@@ -192,9 +184,12 @@ export function PublicDashboardPage() {
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-neutral-50">
-            <Clock size={14} />
-            <span>Actualizado al momento del acceso</span>
+          <div className="flex items-center gap-2">
+            <PrintButton />
+            <div className="flex items-center gap-2 text-xs text-neutral-50">
+              <Clock size={14} />
+              <span>Actualizado al momento del acceso</span>
+            </div>
           </div>
         </div>
       </header>

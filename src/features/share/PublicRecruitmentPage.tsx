@@ -4,6 +4,7 @@ import { isValidShareHash, getPublicRecruitmentData, type PublicRecruitmentData 
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { PrintButton } from '@/components/ui/PrintButton'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { Users, Calendar, UserCheck, Star, ChevronDown, ChevronUp } from 'lucide-react'
@@ -150,8 +151,13 @@ export function PublicRecruitmentPage() {
               <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
             </div>
           </div>
-          <h1 className="text-2xl font-bold">Proceso de Reclutamiento</h1>
-          <p className="text-base opacity-80 mt-1">Evaluación de candidatos — {candidates.length} registro{candidates.length !== 1 ? 's' : ''}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Proceso de Reclutamiento</h1>
+              <p className="text-base opacity-80 mt-1">Evaluación de candidatos — {candidates.length} registro{candidates.length !== 1 ? 's' : ''}</p>
+            </div>
+            <PrintButton />
+          </div>
         </div>
       </div>
 

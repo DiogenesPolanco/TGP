@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { getShareInfo, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
 import { Clock, TrendingUp, Users, Award, Star, AlertTriangle, Brain, BarChart3 } from 'lucide-react'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { PrintButton } from '@/components/ui/PrintButton'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { cn } from '@/lib/utils'
 
@@ -114,7 +115,9 @@ export function PublicMembersOverviewPage() {
               <p className="text-xs text-neutral-50">Vista comparativa · Solo lectura</p>
             </div>
           </div>
-          <Clock size={14} className="text-neutral-50" />
+          <div className="flex items-center gap-2">
+            <PrintButton />
+            <Clock size={14} className="text-neutral-50" />
         </div>
       </header>
 

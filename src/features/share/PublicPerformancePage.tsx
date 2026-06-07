@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { getShareType, getPublicPerformanceData, type PublicPerformanceData } from '@/services/share/publicShareService'
 import { Clock, TrendingUp, Users, Award, BarChart3, Target, Zap } from 'lucide-react'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { PrintButton } from '@/components/ui/PrintButton'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { cn } from '@/lib/utils'
 
@@ -108,7 +109,9 @@ export function PublicPerformancePage() {
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-neutral-50">
+          <div className="flex items-center gap-2">
+            <PrintButton />
+            <div className="flex items-center gap-2 text-xs text-neutral-50">
             <Clock size={14} />
             <span>Actualizado al momento del acceso</span>
           </div>
