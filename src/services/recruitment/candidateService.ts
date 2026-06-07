@@ -1,6 +1,5 @@
 import { db } from '@/services/db/database'
-import type { Candidate, CandidateTechnology, CandidateEvaluation, EvalCategory } from '@/types/domain'
-import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
+import type { Candidate, CandidateTechnology, CandidateEvaluation } from '@/types/domain'
 
 function generateId(): string {
   return crypto.randomUUID()
