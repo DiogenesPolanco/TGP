@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 const VERSION_URL = '/version.json'
-const CHECK_INTERVAL = 5 * 60 * 1000 // cada 5 minutos
+const CHECK_INTERVAL = 15 * 1000 // cada 15s para desarrollo (produccion: 5 min)
 
 interface AppVersion {
   version: string
@@ -26,15 +26,17 @@ export function useVersionCheck() {
 
   const check = useCallback(async () => {
     const v = await fetchVersion()
-    if (!v) return
+    if (!v) { console.warn('[VersionCheck] No se pudo obtener version.json'); return }
 
     if (!cachedVersion) {
+      console.log('[VersionCheck] Build actual:', v.build)
       cachedVersion = v
       setCurrentBuild(v.build)
       return
     }
 
     if (cachedVersion.build !== v.build) {
+      console.log('[VersionCheck] Nueva version detectada:', v.build)
       setStale(true)
     }
   }, [])
@@ -42,6 +44,9 @@ export function useVersionCheck() {
   useEffect(() => {
     check()
     const interval = setInterval(check, CHECK_INTERVAL)
+    // Expose manual check for testing
+    ;(window as any).__checkVersion = check
+    ;(window as any).__forceStale = () => setStale(true)
     return () => clearInterval(interval)
   }, [check])
 
