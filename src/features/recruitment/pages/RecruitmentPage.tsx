@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
+import { deleteCandidate } from '@/services/recruitment/candidateService'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
-import { Plus, Search, Users, UserCheck, Calendar, Star } from 'lucide-react'
+import type { Candidate } from '@/types/domain'
+import { Plus, Search, Users, UserCheck, Calendar, Star, Pencil, Trash2 } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
@@ -17,6 +20,9 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 export function RecruitmentPage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
+  const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
 
   const candidates = useLiveQuery(() =>
     db.candidates.orderBy('createdAt').reverse().toArray(),
@@ -26,35 +32,146 @@ export function RecruitmentPage() {
 
   const filtered = candidates.filter((c) => {
     const roleLabel = MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? ''
-    return c.name.toLowerCase().includes(search.toLowerCase()) ||
+    const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
       roleLabel.toLowerCase().includes(search.toLowerCase())
+    const matchesStatus = !statusFilter || statusFilter === 'all' || c.status === statusFilter
+    return matchesSearch && matchesStatus
   })
 
-  const { page, setPage, totalPages, paginatedItems } = usePagination(filtered, 10)
-
-  const statusBadge = (status: string) => {
-    const cfg = statusConfig[status] ?? { label: status, color: 'bg-neutral-10 text-neutral-60' }
-    return <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (await confirm('¿Eliminar este candidato?')) {
+      await deleteCandidate(id)
+      addNotification({ type: 'success', message: 'Candidato eliminado' })
+    }
   }
+
+  const columns: Column<Candidate>[] = [
+    {
+      key: 'name',
+      label: 'Nombre',
+      sortable: true,
+      render: (c) => (
+        <div>
+          <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.name}</p>
+          {c.email && <p className="text-xs text-neutral-50">{c.email}</p>}
+        </div>
+      ),
+    },
+    {
+      key: 'position',
+      label: 'Posición',
+      sortable: true,
+      render: (c) => (
+        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+          {MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? c.position}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      sortable: true,
+      render: (c) => {
+        const cfg = statusConfig[c.status] ?? { label: c.status, color: 'bg-neutral-10 text-neutral-60' }
+        return <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+      },
+    },
+    {
+      key: 'totalScore',
+      label: 'Score',
+      sortable: true,
+      render: (c) => (
+        <div className="flex items-center gap-2">
+          <div className="w-16 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
+            <div className="h-full bg-primary rounded-full" style={{ width: `${c.totalScore}%` }} />
+          </div>
+          <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">{c.totalScore}%</span>
+        </div>
+      ),
+    },
+    {
+      key: 'interviewDate',
+      label: 'Entrevista',
+      sortable: true,
+      render: (c) => (
+        <span className="text-sm text-neutral-60">
+          {c.interviewDate ? new Date(c.interviewDate).toLocaleDateString('es') : '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (c) => (
+        <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/teams/recruitment/${c.id}/edit`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Editar"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={(e) => handleDelete(e, c.id)}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Reclutamiento</h2>
-        <button
-          onClick={() => navigate('/teams/recruitment/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={18} />
-          Nuevo Candidato
-        </button>
+        <div className="flex items-center gap-2">
+          {statusFilter && (
+            <button onClick={() => setStatusFilter(null)}
+              className="px-3 py-2 text-sm text-neutral-50 hover:text-neutral-90 transition-colors">
+              Limpiar filtro
+            </button>
+          )}
+          <button
+            onClick={() => navigate('/teams/recruitment/new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={18} />
+            Nuevo Candidato
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={<Users size={20} />} label="Total" value={candidates.length} color="text-primary" />
-        <StatCard icon={<Calendar size={20} />} label="Pendientes" value={candidates.filter((c) => c.status === 'pending').length} color="text-warning" />
-        <StatCard icon={<UserCheck size={20} />} label="Entrevistados" value={candidates.filter((c) => c.status === 'interviewed').length} color="text-info" />
-        <StatCard icon={<Star size={20} />} label="Seleccionados" value={candidates.filter((c) => c.status === 'selected').length} color="text-success" />
+        <StatCard
+          icon={<Users size={20} />} label="Total"
+          value={candidates.length} color="text-primary"
+          active={!statusFilter}
+          onClick={() => setStatusFilter(null)}
+        />
+        <StatCard
+          icon={<Calendar size={20} />} label="Pendientes"
+          value={candidates.filter((c) => c.status === 'pending').length} color="text-warning"
+          active={statusFilter === 'pending'}
+          onClick={() => setStatusFilter('pending')}
+        />
+        <StatCard
+          icon={<UserCheck size={20} />} label="Entrevistados"
+          value={candidates.filter((c) => c.status === 'interviewed').length} color="text-info"
+          active={statusFilter === 'interviewed'}
+          onClick={() => setStatusFilter('interviewed')}
+        />
+        <StatCard
+          icon={<Star size={20} />} label="Seleccionados"
+          value={candidates.filter((c) => c.status === 'selected').length} color="text-success"
+          active={statusFilter === 'selected'}
+          onClick={() => setStatusFilter('selected')}
+        />
       </div>
 
       <div className="relative">
@@ -68,68 +185,35 @@ export function RecruitmentPage() {
         />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-5 dark:bg-neutral-85">
-                <th className="text-left px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Nombre</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Posición</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Score</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Entrevista</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-neutral-60 uppercase tracking-wider">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-              {paginatedItems.map((c) => {
-                const team = teams.find((t) => t.id === c.teamId)
-                return (
-                  <tr key={c.id} className="hover:bg-neutral-5 dark:hover:bg-neutral-75/50 transition-colors cursor-pointer" onClick={() => navigate(`/teams/recruitment/${c.id}`)}>
-                    <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.name}</p>
-                      {c.email && <p className="text-xs text-neutral-50">{c.email}</p>}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">{MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? c.position}</td>
-                    <td className="px-4 py-3">{statusBadge(c.status)}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${c.totalScore}%` }} />
-                        </div>
-                        <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">{c.totalScore}%</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-neutral-60">
-                      {c.interviewDate ? new Date(c.interviewDate).toLocaleDateString('es') : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {c.status !== 'selected' && team && (
-                        <span className="text-xs text-neutral-50">{team.name}</span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-        {filtered.length === 0 && (
-          <div className="text-center py-12 text-neutral-50">No se encontraron candidatos</div>
-        )}
-      </div>
-
-      <Pagination page={page} totalPages={totalPages} totalItems={filtered.length} pageSize={10} onPageChange={setPage} />
+      <SortableTable
+        columns={columns}
+        data={filtered}
+        onRowClick={(c) => navigate(`/teams/recruitment/${c.id}`)}
+        pageSize={10}
+        emptyMessage="No se encontraron candidatos"
+      />
     </div>
   )
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({
+  icon, label, value, color, active, onClick,
+}: {
+  icon: React.ReactNode; label: string; value: number; color: string
+  active?: boolean; onClick?: () => void
+}) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <button
+      onClick={onClick}
+      className={`text-left bg-white dark:bg-neutral-80 rounded-xl border p-4 shadow-sm transition-all ${
+        active
+          ? 'border-primary ring-2 ring-primary/20'
+          : 'border-neutral-20 dark:border-neutral-70 hover:shadow-md'
+      }`}
+    >
       <div className={`${color} mb-2`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </div>
+    </button>
   )
 }
