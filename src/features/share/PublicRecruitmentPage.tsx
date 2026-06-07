@@ -128,9 +128,10 @@ export function PublicRecruitmentPage() {
   const evalLeader = [...candidateStats].sort((a, b) => b.evalAvg - a.evalAvg)[0]
   const worstCandidate = [...candidateStats].sort((a, b) => a.totalScore - b.totalScore)[0]
   const selectedCount = candidates.filter((c) => c.status === 'selected').length
+  const selectedNames = candidates.filter((c) => c.status === 'selected').map((c) => c.name).join(', ')
 
   const stats = [
-    { label: 'Seleccionados', value: selectedCount, sub: selectedCount > 0 ? techLeader?.name : '', icon: <Star size={18} />, color: 'text-success' },
+    { label: 'Seleccionados', value: selectedCount, sub: selectedNames, icon: <Star size={18} />, color: 'text-success' },
     { label: 'Líder Tecnologías', value: `${techLeader?.techAvg ?? 0}%`, sub: techLeader?.name ?? '', icon: <Users size={18} />, color: 'text-primary' },
     { label: 'Líder Evaluación', value: `${evalLeader?.evalAvg ?? 0}%`, sub: evalLeader?.name ?? '', icon: <UserCheck size={18} />, color: 'text-info' },
     { label: 'Menor Score', value: `${worstCandidate?.totalScore ?? 0}%`, sub: worstCandidate?.name ?? '', icon: <Calendar size={18} />, color: 'text-danger' },
@@ -161,7 +162,7 @@ export function PublicRecruitmentPage() {
               <div className={`${s.color} mb-2`}>{s.icon}</div>
               <p className="text-2xl font-bold text-neutral-90 dark:text-white">{s.value}</p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40">{s.label}</p>
-              {s.sub && <p className="text-[11px] font-medium text-neutral-50 mt-1 truncate">{s.sub}</p>}
+              {s.sub && <p className="text-sm font-semibold text-neutral-90 dark:text-white mt-1.5 truncate">{s.sub}</p>}
             </div>
           ))}
         </div>
