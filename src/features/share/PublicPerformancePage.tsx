@@ -115,9 +115,9 @@ export function PublicPerformancePage() {
             <Clock size={14} />
             <span>Actualizado al momento del acceso</span>
           </div>
+          </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Row 1: Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

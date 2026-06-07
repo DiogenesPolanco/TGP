@@ -118,6 +118,7 @@ export function PublicMembersOverviewPage() {
           <div className="flex items-center gap-2">
             <PrintButton />
             <Clock size={14} className="text-neutral-50" />
+          </div>
         </div>
       </header>
 
