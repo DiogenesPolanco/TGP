@@ -108,7 +108,8 @@ export function PublicRecruitmentPage() {
 
   if (!data) return <InvalidLinkPage />
 
-  const { candidates, technologies, evaluations } = data
+  const { candidates: rawCandidates, technologies, evaluations } = data
+  const candidates = [...rawCandidates].sort((a, b) => b.totalScore - a.totalScore)
 
   const getTechs = (candidateId: string) => technologies.filter((t) => t.candidateId === candidateId)
   const getEvals = (candidateId: string) => evaluations.filter((e) => e.candidateId === candidateId)
