@@ -41,6 +41,18 @@ function formatVersion(v: AppVersion) {
   return `${v.version} (build ${v.build}, ${v.timestamp})`
 }
 
+function setTestBuild(build: string) {
+  localStorage.setItem(TEST_BUILD_KEY, JSON.stringify({
+    version: '0.0.0',
+    build,
+    timestamp: new Date().toISOString()
+  }))
+  console.log(`[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`)
+}
+
+// Globales inmediatas (no dependen de React)
+;(window as any).__setTestBuild = setTestBuild
+
 export function useVersionCheck() {
   const [stale, setStale] = useState(false)
   const [currentBuild, setCurrentBuild] = useState<string | null>(null)
@@ -78,14 +90,6 @@ export function useVersionCheck() {
     const interval = setInterval(check, CHECK_INTERVAL)
     ;(window as any).__checkVersion = check
     ;(window as any).__forceStale = () => setStale(true)
-    ;(window as any).__setTestBuild = (build: string) => {
-      localStorage.setItem(TEST_BUILD_KEY, JSON.stringify({
-        version: '0.0.0',
-        build,
-        timestamp: new Date().toISOString()
-      }))
-      console.log(`[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`)
-    }
     return () => clearInterval(interval)
   }, [check])
 
