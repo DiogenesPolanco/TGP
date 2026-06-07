@@ -10,6 +10,8 @@ import { useDemoData } from '@/hooks/useDemoData'
 import { useTheme } from '@/hooks/useTheme'
 import { usePrivacyBlur } from '@/hooks/usePrivacyBlur'
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts'
+import { useVersionCheck } from '@/hooks/useVersionCheck'
+import { UpdateAvailable } from '@/components/error/UpdateAvailable'
 import { OnboardingWizard, useFirstTimeuser, isOnboardingDone } from '@/features/onboarding/OnboardingWizard'
 import { cn } from '@/lib/utils'
 import { startAutomatedChecks } from '@/services/jobs/automatedChecksService'
@@ -50,6 +52,9 @@ export function AppShell() {
   }), [navigate, toggleSidebar])
 
   useGlobalShortcuts(appShortcuts())
+
+  const { stale, reload } = useVersionCheck()
+  if (stale) return <UpdateAvailable onReload={reload} />
 
   return (
     <div className={cn('flex h-screen bg-neutral-10 dark:bg-neutral-90', isTabHidden && 'blur-xl transition-all duration-300')}>

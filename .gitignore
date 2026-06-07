@@ -41,5 +41,9 @@ Skillfile.lock
 # Claude memory
 .claude-memory/
 
-# Large test data
+# Build version
+version.json
 e2e/test-data/large.xlsx
+
+# Build version
+public/version.json
