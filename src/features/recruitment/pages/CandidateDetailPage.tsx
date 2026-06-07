@@ -89,7 +89,7 @@ export function CandidateDetailPage() {
           </div>
           <div className="space-y-1">
             <p className="text-lg font-semibold text-neutral-90 dark:text-white">Puntuación General</p>
-            <p className="text-sm text-neutral-60">Basada en {technologies.length} tecnología{technologies.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-neutral-60">50% tecnologías + 50% evaluación</p>
           </div>
         </div>
       </div>
