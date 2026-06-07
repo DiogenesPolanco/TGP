@@ -35,7 +35,7 @@ export function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(today.getMonth())
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedDate, setSelectedDate] = useState<Date>(today)
   const navigate = useNavigate()
 
   const teamSprints = useLiveQuery(() => db.teamSprints.toArray()) ?? []
@@ -114,7 +114,7 @@ export function CalendarPage() {
     days.push(
       <button
         key={d}
-        onClick={() => setSelectedDate(isSelected ? null : new Date(currentYear, currentMonth, d))}
+        onClick={() => setSelectedDate(new Date(currentYear, currentMonth, d))}
         className={cn(
           'relative p-1.5 rounded-lg text-center transition-all border',
           isToday(d) && 'border-primary/40 bg-primary/[0.04] font-bold',
@@ -193,13 +193,13 @@ export function CalendarPage() {
         {/* ── Month Calendar ── */}
         <div className="lg:col-span-2 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
-            <button onClick={() => { setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1); setSelectedDate(null) }} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <button onClick={() => setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
               <ChevronLeft size={20} className="text-neutral-60" />
             </button>
             <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
               {MONTHS[currentMonth]} {currentYear}
             </h2>
-            <button onClick={() => { setCurrentMonth((m) => m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1); setSelectedDate(null) }} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <button onClick={() => setCurrentMonth((m) => m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
               <ChevronRight size={20} className="text-neutral-60" />
             </button>
           </div>
