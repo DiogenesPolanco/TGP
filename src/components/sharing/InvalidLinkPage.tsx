@@ -4,14 +4,9 @@ export function InvalidLinkPage() {
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]" style={{
         background: 'radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)'
       }} />
-      <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]" style={{
-        backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px'
-      }} />
-
       <div className="w-full max-w-3xl relative">
         <div className="bg-white/95 dark:bg-neutral-80/95 backdrop-blur-xl rounded-3xl border border-neutral-20/80 dark:border-neutral-70/80 shadow-2xl shadow-neutral-30/30 dark:shadow-black/30 overflow-hidden">
-          <div className="flex flex-col sm:flex-row min-h-[360px]">
-            {/* Left: gradient — vision */}
+          <div className="flex flex-col sm:flex-row min-h-[320px]">
             <div className="sm:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 sm:p-10 text-white flex flex-col relative overflow-hidden">
               <div className="absolute inset-0 opacity-10" style={{
                 background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
@@ -26,23 +21,14 @@ export function InvalidLinkPage() {
                 </div>
               </div>
               <div className="relative flex-1 flex flex-col justify-center">
-                <p className="text-xs font-medium uppercase tracking-widest opacity-60 mb-3">Enlace agotado</p>
-                <h2 className="text-2xl font-bold leading-tight mb-3">
-                  Este enlace ya<br />cumplió su<br />propósito
-                </h2>
-                <p className="text-sm leading-relaxed opacity-80">
-                  Los enlaces compartidos expiran a las 48 horas para mantener tus datos seguros.
-                  Es parte de un buen gobierno tecnológico.
-                </p>
+                <p className="text-xs font-medium uppercase tracking-widest opacity-60 mb-3">Expirado</p>
+                <h2 className="text-2xl font-bold leading-tight mb-2">Este enlace ya<br />no está activo</h2>
+                <p className="text-sm leading-relaxed opacity-80">Expiran a las 48h por seguridad.</p>
               </div>
               <div className="relative mt-6 pt-4 border-t border-white/15">
-                <p className="text-xs opacity-60 leading-relaxed">
-                  Seguridad ante todo · Datos cifrados de extremo a extremo
-                </p>
+                <p className="text-xs opacity-60 leading-relaxed">TGP · Cifrado extremo a extremo</p>
               </div>
             </div>
-
-            {/* Divider: perforated line */}
             <div className="hidden sm:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
                 {Array.from({ length: 20 }).map((_, i) => (
@@ -50,27 +36,17 @@ export function InvalidLinkPage() {
                 ))}
               </div>
             </div>
-
-            {/* Right: action */}
             <div className="sm:w-[58%] p-8 sm:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
-              <div className="max-w-xs mx-auto w-full space-y-6">
+              <div className="max-w-xs mx-auto w-full space-y-5">
                 <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
                   <svg className="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white mb-1">¿Necesitas acceso?</h3>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
-                    Pídele a la persona que te compartió este enlace que genere uno nuevo desde TGP.
-                    El proceso toma apenas unos segundos.
-                  </p>
-                </div>
-                <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
-                  <span className="font-medium text-neutral-90 dark:text-white">🔐 48h de validez</span>
-                  <br />
-                  Por seguridad, los enlaces expiran automáticamente. Si necesitas más tiempo, el creador puede generar uno nuevo.
-                </div>
+                <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Pide un nuevo enlace</h3>
+                <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+                  A quien te compartió este enlace le tomará segundos generar otro.
+                </p>
               </div>
             </div>
           </div>
