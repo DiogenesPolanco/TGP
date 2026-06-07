@@ -1,5 +1,6 @@
 import { db } from '@/services/db/database'
 import type { Candidate, CandidateTechnology, CandidateEvaluation, TeamMember } from '@/types/domain'
+import type { MemberProfile, Achievement, Skill } from '@/types/domain/performance'
 import type { MemberRole } from '@/constants/enums'
 
 function generateId(): string {
@@ -111,7 +112,7 @@ export async function selectCandidate(id: string, teamId: string): Promise<void>
   const candidate = await db.candidates.get(id)
   if (!candidate) return
 
-  await db.transaction('rw', db.candidates, db.teams, async () => {
+  await db.transaction('rw', [db.candidates, db.teams, db.memberProfiles, db.achievements, db.candidateTechnologies] as const, async () => {
     await db.candidates.update(id, { status: 'selected', teamId, updatedAt: new Date() })
 
     const team = await db.teams.get(teamId)
@@ -126,5 +127,48 @@ export async function selectCandidate(id: string, teamId: string): Promise<void>
       }
       await db.teams.update(teamId, { members: [...team.members, member], updatedAt: new Date() })
     }
+
+    // Create member profile with candidate data
+    const techs = await db.candidateTechnologies.where('candidateId').equals(id).toArray()
+    const skills: Skill[] = techs.map((t) => ({
+      id: crypto.randomUUID(),
+      name: t.name,
+      level: 'intermediate' as const,
+      category: 'Tecnología',
+    }))
+
+    const profile: MemberProfile = {
+      id: `member-${candidate.id}`,
+      teamId,
+      email: candidate.email || '',
+      phoneCell: candidate.phone || '',
+      phoneHome: '',
+      address: '',
+      role: candidate.position as MemberRole,
+      skills,
+      technologies: techs.map((t) => t.name),
+      microservices: [],
+      avgStoryPoints: 0,
+      vacationDaysPerYear: 14,
+      vacationUsed: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    await db.memberProfiles.add(profile)
+
+    // Add achievement with interview comments
+    const achievement: Achievement = {
+      id: crypto.randomUUID(),
+      memberId: `member-${candidate.id}`,
+      title: 'Ser parte del equipo',
+      description: candidate.comments
+        ? candidate.comments.replace(/<[^>]*>/g, '').slice(0, 500)
+        : 'Nuevo integrante del equipo',
+      date: new Date(),
+      type: 'logro',
+      linkedToPromotion: false,
+      createdAt: new Date(),
+    }
+    await db.achievements.add(achievement)
   })
 }
