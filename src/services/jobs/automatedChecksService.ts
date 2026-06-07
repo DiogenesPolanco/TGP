@@ -302,11 +302,10 @@ async function checkLibraryVulnerabilities(): Promise<DashboardAlert[]> {
   return alerts
 }
 
-// ─── Runner ──────────────────────────────────────────────────────────
+// ─── Backup ─────────────────────────────────────────────────────────
 
 async function runBackup(): Promise<DashboardAlert[]> {
   const alerts: DashboardAlert[] = []
-  // Only run backup if scheduler is explicitly enabled
   if (!getSchedulerConfig().enabled) return alerts
   try {
     const backup = await exportDatabase()
@@ -317,35 +316,72 @@ async function runBackup(): Promise<DashboardAlert[]> {
         message: `Backup automático completado — ${Object.keys(backup.tables).length} tablas, ${Object.values(backup.tables).reduce((s, t) => s + t.length, 0)} registros`,
       })
     } else {
+      alerts.push({ type: 'warning', message: 'Backup automático no pudo guardarse (espacio insuficiente)' })
+    }
+  } catch (err) {
+    alerts.push({ type: 'warning', message: `Error en backup automático: ${err instanceof Error ? err.message : String(err)}` })
+  }
+  if (getAzureConfig()) {
+    try {
+      const { blobName } = await uploadBackupToAzure()
+      alerts.push({ type: 'success', message: `Backup subido a Azure: ${blobName}` })
+    } catch (err) {
+      alerts.push({ type: 'warning', message: `Backup a Azure falló: ${err instanceof Error ? err.message : String(err)}` })
+    }
+  }
+  return alerts
+}
+
+// ─── Share cleanup ──────────────────────────────────────────────
+
+async function cleanExpiredShares(): Promise<DashboardAlert[]> {
+  const alerts: DashboardAlert[] = []
+  const { getAzureConfig } = await import('@/services/backup/azureBackupService')
+  const config = getAzureConfig()
+  if (!config?.sasUrl || !config.containerName) return alerts
+
+  const { ContainerClient } = await import('@azure/storage-blob')
+  const qIdx = config.sasUrl.indexOf('?')
+  if (qIdx < 0) return alerts
+  const sasParams = config.sasUrl.substring(qIdx)
+  const baseUrl = config.sasUrl.substring(0, qIdx)
+  const urlObj = new URL(baseUrl)
+  const containerUrl = `${urlObj.protocol}//${urlObj.hostname}/${config.containerName}${sasParams}`
+  const client = new ContainerClient(containerUrl)
+
+  const now = Date.now()
+  const maxAge = 48 * 60 * 60 * 1000 // 48 hours
+  let deleted = 0
+
+  try {
+    const iter = client.listBlobsFlat()
+    for await (const blob of iter) {
+      if (!blob.name.startsWith('tgp-share-') && !blob.name.startsWith('tgp-data-') && !blob.name.startsWith('d')) continue
+      if (blob.properties.lastModified) {
+        const age = now - blob.properties.lastModified.getTime()
+        if (age > maxAge) {
+          await client.deleteBlob(blob.name)
+          deleted++
+        }
+      }
+    }
+    if (deleted > 0) {
       alerts.push({
-        type: 'warning',
-        message: 'Backup automático no pudo guardarse (espacio insuficiente)',
+        type: 'info',
+        message: `Limpieza de enlaces compartidos: ${deleted} archivo${deleted > 1 ? 's' : ''} eliminado${deleted > 1 ? 's' : ''} de Azure (${deleted > 1 ? 'expirados' : 'expirado'})`,
       })
     }
   } catch (err) {
     alerts.push({
       type: 'warning',
-      message: `Error en backup automático: ${err instanceof Error ? err.message : String(err)}`,
+      message: `Error en limpieza de Azure: ${err instanceof Error ? err.message : String(err)}`,
     })
-  }
-
-  if (getAzureConfig()) {
-    try {
-      const { blobName } = await uploadBackupToAzure()
-      alerts.push({
-        type: 'success',
-        message: `Backup subido a Azure: ${blobName}`,
-      })
-    } catch (err) {
-      alerts.push({
-        type: 'warning',
-        message: `Backup a Azure falló: ${err instanceof Error ? err.message : String(err)}`,
-      })
-    }
   }
 
   return alerts
 }
+
+// ─── Runner ──────────────────────────────────────────────────────────
 
 export async function runAutomatedChecks(): Promise<{
   alerts: DashboardAlert[]
@@ -361,10 +397,11 @@ export async function runAutomatedChecks(): Promise<{
     checkOverdueDeliverables(),
     checkLibraryVulnerabilities(),
     runBackup(),
+    cleanExpiredShares(),
   ])
 
   const alerts = checks.flat()
-  const totalChecks = 9
+  const totalChecks = 10
 
   // Fire toast notifications via the store
   const store = useAppStore.getState?.()

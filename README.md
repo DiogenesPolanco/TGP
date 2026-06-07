@@ -229,7 +229,7 @@ El sistema incluye un programador de tareas automáticas que ejecuta verificacio
 1. **Configuración**: Desde la sección "Programador Automático" en Administración
 2. **Hora de ejecución**: Selecciona la hora del día para la ejecución automática (formato 24h)
 3. **Ejecución manual**: Botón "Ejecutar Ahora" para forzar la ejecución inmediata
-4. **Verificaciones ejecutadas** (8 en total):
+4. **Verificaciones ejecutadas** (9 en total):
    - Vacaciones del personal — alerta si alguien está de vacaciones
    - Obsolescencia tecnológica — sincroniza EOL y alerta tecnologías obsoletas en uso
    - Compromisos vencidos — alerta compromisos más allá de su fecha
@@ -238,6 +238,7 @@ El sistema incluye un programador de tareas automáticas que ejecuta verificacio
    - Actividades vencidas — alerta actividades fuera de plazo
    - Entregables vencidos — alerta entregables no completados
    - Backup automático — guarda copia local y, si está configurado, sube a Azure
+   - Limpieza de enlaces compartidos — elimina de Azure archivos de enlaces compartidos con más de 48h
 
 ## Rutas
 
