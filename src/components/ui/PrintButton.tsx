@@ -62,22 +62,21 @@ export function PrintButton() {
 
       const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
       const url = URL.createObjectURL(blob)
-      const img = new Image()
+      const img = document.createElement('img')
+      img.width = rect.width
+      img.height = rect.height
 
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => {
-          const ctx = canvas.getContext('2d')!
-          ctx.scale(scale, scale)
-          ctx.drawImage(img, 0, 0)
-          URL.revokeObjectURL(url)
-          resolve()
-        }
-        img.onerror = () => {
-          URL.revokeObjectURL(url)
-          reject(new Error('SVG render failed'))
-        }
-        img.src = url
+      const loaded = new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('SVG render failed'))
       })
+      img.src = url
+      await loaded
+      URL.revokeObjectURL(url)
+
+      const ctx = canvas.getContext('2d')!
+      ctx.scale(scale, scale)
+      ctx.drawImage(img, 0, 0)
 
       const link = document.createElement('a')
       link.download = `tgp-reporte-${new Date().toISOString().split('T')[0]}.png`
