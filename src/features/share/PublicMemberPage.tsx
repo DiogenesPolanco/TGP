@@ -70,7 +70,7 @@ export function PublicMemberPage() {
   const { member, displayName, team, sprints, oneOnOnes } = data
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
       <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

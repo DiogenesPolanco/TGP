@@ -139,7 +139,7 @@ export function PublicRecruitmentPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
       <div className="bg-gradient-to-br from-primary via-primary-dark to-[#03245E] text-white">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex items-center gap-3 mb-4">
