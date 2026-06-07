@@ -3,7 +3,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Upload, Trash2, FileSpreadsheet, RefreshCw, Shield, Download, Clock, Cloud } from 'lucide-react'
+import { Upload, Trash2, FileSpreadsheet, RefreshCw, Shield, Download } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
@@ -127,23 +127,11 @@ export function AdminPage() {
 
       {/* Configuraciones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
-            <Clock size={18} className="text-primary" />
-            <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Programador Automático</h3>
-          </div>
-          <div className="p-5">
-            <JobSchedulerConfig />
-          </div>
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+          <JobSchedulerConfig />
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
-            <Cloud size={18} className="text-primary" />
-            <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Backup en la Nube</h3>
-          </div>
-          <div className="p-5">
-            <AzureBackupConfig />
-          </div>
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+          <AzureBackupConfig />
         </div>
       </div>
 
