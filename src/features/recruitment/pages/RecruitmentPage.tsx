@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
+import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { Plus, Search, Users, UserCheck, Calendar, Star } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -23,10 +24,11 @@ export function RecruitmentPage() {
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
 
-  const filtered = candidates.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.position.toLowerCase().includes(search.toLowerCase()),
-  )
+  const filtered = candidates.filter((c) => {
+    const roleLabel = MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? ''
+    return c.name.toLowerCase().includes(search.toLowerCase()) ||
+      roleLabel.toLowerCase().includes(search.toLowerCase())
+  })
 
   const { page, setPage, totalPages, paginatedItems } = usePagination(filtered, 10)
 
@@ -88,7 +90,7 @@ export function RecruitmentPage() {
                       <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.name}</p>
                       {c.email && <p className="text-xs text-neutral-50">{c.email}</p>}
                     </td>
-                    <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">{c.position}</td>
+                    <td className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">{MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? c.position}</td>
                     <td className="px-4 py-3">{statusBadge(c.status)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { getCandidateTechnologies, deleteCandidate, selectCandidate } from '@/services/recruitment/candidateService'
+import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -93,7 +94,7 @@ export function CandidateDetailPage() {
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <InfoRow icon={<Briefcase size={16} />} label="Posición" value={candidate.position} />
+          <InfoRow icon={<Briefcase size={16} />} label="Posición" value={MEMBER_ROLE_LABELS[candidate.position as keyof typeof MEMBER_ROLE_LABELS] ?? candidate.position} />
           <InfoRow icon={<Calendar size={16} />} label="Entrevista" value={candidate.interviewDate ? new Date(candidate.interviewDate).toLocaleDateString('es') : 'Pendiente'} />
           {candidate.email && <InfoRow icon={<Mail size={16} />} label="Email" value={candidate.email} />}
           {candidate.phone && <InfoRow icon={<Phone size={16} />} label="Teléfono" value={candidate.phone} />}

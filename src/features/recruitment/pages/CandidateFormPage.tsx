@@ -4,11 +4,23 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { createCandidate, updateCandidate, getCandidate, getCandidateTechnologies } from '@/services/recruitment/candidateService'
-import { Plus, Trash2, ArrowLeft } from 'lucide-react'
+import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
+import { Plus, X, ArrowLeft, AlertTriangle } from 'lucide-react'
+import type { SupportStatus } from '@/types/domain'
 
-interface TechEntry {
-  name: string
-  points: number
+const statusLabel: Record<SupportStatus, string> = {
+  active: 'Activo',
+  extended: 'S. Extendido',
+  eol: 'EOL',
+  unknown: '?',
+}
+
+const statusColors: Record<SupportStatus, string> = {
+  active: 'bg-success/10 text-success border-success/30',
+  extended: 'bg-warning/10 text-warning border-warning/30',
+  eol: 'bg-danger/10 text-danger border-danger/30',
+  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30',
 }
 
 export function CandidateFormPage() {
@@ -18,7 +30,7 @@ export function CandidateFormPage() {
   const { addNotification } = useAppStore()
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-  const technologies = useLiveQuery(() => db.technologies.toArray()) ?? []
+  const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -28,8 +40,12 @@ export function CandidateFormPage() {
   const [comments, setComments] = useState('')
   const [status, setStatus] = useState<'pending' | 'interviewed' | 'selected' | 'rejected'>('pending')
   const [teamId, setTeamId] = useState('')
-  const [techs, setTechs] = useState<TechEntry[]>([{ name: '', points: 50 }])
   const [saving, setSaving] = useState(false)
+
+  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
+  const [techScores, setTechScores] = useState<Record<string, number>>({})
+  const [techSearch, setTechSearch] = useState('')
+  const [showTechDropdown, setShowTechDropdown] = useState(false)
 
   useEffect(() => {
     if (!isEdit) return
@@ -46,36 +62,65 @@ export function CandidateFormPage() {
       setTeamId(c.teamId ?? '')
       const techList = await getCandidateTechnologies(id!)
       if (techList.length > 0) {
-        setTechs(techList.map((t) => ({ name: t.name, points: t.points })))
+        const techMap: Record<string, number> = {}
+        const ids: string[] = []
+        for (const t of techList) {
+          const match = allTechnologies.find((at) => at.name === t.name)
+          if (match) {
+            ids.push(match.id)
+            techMap[match.id] = t.points
+          }
+        }
+        setSelectedTechIds(ids)
+        setTechScores(techMap)
       }
     })()
-  }, [isEdit, id])
+  }, [isEdit, id, allTechnologies, comments])
 
-  const addTech = () => setTechs([...techs, { name: '', points: 50 }])
-  const removeTech = (i: number) => setTechs(techs.filter((_, idx) => idx !== i))
-  const updateTech = (i: number, field: keyof TechEntry, value: string | number) => {
-    const next = [...techs]
-    next[i] = { ...next[i], [field]: value }
-    setTechs(next)
+  const addTechnology = (techId: string) => {
+    if (selectedTechIds.includes(techId)) return
+    setSelectedTechIds([...selectedTechIds, techId])
+    setTechScores({ ...techScores, [techId]: 50 })
+    setTechSearch('')
   }
+
+  const removeTechnology = (techId: string) => {
+    setSelectedTechIds(selectedTechIds.filter((id) => id !== techId))
+    const { [techId]: _, ...rest } = techScores
+    setTechScores(rest)
+  }
+
+  const updateScore = (techId: string, points: number) => {
+    setTechScores({ ...techScores, [techId]: points })
+  }
+
+  const availableTechs = allTechnologies.filter(
+    (t) => !selectedTechIds.includes(t.id) &&
+      (!techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase()) || t.vendor.toLowerCase().includes(techSearch.toLowerCase())),
+  )
+
+  const selectedTechs = allTechnologies.filter((t) => selectedTechIds.includes(t.id))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !position.trim()) return
+    if (!name.trim() || !position) return
     setSaving(true)
 
     const base = {
       name: name.trim(),
       email,
       phone,
-      position: position.trim(),
+      position,
       interviewDate: interviewDate ? new Date(interviewDate) : null,
       comments,
       status,
       teamId: teamId || null,
     }
 
-    const cleanTechs = techs.filter((t) => t.name.trim())
+    const cleanTechs = selectedTechIds.map((techId) => {
+      const tech = allTechnologies.find((t) => t.id === techId)
+      return { name: tech?.name ?? techId, points: techScores[techId] ?? 50 }
+    })
 
     try {
       if (isEdit) {
@@ -93,7 +138,10 @@ export function CandidateFormPage() {
     }
   }
 
-  const techOptions = technologies.map((t) => t.name).filter((v, i, a) => a.indexOf(v) === i).sort()
+  const roleOptions = MEMBER_ROLES.map((role) => ({
+    value: role,
+    label: MEMBER_ROLE_LABELS[role],
+  }))
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -113,8 +161,11 @@ export function CandidateFormPage() {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Posición *</label>
-            <input type="text" value={position} onChange={(e) => setPosition(e.target.value)} required placeholder="Ej: Desarrollador Frontend"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <select value={position} onChange={(e) => setPosition(e.target.value)} required
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+              <option value="">Seleccionar rol...</option>
+              {roleOptions.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Email</label>
@@ -153,55 +204,99 @@ export function CandidateFormPage() {
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Comentarios de la Entrevista</label>
-          <textarea value={comments} onChange={(e) => setComments(e.target.value)} rows={3}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <RichTextEditor
+            value={comments}
+            onChange={setComments}
+            placeholder="Registra tus observaciones sobre la entrevista..."
+            minHeight="180px"
+          />
         </div>
 
-        {/* Tecnologías */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Tecnologías y Puntuación</label>
-            <button type="button" onClick={addTech} className="flex items-center gap-1 text-xs text-primary hover:text-primary-dark font-medium">
-              <Plus size={14} /> Agregar tecnología
-            </button>
-          </div>
-          <div className="space-y-2">
-            {techs.map((tech, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={tech.name}
-                  onChange={(e) => updateTech(i, 'name', e.target.value)}
-                  list="tech-options"
-                  placeholder="Tecnología"
-                  className="flex-1 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-                <input
-                  type="range"
-                  min={0} max={100}
-                  value={tech.points}
-                  onChange={(e) => updateTech(i, 'points', parseInt(e.target.value))}
-                  className="w-24 accent-primary"
-                />
-                <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 w-10 text-right">{tech.points}</span>
-                {techs.length > 1 && (
-                  <button type="button" onClick={() => removeTech(i)} className="p-1.5 rounded hover:bg-danger/10 text-neutral-50 hover:text-danger transition-colors">
-                    <Trash2 size={16} />
+          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30">
+            Tecnologías y Puntuación <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
+          </label>
+
+          {selectedTechs.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {selectedTechs.map((tech) => (
+                <span key={tech.id} className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${statusColors[tech.supportStatus]}`}>
+                  {tech.supportStatus === 'eol' && <AlertTriangle size={12} />}
+                  {tech.name} {tech.version}
+                  <button type="button" onClick={() => removeTechnology(tech.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
+                    <X size={14} />
                   </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="relative">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input type="text" placeholder="Buscar tecnología para agregar..."
+                  value={techSearch}
+                  onFocus={() => setShowTechDropdown(true)}
+                  onChange={(e) => { setTechSearch(e.target.value); setShowTechDropdown(true) }}
+                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
+              </div>
+            </div>
+
+            {showTechDropdown && (
+              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                {availableTechs.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-neutral-50">
+                    {techSearch ? 'Sin resultados' : 'Todas las tecnologías ya están seleccionadas'}
+                  </p>
+                ) : (
+                  availableTechs.map((tech) => (
+                    <button key={tech.id} type="button"
+                      onClick={() => addTechnology(tech.id)}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-neutral-90 dark:text-white">{tech.name}</span>
+                        <span className="text-neutral-50">{tech.version}</span>
+                        <span className="text-xs text-neutral-50">({tech.vendor})</span>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[tech.supportStatus]}`}>
+                        {statusLabel[tech.supportStatus]}
+                      </span>
+                    </button>
+                  ))
                 )}
               </div>
-            ))}
+            )}
           </div>
-          <datalist id="tech-options">
-            {techOptions.map((t) => <option key={t} value={t} />)}
-          </datalist>
+
+          {selectedTechs.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider">Puntuar conocimientos</p>
+              {selectedTechs.map((tech) => (
+                <div key={tech.id} className="flex items-center gap-3">
+                  <span className="text-sm text-neutral-70 dark:text-neutral-30 w-32 truncate shrink-0">{tech.name}</span>
+                  <input type="range" min={0} max={100} value={techScores[tech.id] ?? 50}
+                    onChange={(e) => updateScore(tech.id, parseInt(e.target.value))}
+                    className="flex-1 accent-primary" />
+                  <span className="text-sm font-semibold text-primary w-10 text-right">{techScores[tech.id] ?? 50}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedTechs.some((t) => t.supportStatus === 'eol') && (
+            <p className="text-xs text-danger mt-1 flex items-center gap-1">
+              <AlertTriangle size={12} />
+              El candidato con tecnologías EOL puede no ser ideal
+            </p>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-3">
           <button type="button" onClick={() => navigate('/teams/recruitment')} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors">
             Cancelar
           </button>
-          <button type="submit" disabled={saving || !name.trim() || !position.trim()}
+          <button type="submit" disabled={saving || !name.trim() || !position}
             className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
             {saving ? 'Guardando...' : isEdit ? 'Actualizar Candidato' : 'Registrar Candidato'}
           </button>
