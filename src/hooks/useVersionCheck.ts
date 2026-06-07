@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 const VERSION_URL = '/version.json'
 const CHECK_INTERVAL = 15 * 1000 // cada 15s para desarrollo (produccion: 5 min)
 const MAX_CONSECUTIVE_FAILURES = 3
+const TEST_BUILD_KEY = 'tgp-test-build' // localStorage override para pruebas
 
 interface AppVersion {
   version: string
@@ -22,6 +23,20 @@ async function fetchVersion(): Promise<AppVersion | null> {
   }
 }
 
+function getBuildOverride(): AppVersion | null {
+  const raw = localStorage.getItem(TEST_BUILD_KEY)
+  if (!raw) return null
+  try {
+    const v = JSON.parse(raw) as AppVersion
+    console.log('[VersionCheck] Usando override de localStorage:', v.build)
+    return v
+  } catch {
+    console.warn('[VersionCheck] tgp-test-build inválido, ignorando')
+    localStorage.removeItem(TEST_BUILD_KEY)
+    return null
+  }
+}
+
 function formatVersion(v: AppVersion) {
   return `${v.version} (build ${v.build}, ${v.timestamp})`
 }
@@ -31,7 +46,7 @@ export function useVersionCheck() {
   const [currentBuild, setCurrentBuild] = useState<string | null>(null)
 
   const check = useCallback(async () => {
-    const v = await fetchVersion()
+    const v = getBuildOverride() ?? await fetchVersion()
 
     if (v) {
       consecutiveFailures = 0
@@ -63,6 +78,14 @@ export function useVersionCheck() {
     const interval = setInterval(check, CHECK_INTERVAL)
     ;(window as any).__checkVersion = check
     ;(window as any).__forceStale = () => setStale(true)
+    ;(window as any).__setTestBuild = (build: string) => {
+      localStorage.setItem(TEST_BUILD_KEY, JSON.stringify({
+        version: '0.0.0',
+        build,
+        timestamp: new Date().toISOString()
+      }))
+      console.log(`[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`)
+    }
     return () => clearInterval(interval)
   }, [check])
 
