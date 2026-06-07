@@ -91,7 +91,7 @@ export async function createShareLink(
     }
   }
 
-  const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : '/public'
+  const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : type === 'recruitment' ? '/public/recruitment' : '/public'
   const fragment = manifestStr ? `#${encodeURIComponent(manifestStr)}` : ''
   return { hash: shortHash, url: `${window.location.origin}${base}/${shortHash}${fragment}` }
 }
