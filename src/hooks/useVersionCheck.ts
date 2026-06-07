@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 
 const VERSION_URL = '/version.json'
-const CHECK_INTERVAL = 15 * 1000 // cada 15s para desarrollo (produccion: 5 min)
+const CHECK_INTERVAL = 15 * 1000
 const MAX_CONSECUTIVE_FAILURES = 3
-const TEST_BUILD_KEY = 'tgp-test-build' // localStorage override para pruebas
+const TEST_BUILD_KEY = 'tgp-test-build'
+const STALE_KEY = 'tgp-stale'
+const FAILURES_KEY = 'tgp-failures'
 
 interface AppVersion {
   version: string
@@ -12,7 +14,6 @@ interface AppVersion {
 }
 
 let cachedVersion: AppVersion | null = null
-let consecutiveFailures = 0
 
 async function fetchVersion(): Promise<AppVersion | null> {
   try {
@@ -49,19 +50,22 @@ function setTestBuild(build: string) {
   }))
   console.log(`[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`)
 }
-
-// Globales inmediatas (no dependen de React)
 ;(window as any).__setTestBuild = setTestBuild
 
 export function useVersionCheck() {
-  const [stale, setStale] = useState(false)
+  const [stale, setStale] = useState(() => localStorage.getItem(STALE_KEY) === 'true')
   const [currentBuild, setCurrentBuild] = useState<string | null>(null)
+
+  const markStale = useCallback(() => {
+    localStorage.setItem(STALE_KEY, 'true')
+    setStale(true)
+  }, [])
 
   const check = useCallback(async () => {
     const v = getBuildOverride() ?? await fetchVersion()
 
     if (v) {
-      consecutiveFailures = 0
+      localStorage.removeItem(FAILURES_KEY)
       if (!cachedVersion) {
         cachedVersion = v
         setCurrentBuild(v.build)
@@ -69,33 +73,33 @@ export function useVersionCheck() {
       }
       if (cachedVersion.build !== v.build) {
         console.log('[VersionCheck] Nueva versión detectada:', v.build)
-        setStale(true)
+        markStale()
       }
       return
     }
 
-    consecutiveFailures++
+    const failures = (parseInt(localStorage.getItem(FAILURES_KEY) ?? '0', 10)) + 1
+    localStorage.setItem(FAILURES_KEY, String(failures))
     const buildStr = cachedVersion ? formatVersion(cachedVersion) : 'ninguna (primera carga)'
-    console.warn(`[VersionCheck] Intento ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`)
+    console.warn(`[VersionCheck] Intento ${failures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`)
 
-    if (cachedVersion) {
-      setStale(true)
-    } else if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      setStale(true)
+    if (cachedVersion || failures >= MAX_CONSECUTIVE_FAILURES) {
+      markStale()
     }
-  }, [])
+  }, [markStale])
 
   useEffect(() => {
     check()
     const interval = setInterval(check, CHECK_INTERVAL)
     ;(window as any).__checkVersion = check
-    ;(window as any).__forceStale = () => setStale(true)
+    ;(window as any).__forceStale = markStale
     return () => clearInterval(interval)
-  }, [check])
+  }, [check, markStale])
 
   const reload = useCallback(async () => {
     cachedVersion = null
-    // Forzar carga fresca: borrar caches del SW + desregistrar antes de recargar
+    localStorage.removeItem(STALE_KEY)
+    localStorage.removeItem(FAILURES_KEY)
     if ('caches' in window) {
       const keys = await caches.keys()
       await Promise.all(keys.map(k => caches.delete(k)))
