@@ -28,8 +28,6 @@ export function RecruitmentPage() {
     db.candidates.orderBy('createdAt').reverse().toArray(),
   ) ?? []
 
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-
   const filtered = candidates.filter((c) => {
     const roleLabel = MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? ''
     const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
