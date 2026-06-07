@@ -21,3 +21,33 @@ Every memory must answer: could a future agent with zero context read this and k
 | `memento_item_list` | List items with filters (category, status, query) |
 | `memento_identity` | Read identity crystal |
 | `memento_identity_update` | Write/replace identity crystal |
+
+# Configuración del Proyecto — TGP
+
+## Preferencias del Usuario
+
+### Autorizaciones y Ejecución
+- **Siempre pedir aprobación** antes de ejecutar cualquier comando (bash, write, edit, push, commit, deploy)
+- No ejecutar `git commit`, `git push`, `git rebase`, `git merge` ni ningún comando destructivo sin confirmación explícita
+- Mostrar plan de acción antes de implementar cambios multi-archivo
+
+### Commits y Git
+- Mensajes de commit en **español**
+- Formato: `tipo: descripción breve` (ej: `feat:`, `fix:`, `refactor:`, `docs:`)
+- Commits atómicos: un cambio lógico por commit
+- No hacer amend ni force push sin preguntar
+- No commitear sin que el usuario lo solicite explícitamente
+
+### UI/UX
+- UI en **español** (etiquetas, botones, mensajes)
+- Diseño boarding-pass para tarjetas de autenticación y modales principales
+- Modo oscuro con grises neutros, sin tonos azules
+- Notificaciones toast en esquina inferior derecha
+
+### Tecnologías
+- React 19 + TypeScript 5 + Vite 6 + SWC
+- Tailwind CSS 4
+- Dexie.js (IndexedDB) — 20+ tablas
+- No backend server, todo cliente-side SPA
+- Azure Blob Storage para sharing de datos
+- RichTextEditor con TipTap para contenido HTML
