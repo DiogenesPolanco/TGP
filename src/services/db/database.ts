@@ -110,8 +110,8 @@ export class TGPDatabase extends Dexie {
     this.version(9).stores({
       appDatabases: 'id, applicationId, dbType, engine, environment',
     })
-    this.version(10).stores({
-      candidates: 'id, name, position, status, teamId, interviewDate',
+    this.version(11).stores({
+      candidates: 'id, name, position, status, teamId, interviewDate, createdAt',
       candidateTechnologies: 'id, candidateId, name, points',
     })
   }
