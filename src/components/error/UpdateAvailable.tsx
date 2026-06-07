@@ -70,15 +70,15 @@ export function UpdateAvailable({ onReload }: { onReload: () => void }) {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Recarga para actualizar</h3>
+                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Instalar actualización</h3>
                   <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
-                    Las funcionalidades pueden verse afectadas si no actualizas.
+                    Aplica los cambios más recientes para mantener todo funcionando correctamente.
                   </p>
                 </div>
 
                 <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-4 border border-amber-200 dark:border-amber-500/20">
                   <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                    Los datos no se perderán. La recarga es para aplicar los cambios más recientes de la aplicación.
+                    Tus datos no se perderán. La aplicación se descargará de nuevo con las últimas mejoras.
                   </p>
                 </div>
 
@@ -87,7 +87,7 @@ export function UpdateAvailable({ onReload }: { onReload: () => void }) {
                   className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
                 >
                   <RefreshCw size={20} />
-                  Recargar ahora
+                  Instalar ahora
                 </button>
               </div>
             </div>
