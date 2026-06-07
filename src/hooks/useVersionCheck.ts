@@ -26,17 +26,23 @@ export function useVersionCheck() {
 
   const check = useCallback(async () => {
     const v = await fetchVersion()
-    if (!v) { console.warn('[VersionCheck] No se pudo obtener version.json'); return }
 
     if (!cachedVersion) {
-      console.log('[VersionCheck] Build actual:', v.build)
+      if (!v) { console.warn('[VersionCheck] No se pudo obtener version.json'); return }
       cachedVersion = v
       setCurrentBuild(v.build)
       return
     }
 
+    // Fallo después de tener un build → probable redeploy, forzar actualización
+    if (!v) {
+      console.warn('[VersionCheck] Error al obtener version.json — forzando actualización')
+      setStale(true)
+      return
+    }
+
     if (cachedVersion.build !== v.build) {
-      console.log('[VersionCheck] Nueva version detectada:', v.build)
+      console.log('[VersionCheck] Nueva versión detectada:', v.build)
       setStale(true)
     }
   }, [])
