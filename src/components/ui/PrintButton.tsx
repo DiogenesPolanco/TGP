@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Printer, Image, Loader2 } from 'lucide-react'
+import html2canvas from 'html2canvas'
 
 export function PrintButton() {
   const [capturing, setCapturing] = useState(false)
@@ -7,9 +8,8 @@ export function PrintButton() {
   const captureImage = async () => {
     setCapturing(true)
     try {
-      const html2canvas = (await import('html2canvas')).default
       const el = document.getElementById('printable-content')
-      if (!el) return
+      if (!el) { console.warn('[PrintButton] #printable-content no encontrado'); return }
       const canvas = await html2canvas(el, {
         scale: 2,
         useCORS: true,
@@ -22,8 +22,8 @@ export function PrintButton() {
       link.download = `tgp-reporte-${new Date().toISOString().split('T')[0]}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-    } catch {
-      console.warn('[PrintButton] Error al capturar imagen')
+    } catch (err) {
+      console.warn('[PrintButton] Error al capturar imagen:', err)
     } finally {
       setCapturing(false)
     }
