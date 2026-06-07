@@ -108,7 +108,10 @@ export function MemberPerformancePage() {
         {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
           <div className="mb-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-2 text-sm max-w-full overflow-hidden">
             <span className="text-neutral-50 shrink-0">Enlace público:</span>
-            <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-2 py-1 rounded truncate font-mono min-w-0">{cleanUrl}</code>
+            <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
+            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
+            {cleanUrl}
+          </a>
           </div>
         )})()}
 
