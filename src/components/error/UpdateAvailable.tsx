@@ -1,4 +1,4 @@
-import { RefreshCw, Sparkles } from 'lucide-react'
+import { RefreshCw, Sparkles, Download } from 'lucide-react'
 
 export function UpdateAvailable({ onReload }: { onReload: () => void }) {
   return (
@@ -66,7 +66,7 @@ export function UpdateAvailable({ onReload }: { onReload: () => void }) {
             <div className="sm:w-[58%] p-8 sm:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
               <div className="max-w-sm mx-auto w-full space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Sparkles size={32} className="text-primary" />
+                  <Download size={32} className="text-primary" />
                 </div>
 
                 <div className="space-y-2">
