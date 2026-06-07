@@ -3,7 +3,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
 import { useNavigate } from 'react-router-dom'
-import { Upload, Trash2, FileSpreadsheet, RefreshCw, Shield, Download } from 'lucide-react'
+import { Upload, Trash2, FileSpreadsheet, RefreshCw, Shield, Download, Users, BarChart3 } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
@@ -24,6 +24,8 @@ export function AdminPage() {
   const [showTotpDialog, setShowTotpDialog] = useState(false)
   const [totpCode, setTotpCode] = useState('')
   const [totpError, setTotpError] = useState('')
+  const [showStats, setShowStats] = useState(false)
+  const [dbStats, setDbStats] = useState<{ name: string; count: number }[]>([])
 
   const handleReAuthExport = async () => {
     const secret = await getSecret()
@@ -108,6 +110,12 @@ export function AdminPage() {
     finally { setIsSyncing(false) }
   }
 
+  const handleShowStats = async () => {
+    const stats = await Promise.all(db.tables.map(async (t) => ({ name: t.name, count: await t.count() })))
+    setDbStats(stats)
+    setShowStats(true)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -121,6 +129,8 @@ export function AdminPage() {
         <ActionCard icon={<Upload size={20} />} label="Importar JSON" desc="Restaurar backup" color="primary" onClick={() => document.getElementById('import-json')?.click()} />
         <ActionCard icon={<Download size={20} />} label="Cargar demo" desc="Datos de ejemplo" color="success" onClick={handleSeedData} />
         <ActionCard icon={<RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />} label="Sincronizar EOL" desc={syncResult ? `${syncResult.updated} actualizadas` : 'endoflife.date'} color="info" onClick={handleSyncTechnologies} disabled={isSyncing} />
+        <ActionCard icon={<Users size={20} />} label="Usuarios" desc="Gestionar accesos" color="primary" onClick={() => navigate('/admin/users')} />
+        <ActionCard icon={<BarChart3 size={20} />} label="Estadísticas BD" desc="Registros por tabla" color="info" onClick={handleShowStats} />
         <ActionCard icon={<Trash2 size={20} />} label="Limpiar BD" desc="Eliminar todo" color="danger" onClick={handleClearData} />
         <input id="import-json" type="file" accept=".json" onChange={handleImport} disabled={isImporting} className="hidden" />
       </div>
@@ -153,6 +163,35 @@ export function AdminPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
               <button onClick={handleConfirmExport} disabled={totpCode.length !== 6} className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">Verificar y Exportar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stats dialog */}
+      {showStats && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowStats(false)}>
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BarChart3 size={18} className="text-primary" />
+                <h3 className="text-base font-bold text-neutral-90 dark:text-white">Estadísticas de Base de Datos</h3>
+              </div>
+              <button onClick={() => setShowStats(false)} className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75">
+                <span className="text-neutral-50 text-lg leading-none">×</span>
+              </button>
+            </div>
+            <div className="p-5 space-y-1">
+              {dbStats.map((s) => (
+                <div key={s.name} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-neutral-5 dark:hover:bg-neutral-85">
+                  <span className="text-sm text-neutral-70 dark:text-neutral-30 font-medium capitalize">{s.name.replace(/([A-Z])/g, ' $1').trim()}</span>
+                  <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">{s.count.toLocaleString()}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between py-2 px-3 mt-2 border-t border-neutral-20 dark:border-neutral-70">
+                <span className="text-sm font-bold text-neutral-90 dark:text-white">Total</span>
+                <span className="text-sm font-bold text-primary tabular-nums">{dbStats.reduce((s, t) => s + t.count, 0).toLocaleString()}</span>
+              </div>
             </div>
           </div>
         </div>
