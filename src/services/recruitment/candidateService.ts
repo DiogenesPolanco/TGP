@@ -1,5 +1,6 @@
 import { db } from '@/services/db/database'
-import type { Candidate, CandidateTechnology, CandidateEvaluation } from '@/types/domain'
+import type { Candidate, CandidateTechnology, CandidateEvaluation, TeamMember } from '@/types/domain'
+import type { MemberRole } from '@/constants/enums'
 
 function generateId(): string {
   return crypto.randomUUID()
@@ -107,5 +108,23 @@ export async function deleteCandidate(id: string): Promise<void> {
 }
 
 export async function selectCandidate(id: string, teamId: string): Promise<void> {
-  await db.candidates.update(id, { status: 'selected', teamId, updatedAt: new Date() })
+  const candidate = await db.candidates.get(id)
+  if (!candidate) return
+
+  await db.transaction('rw', db.candidates, db.teams, async () => {
+    await db.candidates.update(id, { status: 'selected', teamId, updatedAt: new Date() })
+
+    const team = await db.teams.get(teamId)
+    if (team) {
+      const member: TeamMember = {
+        id: `member-${candidate.id}`,
+        userPrincipal: candidate.email || `${candidate.name.toLowerCase().replace(/\s+/g, '.')}@tgp.demo`,
+        displayName: candidate.name,
+        role: candidate.position as MemberRole,
+        allocationPct: 100,
+        status: 'activo',
+      }
+      await db.teams.update(teamId, { members: [...team.members, member], updatedAt: new Date() })
+    }
+  })
 }

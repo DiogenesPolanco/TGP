@@ -40,10 +40,14 @@ export function CandidateDetailPage() {
 
   const handleSelect = async () => {
     if (!candidate) return
+    if (!candidate.teamId) {
+      addNotification({ type: 'error', message: 'Asigna un equipo al candidato antes de seleccionarlo' })
+      return
+    }
     setSelecting(true)
     try {
-      await selectCandidate(candidate.id, candidate.teamId ?? '')
-      addNotification({ type: 'success', message: 'Candidato seleccionado' })
+      await selectCandidate(candidate.id, candidate.teamId)
+      addNotification({ type: 'success', message: 'Candidato seleccionado y agregado al equipo' })
       navigate('/teams/recruitment')
     } catch {
       addNotification({ type: 'error', message: 'Error al seleccionar candidato' })
