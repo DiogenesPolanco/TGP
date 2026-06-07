@@ -26,6 +26,9 @@ import type {
   OneOnOne,
   Achievement,
   TeamSprint,
+  Candidate,
+  CandidateTechnology,
+  CandidateEvaluation,
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes
@@ -655,6 +658,140 @@ export async function seedDemoData(force = false) {
   }
 
   await db.teamSprints.bulkAdd(teamSprints)
+
+  // ── Recruitment seed data ──
+  const cId = (n: number) => `cand-${n}`
+  const mkCID = () => `ct-${candidateIdx++}`
+  let candidateIdx = 1
+
+  const candidates: Candidate[] = [
+    { id: cId(1), name: 'Elena Vargas', email: 'elena.vargas@email.com', phone: '+56912340001', position: 'senior_developer', interviewDate: days(3), comments: '<p>Excelente candidata con amplia experiencia en microservicios. Demostró conocimiento profundo de patrones de diseño y arquitectura hexagonal. Comunicación clara y actitud proactiva.</p>', status: 'interviewed', teamId: 'team-1', totalScore: 0, createdAt: days(15), updatedAt: days(3) },
+    { id: cId(2), name: 'Roberto Méndez', email: 'roberto.mendez@email.com', phone: '+56912340002', position: 'developer', interviewDate: days(1), comments: '<p>Buen conocimiento de JavaScript y React. Sin experiencia en backend. Potencial para crecer con mentoría.</p>', status: 'interviewed', teamId: null, totalScore: 0, createdAt: days(10), updatedAt: days(1) },
+    { id: cId(3), name: 'Camila Ríos', email: 'camila.rios@email.com', phone: '+56912340003', position: 'tech_lead', interviewDate: days(7), comments: '<p>Perfil excepcional para Tech Lead. Experiencia liderando equipos de hasta 8 personas. Domina arquitecturas cloud-native y metodologías ágiles. Referencias verificadas excelentes.</p>', status: 'pending', teamId: 'team-2', totalScore: 0, createdAt: days(8), updatedAt: days(8) },
+    { id: cId(4), name: 'Diego Herrera', email: 'diego.herrera@email.com', phone: '+56912340004', position: 'senior_developer', interviewDate: days(5), comments: '<p>Sólidos conocimientos en Java y Spring Boot. Experiencia en sistemas transaccionales de alta criticidad. Buen comunicador, pero mostró poca flexibilidad para aprender nuevas tecnologías.</p>', status: 'interviewed', teamId: null, totalScore: 0, createdAt: days(12), updatedAt: days(5) },
+    { id: cId(5), name: 'Sofía Paredes', email: 'sofia.paredes@email.com', phone: '+56912340005', position: 'ux_designer', interviewDate: null, comments: '', status: 'pending', teamId: null, totalScore: 0, createdAt: days(6), updatedAt: days(6) },
+    { id: cId(6), name: 'Andrés Muñoz', email: 'andres.munoz@email.com', phone: '+56912340006', position: 'developer', interviewDate: days(10), comments: '<p>Buenos fundamentos pero poca experiencia práctica. Demostró interés genuino en aprender. Recomendable para posición junior.</p>', status: 'pending', teamId: null, totalScore: 0, createdAt: days(5), updatedAt: days(5) },
+    { id: cId(7), name: 'Valentina Soto', email: 'valentina.soto@email.com', phone: '+56912340007', position: 'qa', interviewDate: days(2), comments: '<p>Sólida experiencia en automatización de pruebas con Selenium y Cypress. Conocimiento de CI/CD y pruebas de performance. Excelente candidata.</p>', status: 'interviewed', teamId: 'team-1', totalScore: 0, createdAt: days(14), updatedAt: days(2) },
+    { id: cId(8), name: 'Felipe Torres', email: 'felipe.torres@email.com', phone: '+56912340008', position: 'manager', interviewDate: days(14), comments: '<p>Perfil gerencial con experiencia en transformación digital. Buen manejo de equipos multidisciplinarios. Se le pidió una segunda entrevista con el director.</p>', status: 'pending', teamId: null, totalScore: 0, createdAt: days(4), updatedAt: days(4) },
+    { id: cId(9), name: 'Daniela Castro', email: 'daniela.castro@email.com', phone: '+56912340009', position: 'devops', interviewDate: days(8), comments: '<p>Experta en Kubernetes y Terraform. Implementó GitOps en su empresa anterior. Certificada CKA y AWS. Altamente recomendada.</p>', status: 'interviewed', teamId: 'team-2', totalScore: 0, createdAt: days(20), updatedAt: days(8) },
+    { id: cId(10), name: 'Marcelo Vega', email: 'marcelo.vega@email.com', phone: '+56912340010', position: 'senior_developer', interviewDate: days(12), comments: '<p>No cumplió con las expectativas técnicas. Dificultad para resolver problemas de complejidad media en el coding challenge. Se descarta.</p>', status: 'rejected', teamId: null, totalScore: 0, createdAt: days(18), updatedAt: days(12) },
+  ]
+
+  const candidateTechs: CandidateTechnology[] = [
+    // Elena Vargas — senior_developer .NET + Cloud
+    { id: mkCID(), candidateId: cId(1), name: '.NET', points: 90 },
+    { id: mkCID(), candidateId: cId(1), name: 'Azure', points: 85 },
+    { id: mkCID(), candidateId: cId(1), name: 'PostgreSQL', points: 75 },
+    { id: mkCID(), candidateId: cId(1), name: 'Docker', points: 80 },
+    { id: mkCID(), candidateId: cId(1), name: 'Angular', points: 60 },
+    // Roberto Méndez — developer frontend
+    { id: mkCID(), candidateId: cId(2), name: 'React', points: 70 },
+    { id: mkCID(), candidateId: cId(2), name: 'JavaScript', points: 75 },
+    { id: mkCID(), candidateId: cId(2), name: 'Node.js', points: 45 },
+    // Camila Ríos — tech_lead full-stack
+    { id: mkCID(), candidateId: cId(3), name: 'Java', points: 85 },
+    { id: mkCID(), candidateId: cId(3), name: 'Kubernetes', points: 80 },
+    { id: mkCID(), candidateId: cId(3), name: 'AWS', points: 90 },
+    { id: mkCID(), candidateId: cId(3), name: 'Python', points: 70 },
+    { id: mkCID(), candidateId: cId(3), name: 'PostgreSQL', points: 75 },
+    // Diego Herrera — senior_developer Java
+    { id: mkCID(), candidateId: cId(4), name: 'Java', points: 88 },
+    { id: mkCID(), candidateId: cId(4), name: 'Spring Boot', points: 85 },
+    { id: mkCID(), candidateId: cId(4), name: 'PostgreSQL', points: 70 },
+    { id: mkCID(), candidateId: cId(4), name: 'Angular', points: 40 },
+    // Sofía Paredes — ux_designer (sin techs, es diseño)
+    // Andrés Muñoz — developer
+    { id: mkCID(), candidateId: cId(6), name: 'JavaScript', points: 50 },
+    { id: mkCID(), candidateId: cId(6), name: 'React', points: 40 },
+    // Valentina Soto — qa
+    { id: mkCID(), candidateId: cId(7), name: 'Selenium', points: 85 },
+    { id: mkCID(), candidateId: cId(7), name: 'Python', points: 70 },
+    { id: mkCID(), candidateId: cId(7), name: 'Docker', points: 55 },
+    // Felipe Torres — manager (sin techs)
+    // Daniela Castro — devops
+    { id: mkCID(), candidateId: cId(9), name: 'Kubernetes', points: 90 },
+    { id: mkCID(), candidateId: cId(9), name: 'Terraform', points: 85 },
+    { id: mkCID(), candidateId: cId(9), name: 'AWS', points: 80 },
+    { id: mkCID(), candidateId: cId(9), name: 'Docker', points: 85 },
+    { id: mkCID(), candidateId: cId(9), name: 'Python', points: 65 },
+    // Marcelo Vega — senior_developer rejected
+    { id: mkCID(), candidateId: cId(10), name: 'Java', points: 60 },
+    { id: mkCID(), candidateId: cId(10), name: 'PostgreSQL', points: 50 },
+    { id: mkCID(), candidateId: cId(10), name: 'Node.js', points: 45 },
+  ]
+
+  const candidateEvals: CandidateEvaluation[] = [
+    // Elena Vargas
+    { id: `ev-1`, candidateId: cId(1), category: 'technical_knowledge', points: 90 },
+    { id: `ev-2`, candidateId: cId(1), category: 'experience', points: 85 },
+    { id: `ev-3`, candidateId: cId(1), category: 'communication', points: 80 },
+    { id: `ev-4`, candidateId: cId(1), category: 'attitude', points: 85 },
+    { id: `ev-5`, candidateId: cId(1), category: 'problem_solving', points: 88 },
+    { id: `ev-6`, candidateId: cId(1), category: 'teamwork', points: 80 },
+    { id: `ev-7`, candidateId: cId(1), category: 'leadership', points: 70 },
+    // Roberto Méndez
+    { id: `ev-8`, candidateId: cId(2), category: 'technical_knowledge', points: 60 },
+    { id: `ev-9`, candidateId: cId(2), category: 'experience', points: 35 },
+    { id: `ev-10`, candidateId: cId(2), category: 'communication', points: 75 },
+    { id: `ev-11`, candidateId: cId(2), category: 'attitude', points: 85 },
+    { id: `ev-12`, candidateId: cId(2), category: 'problem_solving', points: 55 },
+    { id: `ev-13`, candidateId: cId(2), category: 'teamwork', points: 80 },
+    { id: `ev-14`, candidateId: cId(2), category: 'leadership', points: 30 },
+    // Camila Ríos
+    { id: `ev-15`, candidateId: cId(3), category: 'technical_knowledge', points: 92 },
+    { id: `ev-16`, candidateId: cId(3), category: 'experience', points: 90 },
+    { id: `ev-17`, candidateId: cId(3), category: 'communication', points: 88 },
+    { id: `ev-18`, candidateId: cId(3), category: 'attitude', points: 95 },
+    { id: `ev-19`, candidateId: cId(3), category: 'problem_solving', points: 90 },
+    { id: `ev-20`, candidateId: cId(3), category: 'teamwork', points: 85 },
+    { id: `ev-21`, candidateId: cId(3), category: 'leadership', points: 92 },
+    // Diego Herrera
+    { id: `ev-22`, candidateId: cId(4), category: 'technical_knowledge', points: 85 },
+    { id: `ev-23`, candidateId: cId(4), category: 'experience', points: 80 },
+    { id: `ev-24`, candidateId: cId(4), category: 'communication', points: 60 },
+    { id: `ev-25`, candidateId: cId(4), category: 'attitude', points: 50 },
+    { id: `ev-26`, candidateId: cId(4), category: 'problem_solving', points: 75 },
+    { id: `ev-27`, candidateId: cId(4), category: 'teamwork', points: 55 },
+    { id: `ev-28`, candidateId: cId(4), category: 'leadership', points: 40 },
+    // Valentina Soto
+    { id: `ev-29`, candidateId: cId(7), category: 'technical_knowledge', points: 80 },
+    { id: `ev-30`, candidateId: cId(7), category: 'experience', points: 75 },
+    { id: `ev-31`, candidateId: cId(7), category: 'communication', points: 78 },
+    { id: `ev-32`, candidateId: cId(7), category: 'attitude', points: 85 },
+    { id: `ev-33`, candidateId: cId(7), category: 'problem_solving', points: 72 },
+    { id: `ev-34`, candidateId: cId(7), category: 'teamwork', points: 80 },
+    { id: `ev-35`, candidateId: cId(7), category: 'leadership', points: 45 },
+    // Daniela Castro
+    { id: `ev-36`, candidateId: cId(9), category: 'technical_knowledge', points: 92 },
+    { id: `ev-37`, candidateId: cId(9), category: 'experience', points: 85 },
+    { id: `ev-38`, candidateId: cId(9), category: 'communication', points: 75 },
+    { id: `ev-39`, candidateId: cId(9), category: 'attitude', points: 80 },
+    { id: `ev-40`, candidateId: cId(9), category: 'problem_solving', points: 85 },
+    { id: `ev-41`, candidateId: cId(9), category: 'teamwork', points: 75 },
+    { id: `ev-42`, candidateId: cId(9), category: 'leadership', points: 55 },
+    // Marcelo Vega (rejected)
+    { id: `ev-43`, candidateId: cId(10), category: 'technical_knowledge', points: 50 },
+    { id: `ev-44`, candidateId: cId(10), category: 'experience', points: 55 },
+    { id: `ev-45`, candidateId: cId(10), category: 'communication', points: 60 },
+    { id: `ev-46`, candidateId: cId(10), category: 'attitude', points: 65 },
+    { id: `ev-47`, candidateId: cId(10), category: 'problem_solving', points: 40 },
+    { id: `ev-48`, candidateId: cId(10), category: 'teamwork', points: 55 },
+    { id: `ev-49`, candidateId: cId(10), category: 'leadership', points: 30 },
+  ]
+
+  await db.candidates.bulkAdd(candidates)
+  await db.candidateTechnologies.bulkAdd(candidateTechs)
+  await db.candidateEvaluations.bulkAdd(candidateEvals)
+
+  // Recalculate totalScores (50% tech + 50% eval)
+  for (const c of candidates) {
+    const techs = candidateTechs.filter((t) => t.candidateId === c.id)
+    const evals = candidateEvals.filter((e) => e.candidateId === c.id)
+    const techAvg = techs.length > 0 ? Math.round(techs.reduce((s, t) => s + t.points, 0) / techs.length) : 0
+    const evalAvg = evals.length > 0 ? Math.round(evals.reduce((s, e) => s + e.points, 0) / evals.length) : 0
+    const totalScore = Math.round(techAvg * 0.5 + evalAvg * 0.5)
+    await db.candidates.update(c.id, { totalScore })
+  }
 
   localStorage.setItem(SEEDED_FLAG, 'true')
   seedingInProgress = false
