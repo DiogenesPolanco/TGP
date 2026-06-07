@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Printer, Image, Loader2 } from 'lucide-react'
-import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image-more'
 
 export function PrintButton() {
   const [capturing, setCapturing] = useState(false)
@@ -10,18 +10,25 @@ export function PrintButton() {
     try {
       const el = document.getElementById('printable-content')
       if (!el) { console.warn('[PrintButton] #printable-content no encontrado'); return }
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        onclone: (doc) => {
-          doc.querySelectorAll('.no-print').forEach((el) => el.remove())
-        },
+
+      // Hide no-print elements temporarily
+      const noPrint = el.querySelectorAll<HTMLElement>('.no-print')
+      noPrint.forEach((n) => n.style.display = 'none')
+
+      const blob = await domtoimage.toBlob(el, {
+        width: el.scrollWidth,
+        height: el.scrollHeight,
+        style: { transform: 'none' },
       })
+
+      // Restore no-print elements
+      noPrint.forEach((n) => n.style.display = '')
+
       const link = document.createElement('a')
       link.download = `tgp-reporte-${new Date().toISOString().split('T')[0]}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = URL.createObjectURL(blob)
       link.click()
+      URL.revokeObjectURL(link.href)
     } catch (err) {
       console.warn('[PrintButton] Error al capturar imagen:', err)
     } finally {
