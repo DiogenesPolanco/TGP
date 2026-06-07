@@ -26,6 +26,7 @@ export function AdminPage() {
   const [totpError, setTotpError] = useState('')
   const [showStats, setShowStats] = useState(false)
   const [dbStats, setDbStats] = useState<{ name: string; count: number }[]>([])
+  const [loadingStats, setLoadingStats] = useState(false)
 
   const handleReAuthExport = async () => {
     const secret = await getSecret()
@@ -111,9 +112,12 @@ export function AdminPage() {
   }
 
   const handleShowStats = async () => {
+    if (showStats) { setShowStats(false); return }
+    setLoadingStats(true)
     const stats = await Promise.all(db.tables.map(async (t) => ({ name: t.name, count: await t.count() })))
     setDbStats(stats)
     setShowStats(true)
+    setLoadingStats(false)
   }
 
   return (
@@ -134,6 +138,27 @@ export function AdminPage() {
         <ActionCard icon={<Trash2 size={20} />} label="Limpiar BD" desc="Eliminar todo" color="danger" onClick={handleClearData} />
         <input id="import-json" type="file" accept=".json" onChange={handleImport} disabled={isImporting} className="hidden" />
       </div>
+
+      {loadingStats && (
+        <div className="text-sm text-neutral-50 text-center py-3 animate-pulse">Cargando estadísticas...</div>
+      )}
+
+      {showStats && !loadingStats && (
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Base de Datos</h3>
+            <span className="text-xs text-neutral-50">{dbStats.reduce((s, t) => s + t.count, 0).toLocaleString()} registros</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-1.5">
+            {dbStats.filter((s) => s.count > 0).sort((a, b) => b.count - a.count).map((s) => (
+              <div key={s.name} className="flex items-center justify-between py-1.5 border-b border-neutral-10 dark:border-neutral-85">
+                <span className="text-xs text-neutral-60 dark:text-neutral-40 truncate mr-2">{s.name.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-xs font-bold text-neutral-90 dark:text-white tabular-nums shrink-0">{s.count.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Configuraciones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -163,35 +188,6 @@ export function AdminPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
               <button onClick={handleConfirmExport} disabled={totpCode.length !== 6} className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">Verificar y Exportar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Stats dialog */}
-      {showStats && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowStats(false)}>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
-            <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BarChart3 size={18} className="text-primary" />
-                <h3 className="text-base font-bold text-neutral-90 dark:text-white">Estadísticas de Base de Datos</h3>
-              </div>
-              <button onClick={() => setShowStats(false)} className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75">
-                <span className="text-neutral-50 text-lg leading-none">×</span>
-              </button>
-            </div>
-            <div className="p-5 space-y-1">
-              {dbStats.map((s) => (
-                <div key={s.name} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-neutral-5 dark:hover:bg-neutral-85">
-                  <span className="text-sm text-neutral-70 dark:text-neutral-30 font-medium capitalize">{s.name.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">{s.count.toLocaleString()}</span>
-                </div>
-              ))}
-              <div className="flex items-center justify-between py-2 px-3 mt-2 border-t border-neutral-20 dark:border-neutral-70">
-                <span className="text-sm font-bold text-neutral-90 dark:text-white">Total</span>
-                <span className="text-sm font-bold text-primary tabular-nums">{dbStats.reduce((s, t) => s + t.count, 0).toLocaleString()}</span>
-              </div>
             </div>
           </div>
         </div>
