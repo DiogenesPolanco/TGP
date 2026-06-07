@@ -5,10 +5,13 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { deleteCandidate } from '@/services/recruitment/candidateService'
+import { createShareLink, getPublicRecruitmentData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Candidate } from '@/types/domain'
-import { Plus, Search, Users, UserCheck, Calendar, Star, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Users, UserCheck, Calendar, Star, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
@@ -21,6 +24,10 @@ export function RecruitmentPage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<any>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -136,6 +143,17 @@ export function RecruitmentPage() {
             </button>
           )}
           <button
+            onClick={async () => {
+              const data = await getPublicRecruitmentData()
+              setSharePending(data)
+              setShowPassphrase(true)
+            }}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Share2 size={16} />
+            Compartir
+          </button>
+          <button
             onClick={() => navigate('/teams/recruitment/new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
@@ -144,6 +162,38 @@ export function RecruitmentPage() {
           </button>
         </div>
       </div>
+
+      {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
+          <code className="flex-1 text-xs bg-neutral-5 dark:bg-neutral-85 px-3 py-1.5 rounded-lg text-neutral-70 dark:text-neutral-30 truncate font-mono min-w-0">{cleanUrl}</code>
+          <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+            {copied ? 'Copiado' : 'Copiar'}
+          </button>
+        </div>
+      )})()}
+
+      {showPassphrase && (
+        <PassphraseModal
+          title="Proteger enlace compartido"
+          buttonLabel="Proteger"
+          description="Opcional: agrega una contraseña para cifrar los datos de los candidatos."
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'recruitment', undefined, payload)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onSkip={async () => {
+            const data = sharePending
+            const { url } = await createShareLink(48, 'recruitment', undefined, data)
+            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
 
       <div className="grid grid-cols-4 gap-4">
         <StatCard

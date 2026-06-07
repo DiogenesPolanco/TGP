@@ -3,7 +3,7 @@ import { db } from '@/services/db/database'
 const SHARED_LINKS_KEY = 'tgp-shared-links'
 const AZURE_LINKS_KEY = 'tgp-azure-links'
 
-type ShareType = 'dashboard' | 'performance' | 'member' | 'members'
+type ShareType = 'dashboard' | 'performance' | 'member' | 'members' | 'recruitment'
 
 interface SharedLink {
   hash: string
@@ -197,6 +197,17 @@ export async function getPublicMemberData(memberId: string) {
 }
 
 export type PublicMemberData = Awaited<ReturnType<typeof getPublicMemberData>>
+
+export async function getPublicRecruitmentData() {
+  const [candidates, technologies, evaluations] = await Promise.all([
+    db.candidates.orderBy('createdAt').reverse().toArray(),
+    db.candidateTechnologies.toArray(),
+    db.candidateEvaluations.toArray(),
+  ])
+  return { candidates, technologies, evaluations }
+}
+
+export type PublicRecruitmentData = Awaited<ReturnType<typeof getPublicRecruitmentData>>
 
 export async function fetchAzureShareData<T = unknown>(hash: string): Promise<T | null> {
   try {

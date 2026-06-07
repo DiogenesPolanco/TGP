@@ -103,12 +103,12 @@ export function CandidateDetailPage() {
           {team && <InfoRow icon={<UserCheck size={16} />} label="Equipo" value={team.name} />}
         </div>
 
-        {candidate.comments && (
-          <div className="pt-4 border-t border-neutral-20 dark:border-neutral-70">
-            <p className="text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">Comentarios</p>
-            <p className="text-sm text-neutral-60 leading-relaxed whitespace-pre-wrap">{candidate.comments}</p>
-          </div>
-        )}
+          {candidate.comments && (
+            <div className="pt-4 border-t border-neutral-20 dark:border-neutral-70">
+              <p className="text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">Comentarios</p>
+              <div className="text-sm text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: candidate.comments }} />
+            </div>
+          )}
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
