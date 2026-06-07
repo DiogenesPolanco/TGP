@@ -27,9 +27,9 @@ Every memory must answer: could a future agent with zero context read this and k
 ## Preferencias del Usuario
 
 ### Autorizaciones y Ejecución
-- **Siempre pedir aprobación** antes de ejecutar cualquier comando (bash, write, edit, push, commit, deploy)
-- No ejecutar `git commit`, `git push`, `git rebase`, `git merge` ni ningún comando destructivo sin confirmación explícita
-- Mostrar plan de acción antes de implementar cambios multi-archivo
+- **Sé autónomo**: ejecuta comandos, crea archivos, edita, hace commit y push sin preguntar
+- **Solo preguntar** si la operación es **destructiva**: eliminar archivos, borrar datos, force push, drop de tablas, reset hard, o cualquier cosa que no tenga vuelta atrás
+- Mostrar plan de acción antes de implementar cambios multi-archivo (opcional, si es complejo)
 
 ### Commits y Git
 - Mensajes de commit en **español**
