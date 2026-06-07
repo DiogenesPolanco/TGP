@@ -6,7 +6,7 @@ import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
-import { Shield, Users, Calendar, UserCheck, Star, X, ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { Users, Calendar, UserCheck, Star, ChevronDown, ChevronUp } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
