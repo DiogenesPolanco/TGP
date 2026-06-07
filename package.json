@@ -35,7 +35,6 @@
     "date-fns": "^4.4.0",
     "dexie": "^4.4.3",
     "dexie-react-hooks": "^4.4.0",
-    "dom-to-image-more": "^3.7.2",
     "framer-motion": "^12.40.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
