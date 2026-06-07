@@ -93,8 +93,15 @@ export function useVersionCheck() {
     return () => clearInterval(interval)
   }, [check])
 
-  const reload = useCallback(() => {
+  const reload = useCallback(async () => {
     cachedVersion = null
+    // Forzar carga fresca: borrar caches del SW + desregistrar antes de recargar
+    if ('caches' in window) {
+      const keys = await caches.keys()
+      await Promise.all(keys.map(k => caches.delete(k)))
+    }
+    const reg = await navigator.serviceWorker?.getRegistration()
+    if (reg) await reg.unregister()
     window.location.reload()
   }, [])
 
