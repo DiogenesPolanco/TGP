@@ -41,8 +41,8 @@ export const useAppStore = create<AppState>()(
       addNotification: (notification) =>
         set((state) => ({
           notifications: [
-            ...state.notifications,
-            { ...notification, id: crypto.randomUUID() },
+            ...state.notifications.slice(-4),
+            { ...notification, duration: notification.duration ?? 4000, id: crypto.randomUUID() },
           ],
         })),
       removeNotification: (id) =>

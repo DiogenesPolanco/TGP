@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { CheckCircle, AlertTriangle, XCircle, Info, X } from 'lucide-react'
 
@@ -9,45 +9,28 @@ const iconMap = {
   info: Info,
 }
 
-const styles = {
-  success: {
-    bg: 'bg-success',
-    border: 'border-emerald-700',
-    text: 'text-white',
-    iconColor: 'text-white',
-  },
-  warning: {
-    bg: 'bg-warning',
-    border: 'border-amber-700',
-    text: 'text-white',
-    iconColor: 'text-white',
-  },
-  error: {
-    bg: 'bg-danger',
-    border: 'border-red-700',
-    text: 'text-white',
-    iconColor: 'text-white',
-  },
-  info: {
-    bg: 'bg-info',
-    border: 'border-blue-700',
-    text: 'text-white',
-    iconColor: 'text-white',
-  },
+const bgMap = {
+  success: 'bg-success',
+  warning: 'bg-warning',
+  error: 'bg-danger',
+  info: 'bg-info',
 }
+
+const MAX_TOASTS = 5
 
 export function NotificationToast() {
   const { notifications, removeNotification } = useAppStore()
+  const visible = notifications.slice(-MAX_TOASTS)
 
   if (notifications.length === 0) return null
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 w-full max-w-md pointer-events-none">
-      {notifications.map((notification) => (
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col-reverse items-end gap-2 pointer-events-none max-w-sm">
+      {visible.map((n) => (
         <ToastItem
-          key={notification.id}
-          notification={notification}
-          onRemove={() => removeNotification(notification.id)}
+          key={n.id}
+          notification={n}
+          onRemove={() => removeNotification(n.id)}
         />
       ))}
     </div>
@@ -62,52 +45,57 @@ function ToastItem({
   onRemove: () => void
 }) {
   const Icon = iconMap[notification.type]
+  const [exiting, setExiting] = useState(false)
   const [progress, setProgress] = useState(100)
-  const style = styles[notification.type]
-  const duration = notification.duration ?? 8000
+  const duration = notification.duration ?? 4000
+
+  const handleClose = useCallback(() => {
+    setExiting(true)
+    setTimeout(onRemove, 200)
+  }, [onRemove])
 
   useEffect(() => {
     const start = Date.now()
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       const elapsed = Date.now() - start
       const remaining = Math.max(0, 100 - (elapsed / duration) * 100)
       setProgress(remaining)
       if (elapsed >= duration) {
-        clearInterval(interval)
-        onRemove()
+        clearInterval(timer)
+        handleClose()
       }
-    }, 50)
-    return () => clearInterval(interval)
-  }, [duration, onRemove])
+    }, 100)
+    return () => clearInterval(timer)
+  }, [duration, handleClose])
 
   return (
     <div
       className={`
-        pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl border shadow-2xl
-        min-w-[320px] w-full
-        animate-slide-in
-        ${style.bg} ${style.text} ${style.border}
+        pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl shadow-xl border border-white/20
+        min-w-[300px] w-full transition-all duration-200 ease-in-out
+        ${bgMap[notification.type]} text-white
+        ${exiting ? 'opacity-0 scale-95 translate-x-4' : 'opacity-100 scale-100 translate-x-0'}
       `}
       role="alert"
     >
       <div className="shrink-0 mt-0.5">
-        <Icon size={20} className={style.iconColor} />
+        <Icon size={18} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold leading-snug">{notification.message}</p>
         <div className="mt-2 h-1 w-full rounded-full bg-white/30 overflow-hidden">
           <div
-            className="h-full rounded-full bg-white/70 transition-all duration-[50ms] linear"
+            className="h-full rounded-full bg-white/60 transition-all duration-100 linear"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
       <button
-        onClick={onRemove}
-        className="shrink-0 p-1 rounded-md hover:bg-white/20 transition-colors"
+        onClick={handleClose}
+        className="shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors"
         aria-label="Cerrar"
       >
-        <X size={16} />
+        <X size={14} />
       </button>
     </div>
   )
