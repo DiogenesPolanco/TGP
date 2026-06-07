@@ -19,6 +19,27 @@ function inlineComputedStyles(source: HTMLElement, target: HTMLElement) {
   }
 }
 
+async function inlineImagesAsBase64(root: HTMLElement) {
+  const imgs = [...root.querySelectorAll<HTMLImageElement>('img')]
+  await Promise.all(imgs.map(async (img) => {
+    const src = img.getAttribute('src') || img.src
+    if (!src || src.startsWith('data:')) return
+    try {
+      const absUrl = new URL(src, window.location.origin).href
+      const res = await fetch(absUrl)
+      const blob = await res.blob()
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(blob)
+      })
+      img.src = base64
+    } catch {
+      // ignore — keep original src if conversion fails
+    }
+  }))
+}
+
 export function PrintButton() {
   const [capturing, setCapturing] = useState(false)
 
@@ -28,12 +49,19 @@ export function PrintButton() {
 
     setCapturing(true)
     const noPrint = el.querySelectorAll<HTMLElement>('.no-print')
+    const watermark = el.querySelector<HTMLElement>('.print-watermark')
     try {
       noPrint.forEach((n) => n.style.display = 'none')
+      if (watermark) watermark.style.display = 'block'
 
       const clone = el.cloneNode(true) as HTMLElement
-      clone.querySelectorAll<HTMLElement>('.no-print').forEach((n) => n.remove())
       inlineComputedStyles(el, clone)
+      clone.querySelectorAll<HTMLElement>('.no-print').forEach((n) => n.remove())
+      await inlineImagesAsBase64(clone)
+
+      // Hide watermark again immediately (clone already has it visible)
+      if (watermark) watermark.style.display = 'none'
+      noPrint.forEach((n) => n.style.display = '')
 
       clone.style.position = 'fixed'
       clone.style.left = '0'
@@ -60,8 +88,7 @@ export function PrintButton() {
 
       document.body.removeChild(clone)
 
-      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
+      const svgData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
       const img = document.createElement('img')
       img.width = rect.width
       img.height = rect.height
@@ -70,22 +97,24 @@ export function PrintButton() {
         img.onload = () => resolve()
         img.onerror = () => reject(new Error('SVG render failed'))
       })
-      img.src = url
+      img.src = svgData
       await loaded
-      URL.revokeObjectURL(url)
 
       const ctx = canvas.getContext('2d')!
       ctx.scale(scale, scale)
       ctx.drawImage(img, 0, 0)
 
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve))
+      if (!blob) throw new Error('Canvas toBlob failed')
       const link = document.createElement('a')
       link.download = `tgp-reporte-${new Date().toISOString().split('T')[0]}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = URL.createObjectURL(blob)
       link.click()
+      URL.revokeObjectURL(link.href)
     } catch (err) {
       console.warn('[PrintButton] Error al capturar imagen:', err)
     } finally {
-      noPrint.forEach((n) => n.style.display = '')
+      if (watermark) watermark.style.display = 'none'
       setCapturing(false)
     }
   }
