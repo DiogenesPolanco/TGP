@@ -15,16 +15,19 @@ interface AppVersion {
 
 let cachedVersion: AppVersion | null = null
 
-async function fetchVersion(): Promise<AppVersion | null> {
+type FetchResult = AppVersion | 'network-error' | 'http-error'
+
+async function fetchVersion(): Promise<FetchResult> {
   try {
     const r = await fetch(`${VERSION_URL}?_=${Date.now()}`)
-    return r.ok ? r.json() : null
+    if (r.ok) return r.json()
+    return 'http-error'
   } catch {
-    return null
+    return 'network-error'
   }
 }
 
-function getBuildOverride(): AppVersion | null {
+function getBuildOverride(): FetchResult | null {
   const raw = localStorage.getItem(TEST_BUILD_KEY)
   if (!raw) return null
   try {
@@ -62,28 +65,37 @@ export function useVersionCheck() {
   }, [])
 
   const check = useCallback(async () => {
-    const v = getBuildOverride() ?? await fetchVersion()
+    const result = getBuildOverride() ?? await fetchVersion()
 
-    if (v) {
+    // Successful fetch
+    if (result && typeof result === 'object' && 'build' in result) {
       localStorage.removeItem(FAILURES_KEY)
       if (!cachedVersion) {
-        cachedVersion = v
-        setCurrentBuild(v.build)
+        cachedVersion = result
+        setCurrentBuild(result.build)
         return
       }
-      if (cachedVersion.build !== v.build) {
-        console.log('[VersionCheck] Nueva versión detectada:', v.build)
+      if (cachedVersion.build !== result.build) {
+        console.log('[VersionCheck] Nueva versión detectada:', result.build)
         markStale()
       }
       return
     }
 
+    // Network error (offline) — don't show stale, just wait silently
+    if (result === 'network-error') {
+      if (!navigator.onLine) return // offline, keep waiting
+      // Online but fetch failed — could be transient
+      return
+    }
+
+    // HTTP error (404/500) — server likely changed
     const failures = (parseInt(localStorage.getItem(FAILURES_KEY) ?? '0', 10)) + 1
     localStorage.setItem(FAILURES_KEY, String(failures))
     const buildStr = cachedVersion ? formatVersion(cachedVersion) : 'ninguna (primera carga)'
-    console.warn(`[VersionCheck] Intento ${failures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`)
+    console.warn(`[VersionCheck] Error HTTP ${failures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`)
 
-    if (cachedVersion || failures >= MAX_CONSECUTIVE_FAILURES) {
+    if (cachedVersion && failures >= MAX_CONSECUTIVE_FAILURES) {
       markStale()
     }
   }, [markStale])
