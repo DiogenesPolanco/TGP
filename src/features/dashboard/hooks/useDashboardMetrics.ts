@@ -96,6 +96,7 @@ export function useDashboardMetrics(): DashboardMetrics {
   const rawPlans = useLiveQuery(() => db.plans.toArray())
   const rawCommitments = useLiveQuery(() => db.commitments.toArray())
   const rawActivities = useLiveQuery(() => db.activities.toArray())
+  const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
   const rawHistory = useLiveQuery(() =>
     db.healthIndexHistory
       .orderBy('calculatedAt')
@@ -106,7 +107,7 @@ export function useDashboardMetrics(): DashboardMetrics {
 
   const loading = !rawApplications || !rawVulnerabilities || !rawIncidents || !rawRisks ||
     !rawAuditFindings || !rawTeams || !rawTechnologies || !rawBusinessUnits ||
-    !rawBlockers || !rawPlans || !rawCommitments || !rawActivities || !rawHistory
+    !rawBlockers || !rawPlans || !rawCommitments || !rawActivities || !rawMicroservices || !rawHistory
 
   const applications = useMemo(() => rawApplications ?? [], [rawApplications])
   const vulnerabilities = useMemo(() => rawVulnerabilities ?? [], [rawVulnerabilities])
@@ -120,6 +121,7 @@ export function useDashboardMetrics(): DashboardMetrics {
   const plans = useMemo(() => rawPlans ?? [], [rawPlans])
   const commitments = useMemo(() => rawCommitments ?? [], [rawCommitments])
   const activities = useMemo(() => rawActivities ?? [], [rawActivities])
+  const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
   const thiHistory = useMemo(() =>
     (rawHistory ?? [])
       .sort((a, b) => new Date(a.calculatedAt).getTime() - new Date(b.calculatedAt).getTime())
@@ -164,7 +166,11 @@ export function useDashboardMetrics(): DashboardMetrics {
     return due.getTime() === today.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
   }).length
 
-  const eolTechs = technologies.filter((t) => t.supportStatus === 'eol')
+  const usedTechIds = new Set([
+    ...applications.flatMap((a) => a.technologies),
+    ...microservices.flatMap((ms) => ms.technologies),
+  ])
+  const eolTechs = technologies.filter((t) => t.supportStatus === 'eol' && usedTechIds.has(t.id))
   const extendedTechs = technologies.filter((t) => t.supportStatus === 'extended')
 
   // --- Trends: compare current period vs previous equivalent period ---
