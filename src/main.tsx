@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { TermsPage, isTermsAccepted, acceptTerms } from '@/features/auth/pages/TermsPage'
+import { TermsDeclinedPage } from '@/features/auth/pages/TermsDeclinedPage'
 import { getSession } from '@/services/auth/authService'
 import { InactivityGuard } from '@/components/auth/InactivityGuard'
 import { ErrorBoundary } from '@/components/error/ErrorBoundary'
@@ -21,6 +23,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
   const [checking, setChecking] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
+  const [showTerms, setShowTerms] = useState<'loading' | 'terms' | 'declined' | 'done'>('loading')
 
   useEffect(() => {
     if (isPublicRoute()) {
@@ -30,6 +33,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     queueMicrotask(() => {
       const session = getSession()
       if (session) setAuthed(true)
+      setShowTerms(isTermsAccepted() ? 'done' : 'terms')
       setChecking(false)
     })
   }, [sessionExpired])
@@ -53,6 +57,22 @@ function AuthGate({ children }: { children: React.ReactNode }) {
         <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
       </div>
     )
+  }
+
+  if (!authed && showTerms === 'terms') {
+    return (
+      <TermsPage
+        onAccept={() => {
+          acceptTerms()
+          setShowTerms('done')
+        }}
+        onDecline={() => setShowTerms('declined')}
+      />
+    )
+  }
+
+  if (showTerms === 'declined') {
+    return <TermsDeclinedPage onBack={() => setShowTerms('terms')} />
   }
 
   if (!authed) {
