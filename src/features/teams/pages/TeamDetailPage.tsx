@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { TeamSprintsSection } from '@/features/teams/components/TeamSprintsSection'
-import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2, BarChart3, Eye } from 'lucide-react'
+import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2, BarChart3 } from 'lucide-react'
 
 type Tab = 'dora' | 'sprints'
 
@@ -131,7 +131,9 @@ export function TeamDetailPage() {
             <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
             <div className="space-y-2">
               {team.members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
+                <div key={member.id}
+                  onClick={() => navigate(`/teams/${team.id}/performance/${member.id}`)}
+                  className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group cursor-pointer hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                       <Users size={14} className="text-primary" />
@@ -144,14 +146,7 @@ export function TeamDetailPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
                     <button
-                      onClick={() => navigate(`/teams/${team.id}/performance/${member.id}`)}
-                      className="p-1 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Ver rendimiento"
-                    >
-                      <Eye size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleRemoveMember(member.id)}
+                      onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id) }}
                       className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
                       title="Eliminar miembro"
                     >
