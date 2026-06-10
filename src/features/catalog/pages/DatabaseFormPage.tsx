@@ -3,24 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
-import type { SupportStatus, EnvironmentType } from '@/constants/enums'
+import type { EnvironmentType } from '@/constants/enums'
 import type { DatabaseType } from '@/types/domain'
-import { ArrowLeft, Plus, X, Server, Box } from 'lucide-react'
+import { ArrowLeft, Plus, X, Server } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-
-const statusColors: Record<string, string> = {
-  active: 'border-success/30 bg-success/5 text-success',
-  extended: 'border-warning/30 bg-warning/5 text-warning',
-  eol: 'border-danger/30 bg-danger/5 text-danger',
-  unknown: 'border-neutral-30 bg-neutral-10 text-neutral-50',
-}
-
-const statusLabel: Record<SupportStatus, string> = {
-  active: 'Activo',
-  extended: 'S. Extendido',
-  eol: 'EOL',
-  unknown: '?',
-}
+import { TechSearch } from '@/components/ui/TechSearch'
 
 const dbTypeLabel: Record<DatabaseType, string> = {
   relational: 'Relacional',
@@ -72,7 +59,6 @@ export function DatabaseFormPage() {
   const { addNotification } = useAppStore()
   const application = useLiveQuery(() => (appId ? db.applications.get(appId) : undefined), [appId])
   const existing = useLiveQuery(() => (id ? db.appDatabases.get(id) : undefined), [id])
-  const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
   const microservices = useLiveQuery(
     () => (appId ? db.microservices.where('applicationId').equals(appId).toArray() : []),
     [appId],
@@ -89,9 +75,7 @@ export function DatabaseFormPage() {
   const [isManaged, setIsManaged] = useState(false)
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
   const [selectedMsIds, setSelectedMsIds] = useState<string[]>([])
-  const [techSearch, setTechSearch] = useState('')
   const [msSearch, setMsSearch] = useState('')
-  const [showTechDropdown, setShowTechDropdown] = useState(false)
   const [showMsDropdown, setShowMsDropdown] = useState(false)
 
   useEffect(() => {
@@ -115,25 +99,10 @@ export function DatabaseFormPage() {
   if (id && !existing) return <div className="p-6 text-neutral-50">Cargando...</div>
   if (!appId || !application) return <div className="p-6 text-neutral-50">Aplicación no encontrada</div>
 
-  const selectedTechs = allTechnologies.filter((t) => selectedTechIds.includes(t.id))
-  const availableTechs = allTechnologies.filter(
-    (t) => !selectedTechIds.includes(t.id) &&
-      (!techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase())),
-  )
   const availableMs = microservices.filter(
     (ms) => !selectedMsIds.includes(ms.id) &&
       (!msSearch || ms.name.toLowerCase().includes(msSearch.toLowerCase())),
   )
-
-  const addTechnology = (techId: string) => {
-    setSelectedTechIds((prev) => [...prev, techId])
-    setTechSearch('')
-    setShowTechDropdown(false)
-  }
-
-  const removeTechnology = (techId: string) => {
-    setSelectedTechIds((prev) => prev.filter((id) => id !== techId))
-  }
 
   const addMicroservice = (msId: string) => {
     setSelectedMsIds((prev) => [...prev, msId])
@@ -354,69 +323,11 @@ export function DatabaseFormPage() {
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
             Tecnologías relacionadas <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
           </label>
-
-          <div className="flex flex-wrap gap-2 mb-2">
-            {selectedTechs.map((tech) => (
-              <span
-                key={tech.id}
-                className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${statusColors[tech.supportStatus]}`}
-              >
-                <Box size={12} />
-                {tech.name} {tech.version}
-                <button
-                  type="button"
-                  onClick={() => removeTechnology(tech.id)}
-                  className="ml-0.5 hover:opacity-70 transition-opacity"
-                >
-                  <X size={14} />
-                </button>
-              </span>
-            ))}
-            {selectedTechs.length === 0 && (
-              <span className="text-xs text-neutral-50 py-1">Ninguna tecnología seleccionada</span>
-            )}
-          </div>
-
-          <div className="relative">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar tecnología para asociar..."
-                value={techSearch}
-                onFocus={() => setShowTechDropdown(true)}
-                onChange={(e) => { setTechSearch(e.target.value); setShowTechDropdown(true) }}
-                className="w-full pl-8 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-              <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
-            </div>
-
-            {showTechDropdown && (
-              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                {availableTechs.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-neutral-50">
-                    {techSearch ? 'Sin resultados' : 'Todas las tecnologías ya están seleccionadas'}
-                  </p>
-                ) : (
-                  availableTechs.map((tech) => (
-                    <button
-                      key={tech.id}
-                      type="button"
-                      onClick={() => addTechnology(tech.id)}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-neutral-90 dark:text-white truncate">{tech.name}</span>
-                        <span className="text-neutral-50 shrink-0">{tech.version}</span>
-                      </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${statusColors[tech.supportStatus]}`}>
-                        {statusLabel[tech.supportStatus]}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
+          <TechSearch
+            selectedIds={selectedTechIds}
+            onChange={setSelectedTechIds}
+            enableDepsSearch={true}
+          />
         </div>
 
         {/* Microservices */}

@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Incident } from '@/types/domain'
 
 interface IncidentFormProps {
@@ -131,10 +132,9 @@ export function IncidentForm({ incident, onClose, onSave }: IncidentFormProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha detección</label>
-              <input
-                type="date"
+              <DatePicker
                 value={formData.detectedAt}
-                onChange={(e) => setFormData({ ...formData, detectedAt: e.target.value })}
+                onChange={(v) => setFormData({ ...formData, detectedAt: v })}
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>

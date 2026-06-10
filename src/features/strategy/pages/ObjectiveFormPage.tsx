@@ -6,6 +6,7 @@ import { Plus, ArrowLeft, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 export function ObjectiveFormPage() {
@@ -191,21 +192,19 @@ export function ObjectiveFormPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Inicio *</label>
-            <input
-              type="date"
+            <DatePicker
               required
               value={formData.periodStart}
-              onChange={(e) => setFormData({ ...formData, periodStart: e.target.value })}
+              onChange={(v) => setFormData({ ...formData, periodStart: v })}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fin *</label>
-            <input
-              type="date"
+            <DatePicker
               required
               value={formData.periodEnd}
-              onChange={(e) => setFormData({ ...formData, periodEnd: e.target.value })}
+              onChange={(v) => setFormData({ ...formData, periodEnd: v })}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

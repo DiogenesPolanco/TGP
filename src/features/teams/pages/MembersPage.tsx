@@ -6,7 +6,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import type { MemberStatus } from '@/types/domain'
 import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3, Share2, Check, Copy } from 'lucide-react'
-import { getGlobalMembersKPIs } from '@/services/performance/performanceService'
+import { getGlobalMembersKPIs, DEV_ROLES } from '@/services/performance/performanceService'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
@@ -56,9 +56,12 @@ export function MembersPage() {
 
   const filteredKpis = useMemo(() => {
     if (!globalData) return null
-    const filtered = filterTeam
-      ? globalData.kpisList.filter((k) => k.team.id === filterTeam)
-      : globalData.kpisList
+    // Filtra por equipo y solo roles de desarrollo para los indicadores
+    const filtered = globalData.kpisList.filter((k) => {
+      if (filterTeam && k.team.id !== filterTeam) return false
+      if (!DEV_ROLES.includes(k.member.role)) return false
+      return true
+    })
     const withSP = filtered.filter((k) => k.kpis.totalSP > 0)
     return {
       bestPerformer: withSP.length > 0

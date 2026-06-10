@@ -4,6 +4,7 @@ import type { OneOnOne, Oportunidad } from '@/types/domain'
 import { Plus, MessageSquare, Trash2, Target, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface Props {
   memberId: string
@@ -153,10 +154,9 @@ export function OneOnOneSection({ memberId }: Props) {
           <div className="grid gap-4 sm:grid-cols-3 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
-              <input
-                type="date"
+              <DatePicker
                 value={newMeeting.date}
-                onChange={(e) => setNewMeeting({ ...newMeeting, date: e.target.value })}
+                onChange={(v) => setNewMeeting({ ...newMeeting, date: v })}
                 className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
               />
             </div>
@@ -310,7 +310,7 @@ function MeetingCard({
         <div className="grid gap-3 sm:grid-cols-3 mb-3">
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
-            <input type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} className={inputClass} />
+            <DatePicker value={editData.date} onChange={(v) => setEditData({ ...editData, date: v })} className={inputClass} />
           </div>
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>

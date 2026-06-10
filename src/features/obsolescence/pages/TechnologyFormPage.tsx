@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { useAppStore } from '@/stores/appStore'
 import type { SupportStatus, TechCategory } from '@/types/domain'
 
@@ -69,7 +70,7 @@ export function TechnologyFormPage() {
             <select required value={formData.supportStatus} onChange={(e) => setFormData({ ...formData, supportStatus: e.target.value as SupportStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
               <option value="active">Activo</option><option value="extended">Soporte Extendido</option><option value="eol">EOL</option><option value="unknown">Desconocido</option>
             </select></div>
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label><input type="date" value={formData.eolDate} onChange={(e) => setFormData({ ...formData, eolDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label><DatePicker value={formData.eolDate} onChange={(v) => setFormData({ ...formData, eolDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">CVE(s) conocidos</label>

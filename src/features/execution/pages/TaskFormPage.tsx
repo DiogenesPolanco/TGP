@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { criticalityOptions, taskStatusOptions } from '@/constants/options'
 import type { Task, Criticality } from '@/types/domain'
 
@@ -30,7 +32,7 @@ export function TaskFormPage() {
   const plans = useLiveQuery(() => db.plans.toArray()) ?? []
   const activities = useLiveQuery(() => db.activities.toArray()) ?? []
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TaskFormData>()
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<TaskFormData>()
 
   useEffect(() => {
     if (task) {
@@ -131,9 +133,11 @@ export function TaskFormPage() {
             </select>
           </div>
           <div>
-            <Label>Asignado a</Label>
-            <input {...register('assigneeId')} placeholder="ID del usuario"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <PersonSelect
+              label="Asignado a"
+              value={watch('assigneeId')}
+              onChange={(id) => setValue('assigneeId', id)}
+            />
           </div>
           <div>
             <Label>Horas estimadas</Label>
@@ -142,7 +146,7 @@ export function TaskFormPage() {
           </div>
           <div>
             <Label>Fecha límite</Label>
-            <input type="date" {...register('dueDate')}
+            <DatePicker {...register('dueDate')}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>

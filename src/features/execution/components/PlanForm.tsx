@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Plan } from '@/types/domain'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
 
@@ -165,20 +166,18 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Inicio <span className="text-danger">*</span></label>
-            <input
-              type="date"
+            <DatePicker
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={setStartDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Fin <span className="text-danger">*</span></label>
-            <input
-              type="date"
+            <DatePicker
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={setEndDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

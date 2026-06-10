@@ -4,7 +4,7 @@ const API_BASE = 'https://api.deps.dev/v3'
 const CACHE_PREFIX = 'tgp-depsdev-cache-'
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000
 
-export type DepsSystem = 'npm' | 'maven' | 'nuget' | 'pypi' | 'go' | 'cargo'
+export type DepsSystem = 'npm' | 'maven' | 'nuget' | 'pypi' | 'go' | 'cargo' | 'wikidata'
 
 export const DEPS_SYSTEMS: { value: DepsSystem; label: string; placeholder: string }[] = [
   { value: 'npm', label: 'npm', placeholder: 'lodash@4.17.20' },
@@ -13,6 +13,7 @@ export const DEPS_SYSTEMS: { value: DepsSystem; label: string; placeholder: stri
   { value: 'pypi', label: 'PyPI', placeholder: 'requests@2.31.0' },
   { value: 'go', label: 'Go', placeholder: 'github.com/gin-gonic/gin@v1.9.1' },
   { value: 'cargo', label: 'Cargo', placeholder: 'serde@1.0.0' },
+  { value: 'wikidata', label: 'Wikidata', placeholder: 'buscar tecnología...' },
 ]
 
 export interface DepsAdvisory {

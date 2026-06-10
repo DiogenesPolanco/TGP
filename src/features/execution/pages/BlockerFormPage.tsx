@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Save } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { PersonSelect } from '@/components/ui/PersonSelect'
 
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -188,13 +189,10 @@ export function BlockerFormPage() {
           )}
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Asignado a</label>
-            <input
-              type="text"
+            <PersonSelect
+              label="Asignado a"
               value={assigneeId}
-              onChange={(e) => setAssigneeId(e.target.value)}
-              placeholder="userPrincipal de quien debe destrabar"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={setAssigneeId}
             />
           </div>
 

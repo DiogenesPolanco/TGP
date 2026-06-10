@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Commitment } from '@/types/domain'
 import type { CommitmentStatus } from '@/constants/enums'
 
@@ -49,8 +51,8 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
       const data = {
         title: title.trim(),
         description: description.trim(),
-        ownerId: ownerId.trim() || 'unknown',
-        accountableId: accountableId.trim() || 'unknown',
+        ownerId: ownerId || 'unknown',
+        accountableId: accountableId || 'unknown',
         teamId: teamId || null,
         applicationId: applicationId || null,
         objectiveId: objectiveId || null,
@@ -112,28 +114,20 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
-              Quien se compromete <span className="text-danger">*</span>
-            </label>
-            <input
-              type="text"
+            <PersonSelect
+              label="Quien se compromete"
               value={ownerId}
-              onChange={(e) => setOwnerId(e.target.value)}
-              placeholder="userPrincipal"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={setOwnerId}
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
-              Responsable (stakeholder) <span className="text-danger">*</span>
-            </label>
-            <input
-              type="text"
+            <PersonSelect
+              label="Responsable (stakeholder)"
               value={accountableId}
-              onChange={(e) => setAccountableId(e.target.value)}
-              placeholder="userPrincipal"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={setAccountableId}
+              required
             />
           </div>
 
@@ -200,10 +194,9 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
               Fecha compromiso <span className="text-danger">*</span>
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={commitmentDate}
-              onChange={(e) => setCommitmentDate(e.target.value)}
+              onChange={setCommitmentDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

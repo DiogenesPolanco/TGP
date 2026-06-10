@@ -5,6 +5,8 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
 
@@ -252,13 +254,10 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Asignado a</label>
-            <input
-              type="text"
+            <PersonSelect
+              label="Asignado a"
               value={assigneeId}
-              onChange={(e) => setAssigneeId(e.target.value)}
-              placeholder="userPrincipal"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={setAssigneeId}
             />
           </div>
 
@@ -302,20 +301,18 @@ export function ActivityFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Inicio</label>
-            <input
-              type="date"
+            <DatePicker
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={setStartDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Fin</label>
-            <input
-              type="date"
+            <DatePicker
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              onChange={setDueDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

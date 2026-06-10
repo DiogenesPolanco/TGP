@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
+import { PersonSelect } from '@/components/ui/PersonSelect'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Blocker } from '@/types/domain'
@@ -121,13 +122,10 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Asignado a</label>
-            <input
-              type="text"
+            <PersonSelect
+              label="Asignado a"
               value={assigneeId}
-              onChange={(e) => setAssigneeId(e.target.value)}
-              placeholder="userPrincipal de quien debe destrabar"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={setAssigneeId}
             />
           </div>
 

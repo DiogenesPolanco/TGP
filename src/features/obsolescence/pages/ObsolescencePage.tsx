@@ -16,6 +16,7 @@ import {
   Layers,
   Calendar,
   Shield,
+  Network,
 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import type { Technology, SupportStatus, TechCategory } from '@/types/domain'
@@ -267,6 +268,13 @@ export function ObsolescencePage() {
           >
             <Upload size={16} />
             Importar
+          </button>
+          <button
+            onClick={() => navigate('map')}
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            <Network size={16} />
+            Mapa de Obsolescencias
           </button>
           <button
             onClick={() => navigate('new')}

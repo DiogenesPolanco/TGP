@@ -5,6 +5,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, X, Save, ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
 
 const statusColors: Record<DeliverableStatus, string> = {
@@ -127,10 +128,9 @@ function DeliverableForm({
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Fecha límite</label>
-              <input
-                type="date"
+              <DatePicker
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={setDueDate}
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -237,10 +237,9 @@ function DeliverableRow({
             <option value="completed">Completado</option>
             <option value="cancelled">Cancelado</option>
           </select>
-          <input
-            type="date"
+          <DatePicker
             value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            onChange={setDueDate}
             className="px-2 py-1 text-xs rounded border border-neutral-30 dark:border-neutral-60 bg-transparent w-32"
           />
           <select

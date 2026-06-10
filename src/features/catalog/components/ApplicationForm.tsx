@@ -1,23 +1,13 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X, Plus, AlertTriangle } from 'lucide-react'
+import { useUserStore } from '@/stores/userStore'
+import { X } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { Application, Technology, SupportStatus } from '@/types/domain'
-
-const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-success/10 text-success border-success/30',
-  extended: 'bg-warning/10 text-warning border-warning/30',
-  eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
-}
-
-const statusLabel: Record<SupportStatus, string> = {
-  active: 'Activo',
-  extended: 'S. Extendido',
-  eol: 'EOL',
-  unknown: '?',
-}
+import { TechSearch } from '@/components/ui/TechSearch'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
+import type { Application } from '@/types/domain'
 
 interface ApplicationFormProps {
   application: Application | null
@@ -27,11 +17,13 @@ interface ApplicationFormProps {
 
 export function ApplicationForm({ application, onClose, onSave }: ApplicationFormProps) {
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
-  const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
+  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
+  const currentUser = useUserStore((s) => s.currentUser)
   const [formData, setFormData] = useState({
     name: application?.name ?? '',
     description: application?.description ?? '',
     ownerName: application?.ownerName ?? '',
+    ownerId: application?.ownerId ?? '',
     businessUnitId: application?.businessUnitId ?? '',
     criticality: application?.criticality ?? 'medium',
     architecture: application?.architecture ?? 'monolith',
@@ -39,24 +31,19 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
     supportEndDate: application?.supportEndDate ? new Date(application.supportEndDate).toISOString().split('T')[0] : '',
   })
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>(application?.technologies ?? [])
-  const [techSearch, setTechSearch] = useState('')
-  const [showTechDropdown, setShowTechDropdown] = useState(false)
 
-  const availableTechs = allTechnologies.filter(
-    (t) => !selectedTechIds.includes(t.id) &&
-      (!techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase()) || t.vendor.toLowerCase().includes(techSearch.toLowerCase()))
-  )
-
-  const selectedTechs = allTechnologies.filter((t) => selectedTechIds.includes(t.id))
-
-  const addTechnology = (tech: Technology) => {
-    setSelectedTechIds([...selectedTechIds, tech.id])
-    setTechSearch('')
-    setShowTechDropdown(false)
-  }
-
-  const removeTechnology = (techId: string) => {
-    setSelectedTechIds(selectedTechIds.filter((id) => id !== techId))
+  const handlePersonChange = (personId: string) => {
+    if (personId === '__me__') {
+      setFormData({ ...formData, ownerId: '__me__', ownerName: currentUser?.displayName ?? 'Yo' })
+    } else {
+      for (const team of teams) {
+        const member = team.members.find((m) => m.id === personId)
+        if (member) {
+          setFormData({ ...formData, ownerId: member.id, ownerName: member.displayName })
+          return
+        }
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,7 +51,7 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
     const data = {
       ...formData,
       supportEndDate: formData.supportEndDate ? new Date(formData.supportEndDate) : null,
-      ownerId: application?.ownerId ?? `user-${crypto.randomUUID()}`,
+      ownerId: formData.ownerId || `user-${crypto.randomUUID()}`,
       technologies: selectedTechIds,
       metadata: application?.metadata ?? {},
       createdAt: application?.createdAt ?? new Date(),
@@ -112,16 +99,12 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Owner *</label>
-            <input
-              type="text"
-              required
-              value={formData.ownerName}
-              onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
+          <PersonSelect
+            label="Owner"
+            value={formData.ownerId}
+            onChange={handlePersonChange}
+            required
+          />
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit *</label>
@@ -189,10 +172,9 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
 
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha fin soporte</label>
-              <input
-                type="date"
+              <DatePicker
                 value={formData.supportEndDate}
-                onChange={(e) => setFormData({ ...formData, supportEndDate: e.target.value })}
+                onChange={(v) => setFormData({ ...formData, supportEndDate: v })}
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -202,79 +184,11 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
               Tecnologías <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
             </label>
-
-            <div className="flex flex-wrap gap-2 mb-2">
-              {selectedTechs.map((tech) => (
-                <span
-                  key={tech.id}
-                  className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${statusColors[tech.supportStatus]}`}
-                >
-                  {tech.supportStatus === 'eol' && <AlertTriangle size={12} />}
-                  {tech.name} {tech.version}
-                  <button
-                    type="button"
-                    onClick={() => removeTechnology(tech.id)}
-                    className="ml-0.5 hover:opacity-70 transition-opacity"
-                  >
-                    <X size={14} />
-                  </button>
-                </span>
-              ))}
-              {selectedTechs.length === 0 && (
-                <span className="text-xs text-neutral-50 py-1">Ninguna tecnología seleccionada</span>
-              )}
-            </div>
-
-            <div className="relative">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Buscar tecnología para agregar..."
-                    value={techSearch}
-                    onFocus={() => setShowTechDropdown(true)}
-                    onChange={(e) => { setTechSearch(e.target.value); setShowTechDropdown(true) }}
-                    className="w-full pl-8 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                  <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
-                </div>
-              </div>
-
-              {showTechDropdown && (
-                <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                  {availableTechs.length === 0 ? (
-                    <p className="px-4 py-3 text-sm text-neutral-50">
-                      {techSearch ? 'Sin resultados' : 'Todas las tecnologías ya están seleccionadas'}
-                    </p>
-                  ) : (
-                    availableTechs.map((tech) => (
-                      <button
-                        key={tech.id}
-                        type="button"
-                        onClick={() => addTechnology(tech)}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-neutral-90 dark:text-white">{tech.name}</span>
-                          <span className="text-neutral-50">{tech.version}</span>
-                          <span className="text-xs text-neutral-50">({tech.vendor})</span>
-                        </div>
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[tech.supportStatus]}`}>
-                          {statusLabel[tech.supportStatus]}
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {selectedTechs.some((t) => t.supportStatus === 'eol') && (
-              <p className="text-xs text-danger mt-2 flex items-center gap-1">
-                <AlertTriangle size={12} />
-                Esta aplicación usa tecnologías EOL sin soporte
-              </p>
-            )}
+            <TechSearch
+              selectedIds={selectedTechIds}
+              onChange={setSelectedTechIds}
+              enableDepsSearch={true}
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

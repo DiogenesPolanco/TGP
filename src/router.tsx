@@ -50,6 +50,7 @@ export const router = createBrowserRouter([
       { path: 'catalog/applications/:id', lazy: () => import('@/features/catalog/pages/ApplicationDetailPage').then((m) => ({ Component: m.ApplicationDetailPage })) },
 
       { path: 'catalog/obsolescence', lazy: () => import('@/features/obsolescence/pages/ObsolescencePage').then((m) => ({ Component: m.ObsolescencePage })) },
+      { path: 'catalog/obsolescence/map', lazy: () => import('@/features/obsolescence/pages/ObsolescenceMapPage').then((m) => ({ Component: m.ObsolescenceMapPage })) },
       { path: 'catalog/obsolescence/new', lazy: () => import('@/features/obsolescence/pages/TechnologyFormPage').then((m) => ({ Component: m.TechnologyFormPage })) },
       { path: 'catalog/obsolescence/:id/edit', lazy: () => import('@/features/obsolescence/pages/TechnologyFormPage').then((m) => ({ Component: m.TechnologyFormPage })) },
       { path: 'catalog/obsolescence/:id', lazy: () => import('@/features/obsolescence/pages/TechnologyDetailPage').then((m) => ({ Component: m.TechnologyDetailPage })) },

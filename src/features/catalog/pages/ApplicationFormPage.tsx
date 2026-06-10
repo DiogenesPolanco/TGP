@@ -3,9 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useUserStore } from '@/stores/userStore'
 import { ArrowLeft } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { TechSearch } from '@/components/ui/TechSearch'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
 
 export function ApplicationFormPage() {
@@ -14,11 +17,14 @@ export function ApplicationFormPage() {
   const { addNotification } = useAppStore()
   const application = useLiveQuery(() => (id ? db.applications.get(id) : undefined), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
+  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
+  const currentUser = useUserStore((s) => s.currentUser)
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     ownerName: '',
+    ownerId: application?.ownerId ?? '',
     businessUnitId: '',
     criticality: 'medium' as Criticality,
     architecture: 'monolith' as ArchitectureType,
@@ -27,6 +33,20 @@ export function ApplicationFormPage() {
   })
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
 
+  const handlePersonChange = (personId: string) => {
+    if (personId === '__me__') {
+      setFormData({ ...formData, ownerId: '__me__', ownerName: currentUser?.displayName ?? 'Yo' })
+    } else {
+      for (const team of teams) {
+        const member = team.members.find((m) => m.id === personId)
+        if (member) {
+          setFormData({ ...formData, ownerId: member.id, ownerName: member.displayName })
+          return
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     if (application) {
       queueMicrotask(() => {
@@ -34,6 +54,7 @@ export function ApplicationFormPage() {
           name: application.name ?? '',
           description: application.description ?? '',
           ownerName: application.ownerName ?? '',
+          ownerId: application.ownerId ?? '',
           businessUnitId: application.businessUnitId ?? '',
           criticality: application.criticality ?? 'medium',
           architecture: application.architecture ?? 'monolith',
@@ -52,7 +73,7 @@ export function ApplicationFormPage() {
     const data = {
       ...formData,
       supportEndDate: formData.supportEndDate ? new Date(formData.supportEndDate) : null,
-      ownerId: application?.ownerId ?? `user-${crypto.randomUUID()}`,
+      ownerId: formData.ownerId || `user-${crypto.randomUUID()}`,
       technologies: selectedTechIds,
       metadata: application?.metadata ?? {},
       createdAt: application?.createdAt ?? new Date(),
@@ -101,16 +122,12 @@ export function ApplicationFormPage() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Owner *</label>
-          <input
-            type="text"
-            required
-            value={formData.ownerName}
-            onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-        </div>
+        <PersonSelect
+          label="Owner"
+          value={formData.ownerId}
+          onChange={handlePersonChange}
+          required
+        />
 
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit *</label>
@@ -178,10 +195,9 @@ export function ApplicationFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha fin soporte</label>
-            <input
-              type="date"
+            <DatePicker
               value={formData.supportEndDate}
-              onChange={(e) => setFormData({ ...formData, supportEndDate: e.target.value })}
+              onChange={(v) => setFormData({ ...formData, supportEndDate: v })}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -195,6 +211,7 @@ export function ApplicationFormPage() {
             selectedIds={selectedTechIds}
             onChange={setSelectedTechIds}
             placeholder="Buscar tecnología para agregar..."
+            enableDepsSearch={true}
           />
         </div>
 

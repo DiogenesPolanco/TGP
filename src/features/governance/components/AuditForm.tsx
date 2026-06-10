@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { AuditFinding } from '@/types/domain'
 
 interface AuditFormProps {
@@ -153,11 +154,10 @@ export function AuditForm({ finding, onClose, onSave }: AuditFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha vencimiento *</label>
-              <input
-                type="date"
+              <DatePicker
                 required
                 value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                onChange={(v) => setFormData({ ...formData, dueDate: v })}
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>

@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { PersonSelect } from '@/components/ui/PersonSelect'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -191,13 +192,10 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Asignado</label>
-                  <input
-                    type="text"
+                  <PersonSelect
+                    label="Asignado"
                     value={editAssigneeId}
-                    onChange={(e) => setEditAssigneeId(e.target.value)}
-                    placeholder="user"
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                    onChange={setEditAssigneeId}
                   />
                 </div>
               </div>

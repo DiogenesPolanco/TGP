@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import type { VacationRecord } from '@/types/domain'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { Plus, Trash2, Save, X, Umbrella, Calendar } from 'lucide-react'
 
 interface Props {
@@ -154,11 +155,11 @@ export function VacationsSection({ memberId }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-neutral-50 mb-1">Inicio</label>
-                <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                <DatePicker value={form.startDate} onChange={(v) => setForm({ ...form, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-neutral-50 mb-1">Fin</label>
-                <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                <DatePicker value={form.endDate} onChange={(v) => setForm({ ...form, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
               </div>
             </div>
             <div>
@@ -192,11 +193,11 @@ export function VacationsSection({ memberId }: Props) {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs text-neutral-50 mb-1">Inicio</label>
-                      <input type="date" value={editForm.startDate} onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                      <DatePicker value={editForm.startDate} onChange={(v) => setEditForm({ ...editForm, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs text-neutral-50 mb-1">Fin</label>
-                      <input type="date" value={editForm.endDate} onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                      <DatePicker value={editForm.endDate} onChange={(v) => setEditForm({ ...editForm, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
                     </div>
                   </div>
                   <input type="text" value={editForm.reason} onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />

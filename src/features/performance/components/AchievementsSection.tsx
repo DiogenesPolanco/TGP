@@ -4,6 +4,7 @@ import type { Achievement } from '@/types/domain'
 import { Plus, Award, Trophy, Star, BookOpen, TrendingUp, Trash2, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface Props {
   memberId: string
@@ -169,10 +170,9 @@ export function AchievementsSection({ memberId }: Props) {
           <div className="flex items-center gap-4 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
-              <input
-                type="date"
+              <DatePicker
                 value={newAchievement.date}
-                onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+                onChange={(v) => setNewAchievement({ ...newAchievement, date: v })}
                 className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
               />
             </div>
@@ -246,10 +246,9 @@ export function AchievementsSection({ memberId }: Props) {
                 <div className="flex items-center gap-4 mb-3">
                   <div>
                     <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
-                    <input
-                      type="date"
+                    <DatePicker
                       value={editData.date}
-                      onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                      onChange={(v) => setEditData({ ...editData, date: v })}
                       className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
                     />
                   </div>

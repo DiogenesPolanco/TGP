@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
 
 export function PlanFormPage() {
@@ -145,13 +146,13 @@ export function PlanFormPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha Inicio *</label>
-            <input type="date" required value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <DatePicker required value={formData.startDate} onChange={(v) => setFormData({ ...formData, startDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha Fin *</label>
-          <input type="date" required value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <DatePicker required value={formData.endDate} onChange={(v) => setFormData({ ...formData, endDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
         </div>
 
         <div className="flex justify-end gap-3 pt-4">

@@ -1,5 +1,8 @@
 import { db } from '@/services/db/database'
-import type { Team, TeamMember } from '@/types/domain'
+import type { Team, TeamMember, MemberRole } from '@/types/domain'
+
+/** Roles considerados para análisis de métricas y rendimiento */
+export const DEV_ROLES: MemberRole[] = ['developer', 'senior_developer', 'tech_lead']
 
 export interface MemberWithTeam {
   member: TeamMember
@@ -91,12 +94,13 @@ export async function getTeamPerformanceIndicators(team: Team): Promise<{
   topSP: { member: TeamMember; sp: number } | null
   bottomSP: { member: TeamMember; sp: number } | null
 }> {
-  if (!team.members || team.members.length === 0) {
+  const devMembers = team.members.filter((m) => DEV_ROLES.includes(m.role))
+  if (!devMembers || devMembers.length === 0) {
     return { bestPerformer: null, worstPerformer: null, topSP: null, bottomSP: null }
   }
 
   const kpisList = await Promise.all(
-    team.members.map(async (m) => {
+    devMembers.map(async (m) => {
       const kpis = await getMemberKPIs(m.id)
       kpis.memberName = m.displayName
       return { member: m, kpis }
@@ -146,7 +150,9 @@ export async function getGlobalMembersKPIs() {
     })
   )
 
-  const withSP = kpisList.filter((k) => k.kpis.totalSP > 0)
+  // Estadísticas solo con roles de desarrollo (dev, senior, tech lead)
+  const devKpis = kpisList.filter((k) => DEV_ROLES.includes(k.member.role))
+  const withSP = devKpis.filter((k) => k.kpis.totalSP > 0)
   const bestPerformer = withSP.length > 0
     ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
     : null
@@ -157,7 +163,7 @@ export async function getGlobalMembersKPIs() {
     ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
     : null
 
-  const withAttention = kpisList.filter((k) => k.kpis.attentionScore > 0)
+  const withAttention = devKpis.filter((k) => k.kpis.attentionScore > 0)
   const needsAttention = withAttention.length > 0
     ? withAttention.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
     : null

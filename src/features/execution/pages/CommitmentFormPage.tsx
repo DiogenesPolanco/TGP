@@ -5,6 +5,8 @@ import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { CommitmentStatus } from '@/constants/enums'
 
 const statusOptions: { value: CommitmentStatus; label: string }[] = [
@@ -65,8 +67,8 @@ export function CommitmentFormPage() {
     const data = {
       title: formData.title.trim(),
       description: formData.description.trim(),
-      ownerId: formData.ownerId.trim() || 'unknown',
-      accountableId: formData.accountableId.trim() || 'unknown',
+      ownerId: formData.ownerId || 'unknown',
+      accountableId: formData.accountableId || 'unknown',
       teamId: formData.teamId || null,
       applicationId: formData.applicationId || null,
       objectiveId: formData.objectiveId || null,
@@ -111,14 +113,18 @@ export function CommitmentFormPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Quien se compromete *</label>
-            <input type="text" required value={formData.ownerId} onChange={(e) => setFormData({ ...formData, ownerId: e.target.value })} placeholder="userPrincipal" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Responsable *</label>
-            <input type="text" required value={formData.accountableId} onChange={(e) => setFormData({ ...formData, accountableId: e.target.value })} placeholder="userPrincipal" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-          </div>
+          <PersonSelect
+            label="Quien se compromete"
+            value={formData.ownerId}
+            onChange={(id) => setFormData({ ...formData, ownerId: id })}
+            required
+          />
+          <PersonSelect
+            label="Responsable (stakeholder)"
+            value={formData.accountableId}
+            onChange={(id) => setFormData({ ...formData, accountableId: id })}
+            required
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -164,7 +170,7 @@ export function CommitmentFormPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha compromiso *</label>
-            <input type="date" required value={formData.commitmentDate} onChange={(e) => setFormData({ ...formData, commitmentDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <DatePicker required value={formData.commitmentDate} onChange={(v) => setFormData({ ...formData, commitmentDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
 

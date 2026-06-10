@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { Severity, AuditStatus, AuditCategory } from '@/types/domain'
 
 const CATEGORY_OPTIONS: { value: AuditCategory; label: string }[] = [
@@ -93,7 +94,7 @@ export function AuditFormPage() {
             <select required value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as AuditStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
               <option value="open">Abierto</option><option value="in_progress">En progreso</option><option value="overdue">Vencido</option><option value="resolved">Resuelto</option>
             </select></div>
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha límite</label><input type="date" value={formData.dueDate} onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha límite</label><DatePicker value={formData.dueDate} onChange={(v) => setFormData({ ...formData, dueDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Aplicación</label>

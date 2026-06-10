@@ -3,6 +3,7 @@ import { db } from '@/services/db/database'
 import type { TeamSprint, SprintRecord, TeamMember } from '@/types/domain'
 import { Plus, Trash2, Edit3, AlertTriangle, CheckCircle2, Loader2, Calendar } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface Props {
   teamId: string
@@ -291,19 +292,17 @@ export function TeamSprintsSection({ teamId, members }: Props) {
           <div className="grid gap-3 sm:grid-cols-2 mb-3">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha Inicio</label>
-              <input
-                type="date"
+              <DatePicker
                 value={form.startDate}
-                onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                onChange={(v) => setForm({ ...form, startDate: v })}
                 className={inputClass}
               />
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha Fin</label>
-              <input
-                type="date"
+              <DatePicker
                 value={form.endDate}
-                onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                onChange={(v) => setForm({ ...form, endDate: v })}
                 className={inputClass}
               />
             </div>

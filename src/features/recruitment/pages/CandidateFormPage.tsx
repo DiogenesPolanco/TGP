@@ -7,22 +7,10 @@ import { createCandidate, updateCandidate, getCandidate, getCandidateTechnologie
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
-import { Plus, X, ArrowLeft, AlertTriangle } from 'lucide-react'
-import type { SupportStatus, EvalCategory } from '@/types/domain'
-
-const statusLabel: Record<SupportStatus, string> = {
-  active: 'Activo',
-  extended: 'S. Extendido',
-  eol: 'EOL',
-  unknown: '?',
-}
-
-const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-success/10 text-success border-success/30',
-  extended: 'bg-warning/10 text-warning border-warning/30',
-  eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30',
-}
+import { ArrowLeft, AlertTriangle } from 'lucide-react'
+import { TechSearch } from '@/components/ui/TechSearch'
+import { DatePicker } from '@/components/ui/DatePicker'
+import type { EvalCategory } from '@/types/domain'
 
 export function CandidateFormPage() {
   const navigate = useNavigate()
@@ -45,8 +33,6 @@ export function CandidateFormPage() {
 
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
   const [techScores, setTechScores] = useState<Record<string, number>>({})
-  const [techSearch, setTechSearch] = useState('')
-  const [showTechDropdown, setShowTechDropdown] = useState(false)
 
   const [evalScores, setEvalScores] = useState<Record<EvalCategory, number>>(() =>
     Object.fromEntries(EVALUATION_CATEGORIES.map((c) => [c.key, 50])) as Record<EvalCategory, number>,
@@ -92,27 +78,9 @@ export function CandidateFormPage() {
     })()
   }, [isEdit, id, allTechnologies])
 
-  const addTechnology = (techId: string) => {
-    if (selectedTechIds.includes(techId)) return
-    setSelectedTechIds([...selectedTechIds, techId])
-    setTechScores({ ...techScores, [techId]: 50 })
-    setTechSearch('')
-  }
-
-  const removeTechnology = (techId: string) => {
-    setSelectedTechIds(selectedTechIds.filter((id) => id !== techId))
-    const { [techId]: _, ...rest } = techScores
-    setTechScores(rest)
-  }
-
   const updateScore = (techId: string, points: number) => {
     setTechScores({ ...techScores, [techId]: points })
   }
-
-  const availableTechs = allTechnologies.filter(
-    (t) => !selectedTechIds.includes(t.id) &&
-      (!techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase()) || t.vendor.toLowerCase().includes(techSearch.toLowerCase())),
-  )
 
   const selectedTechs = allTechnologies.filter((t) => selectedTechIds.includes(t.id))
 
@@ -199,7 +167,7 @@ export function CandidateFormPage() {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Fecha de Entrevista</label>
-            <input type="date" value={interviewDate} onChange={(e) => setInterviewDate(e.target.value)}
+            <DatePicker value={interviewDate} onChange={setInterviewDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
           <div className="space-y-1.5">
@@ -236,58 +204,22 @@ export function CandidateFormPage() {
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30">
             Tecnologías y Puntuación <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
           </label>
-
-          {selectedTechs.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-2">
-              {selectedTechs.map((tech) => (
-                <span key={tech.id} className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${statusColors[tech.supportStatus]}`}>
-                  {tech.supportStatus === 'eol' && <AlertTriangle size={12} />}
-                  {tech.name} {tech.version}
-                  <button type="button" onClick={() => removeTechnology(tech.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
-                    <X size={14} />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="relative">
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <input type="text" placeholder="Buscar tecnología para agregar..."
-                  value={techSearch}
-                  onFocus={() => setShowTechDropdown(true)}
-                  onChange={(e) => { setTechSearch(e.target.value); setShowTechDropdown(true) }}
-                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
-              </div>
-            </div>
-
-            {showTechDropdown && (
-              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                {availableTechs.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-neutral-50">
-                    {techSearch ? 'Sin resultados' : 'Todas las tecnologías ya están seleccionadas'}
-                  </p>
-                ) : (
-                  availableTechs.map((tech) => (
-                    <button key={tech.id} type="button"
-                      onClick={() => addTechnology(tech.id)}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
-                      <div className="flex items-center gap-2">
-                        <span className="text-neutral-90 dark:text-white">{tech.name}</span>
-                        <span className="text-neutral-50">{tech.version}</span>
-                        <span className="text-xs text-neutral-50">({tech.vendor})</span>
-                      </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[tech.supportStatus]}`}>
-                        {statusLabel[tech.supportStatus]}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
+          <TechSearch
+            selectedIds={selectedTechIds}
+            onChange={(ids) => {
+              // Initialize score for newly added technologies
+              const added = ids.filter(id => !selectedTechIds.includes(id))
+              if (added.length > 0) {
+                setTechScores(prev => {
+                  const next = { ...prev }
+                  for (const id of added) next[id] = 50
+                  return next
+                })
+              }
+              setSelectedTechIds(ids)
+            }}
+            enableDepsSearch={true}
+          />
 
           {selectedTechs.length > 0 && (
             <div className="space-y-3 pt-2">

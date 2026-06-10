@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { db } from '@/services/db/database'
 import type { Technology, TechCategory, SupportStatus } from '@/types/domain'
 
@@ -144,10 +145,9 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label>
-              <input
-                type="date"
+              <DatePicker
                 value={formData.eolDate}
-                onChange={(e) => setFormData({ ...formData, eolDate: e.target.value })}
+                onChange={(v) => setFormData({ ...formData, eolDate: v })}
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>

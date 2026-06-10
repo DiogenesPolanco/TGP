@@ -33,6 +33,8 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
   const [showDropdown, setShowDropdown] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
+  const queryRef = useRef('')
 
   // deps.dev state
   const [depsSystem, setDepsSystem] = useState<DepsSystem>('npm')
@@ -73,21 +75,74 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
   }
 
   const handleDepsSearch = async () => {
-    if (!query.trim() || depsSearching) return
+    const searchQuery = query.trim()
+    if (!searchQuery || depsSearching) return
+
+    // Cancel any in-flight request
+    if (abortRef.current) {
+      abortRef.current.abort()
+    }
+    abortRef.current = new AbortController()
+    const signal = abortRef.current.signal
+    queryRef.current = searchQuery
+
     setDepsSearching(true)
     setDepsError(null)
     setDepsResult(null)
+
+    // Wikidata search uses its own API
+    if (depsSystem === 'wikidata') {
+      try {
+        const res = await fetch(
+          `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(searchQuery)}&language=en&limit=10&format=json&origin=*`,
+          { signal },
+        )
+        const json = await res.json()
+        // Discard if query changed while fetching
+        if (queryRef.current !== searchQuery) return
+        const results = json.search ?? []
+        if (results.length > 0) {
+          setDepsResult({
+            system: 'wikidata',
+            name: results[0].label,
+            version: results[0].description ?? '',
+            description: results[0].description ?? '',
+            license: '',
+            advisories: [],
+            supportStatus: 'unknown',
+            cveList: [],
+            advisoryIds: [],
+          } as DepsPackageResult)
+        } else {
+          setDepsError(`No se encontró "${searchQuery}" en Wikidata`)
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setDepsError('Error al consultar Wikidata')
+      } finally {
+        if (queryRef.current === searchQuery) {
+          setDepsSearching(false)
+        }
+      }
+      return
+    }
+
     try {
-      const result = await lookupDepsPackage(query.trim(), depsSystem)
+      const result = await lookupDepsPackage(searchQuery, depsSystem)
+      // Discard if query changed while fetching
+      if (queryRef.current !== searchQuery) return
       if (result) {
         setDepsResult(result)
       } else {
-        setDepsError(`No se encontró "${query.trim()}" en ${DEPS_SYSTEMS.find((s) => s.value === depsSystem)?.label ?? depsSystem}`)
+        setDepsError(`No se encontró "${searchQuery}" en ${DEPS_SYSTEMS.find((s) => s.value === depsSystem)?.label ?? depsSystem}`)
       }
     } catch {
+      if (queryRef.current !== searchQuery) return
       setDepsError('Error al consultar deps.dev')
     } finally {
-      setDepsSearching(false)
+      if (queryRef.current === searchQuery) {
+        setDepsSearching(false)
+      }
     }
   }
 
@@ -199,8 +254,8 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
           })}
 
           {/* deps.dev section */}
-          {enableDepsSearch && (
-            <div className="border-t border-neutral-20 dark:border-neutral-70">
+          {enableDepsSearch && (depsSearching || depsResult || depsError || (results.length === 0 && query.trim() && !depsResult)) && (
+            <div className={`${results.length > 0 ? 'border-t border-neutral-20 dark:border-neutral-70' : ''}`}>
               {depsSearching ? (
                 <div className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-50">
                   <Loader2 size={14} className="animate-spin" />
