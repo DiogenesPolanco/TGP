@@ -109,6 +109,7 @@ export const router = createBrowserRouter([
 
       // Ejecución
       { path: 'execution/daily', lazy: () => import('@/features/execution/pages/DailyPage').then((m) => ({ Component: m.DailyPage })) },
+      { path: 'execution/timeline', lazy: () => import('@/features/execution/pages/ExecutiveTimelinePage').then((m) => ({ Component: m.ExecutiveTimelinePage })) },
 
       { path: 'execution/plans', lazy: () => import('@/features/execution/pages/PlansPage').then((m) => ({ Component: m.PlansPage })) },
       { path: 'execution/plans/new', lazy: () => import('@/features/execution/pages/PlanFormPage').then((m) => ({ Component: m.PlanFormPage })) },

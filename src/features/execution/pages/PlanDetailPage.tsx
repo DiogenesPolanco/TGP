@@ -1,48 +1,18 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { ArrowLeft, Plus, Pencil, Trash2, ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
+import { ActivityGantt } from '../components/ActivityGantt'
 import type { Activity } from '@/types/domain'
-import type { DeliverableStatus } from '@/constants/enums'
-
-const statusIcon: Record<DeliverableStatus, React.ReactNode> = {
-  pending: <Circle size={16} className="text-neutral-50" />,
-  in_progress: <Clock size={16} className="text-info" />,
-  completed: <CheckCircle2 size={16} className="text-success" />,
-  cancelled: <XCircle size={16} className="text-neutral-50" />,
-}
-
-const statusLabel: Record<DeliverableStatus, string> = {
-  pending: 'Pendiente',
-  in_progress: 'En Progreso',
-  completed: 'Completado',
-  cancelled: 'Cancelado',
-}
-
-const priorityColor: Record<string, string> = {
-  low: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60',
-  medium: 'bg-info/10 text-info',
-  high: 'bg-warning/10 text-warning',
-  critical: 'bg-danger/10 text-danger',
-}
-
-const priorityLabel: Record<string, string> = {
-  low: 'Baja',
-  medium: 'Media',
-  high: 'Alta',
-  critical: 'Crítica',
-}
 
 export function PlanDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { confirm } = useConfirm()
-
-  const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
 
   const plan = useLiveQuery(() => db.plans.get(id ?? ''), [id])
   const rawActivities = useLiveQuery(() => db.activities.where('planId').equals(id ?? '').toArray(), [id])
@@ -59,20 +29,7 @@ export function PlanDetailPage() {
   const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
   const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])
 
-  const rootActivities = activities.filter((a) => !a.parentActivityId)
   const childActivities = (parentId: string) => activities.filter((a) => a.parentActivityId === parentId)
-
-  const tasksByActivity = useMemo(() => {
-    const map = new Map<string, typeof tasks>()
-    for (const t of tasks) {
-      if (t.activityId) {
-        const existing = map.get(t.activityId) ?? []
-        existing.push(t)
-        map.set(t.activityId, existing)
-      }
-    }
-    return map
-  }, [tasks])
 
   const stats = useMemo(() => ({
     total: activities.length,
@@ -103,15 +60,6 @@ export function PlanDetailPage() {
       status: newStatus as 'todo' | 'done',
       completedAt: newStatus === 'done' ? new Date() : null,
       updatedAt: new Date(),
-    })
-  }
-
-  const toggleExpand = (id: string) => {
-    setExpandedActivities((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
     })
   }
 
@@ -215,165 +163,21 @@ export function PlanDetailPage() {
         <DependencyList planId={plan.id} />
       </div>
 
-      {/* Activities section */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
-          <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
-            Actividades ({rootActivities.length})
-          </h3>
-          <button
-            onClick={() => navigate(`/execution/plans/${plan.id}/activities/new`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-          >
-            <Plus size={16} />
-            Nueva Actividad
-          </button>
-        </div>
-
-        <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
-          {rootActivities.length === 0 ? (
-            <div className="p-8 text-center text-sm text-neutral-50">
-              No hay actividades. Crea la primera para empezar.
-            </div>
-          ) : (
-            rootActivities.map((activity) => (
-              <ActivityNode
-                key={activity.id}
-                activity={activity}
-                childActivities={childActivities(activity.id)}
-                tasks={tasksByActivity.get(activity.id) ?? []}
-                teamMap={teamMap}
-                appMap={appMap}
-                expanded={expandedActivities.has(activity.id)}
-                onToggle={() => toggleExpand(activity.id)}
-                onEdit={() => navigate(`/execution/plans/${plan.id}/activities/${activity.id}/edit`)}
-                onDelete={() => handleDeleteActivity(activity)}
-                onTaskToggle={handleTaskStatusToggle}
-              />
-            ))
-          )}
-        </div>
-      </div>
+      {/* Phase 4: Interactive Gantt Chart */}
+      <ActivityGantt
+        planId={plan.id}
+        activities={activities}
+        tasks={tasks}
+        teamMap={teamMap}
+        appMap={appMap}
+        onEditActivity={(activityId) => navigate(`/execution/plans/${plan.id}/activities/${activityId}/edit`)}
+        onDeleteActivity={handleDeleteActivity}
+        onTaskToggle={handleTaskStatusToggle}
+        onNewActivity={() => navigate(`/execution/plans/${plan.id}/activities/new`)}
+      />
 
     </div>
   )
 }
 
-function ActivityNode({
-  activity,
-  childActivities: children,
-  tasks,
-  teamMap,
-  appMap,
-  expanded,
-  onToggle,
-  onEdit,
-  onDelete,
-  onTaskToggle,
-}: {
-  activity: Activity
-  childActivities: Activity[]
-  tasks: { id: string; title: string; status: string }[]
-  teamMap: Map<string, { name: string }>
-  appMap: Map<string, { name: string }>
-  expanded: boolean
-  onToggle: () => void
-  onEdit: () => void
-  onDelete: () => void
-  onTaskToggle: (taskId: string, currentStatus: string) => void
-}) {
-  return (
-    <div className="group">
-      <div className="flex items-start justify-between px-6 py-4 hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          {statusIcon[activity.status]}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-neutral-90 dark:text-white">{activity.title}</span>
-              <span className={`text-xs px-1.5 py-0.5 rounded ${priorityColor[activity.priority]}`}>
-                {priorityLabel[activity.priority]}
-              </span>
-              <span className="text-xs text-neutral-50">{statusLabel[activity.status]}</span>
-            </div>
-            {activity.description && (
-              <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5 line-clamp-1">{activity.description}</p>
-            )}
-            <div className="flex items-center gap-3 mt-1 text-xs text-neutral-50">
-              {activity.assigneeId && <span>{activity.assigneeId}</span>}
-              {teamMap.get(activity.teamId ?? '') && <span>{teamMap.get(activity.teamId!)?.name}</span>}
-              {appMap.get(activity.applicationId ?? '') && <span>{appMap.get(activity.applicationId!)?.name}</span>}
-              {activity.plannedPoints && <span>{activity.plannedPoints} pts planif.</span>}
-              {activity.dueDate && (
-                <span className={new Date(activity.dueDate) < new Date() && activity.status !== 'completed' ? 'text-danger' : ''}>
-                  Vence: {new Date(activity.dueDate).toLocaleDateString('es-ES')}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-1 shrink-0 ml-4">
-          {children.length > 0 && (
-            <button onClick={onToggle} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
-              {expanded ? <ChevronUp size={16} className="text-neutral-50" /> : <ChevronDown size={16} className="text-neutral-50" />}
-            </button>
-          )}
-          <button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
-            <Pencil size={14} />
-          </button>
-          <button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger opacity-0 group-hover:opacity-100 transition-all">
-            <Trash2 size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Sub-activities */}
-      {expanded && children.length > 0 && (
-        <div className="ml-12 border-l-2 border-neutral-20 dark:border-neutral-70">
-          {children.map((child) => (
-            <div key={child.id} className="flex items-start justify-between px-6 py-3 hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {statusIcon[child.status]}
-                <div className="min-w-0">
-                  <span className="text-sm text-neutral-90 dark:text-white">{child.title}</span>
-                  <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${priorityColor[child.priority]}`}>
-                    {priorityLabel[child.priority]}
-                  </span>
-                  {child.assigneeId && <span className="ml-2 text-xs text-neutral-50">{child.assigneeId}</span>}
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0 ml-4 opacity-0 group-hover:opacity-100 transition-all">
-                <button onClick={onEdit} className="p-1 rounded text-neutral-50 hover:text-primary"><Pencil size={14} /></button>
-                <button onClick={onDelete} className="p-1 rounded text-neutral-50 hover:text-danger"><Trash2 size={14} /></button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Inline Tasks */}
-      {tasks.length > 0 && (
-        <div className="ml-12 pb-2">
-          {tasks.map((task) => (
-            <button
-              key={task.id}
-              onClick={() => onTaskToggle(task.id, task.status)}
-              className="flex items-center gap-2 px-6 py-1.5 w-full text-left hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group"
-            >
-              <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                task.status === 'done'
-                  ? 'bg-success border-success'
-                  : 'border-neutral-40 dark:border-neutral-50 group-hover:border-primary'
-              }`}>
-                {task.status === 'done' && <CheckCircle2 size={10} className="text-white" />}
-              </div>
-              <span className={`text-xs ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-neutral-70 dark:text-neutral-30'}`}>
-                {task.title}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}

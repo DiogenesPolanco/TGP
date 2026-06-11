@@ -8,6 +8,9 @@ import {
   Calendar, ListTodo, Ban, Target,
 } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
+import { PlanCard } from '../components/PlanCard'
+import { UpNextPanel } from '../components/UpNextPanel'
+import { WeeklyTimeline } from '../components/WeeklyTimeline'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -51,7 +54,7 @@ export function DailyPage() {
       return act ? planMap.get(act.planId) : undefined
     }
     if (blocker.sourceType === 'commitment') {
-      return undefined // commitments don't have a direct planId
+      return undefined
     }
     if (blocker.sourceType === 'task') {
       const task = tasks.find((t) => t.id === blocker.sourceId)
@@ -64,7 +67,6 @@ export function DailyPage() {
     const tomorrow = new Date(today)
     tomorrow.setDate(tomorrow.getDate() + 1)
 
-    // Activities due today or overdue
     const activitiesWithDue = activities.filter((a) => a.dueDate)
     const dueToday = activitiesWithDue.filter((a) => {
       const d = new Date(a.dueDate!)
@@ -77,7 +79,6 @@ export function DailyPage() {
       return d.getTime() < today.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
     })
 
-    // Commitments expiring soon (within 7 days)
     const activeCommitments = commitments.filter((c) => c.status === 'active' || c.status === 'at_risk')
     const commitmentsDueSoon = activeCommitments.filter((c) => {
       const d = new Date(c.commitmentDate)
@@ -91,10 +92,7 @@ export function DailyPage() {
       return d.getTime() < today.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
     })
 
-    // Active blockers
     const activeBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated')
-
-    // Tasks due today
     const tasksDue = tasks.filter((t) => {
       if (!t.dueDate || t.status === 'done') return false
       const d = new Date(t.dueDate)
@@ -102,7 +100,6 @@ export function DailyPage() {
       return d.getTime() <= today.getTime()
     })
 
-    // Plan progress
     const activePlans = plans.filter((p) => p.status === 'in_progress')
 
     return {
@@ -125,7 +122,7 @@ export function DailyPage() {
   const criticalBlockers = agenda.activeBlockers.filter((b) => b.severity === 'critical' || b.severity === 'high')
 
   return (
-    <><div className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -137,6 +134,13 @@ export function DailyPage() {
           </p>
         </div>
       </div>
+
+      {/* Phase 1.3: Weekly Timeline Roadmap */}
+      <WeeklyTimeline
+        activities={activities}
+        commitments={commitments}
+        today={today}
+      />
 
       {/* Stats bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -358,8 +362,17 @@ export function DailyPage() {
           )}
         </div>
 
-        {/* Right column: Plans overview */}
+        {/* Right column: Plans overview + Up Next */}
         <div className="space-y-4">
+          {/* Phase 1.2: Up Next Panel */}
+          <UpNextPanel
+            activities={activities}
+            plans={plans}
+            commitments={commitments}
+            today={today}
+          />
+
+          {/* Plans */}
           <h3 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider">
             Planes Activos
           </h3>
@@ -370,54 +383,23 @@ export function DailyPage() {
               <p className="text-sm text-neutral-50">No hay planes activos</p>
             </div>
           ) : (
-            agenda.activePlans.map((plan) => {
-              const planActivities = activities.filter((a) => a.planId === plan.id)
-              const completed = planActivities.filter((a) => a.status === 'completed').length
-              const total = planActivities.length
-              const healthColor = plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
-
-              const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
-              // eslint-disable-next-line react-hooks/purity
-              const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-              const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
-
-              return (
-                <div
-                  key={plan.id}
-                  className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer"
-                  onClick={() => navigate(`/execution/plans/${plan.id}`)}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-base font-semibold text-neutral-90 dark:text-white">{plan.title}</h4>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${healthColor}`} />
-                      <span className="text-xs text-neutral-50">
-                        {daysLeft > 0 ? `${daysLeft}d` : 'Vencido'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 mb-3">
-                    <div
-                      className={`h-2 rounded-full transition-all ${healthColor}`}
-                      style={{ width: `${Math.min(100, progress)}%` }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-neutral-60 dark:text-neutral-40">
-                    <span>{progress}% completo</span>
-                    <span>{completed}/{total} actividades</span>
-                      <span>{new Date(plan.startDate).toLocaleDateString('es-ES')} - {new Date(plan.endDate).toLocaleDateString('es-ES')}</span>
-                  </div>
-                </div>
-              )
-            })
+            <div className="space-y-4">
+              {agenda.activePlans.map((plan) => {
+                const planActivities = activities.filter((a) => a.planId === plan.id)
+                return (
+                  <PlanCard
+                    key={plan.id}
+                    plan={plan}
+                    activities={planActivities}
+                    today={today}
+                  />
+                )
+              })}
+            </div>
           )}
         </div>
       </div>
     </div>
-
-    </>
   )
 }
 

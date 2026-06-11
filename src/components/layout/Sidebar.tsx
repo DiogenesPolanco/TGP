@@ -32,6 +32,7 @@ const navItems: NavItem[] = [
     icon: <ClipboardList size={20} />,
     children: [
       { label: 'Seguimiento Diario', path: '/execution/daily' },
+      { label: 'Timeline Ejecutivo', path: '/execution/timeline' },
       { label: 'Planes', path: '/execution/plans' },
       { label: 'Compromisos', path: '/execution/commitments' },
       { label: 'Calendario', path: '/calendar' },
