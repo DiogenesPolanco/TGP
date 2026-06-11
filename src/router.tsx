@@ -5,6 +5,9 @@ import { PublicPerformancePage } from '@/features/share/PublicPerformancePage'
 import { PublicMemberPage } from '@/features/share/PublicMemberPage'
 import { PublicMembersOverviewPage } from '@/features/share/PublicMembersOverviewPage'
 import { PublicRecruitmentPage } from '@/features/share/PublicRecruitmentPage'
+import { PublicDailyPage } from '@/features/share/PublicDailyPage'
+import { PublicPlanPage } from '@/features/share/PublicPlanPage'
+import { PublicTimelinePage } from '@/features/share/PublicTimelinePage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
 
 export const router = createBrowserRouter([
@@ -27,6 +30,18 @@ export const router = createBrowserRouter([
   {
     path: '/public/recruitment/:hash',
     element: <PublicRecruitmentPage />,
+  },
+  {
+    path: '/public/daily/:hash',
+    element: <PublicDailyPage />,
+  },
+  {
+    path: '/public/plan/:hash',
+    element: <PublicPlanPage />,
+  },
+  {
+    path: '/public/timeline/:hash',
+    element: <PublicTimelinePage />,
   },
   {
     path: '/',

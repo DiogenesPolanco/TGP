@@ -5,10 +5,13 @@ import { db } from '@/services/db/database'
 import {
   Target, AlertTriangle, CheckCircle2, XCircle, PauseCircle, Clock,
   Calendar, ArrowRight, Users, Building2, Filter, ChevronLeft, ChevronRight,
-  AlertOctagon,
+  AlertOctagon, Share2, Copy, Check,
 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan, Activity, Blocker, Commitment } from '@/types/domain'
+import { createShareLink, getPublicTimelineData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   planned: { label: 'Planificado', color: 'text-info' },
@@ -28,9 +31,15 @@ export function ExecutiveTimelinePage() {
   const navigate = useNavigate()
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all')
+  const [healthFilter, setHealthFilter] = useState<'all' | 'green' | 'yellow' | 'red'>('all')
+  const [overdueFilter, setOverdueFilter] = useState(false)
   const [buFilter, setBuFilter] = useState<string>('all')
   const [teamFilter, setTeamFilter] = useState<string>('all')
   const [weekOffset, setWeekOffset] = useState(0)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<unknown>(null)
 
   // Data
   const rawPlans = useLiveQuery(() => db.plans.toArray())
@@ -56,11 +65,16 @@ export function ExecutiveTimelinePage() {
   const filteredPlans = useMemo(() => {
     return plans.filter((p) => {
       if (statusFilter !== 'all' && p.status !== statusFilter) return false
+      if (healthFilter !== 'all' && p.health !== healthFilter) return false
+      if (overdueFilter) {
+        if (p.status !== 'in_progress') return false
+        if (new Date(p.endDate) >= today) return false
+      }
       if (buFilter !== 'all' && p.businessUnitId !== buFilter) return false
       if (teamFilter !== 'all' && p.teamId !== teamFilter) return false
       return true
     })
-  }, [plans, statusFilter, buFilter, teamFilter])
+  }, [plans, statusFilter, healthFilter, overdueFilter, buFilter, teamFilter, today])
 
   // Timeline range
   const { timelineStart, timelineEnd, totalWeeks, weekWidth } = useMemo(() => {
@@ -166,6 +180,20 @@ export function ExecutiveTimelinePage() {
   const totalWidth = totalWeeks * weekWidth
   const dayWidth = weekWidth / 7
 
+  const handleShare = async () => {
+    const data = await getPublicTimelineData()
+    setSharePending(data)
+    setShowPassphrase(true)
+  }
+
+  const handleCopy = () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl.split('#')[0])
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -178,21 +206,73 @@ export function ExecutiveTimelinePage() {
             Visión consolidada de todos los planes
           </p>
         </div>
-        <button
-          onClick={() => navigate('/execution/plans/new')}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-        >
-          <Target size={16} />
-          Nuevo Plan
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
+            title="Compartir Timeline"
+          >
+            <Share2 size={16} />
+            Compartir
+          </button>
+          {shareUrl && (
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
+              title="Copiar enlace"
+            >
+              {copied ? <Check size={16} className="text-success" /> : <Copy size={16} />}
+              {copied ? 'Copiado' : 'Copiar'}
+            </button>
+          )}
+          <button
+            onClick={() => navigate('/execution/plans/new')}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+          >
+            <Target size={16} />
+            Nuevo Plan
+          </button>
+        </div>
       </div>
 
       {/* Stats summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatBox icon={<Target size={16} />} label="Total Planes" value={stats.total} color="text-primary" bg="bg-primary/10" />
-        <StatBox icon={<Clock size={16} />} label="Activos" value={stats.active} color="text-success" bg="bg-success/10" />
-        <StatBox icon={<AlertTriangle size={16} />} label="En Riesgo" value={stats.atRisk} color="text-warning" bg="bg-warning/10" />
-        <StatBox icon={<XCircle size={16} />} label="Vencidos" value={stats.overdue} color="text-danger" bg="bg-danger/10" />
+        <StatBox
+          icon={<Target size={16} />}
+          label="Total Planes"
+          value={stats.total}
+          color="text-primary"
+          bg="bg-primary/10"
+          active={statusFilter === 'all' && healthFilter === 'all' && !overdueFilter}
+          onClick={() => { setStatusFilter('all'); setHealthFilter('all'); setOverdueFilter(false) }}
+        />
+        <StatBox
+          icon={<Clock size={16} />}
+          label="Activos"
+          value={stats.active}
+          color="text-success"
+          bg="bg-success/10"
+          active={statusFilter === 'in_progress' && healthFilter === 'all' && !overdueFilter}
+          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('all'); setOverdueFilter(false) }}
+        />
+        <StatBox
+          icon={<AlertTriangle size={16} />}
+          label="En Riesgo"
+          value={stats.atRisk}
+          color="text-warning"
+          bg="bg-warning/10"
+          active={statusFilter === 'in_progress' && healthFilter !== 'all' && !overdueFilter}
+          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('red'); setOverdueFilter(false) }}
+        />
+        <StatBox
+          icon={<XCircle size={16} />}
+          label="Vencidos"
+          value={stats.overdue}
+          color="text-danger"
+          bg="bg-danger/10"
+          active={statusFilter === 'in_progress' && healthFilter === 'all' && overdueFilter}
+          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('all'); setOverdueFilter(true) }}
+        />
       </div>
 
       {/* Filters */}
@@ -481,18 +561,59 @@ export function ExecutiveTimelinePage() {
           )}
         </div>
       </div>
+
+      {showPassphrase && (
+        <PassphraseModal
+          title="Compartir Timeline Ejecutivo"
+          buttonLabel="Compartir"
+          description="Opcional: agrega una contraseña para cifrar los datos. Quien reciba el enlace necesitará la contraseña para verlos."
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'timeline', undefined, payload)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onSkip={async () => {
+            const data = sharePending
+            const { url } = await createShareLink(48, 'timeline', undefined, data)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
     </div>
   )
 }
 
-function StatBox({ icon, label, value, color, bg }: {
-  icon: React.ReactNode; label: string; value: number; color: string; bg: string
+function StatBox({ icon, label, value, color, bg, active, onClick }: {
+  icon: React.ReactNode; label: string; value: number; color: string; bg: string;
+  active?: boolean; onClick?: () => void
 }) {
+  if (!onClick) {
+    return (
+      <div className={`${bg} rounded-xl border border-neutral-20 dark:border-neutral-70 p-4`}>
+        <div className={`${color} mb-1`}>{icon}</div>
+        <p className={`text-2xl font-bold ${color}`}>{value}</p>
+        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      </div>
+    )
+  }
   return (
-    <div className={`${bg} rounded-xl border border-neutral-20 dark:border-neutral-70 p-4`}>
+    <button
+      onClick={onClick}
+      className={`${bg} rounded-xl border p-4 text-left cursor-pointer transition-all hover:shadow-md ${
+        active
+          ? 'border-neutral-60 dark:border-neutral-40 ring-2 ring-inset ring-neutral-50/30 dark:ring-neutral-30/30'
+          : 'border-neutral-20 dark:border-neutral-70 hover:border-neutral-40 dark:hover:border-neutral-50'
+      }`}
+    >
       <div className={`${color} mb-1`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </div>
+    </button>
   )
 }
