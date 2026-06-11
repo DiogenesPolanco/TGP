@@ -32,7 +32,7 @@ import type {
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes
-const SEEDED_FLAG = 'tgp-seeded-v2'
+const SEEDED_FLAG = 'tgp-seeded-v4'
 let seedingInProgress = false
 
 export async function seedDemoData(force = false) {
@@ -296,7 +296,102 @@ export async function seedDemoData(force = false) {
   ]
 
   const objectives: Objective[] = [
-    { id: 'obj-1', teamId: 'team-1', businessUnitId: 'bu-digital', title: 'Mejorar tiempo de entrega', description: 'Reducir lead time a menos de 24h', type: 'okr', periodStart: new Date('2024-01-01'), periodEnd: new Date('2024-03-31'), progress: 65, status: 'on_track', keyResults: [{ id: 'kr-1', title: 'Reducir lead time a < 24h', measure: 'hours', baseline: 48, target: 24, current: 30, status: 'on_track' }], metadata: {}, createdAt: new Date(), updatedAt: new Date() },
+    // ── TÉCNICOS: Mejora de procesos de ingeniería ──
+    {
+      id: 'obj-1', teamId: 'team-1', businessUnitId: 'bu-digital',
+      title: 'Mejorar eficiencia de entrega',
+      description: 'Reducir lead time, aumentar frecuencia de deploy y disminuir tasa de fallo en cambios',
+      type: 'okr', periodStart: new Date('2026-01-01'), periodEnd: new Date('2026-06-30'),
+      progress: 58, status: 'on_track',
+      keyResults: [
+        { id: 'kr-1', title: 'Reducir lead time a < 24h', measure: 'hours', baseline: 48, target: 24, current: 30, status: 'on_track' },
+        { id: 'kr-2', title: 'Aumentar deploys semanales a 5', measure: 'deploys/sem', baseline: 1, target: 5, current: 3, status: 'at_risk' },
+        { id: 'kr-3', title: 'Reducir tasa de fallo a < 5%', measure: '% fallo', baseline: 15, target: 5, current: 8, status: 'behind' },
+      ],
+      metadata: {}, createdAt: new Date('2025-12-15'), updatedAt: new Date(),
+    },
+    {
+      id: 'obj-tech-2', teamId: 'team-1', businessUnitId: 'bu-digital',
+      title: 'Cero vulnerabilidades críticas en producción',
+      description: 'Eliminar vulnerabilidades P1, automatizar escaneo de seguridad y alcanzar cobertura de SAST en CI/CD',
+      type: 'okr', periodStart: new Date('2026-04-01'), periodEnd: new Date('2026-09-30'),
+      progress: 45, status: 'at_risk',
+      keyResults: [
+        { id: 'kr-tech-2a', title: 'Corregir todas las vulnerabilidades P1 abiertas', measure: 'vulns', baseline: 12, target: 0, current: 3, status: 'on_track' },
+        { id: 'kr-tech-2b', title: 'Automatizar escaneo SAST en pipelines CI/CD', measure: '% repos', baseline: 30, target: 100, current: 60, status: 'on_track' },
+        { id: 'kr-tech-2c', title: 'Reducir ventana de exposición de vulns críticas', measure: 'hours', baseline: 72, target: 24, current: 48, status: 'behind' },
+      ],
+      metadata: {}, createdAt: new Date('2026-03-20'), updatedAt: new Date(),
+    },
+    {
+      id: 'obj-tech-3', teamId: 'team-2', businessUnitId: 'bu-core',
+      title: 'Modernización del stack tecnológico',
+      description: 'Migrar aplicaciones legacy, actualizar sistemas operativos y estandarizar bases de datos',
+      type: 'okr', periodStart: new Date('2026-01-01'), periodEnd: new Date('2026-12-31'),
+      progress: 30, status: 'at_risk',
+      keyResults: [
+        { id: 'kr-tech-3a', title: 'Migrar aplicaciones core a .NET 8', measure: 'apps', baseline: 0, target: 5, current: 2, status: 'at_risk' },
+        { id: 'kr-tech-3b', title: 'Actualizar servidores a Ubuntu 24.04 LTS', measure: '% servidores', baseline: 20, target: 100, current: 40, status: 'behind' },
+        { id: 'kr-tech-3c', title: 'Estandarizar PostgreSQL 16 en todos los entornos', measure: '% entornos', baseline: 10, target: 100, current: 30, status: 'on_track' },
+      ],
+      metadata: {}, createdAt: new Date('2025-12-01'), updatedAt: new Date(),
+    },
+
+    // ── NEGOCIO: Experiencia de cliente y procesos ──
+    {
+      id: 'obj-biz-1', teamId: null, businessUnitId: 'bu-legacy',
+      title: 'Mejorar experiencia digital del cliente',
+      description: 'Aumentar adopción de canales digitales, reducir tiempos de respuesta y mejorar NPS',
+      type: 'okr', periodStart: new Date('2026-04-01'), periodEnd: new Date('2026-09-30'),
+      progress: 35, status: 'at_risk',
+      keyResults: [
+        { id: 'kr-biz-1a', title: 'Aumentar adopción de app móvil en clientes activos', measure: '% adopción', baseline: 15, target: 40, current: 22, status: 'at_risk' },
+        { id: 'kr-biz-1b', title: 'Reducir tiempo de carga del portal a < 2s', measure: 'seconds', baseline: 4.5, target: 2, current: 3.2, status: 'on_track' },
+        { id: 'kr-biz-1c', title: 'Aumentar NPS digital de 65 a 80', measure: 'puntos NPS', baseline: 65, target: 80, current: 70, status: 'on_track' },
+      ],
+      metadata: {}, createdAt: new Date('2026-03-15'), updatedAt: new Date(),
+    },
+    {
+      id: 'obj-biz-2', teamId: 'team-2', businessUnitId: 'bu-core',
+      title: 'Optimizar procesos operativos del core bancario',
+      description: 'KPIs de eficiencia operativa: resolución de tickets, cumplimiento SLA y autoservicio',
+      type: 'kpi', periodStart: new Date('2026-01-01'), periodEnd: new Date('2026-12-31'),
+      progress: 72, status: 'on_track',
+      keyResults: [
+        { id: 'kr-biz-2a', title: 'Reducir tiempo promedio de resolución de tickets', measure: 'hours', baseline: 48, target: 24, current: 36, status: 'at_risk' },
+        { id: 'kr-biz-2b', title: 'Alcanzar 99% de cumplimiento SLA', measure: '% SLA', baseline: 85, target: 99, current: 92, status: 'on_track' },
+        { id: 'kr-biz-2c', title: 'Aumentar tasa de autoservicio en mesa de ayuda', measure: '% autoservicio', baseline: 20, target: 50, current: 30, status: 'on_track' },
+      ],
+      metadata: {}, createdAt: new Date('2025-12-20'), updatedAt: new Date(),
+    },
+
+    // ── PLATAFORMA: Disponibilidad, confiabilidad y SRE ──
+    {
+      id: 'obj-plat-1', teamId: 'team-2', businessUnitId: 'bu-core',
+      title: 'Garantizar disponibilidad y confiabilidad de la plataforma',
+      description: 'Alcanzar cuatro nueves de uptime, reducir MTTR e implementar DR multi-región',
+      type: 'okr', periodStart: new Date('2026-04-01'), periodEnd: new Date('2026-12-31'),
+      progress: 40, status: 'on_track',
+      keyResults: [
+        { id: 'kr-plat-1a', title: 'Alcanzar 99.99% de uptime en servicios críticos', measure: '% uptime', baseline: 99.95, target: 99.99, current: 99.97, status: 'on_track' },
+        { id: 'kr-plat-1b', title: 'Reducir MTTR a menos de 1 hora', measure: 'hours', baseline: 2.5, target: 1, current: 1.5, status: 'on_track' },
+        { id: 'kr-plat-1c', title: 'Implementar disaster recovery multi-región', measure: '% cobertura', baseline: 20, target: 100, current: 45, status: 'behind' },
+      ],
+      metadata: {}, createdAt: new Date('2026-03-01'), updatedAt: new Date(),
+    },
+    {
+      id: 'obj-plat-2', teamId: null, businessUnitId: 'bu-digital',
+      title: 'Adoptar prácticas SRE en todos los equipos de producto',
+      description: 'Scorecard balanceado de adopción SRE: definición de SLOs, SLIs, error budgets y runbooks',
+      type: 'balanced_scorecard', periodStart: new Date('2026-04-01'), periodEnd: new Date('2026-10-31'),
+      progress: 25, status: 'behind',
+      keyResults: [
+        { id: 'kr-plat-2a', title: 'Definir SLOs para todos los servicios críticos', measure: '% servicios', baseline: 0, target: 100, current: 60, status: 'on_track' },
+        { id: 'kr-plat-2b', title: 'Implementar dashboards de SLI en Grafana', measure: 'dashboards', baseline: 0, target: 8, current: 3, status: 'at_risk' },
+        { id: 'kr-plat-2c', title: 'Establecer error budgets por servicio', measure: '% servicios', baseline: 0, target: 100, current: 15, status: 'behind' },
+      ],
+      metadata: {}, createdAt: new Date('2026-03-25'), updatedAt: new Date(),
+    },
   ]
 
   const deliverables: Deliverable[] = [
@@ -384,55 +479,123 @@ export async function seedDemoData(force = false) {
     return d
   }
 
-  const plans: Plan[] = [
-    { id: 'plan-1', title: 'Q2 2026 — Modernizacion Core', description: 'Actualizacion de frameworks y migracion de BD del core bancario', teamId: 'team-1', businessUnitId: 'bu-core', objectiveId: 'obj-1', status: 'in_progress', health: 'yellow', startDate: ds(-45), endDate: ds(45), metadata: {}, createdAt: ds(-45), updatedAt: ds(-1) },
-    { id: 'plan-2', title: 'Q2 2026 — Seguridad', description: 'Correccion de vulnerabilidades y hardening de aplicaciones', teamId: 'team-2', businessUnitId: 'bu-digital', objectiveId: 'obj-1', status: 'in_progress', health: 'green', startDate: ds(-30), endDate: ds(60), metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
-    { id: 'plan-3', title: 'Migracion CRM — Planificacion', description: 'Plan de reemplazo del CRM legacy', teamId: 'team-2', businessUnitId: 'bu-legacy', objectiveId: null, status: 'planned', health: 'green', startDate: ds(15), endDate: ds(75), metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
-  ]
-
+  // ── Plan 1: Modernización Core (en progreso, yellow) ──
   const plan1Activities: Activity[] = [
-    { id: 'act-1', planId: 'plan-1', parentActivityId: null, title: 'Migrar Core Banking a .NET 8', description: 'Actualizar el framework del core bancario', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'critical', status: 'in_progress', estimatedHours: 80, actualHours: 45, plannedPoints: 21, completedPoints: null, startDate: ds(-40), dueDate: ds(20), completedAt: null, metadata: {}, createdAt: ds(-40), updatedAt: ds(-1) },
+    { id: 'act-1', planId: 'plan-1', parentActivityId: null, title: 'Migrar Core Banking a .NET 8', description: 'Actualizar el framework del core bancario de .NET 6 a .NET 8', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'critical', status: 'in_progress', estimatedHours: 80, actualHours: 45, plannedPoints: 21, completedPoints: 8, startDate: ds(-40), dueDate: ds(20), completedAt: null, metadata: {}, createdAt: ds(-40), updatedAt: ds(-1) },
     { id: 'act-2', planId: 'plan-1', parentActivityId: 'act-1', title: 'Actualizar dependencias NuGet', description: 'Actualizar paquetes a versiones compatibles con .NET 8', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'completed', estimatedHours: 16, actualHours: 14, plannedPoints: 5, completedPoints: 5, startDate: ds(-40), dueDate: ds(-15), completedAt: ds(-16), metadata: {}, createdAt: ds(-40), updatedAt: ds(-16) },
-    { id: 'act-3', planId: 'plan-1', parentActivityId: 'act-1', title: 'Migrar controladores MVC', description: 'Migrar todos los controladores a la nueva version', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'in_progress', estimatedHours: 32, actualHours: 20, plannedPoints: 8, completedPoints: null, startDate: ds(-30), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
-    { id: 'act-4', planId: 'plan-1', parentActivityId: null, title: 'Actualizar PostgreSQL 16', description: 'Migracion de base de datos', assigneeId: 'user-2', teamId: 'team-1', applicationId: 'app-1', priority: 'medium', status: 'in_progress', estimatedHours: 40, actualHours: 25, plannedPoints: 13, completedPoints: null, startDate: ds(-35), dueDate: ds(5), completedAt: null, metadata: {}, createdAt: ds(-35), updatedAt: ds(-1) },
-    { id: 'act-5', planId: 'plan-1', parentActivityId: null, title: 'Implementar OAuth2 en Portal', description: 'Migrar autenticacion a OAuth2 con Keycloak', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-2', priority: 'high', status: 'pending', estimatedHours: 24, actualHours: null, plannedPoints: 8, completedPoints: null, startDate: ds(1), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+    { id: 'act-3', planId: 'plan-1', parentActivityId: 'act-1', title: 'Migrar controladores MVC', description: 'Migrar todos los controladores a la nueva versión de ASP.NET Core', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'in_progress', estimatedHours: 32, actualHours: 20, plannedPoints: 8, completedPoints: 4, startDate: ds(-30), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
+    { id: 'act-18', planId: 'plan-1', parentActivityId: 'act-1', title: 'Migrar capa de datos a EF Core', description: 'Migrar la capa de acceso a datos de ADO.NET a Entity Framework Core', assigneeId: null, teamId: 'team-1', applicationId: 'app-1', priority: 'medium', status: 'pending', estimatedHours: 24, actualHours: null, plannedPoints: 8, completedPoints: null, startDate: ds(2), dueDate: ds(20), completedAt: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-5) },
+    { id: 'act-4', planId: 'plan-1', parentActivityId: null, title: 'Actualizar PostgreSQL 16', description: 'Migración de base de datos de PostgreSQL 14 a 16', assigneeId: 'user-2', teamId: 'team-1', applicationId: 'app-1', priority: 'medium', status: 'in_progress', estimatedHours: 40, actualHours: 25, plannedPoints: 13, completedPoints: 6, startDate: ds(-35), dueDate: ds(5), completedAt: null, metadata: {}, createdAt: ds(-35), updatedAt: ds(-1) },
+    { id: 'act-5', planId: 'plan-1', parentActivityId: null, title: 'Implementar OAuth2 en Portal', description: 'Migrar autenticación a OAuth2 con Keycloak — BLOQUEADO por certificado SSL vencido', assigneeId: 'user-1', teamId: 'team-1', applicationId: 'app-2', priority: 'high', status: 'pending', estimatedHours: 24, actualHours: null, plannedPoints: 8, completedPoints: null, startDate: ds(1), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+    { id: 'act-19', planId: 'plan-1', parentActivityId: null, title: 'Actualizar librerías de logging', description: 'Actualizar Serilog y NLog a versiones compatibles con .NET 8', assigneeId: 'user-3', teamId: 'team-1', applicationId: 'app-1', priority: 'low', status: 'completed', estimatedHours: 8, actualHours: 6, plannedPoints: 3, completedPoints: 3, startDate: ds(-45), dueDate: ds(-30), completedAt: ds(-31), metadata: {}, createdAt: ds(-45), updatedAt: ds(-31) },
+    { id: 'act-20', planId: 'plan-1', parentActivityId: null, title: 'Pruebas de integración del core', description: 'Suite completa de pruebas de integración post-migración', assigneeId: null, teamId: 'team-1', applicationId: 'app-1', priority: 'high', status: 'pending', estimatedHours: 40, actualHours: null, plannedPoints: 13, completedPoints: null, startDate: ds(15), dueDate: ds(45), completedAt: null, metadata: {}, createdAt: ds(-1), updatedAt: ds(-1) },
   ]
 
+  // ── Plan 2: Seguridad (en progreso, green) ──
   const plan2Activities: Activity[] = [
-    { id: 'act-6', planId: 'plan-2', parentActivityId: null, title: 'Auditoria de vulnerabilidades', description: 'Escaneo completo de vulnerabilidades en todas las apps', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'critical', status: 'completed', estimatedHours: 16, actualHours: 18, plannedPoints: 13, completedPoints: 13, startDate: ds(-20), dueDate: ds(-5), completedAt: ds(-6), metadata: {}, createdAt: ds(-20), updatedAt: ds(-6) },
-    { id: 'act-7', planId: 'plan-2', parentActivityId: null, title: 'Corregir XSS en formularios de busqueda', description: 'Sanitizar inputs en el portal clientes', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'high', status: 'in_progress', estimatedHours: 12, actualHours: 6, plannedPoints: 5, completedPoints: null, startDate: ds(-14), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-14), updatedAt: ds(-1) },
-    { id: 'act-8', planId: 'plan-2', parentActivityId: null, title: 'Implementar CSP headers', description: 'Agregar Content Security Policy headers', assigneeId: null, teamId: 'team-2', applicationId: 'app-2', priority: 'medium', status: 'pending', estimatedHours: 8, actualHours: null, plannedPoints: 3, completedPoints: null, startDate: ds(2), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-7), updatedAt: ds(-1) },
+    { id: 'act-6', planId: 'plan-2', parentActivityId: null, title: 'Auditoría de vulnerabilidades', description: 'Escaneo completo de vulnerabilidades en todas las apps del portafolio', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'critical', status: 'completed', estimatedHours: 16, actualHours: 18, plannedPoints: 13, completedPoints: 13, startDate: ds(-20), dueDate: ds(-5), completedAt: ds(-6), metadata: {}, createdAt: ds(-20), updatedAt: ds(-6) },
+    { id: 'act-7', planId: 'plan-2', parentActivityId: null, title: 'Corregir XSS en formularios de búsqueda', description: 'Sanitizar inputs en el portal clientes — VENCE HOY', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'high', status: 'in_progress', estimatedHours: 12, actualHours: 6, plannedPoints: 5, completedPoints: 2, startDate: ds(-14), dueDate: ds(0), completedAt: null, metadata: {}, createdAt: ds(-14), updatedAt: ds(-1) },
+    { id: 'act-8', planId: 'plan-2', parentActivityId: null, title: 'Implementar CSP headers', description: 'Agregar Content Security Policy headers a todas las respuestas HTTP', assigneeId: null, teamId: 'team-2', applicationId: 'app-2', priority: 'medium', status: 'pending', estimatedHours: 8, actualHours: null, plannedPoints: 3, completedPoints: null, startDate: ds(2), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-7), updatedAt: ds(-1) },
+    { id: 'act-21', planId: 'plan-2', parentActivityId: null, title: 'Implementar WAF en API Gateway', description: 'Configurar Web Application Firewall en el API Gateway del portal', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-2', priority: 'high', status: 'in_progress', estimatedHours: 20, actualHours: 8, plannedPoints: 8, completedPoints: 3, startDate: ds(-10), dueDate: ds(15), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+    { id: 'act-22', planId: 'plan-2', parentActivityId: null, title: 'Parchear servidores Ubuntu 20.04', description: 'Aplicar parches de seguridad críticos a servidores Ubuntu con CVE-2024-6387', assigneeId: 'user-5', teamId: 'team-2', applicationId: 'app-9', priority: 'critical', status: 'in_progress', estimatedHours: 16, actualHours: 4, plannedPoints: 5, completedPoints: 1, startDate: ds(-25), dueDate: ds(-3), completedAt: null, metadata: {}, createdAt: ds(-25), updatedAt: ds(-3) },
   ]
 
-  const allActivities = [...plan1Activities, ...plan2Activities]
+  // ── Plan 3: Migración CRM (planned, green) ──
+  const plan3Activities: Activity[] = [
+    { id: 'act-9', planId: 'plan-3', parentActivityId: null, title: 'Análisis de impacto y dependencias del CRM', description: 'Evaluar el impacto de migrar el CRM legacy al nuevo sistema', assigneeId: 'user-4', teamId: 'team-2', applicationId: 'app-5', priority: 'high', status: 'pending', estimatedHours: 24, actualHours: null, plannedPoints: 8, completedPoints: null, startDate: ds(15), dueDate: ds(30), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
+    { id: 'act-10', planId: 'plan-3', parentActivityId: null, title: 'Migración de datos a nuevo CRM', description: 'Migrar datos históricos del CRM legacy al nuevo sistema', assigneeId: null, teamId: 'team-2', applicationId: 'app-5', priority: 'critical', status: 'pending', estimatedHours: 80, actualHours: null, plannedPoints: 21, completedPoints: null, startDate: ds(30), dueDate: ds(60), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
+    { id: 'act-11', planId: 'plan-3', parentActivityId: null, title: 'Capacitación usuarios nuevo CRM', description: 'Entrenar a los usuarios finales en el nuevo sistema CRM', assigneeId: null, teamId: 'team-2', applicationId: 'app-5', priority: 'medium', status: 'pending', estimatedHours: 16, actualHours: null, plannedPoints: 5, completedPoints: null, startDate: ds(60), dueDate: ds(75), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
+  ]
 
+  // ── Plan 4: App Móvil (en progreso, red — en crisis) ──
+  const plan4Activities: Activity[] = [
+    { id: 'act-12', planId: 'plan-4', parentActivityId: null, title: 'Implementar modo offline', description: 'Soporte offline completo para la app móvil con sincronización', assigneeId: 'user-3', teamId: 'team-1', applicationId: 'app-3', priority: 'critical', status: 'in_progress', estimatedHours: 60, actualHours: 20, plannedPoints: 21, completedPoints: 5, startDate: ds(-15), dueDate: ds(30), completedAt: null, metadata: {}, createdAt: ds(-20), updatedAt: ds(-1) },
+    { id: 'act-23', planId: 'plan-4', parentActivityId: 'act-12', title: 'Diseñar esquema de caché local', description: 'Diseñar esquema de almacenamiento offline con IndexedDB', assigneeId: 'user-3', teamId: 'team-1', applicationId: 'app-3', priority: 'high', status: 'in_progress', estimatedHours: 12, actualHours: 10, plannedPoints: 5, completedPoints: 3, startDate: ds(-15), dueDate: ds(-5), completedAt: null, metadata: {}, createdAt: ds(-20), updatedAt: ds(-5) },
+    { id: 'act-24', planId: 'plan-4', parentActivityId: 'act-12', title: 'Implementar sincronización en segundo plano', description: 'Sincronización automática al recuperar conectividad', assigneeId: 'user-3', teamId: 'team-1', applicationId: 'app-3', priority: 'high', status: 'in_progress', estimatedHours: 24, actualHours: 8, plannedPoints: 8, completedPoints: 2, startDate: ds(-8), dueDate: ds(10), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+    { id: 'act-25', planId: 'plan-4', parentActivityId: 'act-12', title: 'Pruebas de sincronización offline', description: 'Suite de pruebas para el modo offline en múltiples escenarios de red', assigneeId: null, teamId: 'team-1', applicationId: 'app-3', priority: 'medium', status: 'pending', estimatedHours: 16, actualHours: null, plannedPoints: 5, completedPoints: null, startDate: ds(10), dueDate: ds(30), completedAt: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-5) },
+    { id: 'act-13', planId: 'plan-4', parentActivityId: null, title: 'Rediseño de navegación principal', description: 'Nuevo diseño de navegación con bottom tabs y gestos', assigneeId: 'user-3', teamId: 'team-1', applicationId: 'app-3', priority: 'high', status: 'in_progress', estimatedHours: 32, actualHours: 12, plannedPoints: 8, completedPoints: 3, startDate: ds(-10), dueDate: ds(-2), completedAt: null, metadata: {}, createdAt: ds(-15), updatedAt: ds(-2) },
+    { id: 'act-14', planId: 'plan-4', parentActivityId: null, title: 'Integración notificaciones push', description: 'Integrar Firebase Cloud Messaging para notificaciones push', assigneeId: null, teamId: 'team-1', applicationId: 'app-3', priority: 'medium', status: 'pending', estimatedHours: 16, actualHours: null, plannedPoints: 5, completedPoints: null, startDate: ds(10), dueDate: ds(45), completedAt: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+  ]
+
+  // ── Plan 5: Infraestructura (completado, green) ──
+  const plan5Activities: Activity[] = [
+    { id: 'act-15', planId: 'plan-5', parentActivityId: null, title: 'Migrar servidores a Ubuntu 24.04', description: 'Migración completa de servidores de Ubuntu 20.04 a 24.04 LTS', assigneeId: 'user-5', teamId: 'team-2', applicationId: 'app-9', priority: 'critical', status: 'completed', estimatedHours: 40, actualHours: 38, plannedPoints: 13, completedPoints: 13, startDate: ds(-90), dueDate: ds(-60), completedAt: ds(-61), metadata: {}, createdAt: ds(-90), updatedAt: ds(-61) },
+    { id: 'act-16', planId: 'plan-5', parentActivityId: null, title: 'Actualizar Kubernetes a 1.29', description: 'Upgrade del cluster Kubernetes de 1.27 a 1.29', assigneeId: 'user-2', teamId: 'team-2', applicationId: 'app-9', priority: 'high', status: 'completed', estimatedHours: 24, actualHours: 28, plannedPoints: 8, completedPoints: 8, startDate: ds(-80), dueDate: ds(-50), completedAt: ds(-51), metadata: {}, createdAt: ds(-80), updatedAt: ds(-51) },
+    { id: 'act-17', planId: 'plan-5', parentActivityId: null, title: 'Implementar monitoring con Prometheus', description: 'Desplegar stack Prometheus + Grafana para monitoreo de infraestructura', assigneeId: 'user-5', teamId: 'team-2', applicationId: 'app-9', priority: 'medium', status: 'completed', estimatedHours: 32, actualHours: 30, plannedPoints: 8, completedPoints: 8, startDate: ds(-60), dueDate: ds(-30), completedAt: ds(-31), metadata: {}, createdAt: ds(-60), updatedAt: ds(-31) },
+  ]
+
+  const allActivities = [
+    ...plan1Activities, ...plan2Activities,
+    ...plan3Activities, ...plan4Activities, ...plan5Activities,
+  ]
+
+  // ── Tasks ──
   const tasks: Task[] = [
-    { id: 'task-1', activityId: 'act-1', planId: 'plan-1', title: 'Evaluar cambios de version', description: '', assigneeId: 'user-1', status: 'done', priority: 'medium', estimatedHours: 4, dueDate: ds(-38), completedAt: ds(-39), dependsOn: [], metadata: {}, createdAt: ds(-40), updatedAt: ds(-39) },
-    { id: 'task-2', activityId: 'act-1', planId: 'plan-1', title: 'Actualizar Dockerfile a .NET 8 SDK', description: '', assigneeId: 'user-1', status: 'done', priority: 'high', estimatedHours: 2, dueDate: ds(-35), completedAt: ds(-36), dependsOn: [], metadata: {}, createdAt: ds(-40), updatedAt: ds(-36) },
-    { id: 'task-3', activityId: 'act-1', planId: 'plan-1', title: 'Verificar compatibilidad de paquetes', description: '', assigneeId: 'user-1', status: 'in_progress', priority: 'high', estimatedHours: 8, dueDate: ds(-1), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-30), updatedAt: ds(-2) },
-    { id: 'task-4', activityId: 'act-4', planId: 'plan-1', title: 'Hacer dump de BD actual', description: '', assigneeId: 'user-2', status: 'done', priority: 'critical', estimatedHours: 2, dueDate: ds(-30), completedAt: ds(-31), dependsOn: [], metadata: {}, createdAt: ds(-35), updatedAt: ds(-31) },
-    { id: 'task-5', activityId: 'act-4', planId: 'plan-1', title: 'Ejecutar pg_upgrade', description: '', assigneeId: 'user-2', status: 'todo', priority: 'critical', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-10), updatedAt: ds(-2) },
-    { id: 'task-6', activityId: 'act-7', planId: 'plan-2', title: 'Identificar endpoints vulnerables', description: '', assigneeId: 'user-2', status: 'done', priority: 'high', estimatedHours: 3, dueDate: ds(-10), completedAt: ds(-11), dependsOn: [], metadata: {}, createdAt: ds(-14), updatedAt: ds(-11) },
-    { id: 'task-7', activityId: 'act-7', planId: 'plan-2', title: 'Implementar sanitizacion en backend', description: '', assigneeId: 'user-2', status: 'in_progress', priority: 'high', estimatedHours: 6, dueDate: ds(0), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-10), updatedAt: ds(-2) },
-    { id: 'task-8', activityId: 'act-7', planId: 'plan-2', title: 'Agregar tests de seguridad', description: '', assigneeId: 'user-2', status: 'todo', priority: 'medium', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: [], metadata: {}, createdAt: ds(-7), updatedAt: ds(-2) },
+    { id: 'task-1', activityId: 'act-1', planId: 'plan-1', title: 'Evaluar cambios de versión .NET 8', description: 'Revisar breaking changes y planificar migración', assigneeId: 'user-1', status: 'done', priority: 'medium', estimatedHours: 4, dueDate: ds(-38), completedAt: ds(-39), dependsOn: [], metadata: {}, createdAt: ds(-40), updatedAt: ds(-39) },
+    { id: 'task-2', activityId: 'act-1', planId: 'plan-1', title: 'Actualizar Dockerfile a .NET 8 SDK', description: 'Cambiar imagen base en Dockerfile', assigneeId: 'user-1', status: 'done', priority: 'high', estimatedHours: 2, dueDate: ds(-35), completedAt: ds(-36), dependsOn: ['task-1'], metadata: {}, createdAt: ds(-40), updatedAt: ds(-36) },
+    { id: 'task-3', activityId: 'act-1', planId: 'plan-1', title: 'Verificar compatibilidad de paquetes NuGet', description: 'Validar que todos los paquetes tengan versión para .NET 8', assigneeId: 'user-1', status: 'in_progress', priority: 'high', estimatedHours: 8, dueDate: ds(-1), completedAt: null, dependsOn: ['task-2'], metadata: {}, createdAt: ds(-30), updatedAt: ds(-2) },
+    { id: 'task-4', activityId: 'act-4', planId: 'plan-1', title: 'Hacer dump de BD actual', description: 'Respaldar base de datos PostgreSQL 14 antes de migrar', assigneeId: 'user-2', status: 'done', priority: 'critical', estimatedHours: 2, dueDate: ds(-30), completedAt: ds(-31), dependsOn: [], metadata: {}, createdAt: ds(-35), updatedAt: ds(-31) },
+    { id: 'task-5', activityId: 'act-4', planId: 'plan-1', title: 'Ejecutar pg_upgrade en staging', description: 'Probar la migración en entorno de staging primero', assigneeId: 'user-2', status: 'done', priority: 'critical', estimatedHours: 4, dueDate: ds(-10), completedAt: ds(-11), dependsOn: ['task-4'], metadata: {}, createdAt: ds(-10), updatedAt: ds(-11) },
+    { id: 'task-5b', activityId: 'act-4', planId: 'plan-1', title: 'Ejecutar pg_upgrade en producción', description: 'Migrar base de datos de producción a PostgreSQL 16', assigneeId: 'user-2', status: 'todo', priority: 'critical', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: ['task-5'], metadata: {}, createdAt: ds(-10), updatedAt: ds(-2) },
+    { id: 'task-5c', activityId: 'act-4', planId: 'plan-1', title: 'Verificar integridad post-migración', description: 'Ejecutar scripts de validación de datos tras la migración', assigneeId: 'user-2', status: 'todo', priority: 'high', estimatedHours: 2, dueDate: ds(3), completedAt: null, dependsOn: ['task-5b'], metadata: {}, createdAt: ds(-5), updatedAt: ds(-5) },
+
+    { id: 'task-6', activityId: 'act-7', planId: 'plan-2', title: 'Identificar endpoints vulnerables', description: 'Mapear endpoints del portal que aceptan input de usuario', assigneeId: 'user-2', status: 'done', priority: 'high', estimatedHours: 3, dueDate: ds(-10), completedAt: ds(-11), dependsOn: [], metadata: {}, createdAt: ds(-14), updatedAt: ds(-11) },
+    { id: 'task-7', activityId: 'act-7', planId: 'plan-2', title: 'Implementar sanitización en backend XSS', description: 'Sanitizar inputs en todos los endpoints de búsqueda — VENCE HOY', assigneeId: 'user-2', status: 'in_progress', priority: 'high', estimatedHours: 6, dueDate: ds(0), completedAt: null, dependsOn: ['task-6'], metadata: {}, createdAt: ds(-10), updatedAt: ds(0) },
+    { id: 'task-7b', activityId: 'act-7', planId: 'plan-2', title: 'Validar formulario de login', description: 'Verificar que el formulario de login sanitiza correctamente', assigneeId: 'user-2', status: 'done', priority: 'medium', estimatedHours: 2, dueDate: ds(0), completedAt: ds(-1), dependsOn: [], metadata: {}, createdAt: ds(-3), updatedAt: ds(-1) },
+    { id: 'task-8', activityId: 'act-7', planId: 'plan-2', title: 'Agregar tests de seguridad XSS', description: 'Escribir tests automatizados para validar sanitización', assigneeId: 'user-2', status: 'todo', priority: 'medium', estimatedHours: 4, dueDate: ds(2), completedAt: null, dependsOn: ['task-7'], metadata: {}, createdAt: ds(-7), updatedAt: ds(-2) },
+    { id: 'task-22a', activityId: 'act-22', planId: 'plan-2', title: 'Evaluar parches disponibles', description: 'Revisar parches de seguridad para CVE-2024-6387', assigneeId: 'user-5', status: 'done', priority: 'critical', estimatedHours: 2, dueDate: ds(-20), completedAt: ds(-21), dependsOn: [], metadata: {}, createdAt: ds(-25), updatedAt: ds(-21) },
+    { id: 'task-22b', activityId: 'act-22', planId: 'plan-2', title: 'Aplicar parches en servidores staging', description: 'Probar parches en entorno de staging', assigneeId: 'user-5', status: 'in_progress', priority: 'critical', estimatedHours: 8, dueDate: ds(-5), completedAt: null, dependsOn: ['task-22a'], metadata: {}, createdAt: ds(-20), updatedAt: ds(-5) },
+    { id: 'task-22c', activityId: 'act-22', planId: 'plan-2', title: 'Aplicar parches en producción', description: 'Desplegar parches en servidores productivos', assigneeId: 'user-5', status: 'todo', priority: 'critical', estimatedHours: 6, dueDate: ds(2), completedAt: null, dependsOn: ['task-22b'], metadata: {}, createdAt: ds(-15), updatedAt: ds(-5) },
+
+    { id: 'task-12a', activityId: 'act-23', planId: 'plan-4', title: 'Definir schema IndexedDB para caché', description: 'Diseñar las tablas de almacenamiento offline', assigneeId: 'user-3', status: 'done', priority: 'high', estimatedHours: 4, dueDate: ds(-12), completedAt: ds(-13), dependsOn: [], metadata: {}, createdAt: ds(-15), updatedAt: ds(-13) },
+    { id: 'task-12b', activityId: 'act-23', planId: 'plan-4', title: 'Implementar service worker', description: 'Crear service worker para caché de assets y API — VENCE HOY', assigneeId: 'user-3', status: 'todo', priority: 'high', estimatedHours: 8, dueDate: ds(0), completedAt: null, dependsOn: ['task-12a'], metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+    { id: 'task-12c', activityId: 'act-24', planId: 'plan-4', title: 'Implementar cola de sincronización', description: 'Crear cola de operaciones pendientes para sincronizar al reconectar', assigneeId: 'user-3', status: 'todo', priority: 'high', estimatedHours: 12, dueDate: ds(8), completedAt: null, dependsOn: ['task-12b'], metadata: {}, createdAt: ds(-8), updatedAt: ds(-2) },
+    { id: 'task-13a', activityId: 'act-13', planId: 'plan-4', title: 'Diseñar prototipo navegación', description: 'Crear prototipo Figma de la nueva navegación con bottom tabs', assigneeId: 'user-3', status: 'done', priority: 'high', estimatedHours: 8, dueDate: ds(-8), completedAt: ds(-9), dependsOn: [], metadata: {}, createdAt: ds(-10), updatedAt: ds(-9) },
+    { id: 'task-13b', activityId: 'act-13', planId: 'plan-4', title: 'Implementar bottom tab navigator', description: 'Implementar navegación con tabs inferiores en React Native', assigneeId: 'user-3', status: 'in_progress', priority: 'high', estimatedHours: 16, dueDate: ds(-2), completedAt: null, dependsOn: ['task-13a'], metadata: {}, createdAt: ds(-8), updatedAt: ds(-2) },
+    { id: 'task-13c', activityId: 'act-13', planId: 'plan-4', title: 'Agregar gestos de navegación', description: 'Implementar gestos swipe entre tabs', assigneeId: 'user-3', status: 'todo', priority: 'medium', estimatedHours: 8, dueDate: ds(3), completedAt: null, dependsOn: ['task-13b'], metadata: {}, createdAt: ds(-5), updatedAt: ds(-2) },
   ]
 
+  // ── Commitments ──
   const commitments: Commitment[] = [
-    { id: 'comm-1', title: 'Entregar plan de migracion CRM', description: 'Documento con estrategia y cronograma', ownerId: 'user-4', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-5', objectiveId: null, deliverableId: 'del-6', status: 'active', commitmentDate: ds(3), fulfilledAt: null, metadata: {}, createdAt: ds(-20), updatedAt: ds(-5) },
-    { id: 'comm-2', title: 'Corregir vulnerabilidades criticas', description: 'Todas las vulnerabilidades P1 deben estar corregidas', ownerId: 'user-1', accountableId: 'user-2', teamId: 'team-1', applicationId: 'app-1', objectiveId: 'obj-1', deliverableId: null, status: 'at_risk', commitmentDate: ds(-2), fulfilledAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-3) },
-    { id: 'comm-3', title: 'Certificacion SSL renovada', description: 'Renovar certificados SSL del portal', ownerId: 'user-2', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-2', objectiveId: null, deliverableId: 'del-2', status: 'breached', commitmentDate: ds(-10), fulfilledAt: null, metadata: {}, createdAt: ds(-60), updatedAt: ds(-11) },
+    { id: 'comm-1', title: 'Entregar plan de migración CRM', description: 'Documento con estrategia y cronograma detallado de migración', ownerId: 'user-4', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-5', objectiveId: null, deliverableId: 'del-6', status: 'active', commitmentDate: ds(3), fulfilledAt: null, metadata: {}, createdAt: ds(-20), updatedAt: ds(-5) },
+    { id: 'comm-2', title: 'Corregir vulnerabilidades críticas', description: 'Todas las vulnerabilidades P1 deben estar corregidas antes del auditoría', ownerId: 'user-1', accountableId: 'user-2', teamId: 'team-1', applicationId: 'app-1', objectiveId: 'obj-1', deliverableId: null, status: 'at_risk', commitmentDate: ds(-1), fulfilledAt: null, metadata: {}, createdAt: ds(-30), updatedAt: ds(-3) },
+    { id: 'comm-3', title: 'Certificación SSL renovada', description: 'Renovar certificados SSL del portal de clientes (vencido)', ownerId: 'user-2', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-2', objectiveId: null, deliverableId: 'del-2', status: 'breached', commitmentDate: ds(-10), fulfilledAt: null, metadata: {}, createdAt: ds(-60), updatedAt: ds(-11) },
+    { id: 'comm-4', title: 'Migración a .NET 8 completada', description: 'Migrar el core bancario a .NET 8 exitosamente', ownerId: 'user-1', accountableId: 'user-1', teamId: 'team-1', applicationId: 'app-1', objectiveId: null, deliverableId: 'del-1', status: 'fulfilled', commitmentDate: ds(-30), fulfilledAt: ds(-35), metadata: {}, createdAt: ds(-60), updatedAt: ds(-35) },
+    { id: 'comm-5', title: 'Pruebas de seguridad de portal', description: 'Completar todas las pruebas de seguridad post-parche — VENCE HOY', ownerId: 'user-2', accountableId: 'user-1', teamId: 'team-2', applicationId: 'app-2', objectiveId: null, deliverableId: null, status: 'active', commitmentDate: ds(0), fulfilledAt: null, metadata: {}, createdAt: ds(-7), updatedAt: ds(-1) },
   ]
 
+  // ── Blockers ──
   const blockers: Blocker[] = [
-    { id: 'blk-1', sourceType: 'activity', sourceId: 'act-5', title: 'Certificado SSL vencido', description: 'El certificado SSL del portal de clientes vencio y debe ser renovado antes de implementar OAuth2', severity: 'high', status: 'open', raisedById: 'user-1', assigneeId: 'user-2', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-2) },
-    { id: 'blk-2', sourceType: 'activity', sourceId: 'act-4', title: 'Dependencia externa proveedor SMS', description: 'El proveedor de SMS no ha entregado las credenciales para el entorno de staging', severity: 'medium', status: 'open', raisedById: 'user-2', assigneeId: 'user-1', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-3), updatedAt: ds(-1) },
+    { id: 'blk-1', sourceType: 'activity', sourceId: 'act-5', title: 'Certificado SSL vencido', description: 'El certificado SSL del portal de clientes venció el mes pasado y debe ser renovado para implementar OAuth2', severity: 'high', status: 'open', raisedById: 'user-1', assigneeId: 'user-2', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-2) },
+    { id: 'blk-2', sourceType: 'activity', sourceId: 'act-4', title: 'Credenciales proveedor SMS no entregadas', description: 'El proveedor de SMS no ha entregado las credenciales para el entorno de staging de notificaciones', severity: 'medium', status: 'open', raisedById: 'user-2', assigneeId: 'user-1', escalatedAt: null, resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-3), updatedAt: ds(-1) },
+    { id: 'blk-3', sourceType: 'activity', sourceId: 'act-14', title: 'API de notificaciones push no disponible', description: 'Firebase Cloud Messaging no está configurado en el proyecto — se necesita acceso de admin', severity: 'high', status: 'escalated', raisedById: 'user-3', assigneeId: 'user-1', escalatedAt: ds(-2), resolvedAt: null, resolutionNotes: null, metadata: {}, createdAt: ds(-7), updatedAt: ds(-2) },
+    { id: 'blk-4', sourceType: 'activity', sourceId: 'act-22', title: 'Parche de kernel requiere reinicio', description: 'El parche de seguridad de Ubuntu requiere reinicio del servidor, coordinado con el equipo de operaciones para el fin de semana', severity: 'critical', status: 'resolved', raisedById: 'user-5', assigneeId: 'user-5', escalatedAt: null, resolvedAt: ds(-1), resolutionNotes: 'Reinicio programado realizado sin incidentes', metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
   ]
 
+  // ── Dependencies ──
+  const executionDependencies: Dependency[] = [
+    { id: 'depex-1', sourceType: 'activity', sourceId: 'act-5', targetType: 'blocker', targetId: 'blk-1', relationType: 'depends_on', description: 'OAuth2 bloqueado por certificado SSL vencido', status: 'active', expectedResolutionDate: ds(7), metadata: {}, createdAt: ds(-5), updatedAt: ds(-2) },
+    { id: 'depex-2', sourceType: 'activity', sourceId: 'act-24', targetType: 'activity', targetId: 'act-23', relationType: 'depends_on', description: 'Sincronización depende del diseño de caché local', status: 'active', expectedResolutionDate: ds(3), metadata: {}, createdAt: ds(-8), updatedAt: ds(-2) },
+    { id: 'depex-3', sourceType: 'activity', sourceId: 'act-25', targetType: 'activity', targetId: 'act-24', relationType: 'depends_on', description: 'Pruebas dependen de sincronización implementada', status: 'active', expectedResolutionDate: null, metadata: {}, createdAt: ds(-5), updatedAt: ds(-5) },
+    { id: 'depex-4', sourceType: 'activity', sourceId: 'act-14', targetType: 'activity', targetId: 'act-13', relationType: 'depends_on', description: 'Notificaciones push dependen del rediseño de navegación', status: 'active', expectedResolutionDate: null, metadata: {}, createdAt: ds(-10), updatedAt: ds(-1) },
+  ]
+
+  // ── Plans ──
+  const plans: Plan[] = [
+    { id: 'plan-1', title: 'Modernización Core Bancario',   description: 'Migración a .NET 8, PostgreSQL 16 y OAuth2 para el core bancario (Q2 2026)', teamId: 'team-1', businessUnitId: 'bu-core',    objectiveId: 'obj-1', status: 'in_progress', health: 'yellow', startDate: ds(-45), endDate: ds(45),  metadata: {}, createdAt: ds(-45), updatedAt: ds(-1) },
+    { id: 'plan-2', title: 'Seguridad y Hardening',         description: 'Corrección de vulnerabilidades, WAF, hardening de servidores (Q2 2026)',   teamId: 'team-2', businessUnitId: 'bu-digital', objectiveId: 'obj-1', status: 'in_progress', health: 'green',  startDate: ds(-30), endDate: ds(60),  metadata: {}, createdAt: ds(-30), updatedAt: ds(-1) },
+    { id: 'plan-3', title: 'Migración CRM Legacy',          description: 'Plan de reemplazo del CRM legacy (Q3 2026)',                               teamId: 'team-2', businessUnitId: 'bu-legacy',  objectiveId: null,      status: 'planned',     health: 'green',  startDate: ds(15),  endDate: ds(75),  metadata: {}, createdAt: ds(-10), updatedAt: ds(-10) },
+    { id: 'plan-4', title: 'App Móvil v2 — Offline First',  description: 'Soporte offline, sincronización y rediseño de navegación — EN RIESGO',    teamId: 'team-1', businessUnitId: 'bu-digital', objectiveId: null,      status: 'in_progress', health: 'red',    startDate: ds(-20), endDate: ds(50),  metadata: {}, createdAt: ds(-20), updatedAt: ds(-1) },
+    { id: 'plan-5', title: 'Actualización Infraestructura Q1', description: 'Migración Ubuntu 24.04, upgrade Kubernetes, stack Prometheus (Q1 2026)', teamId: 'team-2', businessUnitId: 'bu-core', objectiveId: null,      status: 'completed',   health: 'green',  startDate: ds(-90), endDate: ds(-30), metadata: {}, createdAt: ds(-90), updatedAt: ds(-31) },
+  ]
+
+  // Persist execution data
   await db.plans.bulkAdd(plans)
   await db.activities.bulkAdd(allActivities)
   await db.tasks.bulkAdd(tasks)
   await db.commitments.bulkAdd(commitments)
   await db.blockers.bulkAdd(blockers)
+  await db.dependencies.bulkAdd(executionDependencies)
 
   // ── Performance module seed data ──
   const ds2 = (offset: number) => {
