@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
@@ -32,7 +32,7 @@ export function TaskFormPage() {
   const plans = useLiveQuery(() => db.plans.toArray()) ?? []
   const activities = useLiveQuery(() => db.activities.toArray()) ?? []
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<TaskFormData>()
+  const { register, handleSubmit, reset, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<TaskFormData>()
 
   useEffect(() => {
     if (task) {
@@ -146,8 +146,14 @@ export function TaskFormPage() {
           </div>
           <div>
             <Label>Fecha límite</Label>
-            <DatePicker {...register('dueDate')}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker value={field.value} onChange={field.onChange}
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              )}
+            />
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
