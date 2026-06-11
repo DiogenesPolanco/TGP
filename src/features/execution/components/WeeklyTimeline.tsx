@@ -6,6 +6,8 @@ interface WeeklyTimelineProps {
   activities: Activity[]
   commitments: Commitment[]
   today: Date
+  selectedWeek: { start: Date; end: Date } | null
+  onWeekSelect: (week: { start: Date; end: Date } | null) => void
 }
 
 interface WeekBucket {
@@ -19,7 +21,7 @@ interface WeekBucket {
   isPast: boolean
 }
 
-export function WeeklyTimeline({ activities, commitments, today }: WeeklyTimelineProps) {
+export function WeeklyTimeline({ activities, commitments, today, selectedWeek, onWeekSelect }: WeeklyTimelineProps) {
   const [offset, setOffset] = useState(0)
 
   const weeks = useMemo(() => {
@@ -30,9 +32,11 @@ export function WeeklyTimeline({ activities, commitments, today }: WeeklyTimelin
 
   if (weeks.length === 0) return null
 
+  const isSelected = (week: WeekBucket) =>
+    selectedWeek && week.start.getTime() === selectedWeek.start.getTime()
+
   return (
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary" />
@@ -54,29 +58,32 @@ export function WeeklyTimeline({ activities, commitments, today }: WeeklyTimelin
         </div>
       </div>
 
-      {/* Week columns */}
       <div className="flex divide-x divide-neutral-20 dark:divide-neutral-70 overflow-x-auto">
         {weeks.map((week, i) => {
           const barHeight = Math.max(4, (week.count / maxCount) * 48)
           const isOverloaded = week.count > 3
+          const selected = isSelected(week)
 
           return (
-            <div
+            <button
               key={i}
-              className={`flex-1 min-w-[90px] px-3 py-4 flex flex-col items-center gap-2 transition-colors ${
-                week.isCurrent
-                  ? 'bg-primary/[0.03] dark:bg-primary/[0.06]'
-                  : week.isPast
-                    ? 'opacity-50'
-                    : 'hover:bg-neutral-10 dark:hover:bg-neutral-70/30'
+              onClick={() => onWeekSelect(selected ? null : { start: week.start, end: week.end })}
+              className={`flex-1 min-w-[90px] px-3 py-4 flex flex-col items-center gap-2 transition-all cursor-pointer ${
+                selected
+                  ? 'bg-primary/10 ring-2 ring-inset ring-primary'
+                  : week.isCurrent
+                    ? 'bg-primary/[0.03] dark:bg-primary/[0.06]'
+                    : week.isPast
+                      ? 'opacity-50'
+                      : 'hover:bg-neutral-10 dark:hover:bg-neutral-70/30'
               }`}
             >
-              {/* Week label */}
-              <span className="text-[11px] font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+              <span className={`text-[11px] font-semibold uppercase tracking-wider ${
+                selected ? 'text-primary' : 'text-neutral-60 dark:text-neutral-40'
+              }`}>
                 {week.shortLabel}
               </span>
 
-              {/* Bar chart */}
               <div className="flex items-end h-12 gap-[3px]">
                 <div
                   className={`w-4 rounded-t-sm transition-all duration-500 ${
@@ -96,14 +103,15 @@ export function WeeklyTimeline({ activities, commitments, today }: WeeklyTimelin
                 )}
               </div>
 
-              {/* Counts */}
               <div className="flex items-center gap-1.5">
                 <span className={`text-sm font-bold ${
-                  week.isPast
-                    ? 'text-neutral-40'
-                    : isOverloaded
-                      ? 'text-danger'
-                      : 'text-neutral-90 dark:text-white'
+                  selected
+                    ? 'text-primary'
+                    : week.isPast
+                      ? 'text-neutral-40'
+                      : isOverloaded
+                        ? 'text-danger'
+                        : 'text-neutral-90 dark:text-white'
                 }`}>
                   {week.count}
                 </span>
@@ -114,11 +122,10 @@ export function WeeklyTimeline({ activities, commitments, today }: WeeklyTimelin
                 )}
               </div>
 
-              {/* Date range */}
               <span className="text-[10px] text-neutral-50">
                 {week.start.getDate()}/{week.start.getMonth() + 1}
               </span>
-            </div>
+            </button>
           )
         })}
       </div>
@@ -135,16 +142,14 @@ function buildWeeks(
   const weeks: WeekBucket[] = []
   const now = new Date(today)
 
-  // Start from Monday of current week, then apply offset (in weeks)
   const dayOfWeek = now.getDay()
   const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
   now.setDate(now.getDate() + mondayOffset + offset * 7)
 
-  // Count items per week
   const countByWeek = new Map<string, { count: number; overdue: number }>()
 
   const incWeek = (date: Date, isOverdue: boolean) => {
-    const key = getWeekKey(date, dayOfWeek === 0 ? -6 : 1 - dayOfWeek, offset)
+    const key = getWeekKey(date)
     const entry = countByWeek.get(key) ?? { count: 0, overdue: 0 }
     entry.count++
     if (isOverdue) entry.overdue++
@@ -169,7 +174,6 @@ function buildWeeks(
     incWeek(d, diffDays < 0)
   }
 
-  // Build 8 weeks
   for (let w = 0; w < 8; w++) {
     const weekStart = new Date(now)
     weekStart.setDate(now.getDate() + w * 7)
@@ -206,7 +210,7 @@ function getMonday(date: Date): Date {
   return d
 }
 
-function getWeekKey(date: Date, baseOffset: number, totalOffset: number): string {
+function getWeekKey(date: Date): string {
   return `${date.getFullYear()}-W${getWeekNumber(date)}`
 }
 
