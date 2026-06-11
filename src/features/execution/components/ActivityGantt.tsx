@@ -14,6 +14,7 @@ interface ActivityGanttProps {
   onDeleteActivity: (activity: Activity) => void
   onTaskToggle: (taskId: string, currentStatus: string) => void
   onNewActivity: () => void
+  readOnly?: boolean
 }
 
 const statusIcon: Record<DeliverableStatus, React.ReactNode> = {
@@ -54,6 +55,7 @@ const priorityLabel: Record<string, string> = {
 export function ActivityGantt({
   planId, activities, tasks, teamMap, appMap,
   onEditActivity, onDeleteActivity, onTaskToggle, onNewActivity,
+  readOnly = false,
 }: ActivityGanttProps) {
   const navigate = useNavigate()
   const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
@@ -135,19 +137,21 @@ export function ActivityGantt({
       <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
-            Diagrama de Gantt
+            Detalle del plan
           </h3>
           <span className="text-xs text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">
             {rootActivities.length} actividad{rootActivities.length !== 1 ? 'es' : ''}
           </span>
         </div>
-        <button
-          onClick={onNewActivity}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-        >
-          <Plus size={16} />
-          Nueva Actividad
-        </button>
+        {!readOnly && (
+          <button
+            onClick={onNewActivity}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+          >
+            <Plus size={16} />
+            Nueva Actividad
+          </button>
+        )}
       </div>
 
       {/* Gantt header with time scale */}
@@ -230,6 +234,7 @@ export function ActivityGantt({
                     hasChildren={childActivities(activity.id).length > 0}
                     isExpanded={expandedActivities.has(activity.id)}
                     onToggle={() => toggleExpand(activity.id)}
+                    readOnly={readOnly}
                   />
 
                   {/* Sub-activities + tasks */}
@@ -252,6 +257,7 @@ export function ActivityGantt({
                             isExpanded={false}
                             onToggle={() => {}}
                             isSub={true}
+                            readOnly={readOnly}
                           />
                           {/* Tasks for this child */}
                           {(tasksByActivity.get(child.id) ?? []).length > 0 && (
@@ -314,6 +320,7 @@ function ActivityGanttRow({
   activity, timelineStart, totalDays, dayWidth, today,
   teamMap, appMap, onEdit, onDelete,
   hasChildren, isExpanded, onToggle, isSub,
+  readOnly = false,
 }: {
   activity: Activity
   timelineStart: Date
@@ -328,6 +335,7 @@ function ActivityGanttRow({
   isExpanded: boolean
   onToggle: () => void
   isSub?: boolean
+  readOnly?: boolean
 }) {
   const totalPixels = totalDays * (dayWidth / 7)
   const isOverdue = activity.dueDate && new Date(activity.dueDate) < today && activity.status !== 'completed' && activity.status !== 'cancelled'
@@ -366,14 +374,16 @@ function ActivityGanttRow({
             {activity.assigneeId && <span title={`Asignado: ${activity.assigneeId}`} className="text-[10px] text-neutral-50">{activity.assigneeId}</span>}
           </div>
         </div>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary">
-            <Pencil size={12} />
-          </button>
-          <button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger">
-            <Trash2 size={12} />
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary">
+              <Pencil size={12} />
+            </button>
+            <button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger">
+              <Trash2 size={12} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Gantt area */}
