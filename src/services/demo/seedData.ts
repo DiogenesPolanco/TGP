@@ -29,6 +29,7 @@ import type {
   Candidate,
   CandidateTechnology,
   CandidateEvaluation,
+  Dependency,
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes

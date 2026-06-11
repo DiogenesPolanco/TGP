@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Target, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
 import type { Plan, Activity } from '@/types/domain'
 
 interface PlanCardProps {
@@ -43,7 +43,6 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
 
   // ── Health color ──
   const healthColor = plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
-  const forecastColor = forecastStatus === 'critical' ? 'text-danger' : forecastStatus === 'at_risk' ? 'text-warning' : 'text-success'
 
   // ── Overdue count badge ──
   const overdueCount = overdueActivities.length

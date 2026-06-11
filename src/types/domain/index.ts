@@ -436,9 +436,9 @@ export interface Commitment {
 
 export interface Dependency {
   id: string
-  sourceType: 'task' | 'activity' | 'plan' | 'commitment'
+  sourceType: 'task' | 'activity' | 'plan' | 'commitment' | 'blocker'
   sourceId: string
-  targetType: 'task' | 'activity' | 'plan' | 'commitment' | 'deliverable'
+  targetType: 'task' | 'activity' | 'plan' | 'commitment' | 'deliverable' | 'blocker'
   targetId: string
   relationType: DependencyRelation
   description: string

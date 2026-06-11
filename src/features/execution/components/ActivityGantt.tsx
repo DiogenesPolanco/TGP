@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle, Pencil, Trash2, Plus } from 'lucide-react'
 import type { Activity } from '@/types/domain'
 import type { DeliverableStatus } from '@/constants/enums'
@@ -7,7 +6,7 @@ import type { DeliverableStatus } from '@/constants/enums'
 interface ActivityGanttProps {
   planId: string
   activities: Activity[]
-  tasks: { id: string; activityId: string | null; title: string; status: string; priority: string }[]
+  tasks: { id: string; activityId: string | null; title: string; status: string; priority: string; dueDate: Date | null }[]
   teamMap: Map<string, { name: string }>
   appMap: Map<string, { name: string }>
   onEditActivity: (activityId: string) => void
@@ -31,13 +30,6 @@ const statusLabel: Record<DeliverableStatus, string> = {
   cancelled: 'Cancelado',
 }
 
-const statusColor: Record<string, string> = {
-  pending: 'bg-neutral-30 dark:bg-neutral-60',
-  in_progress: 'bg-info',
-  completed: 'bg-success',
-  cancelled: 'bg-neutral-40 dark:bg-neutral-60',
-}
-
 const priorityColor: Record<string, string> = {
   low: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60',
   medium: 'bg-info/10 text-info',
@@ -53,11 +45,10 @@ const priorityLabel: Record<string, string> = {
 }
 
 export function ActivityGantt({
-  planId, activities, tasks, teamMap, appMap,
+  activities, tasks, teamMap, appMap,
   onEditActivity, onDeleteActivity, onTaskToggle, onNewActivity,
   readOnly = false,
 }: ActivityGanttProps) {
-  const navigate = useNavigate()
   const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
 
   const toggleExpand = (id: string) => {
@@ -85,7 +76,7 @@ export function ActivityGantt({
   }, [tasks])
 
   // Timeline range
-  const { timelineStart, timelineEnd, totalDays } = useMemo(() => {
+  const { timelineStart, totalDays } = useMemo(() => {
     let min = Infinity
     let max = -Infinity
     const today = new Date()
@@ -110,9 +101,7 @@ export function ActivityGantt({
     if (!hasDates) {
       const fallbackStart = new Date(today)
       fallbackStart.setDate(fallbackStart.getDate() - 14)
-      const fallbackEnd = new Date(today)
-      fallbackEnd.setDate(fallbackEnd.getDate() + 14)
-      return { timelineStart: fallbackStart, timelineEnd: fallbackEnd, totalDays: 28 }
+      return { timelineStart: fallbackStart, totalDays: 28 }
     }
 
     const start = new Date(min)
@@ -125,7 +114,7 @@ export function ActivityGantt({
 
     const days = Math.max(28, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
 
-    return { timelineStart: start, timelineEnd: end, totalDays: days }
+    return { timelineStart: start, totalDays: days }
   }, [activities])
 
   const today = new Date()
@@ -517,7 +506,6 @@ function buildMonthSegments(start: Date, totalDays: number) {
     const year = current.getFullYear()
     const month = current.getMonth()
     const daysInMonth = new Date(year, month + 1, 0).getDate()
-    const daysFromStart = Math.ceil((current.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
     const remainingInMonth = daysInMonth - current.getDate() + 1
     const days = Math.min(remainingInMonth, totalDays)
 

@@ -3,12 +3,11 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import {
-  Target, AlertTriangle, CheckCircle2, XCircle, PauseCircle, Clock,
-  Calendar, ArrowRight, Users, Building2, Filter, ChevronLeft, ChevronRight,
+  Target, AlertTriangle, XCircle, Clock,
+  Calendar, ArrowRight, Filter, ChevronLeft, ChevronRight,
   AlertOctagon, Share2, Copy, Check,
 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
-import type { Plan, Activity, Blocker, Commitment } from '@/types/domain'
 import { createShareLink, getPublicTimelineData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
@@ -49,8 +48,6 @@ export function ExecutiveTimelinePage() {
   const plans = useMemo(() => rawPlans ?? [], [rawPlans])
   const rawActivities = useLiveQuery(() => db.activities.toArray())
   const activities = useMemo(() => rawActivities ?? [], [rawActivities])
-  const rawTasks = useLiveQuery(() => db.tasks.toArray())
-  const tasks = useMemo(() => rawTasks ?? [], [rawTasks])
   const rawBlockers = useLiveQuery(() => db.blockers.toArray())
   const blockers = useMemo(() => rawBlockers ?? [], [rawBlockers])
   const rawCommitments = useLiveQuery(() => db.commitments.toArray())
@@ -59,10 +56,6 @@ export function ExecutiveTimelinePage() {
   const teams = useMemo(() => rawTeams ?? [], [rawTeams])
   const rawBusinessUnits = useLiveQuery(() => db.businessUnits.toArray())
   const businessUnits = useMemo(() => rawBusinessUnits ?? [], [rawBusinessUnits])
-
-  const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p])), [plans])
-  const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams])
-  const buMap = useMemo(() => new Map(businessUnits.map((b) => [b.id, b])), [businessUnits])
 
   // Filters
   const filteredPlans = useMemo(() => {
@@ -181,7 +174,6 @@ export function ExecutiveTimelinePage() {
   }, [blockers, stats, plans, today])
 
   const totalWidth = totalWeeks * weekWidth
-  const dayWidth = weekWidth / 7
 
   const doShare = async () => {
     const data = await getPublicTimelineData()
