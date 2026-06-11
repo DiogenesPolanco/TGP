@@ -123,13 +123,39 @@ src/
 - Filtros por estado y aplicación
 
 ### Ejecución (Módulo completo)
-- **Planes** (`/execution/plans`, `/execution/plans/:id`) — Planes de ejecución con health status
-- **Daily** (`/execution/daily`) — Vista diaria de actividades y bloqueos
+- **Planes** (`/execution/plans`, `/execution/plans/:id`) — Planes de ejecución con health status, health indicators y Gantt de actividades
+- **Timeline Ejecutivo** (`/execution/timeline`) — Visión consolidada de todos los planes en un diagrama de Gantt con:
+  - StatBox clickeables (Total Planes, Activos, En Riesgo, Vencidos) con filtros combinados por status/salud/vencimiento
+  - Navegación temporal (retroceder/avanzar 12 semanas, botón "Hoy")
+  - Barras de plan con color de salud (verde/amarillo/rojo), % completado y línea de "Hoy"
+  - Sidebar con Próximos Hitos y Alertas del sistema
+- **Daily** (`/execution/daily`) — Vista diaria de actividades, bloqueos y tareas pendientes con:
+  - WeeklyTimeline clickeable para filtrar la agenda por semana
+  - UpNextPanel sincronizado con la semana seleccionada
+  - Seguimiento de actividades que vencen hoy, vencidas, compromisos y completadas
+  - **Compartir** — genera enlace público del seguimiento diario
 - **Compromisos** (`/execution/commitments`) — Compromisos con tracking de estado (active, at_risk, breached, fulfilled)
 - **Actividades** — Asociadas a planes, con asignación y fechas
 - **Bloqueos** — Severidad y escalamiento, tracking de resolución
 - **Dependencias** — Entre tareas, actividades, planes y compromisos
 - **Servicio de Escalamiento** — `escalationService.ts`
+
+### Compartir y Enlaces Públicos
+- **Compartir Dashboard, Daily, Plan, Timeline, Performance, Reclutamiento y más** — cada módulo permite generar un enlace público con:
+  - Cifrado opcional AES-GCM 256 con passphrase
+  - Almacenamiento en Azure Blob Storage (cuando está configurado) o localStorage
+  - Vista de solo lectura para el receptor
+  - Caducidad automática a las 48h
+  - Botones de descarga PDF e Imagen en las vistas públicas
+  - Páginas públicas standalone sin necesidad de autenticación:
+    - `/public/dashboard/:hash` — Dashboard Ejecutivo
+    - `/public/daily/:hash` — Seguimiento Diario
+    - `/public/plan/:hash` — Detalle de Plan con Diagrama de Gantt
+    - `/public/timeline/:hash` — Timeline Ejecutivo (sin hitos próximos)
+    - `/public/performance/:hash` — Performance de equipos
+    - `/public/member/:hash` — Detalle de miembro
+    - `/public/members/:hash` — Vista general de miembros
+    - `/public/recruitment/:hash` — Reclutamiento
 
 ### Administración (`/admin`)
 - **Importación de datos desde Excel** (`/admin/import`)
@@ -261,9 +287,18 @@ El sistema incluye un programador de tareas automáticas que ejecuta verificacio
 | `/execution/plans` | Planes de ejecución |
 | `/execution/plans/:id` | Detalle de Plan |
 | `/execution/commitments` | Compromisos |
+| `/execution/timeline` | Timeline Ejecutivo |
 | `/admin` | Administración |
 | `/admin/import` | Importación Excel |
 | `/admin/business-units` | Unidades de Negocio |
+| `/public/:hash` | Dashboard público |
+| `/public/daily/:hash` | Seguimiento Diario público |
+| `/public/plan/:hash` | Detalle de Plan público |
+| `/public/timeline/:hash` | Timeline Ejecutivo público |
+| `/public/performance/:hash` | Performance público |
+| `/public/member/:hash` | Miembro público |
+| `/public/members/:hash` | Miembros público |
+| `/public/recruitment/:hash` | Reclutamiento público |
 
 ## Desarrollo
 
@@ -349,6 +384,51 @@ localStorage.removeItem('tgp-auth-secret-salt');
 sessionStorage.removeItem('tgp-auth-session');
 location.reload();
 ```
+
+## Compartir Datos y Políticas de Privacidad
+
+TGP permite generar enlaces públicos para compartir información con personas dentro y fuera de la institución. Es responsabilidad del usuario conocer y gestionar los riesgos asociados.
+
+### Responsabilidad del Usuario
+
+- **Contenido sensible**: El usuario es el único responsable de evaluar qué información comparte. TGP no filtra, revisa ni modifica los datos antes de generar un enlace público.
+- **Información clasificada**: No compartas información que la institución considere confidencial, clasificada, sujeta a regulación (GDPR, LGPD, Ley General de Protección de Datos local) o que pudiera representar un riesgo si es divulgada.
+- **Datos personales**: Evita compartir información personal identificable (nombres completos, correos, identificaciones internas) a menos que sea estrictamente necesario y cuentes con la autorización correspondiente.
+- **Datos estratégicos**: Planes, OKRs, métricas de equipos, vulnerabilidades y hallazgos de auditoría pueden revelar estrategia institucional, brechas de seguridad o debilidades operativas. Evalúa el impacto antes de compartir.
+
+### Medidas de Protección Incorporadas
+
+- **Cifrado opcional**: Al compartir, puedes agregar una contraseña que cifra los datos con AES-GCM 256 antes de almacenarlos. Quien reciba el enlace necesitará la misma contraseña para visualizar el contenido.
+- **Caducidad automática**: Todos los enlaces compartidos expiran a las 48 horas. Después de ese período, el enlace deja de funcionar y los datos no son accesibles.
+- **Limpieza programada**: El programador automático elimina de Azure Blob Storage los archivos de enlaces compartidos con más de 48h.
+- **Solo lectura**: Las vistas públicas son exclusivamente de solo lectura. No es posible editar, crear o eliminar datos desde un enlace público.
+- **Autenticación requerida**: Para generar un enlace público, el usuario debe haber iniciado sesión en TGP. Las vistas públicas no requieren autenticación (son accesibles por diseño).
+
+### Almacenamiento y Transmisión
+
+- **localStorage**: Cuando no hay Azure configurado, los enlaces se almacenan en localStorage del navegador del usuario que los creó. Esto significa que solo ese navegador puede generar y validar el enlace.
+- **Azure Blob Storage**: Si está configurado, los datos compartidos se almacenan en Azure Blob Storage y son accesibles desde cualquier lugar mediante el enlace generado. Los archivos se limpian automáticamente después de 48h.
+- **Transmisión**: Los datos viajan cifrados en tránsito (HTTPS). Si se usó cifrado con passphrase, los datos están protegidos adicionalmente con AES-GCM 256.
+
+### Buenas Prácticas
+
+1. **Usa contraseña** para datos que contengan información institucional sensible, incluso si no es clasificada.
+2. **Comparte el mínimo necesario** — selecciona solo la vista que contiene la información requerida por el receptor.
+3. **Comunica la contraseña por un canal diferente** al del enlace (ej. enlace por email, contraseña por mensaje interno).
+4. **Revoca enlaces** desde la sección de administración si sospechas que un enlace fue expuesto antes de su vencimiento.
+5. **Notifica al equipo de seguridad** si se comparten datos clasificados por error.
+6. **No compartas pantallas** que contengan información sensible si el sistema de captura incluye datos que no deben ser divulgados (los botones PDF/Imagen capturan todo el contenido visible de la página).
+
+### Exención de Responsabilidad
+
+TGP es una herramienta de gestión y gobierno tecnológico. El usuario asume toda responsabilidad por:
+
+- La información que decide compartir mediante enlaces públicos
+- El cumplimiento de las políticas institucionales de protección de datos
+- Las consecuencias de compartir información sensible, clasificada o regulada
+- La custodia y transmisión segura de las contraseñas de cifrado a los receptores
+
+El equipo de TGP no será responsable por daños directos o indirectos derivados del uso indebido de la funcionalidad de compartir, incluyendo pero no limitado a filtración de datos, incumplimiento normativo o暴露 de información estratégica.
 
 ## Licencia
 
