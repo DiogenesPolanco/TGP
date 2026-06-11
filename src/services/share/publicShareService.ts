@@ -3,7 +3,7 @@ import { db } from '@/services/db/database'
 const SHARED_LINKS_KEY = 'tgp-shared-links'
 const AZURE_LINKS_KEY = 'tgp-azure-links'
 
-type ShareType = 'dashboard' | 'performance' | 'member' | 'members' | 'recruitment'
+type ShareType = 'dashboard' | 'performance' | 'member' | 'members' | 'recruitment' | 'daily' | 'plan' | 'timeline'
 
 interface SharedLink {
   hash: string
@@ -91,7 +91,7 @@ export async function createShareLink(
     }
   }
 
-  const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : type === 'recruitment' ? '/public/recruitment' : '/public'
+  const base = type === 'performance' ? '/public/performance' : type === 'member' ? '/public/member' : type === 'members' ? '/public/members' : type === 'recruitment' ? '/public/recruitment' : type === 'daily' ? '/public/daily' : type === 'plan' ? '/public/plan' : type === 'timeline' ? '/public/timeline' : '/public'
   const fragment = manifestStr ? `#${encodeURIComponent(manifestStr)}` : ''
   return { hash: shortHash, url: `${window.location.origin}${base}/${shortHash}${fragment}` }
 }
@@ -217,3 +217,55 @@ export async function fetchAzureShareData<T = unknown>(hash: string): Promise<T 
     return null
   }
 }
+
+// ── Public Daily Data ──
+
+export async function getPublicDailyData() {
+  const [plans, activities, tasks, blockers, commitments] = await Promise.all([
+    db.plans.toArray(),
+    db.activities.toArray(),
+    db.tasks.toArray(),
+    db.blockers.toArray(),
+    db.commitments.toArray(),
+  ])
+  return { plans, activities, tasks, blockers, commitments }
+}
+
+export type PublicDailyData = Awaited<ReturnType<typeof getPublicDailyData>>
+
+// ── Public Plan Data ──
+
+export async function getPublicPlanData(planId: string) {
+  const plan = await db.plans.get(planId)
+  if (!plan) return null
+  const [activities, tasks, blockers] = await Promise.all([
+    db.activities.where('planId').equals(planId).toArray(),
+    db.tasks.where('planId').equals(planId).toArray(),
+    db.blockers.toArray(),
+  ])
+  const blockersForPlan = blockers.filter(
+    (b) => b.sourceType === 'plan' && b.sourceId === planId
+  )
+  const teams = await db.teams.toArray()
+  const applications = await db.applications.toArray()
+  return { plan, activities, tasks, blockers: blockersForPlan, teams, applications }
+}
+
+export type PublicPlanData = Awaited<ReturnType<typeof getPublicPlanData>>
+
+// ── Public Timeline Data ──
+
+export async function getPublicTimelineData() {
+  const [plans, activities, tasks, blockers, commitments, teams, businessUnits] = await Promise.all([
+    db.plans.toArray(),
+    db.activities.toArray(),
+    db.tasks.toArray(),
+    db.blockers.toArray(),
+    db.commitments.toArray(),
+    db.teams.toArray(),
+    db.businessUnits.toArray(),
+  ])
+  return { plans, activities, tasks, blockers, commitments, teams, businessUnits }
+}
+
+export type PublicTimelineData = Awaited<ReturnType<typeof getPublicTimelineData>>

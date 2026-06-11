@@ -1,14 +1,17 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { runEscalation } from '../services/escalationService'
+import { createShareLink, getPublicDailyData } from '@/services/share/publicShareService'
+import { encryptData } from '@/services/share/encryptionService'
+import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import {
   AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight, Pencil,
-  Calendar, ListTodo, Ban, Target,
+  Calendar, ListTodo, Ban, Target, Share2, Check, Copy,
 } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
-import { PlanCard } from '../components/PlanCard'
+
 import { UpNextPanel } from '../components/UpNextPanel'
 import { WeeklyTimeline } from '../components/WeeklyTimeline'
 
@@ -27,6 +30,27 @@ export function DailyPage() {
     d.setHours(0, 0, 0, 0)
     return d
   }, [])
+
+  const [selectedWeek, setSelectedWeek] = useState<{ start: Date; end: Date } | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const [showPassphrase, setShowPassphrase] = useState(false)
+  const [sharePending, setSharePending] = useState<unknown>(null)
+
+  const handleShare = useCallback(async () => {
+    const data = await getPublicDailyData()
+    setSharePending(data)
+    setShowPassphrase(true)
+  }, [])
+
+  const cleanUrl = shareUrl?.split('#')[0] ?? ''
+  const handleCopy = useCallback(() => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }, [shareUrl])
 
   useEffect(() => { runEscalation() }, [])
 
@@ -64,32 +88,40 @@ export function DailyPage() {
   }, [planMap, activityMap, tasks])
 
   const agenda = useMemo(() => {
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    const ref = selectedWeek ? new Date(selectedWeek.start) : new Date(today)
+    const weekEnd = selectedWeek ? new Date(selectedWeek.end) : new Date(today)
 
     const activitiesWithDue = activities.filter((a) => a.dueDate)
     const dueToday = activitiesWithDue.filter((a) => {
       const d = new Date(a.dueDate!)
       d.setHours(0, 0, 0, 0)
+      if (selectedWeek) {
+        return d.getTime() >= ref.getTime() && d.getTime() <= weekEnd.getTime()
+      }
       return d.getTime() === today.getTime()
     })
     const overdue = activitiesWithDue.filter((a) => {
       const d = new Date(a.dueDate!)
       d.setHours(0, 0, 0, 0)
-      return d.getTime() < today.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
+      const boundary = selectedWeek ? ref : today
+      return d.getTime() < boundary.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
     })
 
     const activeCommitments = commitments.filter((c) => c.status === 'active' || c.status === 'at_risk')
     const commitmentsDueSoon = activeCommitments.filter((c) => {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
+      if (selectedWeek) {
+        return d.getTime() >= ref.getTime() && d.getTime() <= weekEnd.getTime()
+      }
       const diff = d.getTime() - today.getTime()
       return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000
     })
     const commitmentsOverdue = activeCommitments.filter((c) => {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
-      return d.getTime() < today.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
+      const boundary = selectedWeek ? ref : today
+      return d.getTime() < boundary.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
     })
 
     const activeBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated')
@@ -97,10 +129,23 @@ export function DailyPage() {
       if (!t.dueDate || t.status === 'done') return false
       const d = new Date(t.dueDate)
       d.setHours(0, 0, 0, 0)
+      if (selectedWeek) {
+        return d.getTime() >= ref.getTime() && d.getTime() <= weekEnd.getTime()
+      }
       return d.getTime() <= today.getTime()
     })
 
     const activePlans = plans.filter((p) => p.status === 'in_progress')
+
+    const completedThisWeek = activities.filter((a) => {
+      if (!a.completedAt) return false
+      const d = new Date(a.completedAt)
+      d.setHours(0, 0, 0, 0)
+      if (selectedWeek) {
+        return d.getTime() >= ref.getTime() && d.getTime() <= weekEnd.getTime()
+      }
+      return d.getTime() === today.getTime()
+    })
 
     return {
       dueToday,
@@ -110,14 +155,10 @@ export function DailyPage() {
       activeBlockers,
       tasksDue,
       activePlans,
-      completedToday: activities.filter((a) => {
-        if (!a.completedAt) return false
-        const d = new Date(a.completedAt)
-        d.setHours(0, 0, 0, 0)
-        return d.getTime() === today.getTime()
-      }),
+      completedToday: completedThisWeek,
+      isFiltered: !!selectedWeek,
     }
-  }, [today, activities, commitments, blockers, tasks, plans])
+  }, [today, selectedWeek, activities, commitments, blockers, tasks, plans])
 
   const criticalBlockers = agenda.activeBlockers.filter((b) => b.severity === 'critical' || b.severity === 'high')
 
@@ -133,13 +174,39 @@ export function DailyPage() {
             {today.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
+        >
+          <Share2 size={16} />
+          Compartir
+        </button>
       </div>
+
+      {shareUrl && (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
+          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
+            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
+            {cleanUrl}
+          </a>
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+          >
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+            {copied ? 'Copiado' : 'Copiar'}
+          </button>
+        </div>
+      )}
 
       {/* Phase 1.3: Weekly Timeline Roadmap */}
       <WeeklyTimeline
         activities={activities}
         commitments={commitments}
         today={today}
+        selectedWeek={selectedWeek}
+        onWeekSelect={setSelectedWeek}
       />
 
       {/* Stats bar */}
@@ -168,7 +235,7 @@ export function DailyPage() {
         />
         <StatCard
           icon={<CheckCircle2 size={18} />}
-          label="Completado Hoy"
+          label={selectedWeek ? 'Completado Semana' : 'Completado Hoy'}
           value={agenda.completedToday.length}
           color="text-success"
           bgColor="bg-success/10"
@@ -186,6 +253,7 @@ export function DailyPage() {
           value={agenda.activePlans.length}
           color="text-primary"
           bgColor="bg-primary/10"
+          onClick={() => navigate('/execution/plans')}
         />
       </div>
 
@@ -266,11 +334,13 @@ export function DailyPage() {
             </div>
           )}
 
-          {/* Due today */}
+          {/* Due today / this week */}
           <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
               <Calendar size={16} className="text-warning" />
-              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Vence Hoy</h3>
+              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                {selectedWeek ? 'Vence Esta Semana' : 'Vence Hoy'}
+              </h3>
               {agenda.dueToday.length > 0 && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning">{agenda.dueToday.length}</span>
               )}
@@ -369,36 +439,36 @@ export function DailyPage() {
             activities={activities}
             plans={plans}
             commitments={commitments}
-            today={today}
+            today={selectedWeek?.start ?? today}
           />
 
-          {/* Plans */}
-          <h3 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider">
-            Planes Activos
-          </h3>
 
-          {agenda.activePlans.length === 0 ? (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-8 text-center">
-              <Target size={32} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
-              <p className="text-sm text-neutral-50">No hay planes activos</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {agenda.activePlans.map((plan) => {
-                const planActivities = activities.filter((a) => a.planId === plan.id)
-                return (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    activities={planActivities}
-                    today={today}
-                  />
-                )
-              })}
-            </div>
-          )}
         </div>
       </div>
+
+      {showPassphrase && (
+        <PassphraseModal
+          title="Compartir Seguimiento Diario"
+          buttonLabel="Compartir"
+          description="Opcional: agrega una contraseña para cifrar los datos. Quien reciba el enlace necesitará la contraseña para verlos."
+          onSubmit={async (pass) => {
+            const data = sharePending
+            const payload = pass ? await encryptData(data, pass) : data
+            const { url } = await createShareLink(48, 'daily', undefined, payload)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onSkip={async () => {
+            const data = sharePending
+            const { url } = await createShareLink(48, 'daily', undefined, data)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
+          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+        />
+      )}
     </div>
   )
 }
