@@ -6,6 +6,8 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { createShareLink, getPublicPlanData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { ArrowLeft, Pencil, Share2, Check, Copy } from 'lucide-react'
 import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
@@ -35,15 +37,30 @@ export function PlanDetailPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<unknown>(null)
 
-  const handleShare = useCallback(async () => {
+  const doShare = useCallback(async () => {
     if (!id) return
     const data = await getPublicPlanData(id)
     if (!data) return
     setSharePending(data)
     setShowPassphrase(true)
   }, [id])
+
+  const handleShare = useCallback(async () => {
+    if (!isTermsAccepted()) {
+      setShowTerms(true)
+      return
+    }
+    await doShare()
+  }, [doShare])
+
+  const handleTermsAccepted = useCallback(async () => {
+    acceptTerms()
+    setShowTerms(false)
+    await doShare()
+  }, [doShare])
 
   const cleanUrl = shareUrl?.split('#')[0] ?? ''
   const handleCopy = useCallback(() => {
@@ -225,6 +242,12 @@ export function PlanDetailPage() {
         onNewActivity={() => navigate(`/execution/plans/${plan.id}/activities/new`)}
       />
 
+      {showTerms && (
+        <TermsModal
+          onAccept={handleTermsAccepted}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Compartir Plan"

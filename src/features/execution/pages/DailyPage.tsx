@@ -6,6 +6,8 @@ import { runEscalation } from '../services/escalationService'
 import { createShareLink, getPublicDailyData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import {
   AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight, Pencil,
   Calendar, ListTodo, Ban, Target, Share2, Check, Copy,
@@ -35,13 +37,28 @@ export function DailyPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<unknown>(null)
 
-  const handleShare = useCallback(async () => {
+  const doShare = useCallback(async () => {
     const data = await getPublicDailyData()
     setSharePending(data)
     setShowPassphrase(true)
   }, [])
+
+  const handleShare = useCallback(async () => {
+    if (!isTermsAccepted()) {
+      setShowTerms(true)
+      return
+    }
+    await doShare()
+  }, [doShare])
+
+  const handleTermsAccepted = useCallback(async () => {
+    acceptTerms()
+    setShowTerms(false)
+    await doShare()
+  }, [doShare])
 
   const cleanUrl = shareUrl?.split('#')[0] ?? ''
   const handleCopy = useCallback(() => {
@@ -446,6 +463,12 @@ export function DailyPage() {
         </div>
       </div>
 
+      {showTerms && (
+        <TermsModal
+          onAccept={handleTermsAccepted}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Compartir Seguimiento Diario"

@@ -8,6 +8,7 @@ import { PublicRecruitmentPage } from '@/features/share/PublicRecruitmentPage'
 import { PublicDailyPage } from '@/features/share/PublicDailyPage'
 import { PublicPlanPage } from '@/features/share/PublicPlanPage'
 import { PublicTimelinePage } from '@/features/share/PublicTimelinePage'
+import { TermsPage } from '@/features/share/TermsPage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
 
 export const router = createBrowserRouter([
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
   {
     path: '/public/timeline/:hash',
     element: <PublicTimelinePage />,
+  },
+  {
+    path: '/terms',
+    element: <TermsPage />,
   },
   {
     path: '/',

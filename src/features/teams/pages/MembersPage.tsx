@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { usePagination } from '@/hooks/usePagination'
@@ -10,6 +10,8 @@ import { getGlobalMembersKPIs, DEV_ROLES } from '@/services/performance/performa
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
 
 type TeamEntry = { id: string; name: string }
@@ -25,7 +27,14 @@ export function MembersPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<any>(null)
+
+  const doShare = useCallback(async () => {
+    const data = await getPublicPerformanceData()
+    setSharePending(data)
+    setShowPassphrase(true)
+  }, [])
 
   const rawTeams = useLiveQuery(() => db.teams.toArray())
   const teams = useMemo(() => rawTeams ?? [], [rawTeams])
@@ -93,9 +102,11 @@ export function MembersPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento</h2>
         <button
           onClick={async () => {
-            const data = await getPublicPerformanceData()
-            setSharePending(data)
-            setShowPassphrase(true)
+            if (!isTermsAccepted()) {
+              setShowTerms(true)
+              return
+            }
+            await doShare()
           }}
           className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
@@ -119,6 +130,12 @@ export function MembersPage() {
         </div>
       )})()}
 
+      {showTerms && (
+        <TermsModal
+          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace"

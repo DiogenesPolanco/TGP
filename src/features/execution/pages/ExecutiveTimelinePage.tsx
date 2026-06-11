@@ -12,6 +12,8 @@ import type { Plan, Activity, Blocker, Commitment } from '@/types/domain'
 import { createShareLink, getPublicTimelineData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   planned: { label: 'Planificado', color: 'text-info' },
@@ -39,6 +41,7 @@ export function ExecutiveTimelinePage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<unknown>(null)
 
   // Data
@@ -180,10 +183,24 @@ export function ExecutiveTimelinePage() {
   const totalWidth = totalWeeks * weekWidth
   const dayWidth = weekWidth / 7
 
-  const handleShare = async () => {
+  const doShare = async () => {
     const data = await getPublicTimelineData()
     setSharePending(data)
     setShowPassphrase(true)
+  }
+
+  const handleShare = async () => {
+    if (!isTermsAccepted()) {
+      setShowTerms(true)
+      return
+    }
+    await doShare()
+  }
+
+  const handleTermsAccepted = async () => {
+    acceptTerms()
+    setShowTerms(false)
+    await doShare()
   }
 
   const handleCopy = () => {
@@ -562,6 +579,12 @@ export function ExecutiveTimelinePage() {
         </div>
       </div>
 
+      {showTerms && (
+        <TermsModal
+          onAccept={handleTermsAccepted}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Compartir Timeline Ejecutivo"

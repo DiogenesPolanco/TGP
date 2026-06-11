@@ -10,6 +10,8 @@ import { useDashboardConfigStore } from '@/stores/dashboardConfigStore'
 import { createShareLink, getPublicDashboardData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 
 export function DashboardPage() {
   const metrics = useDashboardMetrics()
@@ -19,13 +21,28 @@ export function DashboardPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<unknown>(null)
 
-  const handleShare = useCallback(async () => {
+  const doShare = useCallback(async () => {
     const data = await getPublicDashboardData()
     setSharePending(data)
     setShowPassphrase(true)
   }, [])
+
+  const handleShare = useCallback(async () => {
+    if (!isTermsAccepted()) {
+      setShowTerms(true)
+      return
+    }
+    await doShare()
+  }, [doShare])
+
+  const handleTermsAccepted = useCallback(async () => {
+    acceptTerms()
+    setShowTerms(false)
+    await doShare()
+  }, [doShare])
 
   const cleanUrl = shareUrl?.split('#')[0] ?? ''
   const handleCopy = useCallback(() => {
@@ -124,6 +141,12 @@ export function DashboardPage() {
       )}
 
       {showConfig && <DashboardConfigModal onClose={() => setShowConfig(false)} />}
+      {showTerms && (
+        <TermsModal
+          onAccept={handleTermsAccepted}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace compartido"

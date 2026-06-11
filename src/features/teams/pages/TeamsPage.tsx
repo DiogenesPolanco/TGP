@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
@@ -7,6 +7,8 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Link } from 'react-router-dom'
@@ -22,7 +24,14 @@ export function TeamsPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<any>(null)
+
+  const doShare = useCallback(async () => {
+    const data = await getPublicPerformanceData()
+    setSharePending(data)
+    setShowPassphrase(true)
+  }, [])
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
@@ -69,9 +78,11 @@ export function TeamsPage() {
           </button>
           <button
             onClick={async () => {
-              const data = await getPublicPerformanceData()
-              setSharePending(data)
-              setShowPassphrase(true)
+              if (!isTermsAccepted()) {
+                setShowTerms(true)
+                return
+              }
+              await doShare()
             }}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
@@ -103,6 +114,12 @@ export function TeamsPage() {
         </div>
       )})()}
 
+      {showTerms && (
+        <TermsModal
+          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
+          onClose={() => { setShowTerms(false) }}
+        />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace compartido"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
@@ -7,6 +7,8 @@ import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { createShareLink, getPublicMemberData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { TermsModal } from '@/components/sharing/TermsModal'
+import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { ArrowLeft, Loader2, Share2, Check } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
@@ -24,7 +26,15 @@ export function MemberPerformancePage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
   const [sharePending, setSharePending] = useState<any>(null)
+
+  const doShare = useCallback(async () => {
+    if (!memberId) return
+    const data = await getPublicMemberData(memberId)
+    setSharePending(data)
+    setShowPassphrase(true)
+  }, [memberId])
   const [team, setTeam] = useState<Team | null>(null)
   const [profile, setProfile] = useState<MemberProfile | null>(null)
   const [kpis, setKpis] = useState<Awaited<ReturnType<typeof getMemberKPIs>> | null>(null)
@@ -93,9 +103,11 @@ export function MemberPerformancePage() {
           <button
             onClick={async () => {
               if (shareUrl) { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); return }
-              const data = await getPublicMemberData(memberId!)
-              setSharePending(data)
-              setShowPassphrase(true)
+              if (!isTermsAccepted()) {
+                setShowTerms(true)
+                return
+              }
+              await doShare()
             }}          
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             title="Compartir perfil"
@@ -115,6 +127,12 @@ export function MemberPerformancePage() {
           </div>
         )})()}
 
+        {showTerms && (
+          <TermsModal
+            onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
+            onClose={() => { setShowTerms(false) }}
+          />
+        )}
         {showPassphrase && (
           <PassphraseModal
             title="Proteger enlace"
