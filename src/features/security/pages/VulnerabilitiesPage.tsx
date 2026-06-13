@@ -59,8 +59,9 @@ export function VulnerabilitiesPage() {
     return colors[severity] || 'bg-neutral-10 text-neutral-60'
   }
 
-  const getSlaStatus = (slaDeadline: Date) => {
-    const days = Math.ceil((new Date(slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  const getSlaStatus = (vuln: Vulnerability) => {
+    if (vuln.status === 'fixed' || vuln.status === 'accepted') return { label: '—', color: 'text-neutral-50' }
+    const days = Math.ceil((new Date(vuln.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     if (days < 0) return { label: 'Vencido', color: 'text-danger' }
     if (days <= 7) return { label: `${days}d`, color: 'text-warning' }
     return { label: `${days}d`, color: 'text-success' }
@@ -70,7 +71,7 @@ export function VulnerabilitiesPage() {
     total: vulnerabilities.length,
     critical: vulnerabilities.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length,
     high: vulnerabilities.filter((v) => v.severity === 'high' && v.status !== 'fixed').length,
-    slaBreached: vulnerabilities.filter((v) => v.status !== 'fixed' && new Date(v.slaDeadline) < new Date()).length,
+    slaBreached: vulnerabilities.filter((v) => v.status !== 'fixed' && v.status !== 'accepted' && new Date(v.slaDeadline) < new Date()).length,
   }
 
   const columns: Column<Vulnerability>[] = [
@@ -129,7 +130,7 @@ export function VulnerabilitiesPage() {
       label: 'SLA',
       sortable: true,
       render: (vuln) => {
-        const sla = getSlaStatus(vuln.slaDeadline)
+        const sla = getSlaStatus(vuln)
         return <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
       },
     },

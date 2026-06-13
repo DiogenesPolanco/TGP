@@ -164,7 +164,7 @@ export function TeamDetailPage() {
       )}
 
       {activeTab === 'sprints' && (
-        <TeamSprintsSection teamId={team.id} members={team.members} />
+        <TeamSprintsSection teamId={team.id} teamName={team.name} members={team.members} />
       )}
     </div>
   )

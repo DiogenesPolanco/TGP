@@ -119,6 +119,9 @@ export class TGPDatabase extends Dexie {
     this.version(12).stores({
       candidateEvaluations: 'id, candidateId, category',
     })
+    this.version(13).stores({
+      vulnerabilities: 'id, applicationId, severity, status, slaDeadline, detectedAt, title, externalId',
+    })
   }
 }
 

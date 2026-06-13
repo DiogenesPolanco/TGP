@@ -41,7 +41,7 @@ export function TeamsPage() {
     (buFilter === 'all' || t.businessUnitId === buFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedTeams } = usePagination(filteredTeams, 5)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedTeams } = usePagination(filteredTeams, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar equipo?')) {
@@ -257,8 +257,9 @@ export function TeamsPage() {
         page={page}
         totalPages={totalPages}
         totalItems={filteredTeams.length}
-        pageSize={5}
+        pageSize={pageSize}
         onPageChange={setPage}
+        onPageSizeChange={setPageSize}
       />
 
       {filteredTeams.length === 0 && (

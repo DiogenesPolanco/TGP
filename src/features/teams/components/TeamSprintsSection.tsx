@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { TeamSprint, SprintRecord, TeamMember } from '@/types/domain'
-import { Plus, Trash2, Edit3, AlertTriangle, CheckCircle2, Loader2, Calendar } from 'lucide-react'
+import { Plus, Trash2, Edit3, AlertTriangle, CheckCircle2, Loader2, Calendar, RefreshCw } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useAppStore } from '@/stores/appStore'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { isJiraConfigured } from '@/services/jira/jiraConfigService'
+import { getBoards, getSprints, getSprintIssues, calcSprintMetrics, syncJiraSprints } from '@/services/jira/jiraService'
 
 interface Props {
   teamId: string
+  teamName: string
   members: TeamMember[]
 }
 
@@ -25,13 +29,15 @@ interface MemberSprintAgg {
   memberDetails: MemberDetail[]
 }
 
-export function TeamSprintsSection({ teamId, members }: Props) {
+export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   const { confirm } = useConfirm()
+  const { addNotification } = useAppStore()
   const [sprints, setSprints] = useState<TeamSprint[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [validationMsg, setValidationMsg] = useState<{ type: 'ok' | 'warn'; text: string } | null>(null)
+  const [syncing, setSyncing] = useState(false)
 
   const [form, setForm] = useState({
     sprintName: '',
@@ -45,6 +51,79 @@ export function TeamSprintsSection({ teamId, members }: Props) {
   })
 
   const todayStr = () => new Date().toISOString().split('T')[0]
+
+  const jiraConfigured = isJiraConfigured()
+
+  const handleSyncFromJira = async () => {
+    if (!jiraConfigured) {
+      addNotification({ type: 'error', message: 'Jira no está configurado. Ve a Administración → Jira.' })
+      return
+    }
+    setSyncing(true)
+    try {
+      const boards = await getBoards()
+      const matchBoard = boards.find(
+        (b) => b.name.toLowerCase().trim() === teamName.toLowerCase().trim()
+      )
+      if (!matchBoard) {
+        addNotification({
+          type: 'error',
+          message: `No se encontró un board de Jira llamado "${teamName}". Verifica que el nombre del board coincida exactamente con el nombre del equipo.`,
+        })
+        setSyncing(false)
+        return
+      }
+      const result = await syncJiraSprints(matchBoard.id, teamId)
+
+      const sprintsFromJira = await getSprints(matchBoard.id)
+      let memberSyncCount = 0
+      for (const sprint of sprintsFromJira) {
+        const issues = await getSprintIssues(sprint.id)
+        const metrics = calcSprintMetrics(issues)
+        const q = sprint.startDate
+          ? `Q${Math.floor(new Date(sprint.startDate).getMonth() / 3) + 1}`
+          : `Q${Math.ceil((new Date().getMonth() + 1) / 3)}`
+        const yr = sprint.startDate ? new Date(sprint.startDate).getFullYear() : new Date().getFullYear()
+
+        for (const [, data] of Object.entries(metrics.perAssignee)) {
+          const matchedMember = members.find(
+            (m) => m.displayName.toLowerCase().trim() === data.displayName.toLowerCase().trim()
+          )
+          if (!matchedMember) continue
+
+          const existing = await db.sprintRecords
+            .where('memberId')
+            .equals(matchedMember.id)
+            .and((r) => r.sprintName === sprint.name)
+            .first()
+
+          await db.sprintRecords.put({
+            id: existing?.id ?? crypto.randomUUID(),
+            memberId: matchedMember.id,
+            sprintName: sprint.name,
+            quarter: q,
+            year: yr,
+            storyPointsCompleted: data.completedSP,
+            storyPointsNotCompleted: data.notCompletedSP,
+            createdAt: existing?.createdAt ?? new Date(),
+          })
+          memberSyncCount++
+        }
+      }
+
+      addNotification({
+        type: 'success',
+        message: `${result.message} + ${memberSyncCount} registros de miembros sincronizados`,
+      })
+      const updated = await db.teamSprints.where('teamId').equals(teamId).toArray()
+      setSprints(updated)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error desconocido'
+      addNotification({ type: 'error', message: `Error al sincronizar con Jira: ${msg}` })
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   const resetForm = () => {
     setForm({
@@ -242,14 +321,26 @@ export function TeamSprintsSection({ teamId, members }: Props) {
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints del Equipo</h2>
-        {!showForm && editingId === null && (
-          <button
-            onClick={() => { setShowForm(true); resetForm() }}
-            className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
-          >
-            <Plus size={16} /> Agregar Sprint
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {jiraConfigured && !showForm && editingId === null && (
+            <button
+              onClick={handleSyncFromJira}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+              {syncing ? 'Sincronizando...' : 'Sync Jira'}
+            </button>
+          )}
+          {!showForm && editingId === null && (
+            <button
+              onClick={() => { setShowForm(true); resetForm() }}
+              className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+            >
+              <Plus size={16} /> Agregar Sprint
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Form */}

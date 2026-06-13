@@ -60,7 +60,7 @@ export function CommitmentsPage() {
     return new Date(a.commitmentDate).getTime() - new Date(b.commitmentDate).getTime()
   })
 
-  const { page, setPage, totalPages, paginatedItems: paginatedCommitments } = usePagination(sorted, 5)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedCommitments } = usePagination(sorted, 5)
 
   const stats = useMemo(() => ({
     total: commitments.length,
@@ -272,8 +272,9 @@ export function CommitmentsPage() {
               page={page}
               totalPages={totalPages}
               totalItems={sorted.length}
-              pageSize={5}
+              pageSize={pageSize}
               onPageChange={setPage}
+              onPageSizeChange={setPageSize}
             />
           </>
         )}

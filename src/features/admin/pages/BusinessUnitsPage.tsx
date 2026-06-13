@@ -28,7 +28,7 @@ export function BusinessUnitsPage() {
     (statusFilter === 'all' || bu.status === statusFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedBUs } = usePagination(filteredBus, 10)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedBUs } = usePagination(filteredBus, 10)
 
   const resetForm = () => {
     setFormName('')
@@ -272,8 +272,9 @@ export function BusinessUnitsPage() {
               page={page}
               totalPages={totalPages}
               totalItems={filteredBus.length}
-              pageSize={10}
+              pageSize={pageSize}
               onPageChange={setPage}
+              onPageSizeChange={setPageSize}
             />
           </>
         )}

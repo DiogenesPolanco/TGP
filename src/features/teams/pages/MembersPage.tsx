@@ -56,7 +56,7 @@ export function MembersPage() {
     return filtered
   }, [globalData, searchTerm, filterTeam, filterStatus])
 
-  const { page, setPage, totalPages, paginatedItems } = usePagination(allMembers, 10)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems } = usePagination(allMembers, 10)
 
   const teamOptions: TeamEntry[] = useMemo(
     () => teams.map((t) => ({ id: t.id, name: t.name })),
@@ -344,8 +344,9 @@ export function MembersPage() {
         page={page}
         totalPages={totalPages}
         totalItems={allMembers.length}
-        pageSize={10}
+        pageSize={pageSize}
         onPageChange={setPage}
+        onPageSizeChange={setPageSize}
       />
 
       <MemberEditModal

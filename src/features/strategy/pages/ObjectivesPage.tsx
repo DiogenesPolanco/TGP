@@ -26,7 +26,7 @@ export function ObjectivesPage() {
     (statusFilter === 'all' || o.status === statusFilter)
   )
 
-  const { page, setPage, totalPages, paginatedItems: paginatedObjectives } = usePagination(filteredObjectives, 5)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedObjectives } = usePagination(filteredObjectives, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar objetivo?')) {
@@ -236,8 +236,9 @@ export function ObjectivesPage() {
         page={page}
         totalPages={totalPages}
         totalItems={filteredObjectives.length}
-        pageSize={5}
+        pageSize={pageSize}
         onPageChange={setPage}
+        onPageSizeChange={setPageSize}
       />
 
       {filteredObjectives.length === 0 && (

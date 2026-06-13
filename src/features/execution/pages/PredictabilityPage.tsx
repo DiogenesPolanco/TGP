@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { usePredictability, getPredictabilityColor, getPredictabilityBg } from '../hooks/usePredictability'
-import type { PeriodGranularity } from '../hooks/usePredictability'
+import type { PeriodGranularity, PredictabilityPeriod } from '../hooks/usePredictability'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts'
@@ -8,6 +8,7 @@ import {
   Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar,
 } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
@@ -65,6 +66,55 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
     </div>
   )
 }
+
+const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
+  { key: 'label', label: 'Período', sortable: true, render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span> },
+  {
+    key: 'avgPredictability',
+    label: 'Predictibilidad',
+    sortable: true,
+    className: 'text-right',
+    render: (p) => <span className={`font-semibold ${getPredictabilityColor(p.avgPredictability)}`}>{p.avgPredictability}%</span>,
+  },
+  {
+    key: 'totalEstimated',
+    label: 'Story Points Planif.',
+    sortable: true,
+    className: 'text-right',
+    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.totalEstimated} pts plan.</span>,
+  },
+  {
+    key: 'totalActual',
+    label: 'Story Points Comp.',
+    sortable: true,
+    className: 'text-right',
+    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.totalActual} pts comp.</span>,
+  },
+  {
+    key: 'planCount',
+    label: 'Planes',
+    sortable: true,
+    className: 'text-right',
+    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.planCount}</span>,
+  },
+  {
+    key: 'color',
+    label: 'Estado',
+    sortable: true,
+    className: 'text-right',
+    render: (p) => (
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPredictabilityBg(p.avgPredictability)} ${getPredictabilityColor(p.avgPredictability)}`}>
+        {p.avgPredictability >= 80 && p.avgPredictability <= 120 ? (
+          <><Minus size={12} /> Consistente</>
+        ) : p.avgPredictability < 80 ? (
+          <><TrendingDown size={12} /> Subestima</>
+        ) : (
+          <><TrendingUp size={12} /> Sobreestima</>
+        )}
+      </span>
+    ),
+  },
+]
 
 export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
@@ -304,44 +354,11 @@ export function PredictabilityPage() {
               Detalle por Período
             </h3>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
-                  <th className="text-left px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Período</th>
-                  <th className="text-right px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Predictibilidad</th>
-                  <th className="text-right px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Story Points Planif.</th>
-                  <th className="text-right px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Story Points Comp.</th>
-                  <th className="text-right px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Planes</th>
-                  <th className="text-right px-5 py-3 font-medium text-neutral-60 dark:text-neutral-40">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-                {currentPeriods.map((period) => (
-                  <tr key={period.periodKey} className="hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
-                    <td className="px-5 py-3 font-medium text-neutral-90 dark:text-white">{period.label}</td>
-                    <td className={`px-5 py-3 text-right font-semibold ${getPredictabilityColor(period.avgPredictability)}`}>
-                      {period.avgPredictability}%
-                    </td>
-                    <td className="px-5 py-3 text-right text-neutral-60 dark:text-neutral-40">{period.totalEstimated} pts plan.</td>
-                    <td className="px-5 py-3 text-right text-neutral-60 dark:text-neutral-40">{period.totalActual} pts comp.</td>
-                    <td className="px-5 py-3 text-right text-neutral-60 dark:text-neutral-40">{period.planCount}</td>
-                    <td className="px-5 py-3 text-right">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPredictabilityBg(period.avgPredictability)} ${getPredictabilityColor(period.avgPredictability)}`}>
-                        {period.avgPredictability >= 80 && period.avgPredictability <= 120 ? (
-                          <><Minus size={12} /> Consistente</>
-                        ) : period.avgPredictability < 80 ? (
-                          <><TrendingDown size={12} /> Subestima</>
-                        ) : (
-                          <><TrendingUp size={12} /> Sobreestima</>
-                        )}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <SortableTable
+            columns={periodColumns}
+            data={currentPeriods.map((p) => ({ ...p, id: p.periodKey }))}
+            pageSize={10}
+          />
         </div>
       )}
     </div>

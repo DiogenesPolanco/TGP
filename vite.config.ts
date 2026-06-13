@@ -5,6 +5,15 @@ import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    proxy: {
+      '/jira-proxy': {
+        target: 'https://diogenespolanco.atlassian.net',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/jira-proxy/, ''),
+      },
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),

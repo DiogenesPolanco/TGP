@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { SprintRecord, TeamSprint } from '@/types/domain'
-import { Plus, Trash2, Edit3 } from 'lucide-react'
+import { Plus, Trash2, Edit3, BarChart3, List } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
+import { cn } from '@/lib/utils'
 
 interface Props {
   memberId: string
   teamId: string
 }
+
+type ViewMode = 'list' | 'chart'
 
 export function SprintsSection({ memberId, teamId }: Props) {
   const { confirm } = useConfirm()
@@ -15,6 +19,10 @@ export function SprintsSection({ memberId, teamId }: Props) {
   const [teamSprints, setTeamSprints] = useState<TeamSprint[]>([])
   const [loadingTeamSprints, setLoadingTeamSprints] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
+  const [quarterFilter, setQuarterFilter] = useState<string | 'all'>('all')
+
   const [newSprint, setNewSprint] = useState({
     sprintName: '',
     quarter: 'Q2',
@@ -41,6 +49,36 @@ export function SprintsSection({ memberId, teamId }: Props) {
       setLoadingTeamSprints(false)
     })
   }, [teamId])
+
+  const availableYears = useMemo(() => {
+    const years = new Set(sprints.map((s) => s.year))
+    return Array.from(years).sort((a, b) => b - a)
+  }, [sprints])
+
+  const filteredSprints = useMemo(() => {
+    return sprints.filter((s) => {
+      if (yearFilter !== 'all' && s.year !== yearFilter) return false
+      if (quarterFilter !== 'all' && s.quarter !== quarterFilter) return false
+      return true
+    })
+  }, [sprints, yearFilter, quarterFilter])
+
+  const chartData = useMemo(() => {
+    return [...filteredSprints]
+      .sort((a, b) => {
+        const nameA = a.sprintName.toLowerCase()
+        const nameB = b.sprintName.toLowerCase()
+        return nameA.localeCompare(nameB)
+      })
+      .map((s) => ({
+        name: s.sprintName.length > 12 ? s.sprintName.slice(0, 12) + '...' : s.sprintName,
+        completados: s.storyPointsCompleted,
+        noCompletados: s.storyPointsNotCompleted,
+        eficiencia: s.storyPointsCompleted + s.storyPointsNotCompleted > 0
+          ? Math.round((s.storyPointsCompleted / (s.storyPointsCompleted + s.storyPointsNotCompleted)) * 100)
+          : 0,
+      }))
+  }, [filteredSprints])
 
   const handleTeamSprintSelect = (sprintName: string, setter: typeof setNewSprint | typeof setEditData, current: typeof newSprint | typeof editData) => {
     const ts = teamSprints.find((s) => s.sprintName === sprintName)
@@ -97,11 +135,11 @@ export function SprintsSection({ memberId, teamId }: Props) {
     setSprints(sprints.filter((s) => s.id !== id))
   }
 
-  const totalSP = sprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
-  const totalNotDone = sprints.reduce((s, sp) => s + sp.storyPointsNotCompleted, 0)
+  const totalSP = filteredSprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
+  const totalNotDone = filteredSprints.reduce((s, sp) => s + sp.storyPointsNotCompleted, 0)
   const efficiency = totalSP + totalNotDone > 0 ? Math.round((totalSP / (totalSP + totalNotDone)) * 100) : 0
 
-  const groupedByQuarter = sprints.reduce<Record<string, SprintRecord[]>>((acc, s) => {
+  const groupedByQuarter = filteredSprints.reduce<Record<string, SprintRecord[]>>((acc, s) => {
     const key = `${s.year} ${s.quarter}`
     if (!acc[key]) acc[key] = []
     acc[key].push(s)
@@ -125,28 +163,115 @@ export function SprintsSection({ memberId, teamId }: Props) {
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints</h2>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={16} /> Agregar Sprint
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-neutral-10 dark:bg-neutral-70 rounded-lg p-0.5">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-1.5 rounded-md transition-colors',
+                viewMode === 'list' ? 'bg-white dark:bg-neutral-80 shadow-sm text-primary' : 'text-neutral-50 hover:text-neutral-90'
+              )}
+              title="Vista lista"
+            >
+              <List size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('chart')}
+              className={cn(
+                'p-1.5 rounded-md transition-colors',
+                viewMode === 'chart' ? 'bg-white dark:bg-neutral-80 shadow-sm text-primary' : 'text-neutral-50 hover:text-neutral-90'
+              )}
+              title="Vista gráfico"
+            >
+              <BarChart3 size={16} />
+            </button>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={16} /> Agregar Sprint
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
           <p className="text-xl font-bold text-primary">{totalSP}</p>
           <p className="text-xs text-neutral-50">SP Completados</p>
         </div>
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-          <p className="text-xl font-bold text-green-600">{efficiency}%</p>
+          <p className={cn('text-xl font-bold', efficiency >= 80 ? 'text-green-600' : efficiency >= 50 ? 'text-amber-600' : 'text-red-600')}>{efficiency}%</p>
           <p className="text-xs text-neutral-50">Eficiencia</p>
         </div>
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-          <p className="text-xl font-bold text-neutral-90 dark:text-white">{sprints.length}</p>
+          <p className="text-xl font-bold text-neutral-90 dark:text-white">{filteredSprints.length}</p>
           <p className="text-xs text-neutral-50">Sprints</p>
         </div>
       </div>
+
+      {sprints.length > 0 && (
+        <div className="flex items-center gap-3 mb-4">
+          <select
+            value={yearFilter === 'all' ? 'all' : yearFilter}
+            onChange={(e) => setYearFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+            className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="all">Todos los años</option>
+            {availableYears.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <select
+            value={quarterFilter}
+            onChange={(e) => setQuarterFilter(e.target.value)}
+            className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="all">Todos los quarters</option>
+            <option value="Q1">Q1</option>
+            <option value="Q2">Q2</option>
+            <option value="Q3">Q3</option>
+            <option value="Q4">Q4</option>
+          </select>
+        </div>
+      )}
+
+      {viewMode === 'chart' && chartData.length > 0 && (
+        <div className="mb-6 p-4 bg-neutral-10 dark:bg-neutral-70 rounded-xl">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={chartData} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" stroke="rgb(156,163,175,0.2)" />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="rgb(156,163,175,0.6)" />
+              <YAxis tick={{ fontSize: 11 }} stroke="rgb(156,163,175,0.6)" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgb(30,30,30)',
+                  border: '1px solid rgb(60,60,60)',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                }}
+                formatter={(value) => [
+                  value,
+                  'SP',
+                ]}
+              />
+              <Legend
+                formatter={(value: string) => (
+                  <span className="text-xs text-neutral-60">
+                    {value === 'completados' ? 'Completados' : 'No completados'}
+                  </span>
+                )}
+              />
+              <Bar dataKey="completados" fill="#22c55e" radius={[4, 4, 0, 0]} name="completados" />
+              <Bar dataKey="noCompletados" fill="#ef4444" radius={[4, 4, 0, 0]} name="noCompletados" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {viewMode === 'chart' && chartData.length === 0 && (
+        <p className="text-center py-6 text-neutral-40 text-sm">No hay datos para mostrar en el gráfico</p>
+      )}
 
       {showForm && (
         <div className="mb-6 p-4 border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70">
@@ -235,101 +360,103 @@ export function SprintsSection({ memberId, teamId }: Props) {
         </div>
       )}
 
-      {Object.keys(groupedByQuarter).length === 0 ? (
-        <p className="text-center py-8 text-neutral-40">Sin sprints registrados</p>
-      ) : (
-        Object.entries(groupedByQuarter).map(([quarter, records]) => (
-          <div key={quarter} className="mb-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{quarter}</h3>
-            <div className="space-y-2">
-              {records.map((sp) =>
-                editingId === sp.id ? (
-                  <div key={sp.id} className="p-3 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
-                    <div className="grid gap-2 sm:grid-cols-5 mb-2">
-                      <div className="sm:col-span-2">
-                        <select
-                          value={editData.sprintName}
-                          onChange={(e) => handleTeamSprintSelect(e.target.value, setEditData, editData)}
-                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+      {viewMode === 'list' && (
+        Object.keys(groupedByQuarter).length === 0 ? (
+          <p className="text-center py-8 text-neutral-40">Sin sprints registrados</p>
+        ) : (
+          Object.entries(groupedByQuarter).map(([quarter, records]) => (
+            <div key={quarter} className="mb-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{quarter}</h3>
+              <div className="space-y-2">
+                {records.map((sp) =>
+                  editingId === sp.id ? (
+                    <div key={sp.id} className="p-3 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
+                      <div className="grid gap-2 sm:grid-cols-5 mb-2">
+                        <div className="sm:col-span-2">
+                          <select
+                            value={editData.sprintName}
+                            onChange={(e) => handleTeamSprintSelect(e.target.value, setEditData, editData)}
+                            className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          >
+                            <option value="">Seleccionar...</option>
+                            {teamSprints.map((ts) => (
+                              <option key={ts.id} value={ts.sprintName}>{ts.sprintName}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <select
+                            value={editData.quarter}
+                            onChange={(e) => setEditData({ ...editData, quarter: e.target.value })}
+                            className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          >
+                            <option value="Q1">Q1</option>
+                            <option value="Q2">Q2</option>
+                            <option value="Q3">Q3</option>
+                            <option value="Q4">Q4</option>
+                          </select>
+                        </div>
+                        <div>
+                          <input
+                            type="number"
+                            value={editData.storyPointsCompleted}
+                            onChange={(e) => setEditData({ ...editData, storyPointsCompleted: Number(e.target.value) })}
+                            className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                            placeholder="SP completados"
+                            min={0}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="number"
+                            value={editData.storyPointsNotCompleted}
+                            onChange={(e) => setEditData({ ...editData, storyPointsNotCompleted: Number(e.target.value) })}
+                            className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                            placeholder="SP no completados"
+                            min={0}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
+                        <button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      key={sp.id}
+                      className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/sprint"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
+                        <p className="text-xs text-neutral-50">
+                          {sp.storyPointsCompleted} SP completados · {sp.storyPointsNotCompleted} SP no completados
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
+                        <button
+                          onClick={() => startEdit(sp)}
+                          className="p-1.5 opacity-0 group-hover/sprint:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                          title="Editar sprint"
                         >
-                          <option value="">Seleccionar...</option>
-                          {teamSprints.map((ts) => (
-                            <option key={ts.id} value={ts.sprintName}>{ts.sprintName}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <select
-                          value={editData.quarter}
-                          onChange={(e) => setEditData({ ...editData, quarter: e.target.value })}
-                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
+                          <Edit3 size={14} />
+                        </button>
+                        <button
+                          onClick={() => removeSprint(sp.id)}
+                          className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          title="Eliminar sprint"
                         >
-                          <option value="Q1">Q1</option>
-                          <option value="Q2">Q2</option>
-                          <option value="Q3">Q3</option>
-                          <option value="Q4">Q4</option>
-                        </select>
-                      </div>
-                      <div>
-                        <input
-                          type="number"
-                          value={editData.storyPointsCompleted}
-                          onChange={(e) => setEditData({ ...editData, storyPointsCompleted: Number(e.target.value) })}
-                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          placeholder="SP completados"
-                          min={0}
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="number"
-                          value={editData.storyPointsNotCompleted}
-                          onChange={(e) => setEditData({ ...editData, storyPointsNotCompleted: Number(e.target.value) })}
-                          className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          placeholder="SP no completados"
-                          min={0}
-                        />
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
-                      <button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    key={sp.id}
-                    className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/sprint"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
-                      <p className="text-xs text-neutral-50">
-                        {sp.storyPointsCompleted} SP completados · {sp.storyPointsNotCompleted} SP no completados
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
-                      <button
-                        onClick={() => startEdit(sp)}
-                        className="p-1.5 opacity-0 group-hover/sprint:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                        title="Editar sprint"
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
-                        onClick={() => removeSprint(sp.id)}
-                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Eliminar sprint"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                )
-              )}
+                  )
+                )}
+              </div>
             </div>
-          </div>
-        ))
+          ))
+        )
       )}
     </div>
   )

@@ -58,7 +58,7 @@ export function SortableTable<T extends { id: string }>({
     })
   }, [data, sortKey, sortDir])
 
-  const { page, setPage, totalPages, paginatedItems } = usePagination(sorted, pageSize)
+  const { page, setPage, totalPages, paginatedItems, pageSize: currentPageSize, setPageSize } = usePagination(sorted, pageSize)
 
   if (data.length === 0) {
     return (
@@ -123,8 +123,9 @@ export function SortableTable<T extends { id: string }>({
         page={page}
         totalPages={totalPages}
         totalItems={data.length}
-        pageSize={pageSize}
+        pageSize={currentPageSize}
         onPageChange={setPage}
+        onPageSizeChange={setPageSize}
       />
     </div>
   )

@@ -50,7 +50,7 @@ export function PlansPage() {
     return true
   })
 
-  const { page, setPage, totalPages, paginatedItems: paginatedPlans } = usePagination(filteredPlans, 5)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedPlans } = usePagination(filteredPlans, 5)
 
   const getActivityStats = (planId: string) => {
     const planActivities = activities.filter((a) => a.planId === planId)
@@ -207,8 +207,9 @@ export function PlansPage() {
         page={page}
         totalPages={totalPages}
         totalItems={filteredPlans.length}
-        pageSize={5}
+        pageSize={pageSize}
         onPageChange={setPage}
+        onPageSizeChange={setPageSize}
       />
 
       {filteredPlans.length === 0 && (
