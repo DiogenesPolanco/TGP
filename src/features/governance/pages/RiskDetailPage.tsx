@@ -43,7 +43,7 @@ export function RiskDetailPage() {
       microservices: linkedMs,
       vulns: allVulns.filter((v) => v.applicationId && appIds.has(v.applicationId)),
       incidents: allIncidents.filter((i) => i.applicationId && appIds.has(i.applicationId)),
-      risks: [risk],
+      risks: [],
       auditFindings: allAudit.filter((a) => a.applicationId && appIds.has(a.applicationId)),
     }
   }, [risk, app, linkedMs, allVulns, allIncidents, allAudit])

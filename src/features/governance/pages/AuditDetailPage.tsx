@@ -48,7 +48,7 @@ export function AuditDetailPage() {
       vulns: allVulns.filter((v) => v.applicationId && appIds.has(v.applicationId)),
       incidents: allIncidents.filter((i) => i.applicationId && appIds.has(i.applicationId)),
       risks: allRisks.filter((r) => r.applicationId && appIds.has(r.applicationId)),
-      auditFindings: [finding],
+      auditFindings: [],
     }
   }, [finding, app, linkedMs, allVulns, allIncidents, allRisks])
 

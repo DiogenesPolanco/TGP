@@ -46,7 +46,7 @@ export function IncidentDetailPage() {
       apps: relatedApps,
       microservices: linkedMs,
       vulns: allVulns.filter((v) => v.applicationId && appIds.has(v.applicationId)),
-      incidents: [incident],
+      incidents: [],
       risks: allRisks.filter((r) => r.applicationId && appIds.has(r.applicationId)),
       auditFindings: allAudit.filter((a) => a.applicationId && appIds.has(a.applicationId)),
     }
