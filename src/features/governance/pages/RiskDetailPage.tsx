@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
-import { Pencil, Server, Search } from 'lucide-react'
+import { Pencil, Server, Search, AlertTriangle, Target, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
 
 const statusLabel: Record<string, string> = { open: 'Abierto', mitigated: 'Mitigado', accepted: 'Aceptado', closed: 'Cerrado' }
@@ -53,7 +53,10 @@ export function RiskDetailPage() {
   }
 
   const riskLevel = risk.riskScore >= 15 ? 'Crítico' : risk.riskScore >= 10 ? 'Alto' : risk.riskScore >= 5 ? 'Medio' : 'Bajo'
-  const riskColor = risk.riskScore >= 15 ? 'bg-danger/10 text-danger' : risk.riskScore >= 10 ? 'bg-warning/10 text-warning' : risk.riskScore >= 5 ? 'bg-info/10 text-info' : 'bg-success/10 text-success'
+  const riskColor = risk.riskScore >= 15 ? 'bg-danger text-white' : risk.riskScore >= 10 ? 'bg-warning text-white' : risk.riskScore >= 5 ? 'bg-info text-white' : 'bg-success text-white'
+  const riskBg = risk.riskScore >= 15 ? 'bg-danger/5 border-danger/20' : risk.riskScore >= 10 ? 'bg-warning/5 border-warning/20' : risk.riskScore >= 5 ? 'bg-info/5 border-info/20' : 'bg-success/5 border-success/20'
+  const riskIcon = risk.riskScore >= 15 ? <XCircle size={24} className="text-white" /> : risk.riskScore >= 10 ? <AlertTriangle size={24} className="text-white" /> : risk.riskScore >= 5 ? <Clock size={24} className="text-white" /> : <CheckCircle size={24} className="text-white" />
+  const riskIconBg = risk.riskScore >= 15 ? 'bg-danger' : risk.riskScore >= 10 ? 'bg-warning' : risk.riskScore >= 5 ? 'bg-info' : 'bg-success'
 
   const tabs = [
     { id: 'info' as const, label: 'Información General', icon: Server },
@@ -98,24 +101,69 @@ export function RiskDetailPage() {
       </div>
 
       {activeTab === 'info' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Section title="Información General">
-            <Field label="Título" value={risk.title} />
-            <Field label="Descripción" value={risk.description} />
-            <Field label="Categoría" value={categoryLabel[risk.category] ?? risk.category} />
-            <Field label="Aplicación" value={app?.name ?? 'Sin asignar'} />
-            <Field label="Unidad de Negocio" value={bu?.name ?? 'Sin asignar'} />
-          </Section>
-          <Section title="Matriz de Riesgo">
-            <Field label="Probabilidad" value={`${risk.probability}/5`} />
-            <Field label="Impacto" value={`${risk.impact}/5`} />
-            <div className="flex items-start gap-2">
-              <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">Score</dt>
-              <dd className={`text-sm font-bold px-2 py-0.5 rounded ${riskColor}`}>{risk.riskScore} · {riskLevel}</dd>
+        <div className="space-y-6">
+          {/* Hero banner */}
+          <div className={`rounded-xl border p-5 ${riskBg}`}>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl ${riskIconBg} flex items-center justify-center shadow-sm`}>
+                  {riskIcon}
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-neutral-50 dark:text-neutral-40">Nivel de Riesgo</p>
+                  <p className="text-xl font-bold text-neutral-90 dark:text-white">{riskLevel}</p>
+                  <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-0.5">
+                    Score: <span className="font-bold">{risk.riskScore}</span> · Probabilidad {risk.probability}/5 · Impacto {risk.impact}/5
+                  </p>
+                </div>
+              </div>
+              <div className={`px-4 py-2 rounded-lg ${riskColor} text-center min-w-[80px]`}>
+                <p className="text-2xl font-bold tabular-nums">{risk.riskScore}</p>
+                <p className="text-[10px] uppercase tracking-wider opacity-80">Score</p>
+              </div>
             </div>
-            <Field label="Estado" value={statusLabel[risk.status] ?? risk.status} />
-            {risk.targetDate && <Field label="Fecha Objetivo" value={new Date(risk.targetDate).toLocaleDateString('es-ES')} />}
-          </Section>
+            {risk.mitigationPlan && (
+              <div className="mt-4 pt-4 border-t border-current/10">
+                <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-1">Plan de Mitigación</p>
+                <p className="text-sm text-neutral-70 dark:text-neutral-30 whitespace-pre-wrap">{risk.mitigationPlan}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Detail cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Section title="Información General" icon={<Server size={18} />}>
+              <div className="grid grid-cols-2 gap-3">
+                <MiniField label="Título" value={risk.title} />
+                <MiniField label="Categoría" value={categoryLabel[risk.category] ?? risk.category} />
+                <MiniField label="Aplicación" value={app?.name ?? 'Sin asignar'} />
+                <MiniField label="Unidad de Negocio" value={bu?.name ?? 'Sin asignar'} />
+              </div>
+            </Section>
+
+            <Section title="Matriz de Riesgo" icon={<Target size={18} />}>
+              <div className="grid grid-cols-2 gap-3">
+                <MiniField label="Probabilidad" value={`${risk.probability}/5`} />
+                <MiniField label="Impacto" value={`${risk.impact}/5`} />
+                <MiniField
+                  label="Estado"
+                  value={
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+                      risk.status === 'open' ? 'bg-danger/10 text-danger' :
+                      risk.status === 'mitigated' ? 'bg-warning/10 text-warning' :
+                      risk.status === 'accepted' ? 'bg-info/10 text-info' :
+                      'bg-success/10 text-success'
+                    }`}>
+                      {statusLabel[risk.status] ?? risk.status}
+                    </span>
+                  }
+                />
+                {risk.targetDate && (
+                  <MiniField label="Fecha Objetivo" value={new Date(risk.targetDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })} />
+                )}
+              </div>
+            </Section>
+          </div>
         </div>
       )}
 
@@ -126,20 +174,23 @@ export function RiskDetailPage() {
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">{title}</h3>
-      <div className="space-y-2">{children}</div>
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+      <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
+        {icon && <span className="text-neutral-50">{icon}</span>}
+        {title}
+      </h3>
+      {children}
     </div>
   )
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function MiniField({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-2">
-      <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">{label}</dt>
-      <dd className="text-sm text-neutral-90 dark:text-white flex-1">{value || '—'}</dd>
+    <div className="space-y-0.5">
+      <dt className="text-[10px] font-medium text-neutral-40 uppercase tracking-wider">{label}</dt>
+      <dd className="text-sm text-neutral-90 dark:text-white">{typeof value === 'string' ? (value || '—') : value}</dd>
     </div>
   )
 }
