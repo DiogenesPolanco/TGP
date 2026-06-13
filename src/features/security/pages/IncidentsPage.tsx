@@ -6,7 +6,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, Clock, Activity, AlertOctagon, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, Clock, Activity, AlertOctagon, Eye, Pencil, Trash2 } from 'lucide-react'
 import type { Incident } from '@/types/domain'
 
 function statusLabel(status: string | null | undefined): string {
@@ -139,6 +139,13 @@ export function IncidentsPage() {
       render: (incident) => (
         <div className="flex items-center justify-end gap-2">
           <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${incident.id}`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Ver detalle"
+          >
+            <Eye size={16} />
+          </button>
+          <button
             onClick={(e) => { e.stopPropagation(); navigate(`${incident.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
@@ -253,7 +260,7 @@ export function IncidentsPage() {
       <SortableTable
         columns={columns}
         data={filteredIncidents}
-        onRowClick={(incident) => navigate(`${incident.id}/edit`)}
+        onRowClick={(incident) => navigate(`${incident.id}`)}
         emptyMessage="No se encontraron incidentes"
       />
     </div>

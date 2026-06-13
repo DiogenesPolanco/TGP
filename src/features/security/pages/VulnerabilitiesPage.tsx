@@ -6,7 +6,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, X, Shield, AlertTriangle, Clock, Pencil, Trash2, ChevronDown, ChevronUp, Bug } from 'lucide-react'
+import { Plus, Search, Filter, X, Shield, AlertTriangle, Clock, Eye, Pencil, Trash2, ChevronDown, ChevronUp, Bug } from 'lucide-react'
 import { FluidAttackImportPanel } from '@/features/admin/components/FluidAttackImportPanel'
 import type { Vulnerability } from '@/types/domain'
 
@@ -165,6 +165,13 @@ export function VulnerabilitiesPage() {
       render: (vuln) => (
         <div className="flex items-center justify-end gap-2">
           <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Ver detalle"
+          >
+            <Eye size={16} />
+          </button>
+          <button
             onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
@@ -314,7 +321,7 @@ export function VulnerabilitiesPage() {
         <SortableTable
           columns={columns}
           data={filteredVulns}
-          onRowClick={(vuln) => navigate(`${vuln.id}/edit`)}
+          onRowClick={(vuln) => navigate(`${vuln.id}`)}
           emptyMessage="No se encontraron vulnerabilidades"
         />
       )}

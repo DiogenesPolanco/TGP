@@ -6,7 +6,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Eye, Pencil, Trash2 } from 'lucide-react'
 import type { AuditFinding } from '@/types/domain'
 
 const severityLabel: Record<string, string> = {
@@ -171,6 +171,13 @@ export function AuditPage() {
       render: (finding) => (
         <div className="flex items-center justify-end gap-2">
           <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Ver detalle"
+          >
+            <Eye size={16} />
+          </button>
+          <button
             onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
@@ -285,7 +292,7 @@ export function AuditPage() {
       <SortableTable
         columns={columns}
         data={filteredFindings}
-        onRowClick={(finding) => navigate(`${finding.id}/edit`)}
+        onRowClick={(finding) => navigate(`${finding.id}`)}
         emptyMessage="No se encontraron hallazgos"
       />
     </div>

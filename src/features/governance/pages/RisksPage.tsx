@@ -6,7 +6,8 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, Upload, X, Eye, Pencil, Trash2 } from 'lucide-react'
+
 import type { Risk } from '@/types/domain'
 
 const statusLabel: Record<string, string> = {
@@ -131,6 +132,13 @@ export function RisksPage() {
       headerClassName: 'text-right',
       render: (risk) => (
         <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}`) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+            title="Ver detalle"
+          >
+            <Eye size={16} />
+          </button>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
@@ -284,7 +292,7 @@ export function RisksPage() {
       <SortableTable
         columns={columns}
         data={filteredRisks}
-        onRowClick={(risk) => navigate(`${risk.id}/edit`)}
+        onRowClick={(risk) => navigate(`${risk.id}`)}
         emptyMessage="No se encontraron riesgos"
       />
     </div>
