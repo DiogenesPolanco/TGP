@@ -31,6 +31,11 @@ import type {
   Candidate,
   CandidateTechnology,
   CandidateEvaluation,
+  VulnerabilityMicroservice,
+  IncidentMicroservice,
+  AuditFindingMicroservice,
+  RiskMicroservice,
+  AppDatabaseMicroservice,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -71,6 +76,13 @@ export class TGPDatabase extends Dexie {
   candidates!: Table<Candidate, string>
   candidateTechnologies!: Table<CandidateTechnology, string>
   candidateEvaluations!: Table<CandidateEvaluation, string>
+
+  // Junction M:N microservicios
+  vulnerabilityMicroservices!: Table<VulnerabilityMicroservice, string>
+  incidentMicroservices!: Table<IncidentMicroservice, string>
+  auditFindingMicroservices!: Table<AuditFindingMicroservice, string>
+  riskMicroservices!: Table<RiskMicroservice, string>
+  appDatabaseMicroservices!: Table<AppDatabaseMicroservice, string>
 
   constructor() {
     super('TGPDatabase')
@@ -121,6 +133,15 @@ export class TGPDatabase extends Dexie {
     })
     this.version(13).stores({
       vulnerabilities: 'id, applicationId, severity, status, slaDeadline, detectedAt, title, externalId',
+    })
+    this.version(14).stores({
+      vulnerabilityMicroservices: 'id, vulnerabilityId, microserviceId',
+      incidentMicroservices: 'id, incidentId, microserviceId',
+      auditFindingMicroservices: 'id, auditFindingId, microserviceId',
+      riskMicroservices: 'id, riskId, microserviceId',
+    })
+    this.version(15).stores({
+      appDatabaseMicroservices: 'id, appDatabaseId, microserviceId',
     })
   }
 }

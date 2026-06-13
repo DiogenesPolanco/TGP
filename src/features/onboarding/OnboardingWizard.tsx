@@ -69,7 +69,7 @@ function StepWelcome({ onNext }: StepProps) {
           </div>
           <div className="flex items-center gap-3 ml-4">
             <span className="text-primary font-bold text-base">2</span>
-            <span><strong>Aplicaciones + Tecnologías</strong> — El portafolio</span>
+            <span><strong>Aplicaciones + Microservicios</strong> — El portafolio</span>
           </div>
           <div className="flex items-center gap-3 ml-8">
             <span className="text-primary font-bold text-base">3</span>
@@ -77,10 +77,14 @@ function StepWelcome({ onNext }: StepProps) {
           </div>
           <div className="flex items-center gap-3 ml-12">
             <span className="text-primary font-bold text-base">4</span>
-            <span><strong>Equipos + Ejecución</strong> — Personas, planes, daily, OKRs</span>
+            <span><strong>Herencia Microservicio→App</strong> — Entidades M:N que se heredan al padre</span>
           </div>
           <div className="flex items-center gap-3 ml-16">
             <span className="text-primary font-bold text-base">5</span>
+            <span><strong>Equipos + Ejecución</strong> — Personas, planes, daily, OKRs</span>
+          </div>
+          <div className="flex items-center gap-3 ml-20">
+            <span className="text-primary font-bold text-base">6</span>
             <span><strong>Dashboard</strong> — THI, KPIs, alertas en tiempo real</span>
           </div>
         </div>
@@ -159,6 +163,7 @@ function StepApplications({ onNext, onSkip }: StepProps) {
           <li>Criticidad (define prioridad en dashboard)</li>
           <li>Tech stack (tecnologías que usa)</li>
           <li>Microservicios y bases de datos asociadas</li>
+          <li>Vulnerabilidades, incidentes, riesgos y hallazgos se heredan de los microservicios</li>
         </ul>
       </div>
       <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3 border border-amber-200 dark:border-amber-500/20">
@@ -262,6 +267,12 @@ function StepSecurity({ onNext, onSkip }: StepProps) {
           (P1-P4 con RCA), <strong>riesgos</strong> (matriz probabilidad×impacto) y
           <strong> auditoría</strong> (hallazgos con plan de acción).
         </p>
+        <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3 border border-amber-200 dark:border-amber-500/20">
+          <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+            💡 Las entidades se pueden asociar tanto a la aplicación directamente como a cada <strong>microservicio</strong>
+            individualmente. Cuando ves una aplicación, las tabs muestran la unión de ambas fuentes.
+          </p>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <button onClick={() => navigate('/security/vulnerabilities')} className="text-left bg-neutral-5 dark:bg-neutral-85 rounded-lg p-3 hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
@@ -396,7 +407,9 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¿Datos de demostración?</h2>
         <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
           Carga datos de ejemplo para explorar todas las funcionalidades sin tener que
-          registrar nada manualmente. Incluye 10 apps, 18 tecnologías, equipos, OKRs y más.
+          registrar nada manualmente. Incluye 10 apps, 9 microservicios con entidades asociadas
+          (vulnerabilidades, incidentes, riesgos, hallazgos vía M:N),
+          18+ tecnologías, equipos, OKRs y más.
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
@@ -440,6 +453,7 @@ function StepDone({ onClose }: StepProps) {
           <li>Sincronizar Tecnologías en Obsolescencia</li>
           <li>Crear Equipos y registrar miembros</li>
           <li>Explorar el Dashboard para ver métricas</li>
+          <li>En detalle de app, clickear microservicio → asociar vulnerabilidades/riesgos</li>
         </ol>
       </div>
       <button onClick={handleFinish} className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">

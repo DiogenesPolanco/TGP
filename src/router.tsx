@@ -68,6 +68,8 @@ export const router = createBrowserRouter([
       { path: 'catalog/applications/:appId/databases/new', lazy: () => import('@/features/catalog/pages/DatabaseFormPage').then((m) => ({ Component: m.DatabaseFormPage })) },
       { path: 'catalog/applications/:appId/databases/:id/edit', lazy: () => import('@/features/catalog/pages/DatabaseFormPage').then((m) => ({ Component: m.DatabaseFormPage })) },
       { path: 'catalog/applications/:id', lazy: () => import('@/features/catalog/pages/ApplicationDetailPage').then((m) => ({ Component: m.ApplicationDetailPage })) },
+      { path: 'catalog/microservices', lazy: () => import('@/features/catalog/pages/MicroservicesPage').then((m) => ({ Component: m.MicroservicesPage })) },
+      { path: 'catalog/microservices/:id', lazy: () => import('@/features/catalog/pages/MicroserviceDetailPage').then((m) => ({ Component: m.MicroserviceDetailPage })) },
 
       { path: 'catalog/obsolescence', lazy: () => import('@/features/obsolescence/pages/ObsolescencePage').then((m) => ({ Component: m.ObsolescencePage })) },
       { path: 'catalog/obsolescence/map', lazy: () => import('@/features/obsolescence/pages/ObsolescenceMapPage').then((m) => ({ Component: m.ObsolescenceMapPage })) },

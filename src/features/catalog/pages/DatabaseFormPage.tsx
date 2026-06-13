@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
@@ -56,6 +56,8 @@ const dbEngineExamples: Record<DatabaseType, string[]> = {
 
 export function DatabaseFormPage() {
   const { appId, id } = useParams<{ appId: string; id: string }>()
+  const [searchParams] = useSearchParams()
+  const microserviceIdParam = searchParams.get('microserviceId')
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
   const application = useLiveQuery(() => (appId ? db.applications.get(appId) : undefined), [appId])
@@ -75,7 +77,9 @@ export function DatabaseFormPage() {
   const [port, setPort] = useState<number | null>(null)
   const [isManaged, setIsManaged] = useState(false)
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
-  const [selectedMsIds, setSelectedMsIds] = useState<string[]>([])
+  const [selectedMsIds, setSelectedMsIds] = useState<string[]>(
+    microserviceIdParam ? [microserviceIdParam] : [],
+  )
   const [msSearch, setMsSearch] = useState('')
   const [showMsDropdown, setShowMsDropdown] = useState(false)
 
@@ -139,14 +143,24 @@ export function DatabaseFormPage() {
       await db.appDatabases.update(existing.id, data)
       addNotification({ type: 'success', message: 'Base de datos actualizada' })
     } else {
+      const newId = crypto.randomUUID()
       await db.appDatabases.add({
-        id: crypto.randomUUID(),
+        id: newId,
         ...data,
         createdAt: new Date(),
       })
+
+      if (microserviceIdParam) {
+        await db.appDatabaseMicroservices.add({
+          id: crypto.randomUUID(),
+          appDatabaseId: newId,
+          microserviceId: microserviceIdParam,
+        })
+      }
+
       addNotification({ type: 'success', message: 'Base de datos creada' })
     }
-    navigate(`/catalog/applications/${appId}`)
+    navigate(microserviceIdParam ? `/catalog/microservices/${microserviceIdParam}` : `/catalog/applications/${appId}`)
   }
 
   const engineSuggestions = dbEngineExamples[dbType] ?? []

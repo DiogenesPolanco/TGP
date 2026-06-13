@@ -1,8 +1,15 @@
+import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
+import { formatDuration } from '@/utils/technologyUtils'
 import { DetailLayout } from '@/components/ui/DetailLayout'
-import { Pencil } from 'lucide-react'
+import {
+  Pencil, Server, Box, Database, Users, Shield,
+  FileWarning, BookOpen, Calendar,
+  ArrowRight, ExternalLink, CircleUser, Bug, Scale,
+  Activity, Search, CheckCircle, Clock, XCircle, HelpCircle,
+} from 'lucide-react'
 
 const supportStatusLabel: Record<string, string> = { active: 'Activo', extended: 'Soporte Extendido', eol: 'EOL', unknown: 'Desconocido' }
 const supportStatusColor: Record<string, string> = { active: 'bg-success/10 text-success', extended: 'bg-warning/10 text-warning', eol: 'bg-danger/10 text-danger', unknown: 'bg-neutral-10 text-neutral-60' }
@@ -11,11 +18,80 @@ const categoryLabel: Record<string, string> = {
   runtime: 'Runtime', library: 'Librería', message_broker: 'Message Broker', cache: 'Cache',
   web_server: 'Web Server', cloud_service: 'Cloud Service', tool: 'Herramienta', other: 'Otro',
 }
+const criticalityColor: Record<string, string> = {
+  critical: 'bg-danger/10 text-danger', high: 'bg-warning/10 text-warning',
+  medium: 'bg-info/10 text-info', low: 'bg-success/10 text-success',
+}
+const criticalityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja' }
+const lifecycleLabel: Record<string, string> = {
+  active: 'Activo', evolving: 'Evolución', deprecated: 'Deprecado',
+  decommissioned: 'Retirado', planned: 'Planificado',
+}
+const lifecycleColor: Record<string, string> = {
+  active: 'bg-success/10 text-success', evolving: 'bg-info/10 text-info',
+  deprecated: 'bg-warning/10 text-warning', decommissioned: 'bg-danger/10 text-danger',
+  planned: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60',
+}
+
+type TabId = 'info' | 'relations'
 
 export function TechnologyDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<TabId>('info')
+
   const tech = useLiveQuery(() => db.technologies.get(id!), [id])
+
+  const rawApps = useLiveQuery(() => db.applications.toArray())
+  const applications = useMemo(() => rawApps ?? [], [rawApps])
+  const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
+  const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
+  const rawDatabases = useLiveQuery(() => db.appDatabases.toArray())
+  const databases = useMemo(() => rawDatabases ?? [], [rawDatabases])
+
+  const rawVulns = useLiveQuery(() => db.vulnerabilities.toArray())
+  const vulnerabilities = useMemo(() => rawVulns ?? [], [rawVulns])
+  const rawIncidents = useLiveQuery(() => db.incidents.toArray())
+  const incidents = useMemo(() => rawIncidents ?? [], [rawIncidents])
+  const rawRisks = useLiveQuery(() => db.risks.toArray())
+  const risks = useMemo(() => rawRisks ?? [], [rawRisks])
+  const rawAudit = useLiveQuery(() => db.auditFindings.toArray())
+  const auditFindings = useMemo(() => rawAudit ?? [], [rawAudit])
+
+  // ── Related entities computation ──
+
+  const related = useMemo(() => {
+    if (!id) return null
+
+    const relatedApps = applications.filter((a) => a.technologies.includes(id))
+    const relatedMsIds = new Set(
+      microservices.filter((ms) => ms.technologies.includes(id)).map((ms) => ms.id),
+    )
+    const relatedMs = microservices.filter((ms) => relatedMsIds.has(ms.id))
+    const relatedDbs = databases.filter((db) => db.technologies.includes(id))
+
+    const appIds = new Set(relatedApps.map((a) => a.id))
+    const appOwnerNames = new Set(relatedApps.map((a) => a.ownerName).filter(Boolean))
+    const msTechLeadNames = new Set(relatedMs.map((ms) => ms.technicalLead).filter(Boolean))
+    const people = [...new Set([...appOwnerNames, ...msTechLeadNames])].filter((p): p is string => !!p)
+
+    // Entities linked to apps using this tech
+    const vulnsForApps = vulnerabilities.filter((v) => v.applicationId && appIds.has(v.applicationId))
+    const incidentsForApps = incidents.filter((i) => i.applicationId && appIds.has(i.applicationId))
+    const risksForApps = risks.filter((r) => r.applicationId && appIds.has(r.applicationId))
+    const auditForApps = auditFindings.filter((a) => a.applicationId && appIds.has(a.applicationId))
+
+    return {
+      apps: relatedApps,
+      microservices: relatedMs,
+      databases: relatedDbs,
+      people,
+      vulns: vulnsForApps,
+      incidents: incidentsForApps,
+      risks: risksForApps,
+      auditFindings: auditForApps,
+    }
+  }, [id, applications, microservices, databases, vulnerabilities, incidents, risks, auditFindings])
 
   if (!tech) {
     return <DetailLayout title="Tecnología no encontrada" onBack={() => navigate('/catalog/obsolescence')}><p className="text-neutral-50">La tecnología no existe o ha sido eliminada.</p></DetailLayout>
@@ -24,11 +100,24 @@ export function TechnologyDetailPage() {
   const now = new Date()
   const eolDate = tech.eolDate ? new Date(tech.eolDate) : null
   const daysUntilEol = eolDate ? Math.ceil((eolDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+  const eolExpired = daysUntilEol !== null && daysUntilEol < 0
+
+  const tabs = [
+    { id: 'info' as TabId, label: 'Información General', icon: Server },
+    { id: 'relations' as TabId, label: 'Relacionados', icon: Search },
+  ]
 
   return (
     <DetailLayout
       title={`${tech.name} ${tech.version}`}
-      subtitle={`${tech.vendor} · ${categoryLabel[tech.category] ?? tech.category}`}
+      subtitle={
+        <span className="flex items-center gap-2">
+          <span>{tech.vendor} · {categoryLabel[tech.category] ?? tech.category}</span>
+          <span className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}>
+            {supportStatusLabel[tech.supportStatus]}
+          </span>
+        </span>
+      }
       onBack={() => navigate('/catalog/obsolescence')}
       backLabel="Obsolescencia"
       actions={
@@ -41,52 +130,571 @@ export function TechnologyDetailPage() {
         </button>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Section title="Información General">
-          <Field label="Nombre" value={tech.name} />
-          <Field label="Versión" value={tech.version} />
-          <Field label="Vendor" value={tech.vendor} />
-          <Field label="Categoría" value={categoryLabel[tech.category] ?? tech.category} />
-        </Section>
-        <Section title="Ciclo de Vida">
-          <div className="flex items-start gap-2">
-            <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">Estado</dt>
-            <dd className={`text-sm font-medium px-2 py-0.5 rounded ${supportStatusColor[tech.supportStatus]}`}>{supportStatusLabel[tech.supportStatus]}</dd>
-          </div>
-          <Field label="EOL Date" value={tech.eolDate ? new Date(tech.eolDate).toLocaleDateString('es-ES') : 'No definido'} />
-          {daysUntilEol !== null && (
-            <Field label="Días restantes" value={daysUntilEol >= 0 ? `${daysUntilEol} días` : `Vencido hace ${Math.abs(daysUntilEol)} días`} />
-          )}
-        </Section>
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 -mx-6 px-6 mb-6">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
+                activeTab === tab.id
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+              }`}
+            >
+              <Icon size={16} />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
-      {tech.cveList.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-neutral-20 dark:border-neutral-70">
-          <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-3">CVEs ({tech.cveList.length})</h3>
-          <div className="flex flex-wrap gap-2">
-            {tech.cveList.map((cve) => (
-              <span key={cve} className="text-xs px-2 py-1 rounded bg-danger/10 text-danger font-mono">{cve}</span>
-            ))}
-          </div>
-        </div>
-      )}
+
+      {activeTab === 'info' && renderInfoTab(tech, supportStatusColor, supportStatusLabel, categoryLabel, daysUntilEol, eolExpired)}
+      {activeTab === 'relations' && related && renderRelationsTab(related, navigate)}
     </DetailLayout>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// ─── Info Tab ───
+
+function renderInfoTab(tech: any, _statusColor: Record<string, string>, _statusLabel: Record<string, string>, _catLabel: Record<string, string>, daysUntilEol: number | null, eolExpired: boolean) {
+  const eolDate = tech.eolDate ? new Date(tech.eolDate) : null
+  const statusKey = tech.supportStatus as string
+  const statusBgColor: Record<string, string> = {
+    active: 'bg-success', extended: 'bg-warning', eol: 'bg-danger', unknown: 'bg-neutral-40',
+  }
+
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">{title}</h3>
-      <div className="space-y-2">{children}</div>
+    <div className="space-y-6">
+      {/* Hero status banner */}
+      <div className={`rounded-xl border p-5 ${supportStatusColor[statusKey] || 'bg-neutral-10'} border-current/20`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl ${statusBgColor[statusKey] || 'bg-neutral-40'} flex items-center justify-center`}>
+              {statusKey === 'active' ? <CheckCircle size={24} className="text-white" /> :
+               statusKey === 'extended' ? <Clock size={24} className="text-white" /> :
+               statusKey === 'eol' ? <XCircle size={24} className="text-white" /> :
+               <HelpCircle size={24} className="text-white" />}
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider opacity-70">Estado Actual</p>
+              <p className="text-xl font-bold">{supportStatusLabel[statusKey] || 'Desconocido'}</p>
+              {eolDate && (
+                <p className="text-sm opacity-80 mt-0.5">
+                  {eolExpired
+                    ? `EOL vencido el ${eolDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`
+                    : `EOL: ${eolDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`
+                  }
+                </p>
+              )}
+            </div>
+          </div>
+          {daysUntilEol !== null && (
+            <div className="text-right">
+              <p className={`text-2xl font-bold tabular-nums ${eolExpired ? 'opacity-70' : ''}`}>
+                {formatDuration(daysUntilEol)}
+              </p>
+              <p className="text-xs opacity-80">{eolExpired ? 'vencido' : 'restantes'}</p>
+            </div>
+          )}
+        </div>
+        {tech.eolDate && (
+          <div className="mt-4">
+            <EolBar eolDate={tech.eolDate} />
+          </div>
+        )}
+      </div>
+
+      {/* Detail cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Section title="Información General" icon={<Server size={18} />}>
+          <div className="grid grid-cols-2 gap-3">
+            <MiniField label="Nombre" value={tech.name} />
+            <MiniField label="Versión" value={tech.version} />
+            <MiniField label="Vendor" value={tech.vendor} />
+            <MiniField label="Categoría" value={categoryLabel[tech.category] ?? tech.category} />
+          </div>
+        </Section>
+
+        <Section title="Ciclo de Vida" icon={<Calendar size={18} />}>
+          <div className="grid grid-cols-2 gap-3">
+            <MiniField
+              label="Estado"
+              value={
+                <span className={`text-xs font-medium px-2 py-0.5 rounded ${supportStatusColor[tech.supportStatus]}`}>
+                  {supportStatusLabel[tech.supportStatus]}
+                </span>
+              }
+            />
+            <MiniField
+              label="EOL Date"
+              value={tech.eolDate ? eolDate!.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No definido'}
+            />
+            {daysUntilEol !== null && (
+              <MiniField
+                label="Tiempo restante"
+                value={eolExpired
+                  ? `Vencido hace ${formatDuration(daysUntilEol)}`
+                  : formatDuration(daysUntilEol)
+                }
+              />
+            )}
+            <MiniField label="CVE(s)" value={`${tech.cveList?.length ?? 0} conocido${tech.cveList?.length !== 1 ? 's' : ''}`} />
+          </div>
+        </Section>
+      </div>
+
+      {tech.cveList.length > 0 && (
+        <Section title={`CVEs Conocidos (${tech.cveList.length})`} icon={<Bug size={18} />}>
+          <div className="flex flex-wrap gap-2">
+            {tech.cveList.map((cve: string) => (
+              <span
+                key={cve}
+                className="text-xs px-2.5 py-1 rounded-full bg-danger/10 text-danger font-mono border border-danger/20 hover:bg-danger/20 transition-colors cursor-default"
+              >
+                {cve}
+              </span>
+            ))}
+          </div>
+        </Section>
+      )}
     </div>
   )
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function EolBar({ eolDate }: { eolDate: Date | string }) {
+  const eol = new Date(eolDate)
+  const now = new Date()
+  const totalMs = eol.getTime() - new Date(0).getTime()
+  const elapsedMs = now.getTime() - new Date(0).getTime()
+  const pct = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100))
+  const expired = now > eol
+  const barColor = expired ? 'bg-danger' : pct > 80 ? 'bg-warning' : pct > 50 ? 'bg-severity-high' : 'bg-success'
+  const remainingDays = Math.ceil((eol.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  const totalDays = Math.ceil((eol.getTime() - new Date(0).getTime()) / (1000 * 60 * 60 * 24))
+  const usedDays = totalDays - remainingDays
+
   return (
-    <div className="flex items-start gap-2">
-      <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">{label}</dt>
-      <dd className="text-sm text-neutral-90 dark:text-white flex-1">{value || '—'}</dd>
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-xs text-neutral-50">
+        <span>{usedDays > 0 ? `Desde hace ${formatDuration(usedDays)}` : 'Inicio'}</span>
+        <span className="font-medium">{expired ? 'Vencido' : `${formatDuration(remainingDays)} restantes`}</span>
+      </div>
+      <div className="h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${barColor}`}
+          style={{ width: `${Math.min(100, Math.max(0, expired ? 100 : pct))}%` }}
+        />
+      </div>
     </div>
   )
+}
+
+// ─── Relations Tab ───
+
+interface RelatedData {
+  apps: any[]
+  microservices: any[]
+  databases: any[]
+  people: string[]
+  vulns: any[]
+  incidents: any[]
+  risks: any[]
+  auditFindings: any[]
+}
+
+function renderRelationsTab(data: RelatedData, navigate: (path: string) => void) {
+  const counts = {
+    apps: data.apps.length,
+    ms: data.microservices.length,
+    dbs: data.databases.length,
+    vulns: data.vulns.length,
+    incidents: data.incidents.length,
+    risks: data.risks.length,
+    audit: data.auditFindings.length,
+    people: data.people.length,
+  }
+
+  const totalImpact = data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length
+
+  return (
+    <div className="space-y-6">
+      {/* Hero section — Quick overview */}
+      <div className="bg-gradient-to-br from-neutral-5 to-neutral-10 dark:from-neutral-85 dark:to-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+        <div className="flex items-start justify-between mb-5">
+          <div>
+            <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
+              <Search size={16} className="text-primary" />
+              Panorama General de Impacto
+            </h3>
+            <p className="text-xs text-neutral-50 mt-0.5">
+              Componentes vinculados a esta tecnología en todo el portafolio
+            </p>
+          </div>
+          {totalImpact > 0 && (
+            <div className="text-right">
+              <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{totalImpact}</p>
+              <p className="text-xs text-neutral-50">Entidades vinculadas</p>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <StatBadge
+            icon={<Server size={16} />}
+            value={counts.apps}
+            label="Aplicaciones"
+            color="primary"
+          />
+          <StatBadge
+            icon={<Box size={16} />}
+            value={counts.ms}
+            label="Microservicios"
+            color="info"
+          />
+          <StatBadge
+            icon={<Database size={16} />}
+            value={counts.dbs}
+            label="Bases de Datos"
+            color="purple"
+          />
+          <StatBadge
+            icon={<Shield size={16} />}
+            value={counts.vulns}
+            label="Vulnerabilidades"
+            color={counts.vulns > 0 ? 'danger' : 'neutral'}
+          />
+          <StatBadge
+            icon={<Activity size={16} />}
+            value={counts.incidents}
+            label="Incidentes"
+            color={counts.incidents > 0 ? 'danger' : 'neutral'}
+          />
+          <StatBadge
+            icon={<FileWarning size={16} />}
+            value={counts.risks}
+            label="Riesgos"
+            color={counts.risks > 0 ? 'warning' : 'neutral'}
+          />
+          <StatBadge
+            icon={<BookOpen size={16} />}
+            value={counts.audit}
+            label="Auditoría"
+            color={counts.audit > 0 ? 'warning' : 'neutral'}
+          />
+          <StatBadge
+            icon={<Users size={16} />}
+            value={counts.people}
+            label="Personas"
+            color="primary"
+          />
+        </div>
+      </div>
+
+      {/* Entity sections */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Applications */}
+        <EntitySection
+          title="Aplicaciones"
+          count={data.apps.length}
+          icon={<Server size={16} />}
+          color="primary"
+          empty="Sin aplicaciones usando esta tecnología"
+        >
+          {data.apps.map((app) => (
+            <EntityCard
+              key={app.id}
+              name={app.name}
+              subtitle={`Owner: ${app.ownerName || '—'}`}
+              badge={criticalityLabel[app.criticality] || ''}
+              badgeColor={criticalityColor[app.criticality] || ''}
+              onClick={() => navigate(`/catalog/applications/${app.id}`)}
+            />
+          ))}
+        </EntitySection>
+
+        {/* Microservices */}
+        <EntitySection
+          title="Microservicios"
+          count={data.microservices.length}
+          icon={<Box size={16} />}
+          color="info"
+          empty="Sin microservicios usando esta tecnología"
+        >
+          {data.microservices.map((ms) => (
+            <EntityCard
+              key={ms.id}
+              name={ms.name}
+              subtitle={`Tech Lead: ${ms.technicalLead || '—'}`}
+              badge={lifecycleLabel[ms.lifecycleStatus] || ''}
+              badgeColor={lifecycleColor[ms.lifecycleStatus] || ''}
+              onClick={() => navigate(`/catalog/microservices/${ms.id}`)}
+            />
+          ))}
+        </EntitySection>
+
+        {/* Databases */}
+        <EntitySection
+          title="Bases de Datos"
+          count={data.databases.length}
+          icon={<Database size={16} />}
+          color="purple"
+          empty="Sin bases de datos usando esta tecnología"
+        >
+          {data.databases.map((db) => (
+            <EntityCard
+              key={db.id}
+              name={db.name}
+              subtitle={`${db.engine} ${db.version} · ${db.environment === 'production' ? 'Producción' : db.environment === 'staging' ? 'Staging' : 'Desarrollo'}`}
+              badge={db.dbType || ''}
+              badgeColor="bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40"
+              onClick={() => navigate(`/catalog/applications/${db.applicationId}`)}
+            />
+          ))}
+        </EntitySection>
+
+        {/* People */}
+        <EntitySection
+          title="Personas"
+          count={data.people.length}
+          icon={<Users size={16} />}
+          color="primary"
+          empty="Sin personas responsables identificadas"
+        >
+          <div className="flex flex-wrap gap-2">
+            {data.people.map((name, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-10 dark:bg-neutral-70 border border-neutral-20 dark:border-neutral-60 hover:border-primary/30 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                  <CircleUser size={16} />
+                </div>
+                <span className="text-sm font-medium text-neutral-90 dark:text-white">{name}</span>
+              </div>
+            ))}
+          </div>
+        </EntitySection>
+      </div>
+
+      {/* Security & Governance section */}
+      {(data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length > 0) && (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 bg-gradient-to-r from-transparent via-neutral-5 to-transparent dark:via-neutral-85">
+            <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
+              <Scale size={16} className="text-primary" />
+      Seguridad y Gobierno — Entidades Vinculadas
+            </h3>
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Vulns */}
+              <ImpactCard
+                title="Vulnerabilidades"
+                count={data.vulns.length}
+                icon={<Shield size={20} />}
+                color={countSeverity(data.vulns)}
+                items={data.vulns.slice(0, 4)}
+                linkLabel="Ver vulnerabilidades"
+                onLink={() => navigate('/security/vulnerabilities')}
+              />
+              {/* Incidents */}
+              <ImpactCard
+                title="Incidentes"
+                count={data.incidents.length}
+                icon={<Activity size={20} />}
+                color={countSeverity(data.incidents)}
+                items={data.incidents.slice(0, 4)}
+                linkLabel="Ver incidentes"
+                onLink={() => navigate('/security/incidents')}
+              />
+              {/* Risks */}
+              <ImpactCard
+                title="Riesgos"
+                count={data.risks.length}
+                icon={<FileWarning size={20} />}
+                color={countSeverity(data.risks)}
+                items={data.risks.slice(0, 4)}
+                linkLabel="Ver riesgos"
+                onLink={() => navigate('/governance/risks')}
+              />
+              {/* Audit */}
+              <ImpactCard
+                title="Hallazgos de Auditoría"
+                count={data.auditFindings.length}
+                icon={<BookOpen size={20} />}
+                color={countSeverity(data.auditFindings)}
+                items={data.auditFindings.slice(0, 4)}
+                linkLabel="Ver hallazgos"
+                onLink={() => navigate('/governance/audit')}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No data at all */}
+      {data.apps.length === 0 && data.microservices.length === 0 && data.databases.length === 0 && data.people.length === 0 && totalImpact === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-neutral-10 dark:bg-neutral-70 flex items-center justify-center mb-4">
+            <Search size={24} className="text-neutral-50" />
+          </div>
+          <p className="text-sm font-medium text-neutral-90 dark:text-white">Sin entidades relacionadas</p>
+          <p className="text-xs text-neutral-50 mt-1">Esta tecnología no está vinculada a ninguna aplicación, microservicio u otra entidad del portafolio.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Shared Components ───
+
+function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+      <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
+        {icon && <span className="text-neutral-50">{icon}</span>}
+        {title}
+      </h3>
+      {children}
+    </div>
+  )
+}
+
+function MiniField({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="space-y-0.5">
+      <dt className="text-[10px] font-medium text-neutral-40 uppercase tracking-wider">{label}</dt>
+      <dd className="text-sm text-neutral-90 dark:text-white">{typeof value === 'string' ? (value || '—') : value}</dd>
+    </div>
+  )
+}
+
+function StatBadge({ icon, value, label, color }: { icon: React.ReactNode; value: number; label: string; color: string }) {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 text-primary border-primary/20',
+    info: 'bg-info/10 text-info border-info/20',
+    danger: 'bg-danger/10 text-danger border-danger/20',
+    warning: 'bg-warning/10 text-warning border-warning/20',
+    purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    neutral: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  }
+  const iconMap: Record<string, string> = {
+    primary: 'text-primary', info: 'text-info', danger: 'text-danger',
+    warning: 'text-warning', purple: 'text-purple-500', neutral: 'text-neutral-50',
+  }
+  return (
+    <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border ${colorMap[color] || colorMap.neutral}`}>
+      <span className={`shrink-0 ${iconMap[color] || iconMap.neutral}`}>{icon}</span>
+      <div>
+        <p className="text-lg font-bold tabular-nums leading-none">{value}</p>
+        <p className="text-xs leading-tight mt-0.5 opacity-80">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function EntitySection({ title, count, icon, color, empty, children }: {
+  title: string; count: number; icon: React.ReactNode; color: string; empty: string; children: React.ReactNode
+}) {
+  const accentColor = color === 'primary' ? 'bg-primary/10 border-primary/20' :
+    color === 'info' ? 'bg-info/10 border-info/20' :
+    color === 'purple' ? 'bg-purple-500/10 border-purple-500/20' :
+    'bg-neutral-10 dark:bg-neutral-70 border-neutral-30 dark:border-neutral-60'
+
+  return (
+    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+      <div className={`px-5 py-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between ${count > 0 ? '' : 'opacity-60'}`}>
+        <div className="flex items-center gap-2">
+          <span className={`p-1 rounded-md ${count > 0 ? accentColor : ''}`}>{icon}</span>
+          <h3 className="text-sm font-bold text-neutral-90 dark:text-white">{title}</h3>
+          <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">{count}</span>
+        </div>
+      </div>
+      <div className="p-4 space-y-2">
+        {count === 0 ? (
+          <p className="text-xs text-neutral-50 py-4 text-center">{empty}</p>
+        ) : children}
+      </div>
+    </div>
+  )
+}
+
+function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
+  name: string; subtitle: string; badge: string; badgeColor: string; onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 hover:border-primary/30 hover:shadow-sm transition-all group text-left"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-90 dark:text-white group-hover:text-primary transition-colors truncate">
+            {name}
+          </span>
+          {badge && (
+            <span className={`text-xs px-1.5 py-0.5 rounded font-medium shrink-0 ${badgeColor}`}>
+              {badge}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
+      </div>
+      <ArrowRight size={14} className="text-neutral-40 group-hover:text-primary transition-colors shrink-0" />
+    </button>
+  )
+}
+
+function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
+  title: string; count: number; icon: React.ReactNode; color: string
+  items: any[]; linkLabel: string; onLink: () => void
+}) {
+  const colorMap: Record<string, { bg: string; text: string; dot: string }> = {
+    danger: { bg: 'bg-danger/5 border-danger/20', text: 'text-danger', dot: 'bg-danger' },
+    warning: { bg: 'bg-warning/5 border-warning/20', text: 'text-warning', dot: 'bg-warning' },
+    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-neutral-20 dark:border-neutral-70', text: 'text-neutral-60', dot: 'bg-neutral-40' },
+  }
+  const style = colorMap[color] || colorMap.neutral
+
+  return (
+    <div className={`rounded-lg border p-4 ${style.bg}`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className={style.text}>{icon}</span>
+          <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">{title}</h4>
+        </div>
+        <span className={`text-lg font-bold tabular-nums ${style.text}`}>{count}</span>
+      </div>
+      {items.length > 0 ? (
+        <div className="space-y-1.5 mb-3">
+          {items.map((item: any) => (
+            <div key={item.id} className="flex items-center gap-2 text-xs text-neutral-70 dark:text-neutral-30">
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`} />
+              <span className="truncate">{item.title || item.name || '—'}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-neutral-50 mb-3">Sin registros</p>
+      )}
+      {count > 0 && (
+        <button onClick={onLink} className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1">
+          {linkLabel}
+          <ExternalLink size={12} />
+        </button>
+      )}
+    </div>
+  )
+}
+
+function countSeverity(items: any[]): string {
+  if (items.length === 0) return 'neutral'
+  const critical = items.filter((i) => i.severity === 'critical' || i.severity === 'high').length
+  const medium = items.filter((i) => i.severity === 'medium').length
+  if (critical > 0) return 'danger'
+  if (medium > 0) return 'warning'
+  return 'neutral'
 }

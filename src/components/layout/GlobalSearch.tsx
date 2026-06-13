@@ -383,7 +383,7 @@ const ROUTE_MAP: Record<string, (item: SearchResult) => string> = {
   tasks: (item) => `/execution/plans/${item.entity.planId}`,
   blockers: (item) => `/execution/plans/${item.id}`,
   deliverables: () => `/catalog/deliverables`,
-  microservices: (item) => `/catalog/applications/${item.entity.applicationId}`,
+  microservices: (item) => `/catalog/microservices/${item.id}`,
   members: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
   teamSprints: (item) => `/teams/${item.entity.teamId}`,
 }

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
+import { formatDuration } from '@/utils/technologyUtils'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import {
@@ -118,15 +119,50 @@ export function ObsolescencePage() {
     const diffDays = diffMs / (1000 * 60 * 60 * 24)
 
     if (diffDays < 0) return { color: 'text-danger', label: 'Vencido', dot: 'bg-danger' }
-    if (diffDays < 180) return { color: 'text-warning', label: `En ${Math.round(diffDays / 30)} meses`, dot: 'bg-warning' }
-    if (diffDays < 365) return { color: 'text-severity-high', label: `En ${Math.round(diffDays / 30)} meses`, dot: 'bg-severity-high' }
-    return { color: 'text-success', label: `En ${Math.round(diffDays / 30)} meses`, dot: 'bg-success' }
+    const human = formatDuration(diffDays)
+    if (diffDays < 180) return { color: 'text-warning', label: `En ${human}`, dot: 'bg-warning' }
+    if (diffDays < 365) return { color: 'text-severity-high', label: `En ${human}`, dot: 'bg-severity-high' }
+    return { color: 'text-success', label: `En ${human}`, dot: 'bg-success' }
   }
 
   const categories = useMemo(() => {
     const cats = new Set(technologies.map((t) => t.category))
     return Array.from(cats) as TechCategory[]
   }, [technologies])
+
+  /** Progress toward EOL as percentage (0 = far away, 100 = expired) */
+  const getLifecyclePct = (eolDate: Date): number => {
+    const created = new Date(eolDate)
+    created.setFullYear(created.getFullYear() - 5) // assume ~5 year lifecycle
+    const total = eolDate.getTime() - created.getTime()
+    const elapsed = Date.now() - created.getTime()
+    return Math.min(100, Math.max(0, (elapsed / total) * 100))
+  }
+
+  function LifecycleBar({ status }: { status: SupportStatus }) {
+    const segments = [
+      { id: 'active', label: 'Activo', color: 'bg-success', w: '1/3' },
+      { id: 'extended', label: 'Extendido', color: 'bg-warning', w: '1/3' },
+      { id: 'eol', label: 'EOL', color: 'bg-danger', w: '1/3' },
+    ]
+    const statusOrder = ['active', 'extended', 'eol', 'unknown']
+    const currentIdx = statusOrder.indexOf(status)
+    return (
+      <div className="flex items-center gap-0.5 shrink-0" title={`Estado: ${getStatusLabel(status)}`}>
+        {segments.map((seg, i) => {
+          const filled = i <= currentIdx && status !== 'unknown'
+          return (
+            <div
+              key={seg.id}
+              className={`h-5 w-2 rounded-sm transition-colors ${
+                filled ? seg.color : 'bg-neutral-20 dark:bg-neutral-70'
+              } ${i === currentIdx && status !== 'unknown' ? 'ring-1 ring-offset-1 ring-offset-white dark:ring-offset-neutral-80 ring-black/20' : ''}`}
+            />
+          )
+        })}
+      </div>
+    )
+  }
 
   const categoryLabels: Record<string, string> = {
     framework: 'Framework', language: 'Lenguaje', database: 'BD',
@@ -166,15 +202,23 @@ export function ObsolescencePage() {
     },
     {
       key: 'supportStatus',
-      label: 'Estado',
+      label: 'Ciclo de Vida',
       sortable: true,
       render: (tech) => {
         const urgency = getEolUrgency(tech)
         return (
-          <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${getStatusStyle(tech.supportStatus)}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${urgency.dot}`} />
-            {getStatusLabel(tech.supportStatus)}
-          </span>
+          <div className="flex items-center gap-3 min-w-[140px]">
+            <LifecycleBar status={tech.supportStatus} />
+            <div className="min-w-0">
+              <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border font-medium ${getStatusStyle(tech.supportStatus)}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${urgency.dot}`} />
+                {getStatusLabel(tech.supportStatus)}
+              </span>
+              {tech.eolDate && tech.supportStatus !== 'active' && (
+                <p className={`text-[10px] mt-0.5 ${urgency.color}`}>{urgency.label}</p>
+              )}
+            </div>
+          </div>
         )
       },
     },
@@ -184,16 +228,33 @@ export function ObsolescencePage() {
       sortable: true,
       render: (tech) => {
         const urgency = getEolUrgency(tech)
+        const eol = tech.eolDate ? new Date(tech.eolDate) : null
+        const now = new Date()
+        const remainingDays = eol ? Math.ceil((eol.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+        const expired = remainingDays !== null && remainingDays < 0
+        const pct = eol ? getLifecyclePct(eol) : 0
         return (
-          <div>
-            <div className="flex items-center gap-2">
-              <Calendar size={14} className="text-neutral-50" />
+          <div className="min-w-[130px]">
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar size={12} className="text-neutral-50 shrink-0" />
               <span className={`text-sm ${urgency.color}`}>
-                {tech.eolDate ? new Date(tech.eolDate).toLocaleDateString('es-ES') : '-'}
+                {eol ? eol.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
               </span>
             </div>
-            {tech.eolDate && (
-              <p className={`text-xs ${urgency.color} mt-0.5`}>{urgency.label}</p>
+            {eol && (
+              <div className="space-y-0.5">
+                <div className="h-1.5 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      expired ? 'bg-danger' : remainingDays! < 180 ? 'bg-warning' : remainingDays! < 365 ? 'bg-severity-high' : 'bg-success'
+                    }`}
+                    style={{ width: `${Math.min(100, pct)}%` }}
+                  />
+                </div>
+                <p className={`text-[10px] leading-tight ${urgency.color}`}>
+                  {expired ? `Vencido hace ${formatDuration(remainingDays!)}` : `${formatDuration(remainingDays!)} restantes`}
+                </p>
+              </div>
             )}
           </div>
         )
@@ -392,7 +453,7 @@ export function ObsolescencePage() {
       <SortableTable
         columns={columns}
         data={filteredTechs}
-        onRowClick={(tech) => navigate(`${tech.id}/edit`)}
+        onRowClick={(tech) => navigate(`${tech.id}`)}
         pageSize={5}
         emptyMessage={
           technologies.length === 0

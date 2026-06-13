@@ -1,8 +1,8 @@
 import { ChevronLeft } from 'lucide-react'
 
 interface DetailLayoutProps {
-  title: string
-  subtitle?: string
+  title: React.ReactNode
+  subtitle?: React.ReactNode
   onBack: () => void
   backLabel?: string
   actions?: React.ReactNode
@@ -25,7 +25,7 @@ export function DetailLayout({ title, subtitle, onBack, backLabel = 'Volver', ac
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{title}</h1>
-          {subtitle && <p className="text-sm text-neutral-60 dark:text-neutral-40">{subtitle}</p>}
+          {subtitle && <div className="text-sm text-neutral-60 dark:text-neutral-40">{subtitle}</div>}
         </div>
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
       </div>

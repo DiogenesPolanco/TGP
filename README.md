@@ -83,11 +83,21 @@ src/
 - **Importar aplicaciones** — navega a `/admin/import` para importación Excel
 - **Exportar aplicaciones** — descarga JSON con datos filtrados
 - Vista de detalle (`/catalog/applications/:id`) con tabs:
-  - Resumen (información general + métricas)
+  - Resumen (información general + métricas consolidadas)
   - Tech Stack (gestor de tecnologías con búsqueda y badges EOL)
-  - Microservicios (asociación de microservicios)
-  - Vulnerabilidades, Riesgos, Incidentes, Auditoría (asociar/desasociar entidades)
+  - Microservicios (asociación de microservicios + entidades vinculadas)
+  - Vulnerabilidades, Riesgos, Incidentes, Auditoría: muestra **entidades directas + heredadas** de microservicios
   - Entregables (creación, edición inline)
+
+### Herencia Microservicio → Aplicación
+
+Las entidades de seguridad y gobierno (vulnerabilidades, incidentes, riesgos, hallazgos de auditoría) pueden asociarse tanto a una **aplicación directamente** como a sus **microservicios** individualmente mediante tablas junction M:N.
+
+Cuando visualizas una aplicación, las tabs de Vulnerabilidades, Incidentes, Riesgos y Auditoría muestran **la unión deduplicada** de:
+- Entidades asociadas directamente a la aplicación (`applicationId`)
+- Entidades asociadas a los microservicios de la aplicación (vía tablas junction)
+
+Esto permite modelar escenarios realistas: una vulnerabilidad de SQL Injection puede estar vinculada al `auth-service` de una aplicación, y al ver la aplicación completa, esa vulnerabilidad aparece como heredada. Desde la tabla de microservicios puedes expandir cada servicio y gestionar sus asociaciones directamente.
 
 ### Obsolescencia Tecnológica (`/catalog/obsolescence`)
 - Registro de tecnologías con versión, vendor, categoría y fecha EOL
@@ -208,6 +218,7 @@ src/
 | HealthIndex | `healthIndexHistory` | Histórico de THI |
 | Deliverable | `deliverables` | Entregables vinculados |
 | Microservice | `microservices` | Microservicios por aplicación |
+| AppDatabase | `appDatabases` | Bases de datos por aplicación |
 | User | `users` | Usuarios del sistema |
 | Plan | `plans` | Planes de ejecución |
 | Activity | `activities` | Actividades de planes |
@@ -215,6 +226,10 @@ src/
 | Commitment | `commitments` | Compromisos con tracking |
 | Blocker | `blockers` | Bloqueos con escalamiento |
 | Dependency | `dependencies` | Dependencias entre entidades |
+| Vulnerab.-Microserv. | `vulnerabilityMicroservices` | Relación M:N vulnerabilidad ↔ microservicio (herencia) |
+| Incidente-Microserv. | `incidentMicroservices` | Relación M:N incidente ↔ microservicio (herencia) |
+| Riesgo-Microserv. | `riskMicroservices` | Relación M:N riesgo ↔ microservicio (herencia) |
+| Hallazgo-Microserv. | `auditFindingMicroservices` | Relación M:N hallazgo ↔ microservicio (herencia) |
 
 ## THI — Technology Health Index
 

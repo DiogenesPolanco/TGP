@@ -12,7 +12,7 @@ import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 import { AzureBackupConfig } from '@/features/admin/components/AzureBackupConfig'
 import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConfig'
 import { JiraConfigPanel } from '@/components/jira/JiraConfigPanel'
-import { FluidAttackImportPanel } from '@/features/admin/components/FluidAttackImportPanel'
+
 import { cn } from '@/lib/utils'
 
 export function AdminPage() {
@@ -172,8 +172,6 @@ export function AdminPage() {
       <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
         <JiraConfigPanel />
       </div>
-
-      <FluidAttackImportPanel />
 
       {/* TOTP dialog */}
       {showTotpDialog && (

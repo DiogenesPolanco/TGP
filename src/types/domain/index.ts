@@ -29,6 +29,37 @@ export type {
   EnvironmentType,
 }
 
+// Junction types for microservice-entity M:N relationships
+export interface VulnerabilityMicroservice {
+  id: string
+  vulnerabilityId: string
+  microserviceId: string
+}
+
+export interface IncidentMicroservice {
+  id: string
+  incidentId: string
+  microserviceId: string
+}
+
+export interface AuditFindingMicroservice {
+  id: string
+  auditFindingId: string
+  microserviceId: string
+}
+
+export interface RiskMicroservice {
+  id: string
+  riskId: string
+  microserviceId: string
+}
+
+export interface AppDatabaseMicroservice {
+  id: string
+  appDatabaseId: string
+  microserviceId: string
+}
+
 export type {
   MemberProfile,
   Skill,
@@ -305,12 +336,42 @@ export interface HealthIndex {
   trend: TrendDirection
 }
 
+export interface MicroserviceFeature {
+  id: string
+  name: string
+  description: string
+  status: 'planned' | 'in_progress' | 'active' | 'deprecated'
+  category: 'api' | 'integration' | 'performance' | 'security' | 'observability' | 'business' | 'other'
+}
+
+export interface MicroserviceRoadmapItem {
+  id: string
+  title: string
+  description: string
+  type: 'upgrade' | 'migration' | 'decommission' | 'feature' | 'security' | 'performance'
+  targetDate: string | null
+  status: 'planned' | 'in_progress' | 'completed' | 'cancelled'
+  priority: 'critical' | 'high' | 'medium' | 'low'
+}
+
+export type MicroserviceLifecycleStatus = 'active' | 'evolving' | 'deprecated' | 'decommissioned' | 'planned'
+
+export type ServiceLevel = 'critical' | 'high' | 'medium' | 'low'
+
 export interface Microservice {
   id: string
   applicationId: string
   name: string
   description: string
   technologies: string[]
+  lifecycleStatus?: MicroserviceLifecycleStatus
+  documentation?: string
+  features?: MicroserviceFeature[]
+  roadmap?: MicroserviceRoadmapItem[]
+  decommissionPlan?: string
+  technicalLead?: string
+  repository?: string
+  serviceLevel?: ServiceLevel
   createdAt: Date
   updatedAt: Date
 }

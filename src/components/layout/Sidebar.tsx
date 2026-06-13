@@ -45,6 +45,7 @@ const navItems: NavItem[] = [
     icon: <FolderKanban size={20} />,
     children: [
       { label: 'Aplicaciones', path: '/catalog/applications' },
+      { label: 'Microservicios', path: '/catalog/microservices' },
       { label: 'Entregables', path: '/catalog/deliverables' },
       { label: 'Obsolescencia', path: '/catalog/obsolescence' },
       { label: 'Dependencias', path: '/dependencies' },

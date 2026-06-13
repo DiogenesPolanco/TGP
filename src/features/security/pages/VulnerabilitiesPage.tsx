@@ -6,7 +6,8 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, Shield, AlertTriangle, Clock, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, X, Shield, AlertTriangle, Clock, Pencil, Trash2, ChevronDown, ChevronUp, Bug } from 'lucide-react'
+import { FluidAttackImportPanel } from '@/features/admin/components/FluidAttackImportPanel'
 import type { Vulnerability } from '@/types/domain'
 
 const severityLabel: Record<string, string> = {
@@ -30,6 +31,7 @@ export function VulnerabilitiesPage() {
   const [severityFilter, setSeverityFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [showImport, setShowImport] = useState(false)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
@@ -72,8 +74,11 @@ export function VulnerabilitiesPage() {
     total: vulnerabilities.length,
     critical: vulnerabilities.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length,
     high: vulnerabilities.filter((v) => v.severity === 'high' && v.status !== 'fixed').length,
+    medium: vulnerabilities.filter((v) => v.severity === 'medium' && v.status !== 'fixed').length,
+    low: vulnerabilities.filter((v) => v.severity === 'low' && v.status !== 'fixed').length,
     slaBreached: vulnerabilities.filter((v) => v.status !== 'fixed' && v.status !== 'accepted' && new Date(v.slaDeadline) < new Date()).length,
   }
+  const activeOpen = stats.critical + stats.high + stats.medium + stats.low
 
   const columns: Column<Vulnerability>[] = [
     {
@@ -132,7 +137,24 @@ export function VulnerabilitiesPage() {
       sortable: true,
       render: (vuln) => {
         const sla = getSlaStatus(vuln)
-        return <span className={`text-sm font-medium ${sla.color}`}>{sla.label}</span>
+        if (sla.label === '—') return <span className="text-sm text-neutral-50">—</span>
+        const created = new Date(vuln.detectedAt)
+        const deadline = new Date(vuln.slaDeadline)
+        const total = deadline.getTime() - created.getTime()
+        const elapsed = Date.now() - created.getTime()
+        const pct = Math.min(100, Math.max(0, (elapsed / total) * 100))
+        const expired = sla.label === 'Vencido'
+        return (
+          <div className="min-w-[80px]">
+            <div className="h-1.5 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${expired ? 'bg-danger' : pct > 80 ? 'bg-warning' : 'bg-success'}`}
+                style={{ width: `${expired ? 100 : Math.min(100, pct)}%` }}
+              />
+            </div>
+            <p className={`text-[11px] mt-0.5 font-medium ${sla.color}`}>{sla.label}</p>
+          </div>
+        )
       },
     },
     {
@@ -167,11 +189,16 @@ export function VulnerabilitiesPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Vulnerabilidades</h2>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            onClick={() => setShowImport(!showImport)}
+            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+              showImport
+                ? 'border-danger text-danger bg-danger/5'
+                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+            }`}
           >
-            <Upload size={16} />
-            Importar
+            <Bug size={16} />
+            FluidAttack
+            {showImport ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
           <button
             onClick={() => navigate('new')}
@@ -189,6 +216,28 @@ export function VulnerabilitiesPage() {
         <StatCard icon={<AlertTriangle size={20} />} label="Altas" value={stats.high} color="text-warning" onClick={() => { setSeverityFilter('high'); setShowFilters(true) }} />
         <StatCard icon={<Clock size={20} />} label="SLA Vencido" value={stats.slaBreached} color="text-danger" onClick={() => { setSeverityFilter('all'); setStatusFilter('all'); setShowFilters(false) }} />
       </div>
+
+      {/* Severity distribution bar */}
+      {activeOpen > 0 && (
+        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-2.5">
+            <h3 className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Distribución por Severidad</h3>
+            <span className="text-[11px] text-neutral-50">{activeOpen} activas</span>
+          </div>
+          <div className="h-2.5 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden flex">
+            {stats.critical > 0 && <div style={{ width: `${(stats.critical / activeOpen) * 100}%` }} className="bg-danger h-full transition-all" title={`Críticas: ${stats.critical}`} />}
+            {stats.high > 0 && <div style={{ width: `${(stats.high / activeOpen) * 100}%` }} className="bg-warning h-full transition-all" title={`Altas: ${stats.high}`} />}
+            {stats.medium > 0 && <div style={{ width: `${(stats.medium / activeOpen) * 100}%` }} className="bg-info h-full transition-all" title={`Medias: ${stats.medium}`} />}
+            {stats.low > 0 && <div style={{ width: `${(stats.low / activeOpen) * 100}%` }} className="bg-success h-full transition-all" title={`Bajas: ${stats.low}`} />}
+          </div>
+          <div className="flex items-center gap-4 mt-2">
+            <SeverityDot color="bg-danger" label={`Críticas ${stats.critical}`} />
+            <SeverityDot color="bg-warning" label={`Altas ${stats.high}`} />
+            <SeverityDot color="bg-info" label={`Medias ${stats.medium}`} />
+            <SeverityDot color="bg-success" label={`Bajas ${stats.low}`} />
+          </div>
+        </div>
+      )}
 
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
@@ -259,7 +308,26 @@ export function VulnerabilitiesPage() {
         onRowClick={(vuln) => navigate(`${vuln.id}/edit`)}
         emptyMessage="No se encontraron vulnerabilidades"
       />
+
+      {showImport && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs text-neutral-50 px-1">
+            <Bug size={14} />
+            <span>Importación FluidAttack — CSV de vulnerabilidades</span>
+          </div>
+          <FluidAttackImportPanel />
+        </div>
+      )}
     </div>
+  )
+}
+
+function SeverityDot({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-neutral-60 dark:text-neutral-40">
+      <span className={`w-2 h-2 rounded-full ${color}`} />
+      {label}
+    </span>
   )
 }
 

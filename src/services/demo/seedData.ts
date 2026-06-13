@@ -150,18 +150,123 @@ export async function seedDemoData(force = false) {
 
   const microservices: Microservice[] = [
     // Core Banking (app-1) microservices
-    { id: 'ms-1', applicationId: 'app-1', name: 'auth-service', description: 'Autenticación y autorización', technologies: ['tech-2', 'tech-4'], createdAt: new Date(), updatedAt: new Date() },
-    { id: 'ms-2', applicationId: 'app-1', name: 'account-service', description: 'Gestión de cuentas bancarias', technologies: ['tech-1', 'tech-5', 'tech-6'], createdAt: new Date(), updatedAt: new Date() },
-    { id: 'ms-3', applicationId: 'app-1', name: 'notification-service', description: 'Notificaciones push y email', technologies: ['tech-7', 'tech-17'], createdAt: new Date(), updatedAt: new Date() },
+    {
+      id: 'ms-1', applicationId: 'app-1', name: 'auth-service',
+      description: 'Autenticación y autorización centralizada con OAuth2 y JWT. Gestiona identidades, sesiones y control de acceso basado en roles (RBAC).',
+      technologies: ['tech-2', 'tech-4'],
+      lifecycleStatus: 'evolving', serviceLevel: 'critical', technicalLead: 'Juan Pérez',
+      repository: 'https://github.com/tgp/auth-service',
+      documentation: '<h2>Arquitectura</h2><p>API REST con Spring Boot 3 + PostgreSQL 16. Implementa OAuth2 con Keycloak como IdP externo.</p><h2>API</h2><ul><li><code>POST /auth/login</code> — Autenticación usuario/contraseña</li><li><code>POST /auth/refresh</code> — Refresco de token JWT</li><li><code>POST /auth/validate</code> — Validación de token</li></ul><h2>Integraciones</h2><p>Keycloak (IdP), Redis (sesiones), alertas vía RabbitMQ.</p>',
+      features: [
+        { id: 'mf-1', name: 'Login con MFA', description: 'Autenticación multifactor vía TOTP', status: 'active', category: 'security' },
+        { id: 'mf-2', name: 'SSO Corporativo', description: 'Single Sign-On con SAML', status: 'active', category: 'integration' },
+        { id: 'mf-3', name: 'Rate Limiting', description: 'Limitación de intentos por IP', status: 'in_progress', category: 'performance' },
+        { id: 'mf-4', name: 'WebAuthn', description: 'Soporte para passkeys y biometría', status: 'planned', category: 'security' },
+      ],
+      roadmap: [
+        { id: 'mr-1', title: 'Migrar a Spring Boot 3.4', description: 'Actualizar framework a última versión LTS', type: 'upgrade', targetDate: '2026-09-30', status: 'in_progress', priority: 'high' },
+        { id: 'mr-2', title: 'Implementar WebAuthn', description: 'Soporte de passkeys FIDO2 para autenticación sin contraseña', type: 'feature', targetDate: '2026-12-15', status: 'planned', priority: 'medium' },
+        { id: 'mr-3', title: 'Deprecar JWT legacy', description: 'Migrar tokens JWT legacy a nuevo formato con claims estándar', type: 'migration', targetDate: '2026-08-01', status: 'planned', priority: 'high' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
+    {
+      id: 'ms-2', applicationId: 'app-1', name: 'account-service',
+      description: 'Gestión de cuentas bancarias, saldos y transacciones. Core del negocio bancario.',
+      technologies: ['tech-1', 'tech-5', 'tech-6'],
+      lifecycleStatus: 'active', serviceLevel: 'critical', technicalLead: 'Carlos López',
+      repository: 'https://github.com/tgp/account-service',
+      features: [
+        { id: 'mf-5', name: 'Consulta de saldos', description: 'Saldo disponible y contable en tiempo real', status: 'active', category: 'api' },
+        { id: 'mf-6', name: 'Transferencias internas', description: 'Transferencias entre cuentas del mismo banco', status: 'active', category: 'business' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
+    { id: 'ms-3', applicationId: 'app-1', name: 'notification-service', description: 'Notificaciones push y email para eventos del sistema', technologies: ['tech-7', 'tech-17'], lifecycleStatus: 'active', serviceLevel: 'low', createdAt: new Date(), updatedAt: new Date() },
     // Portal Clientes (app-2) microservices
-    { id: 'ms-4', applicationId: 'app-2', name: 'api-gateway', description: 'API gateway del portal', technologies: ['tech-7', 'tech-16'], createdAt: new Date(), updatedAt: new Date() },
-    { id: 'ms-5', applicationId: 'app-2', name: 'user-profile-service', description: 'Gestión de perfiles de usuario', technologies: ['tech-8', 'tech-4'], createdAt: new Date(), updatedAt: new Date() },
+    {
+      id: 'ms-4', applicationId: 'app-2', name: 'api-gateway',
+      description: 'API Gateway del portal de clientes. Enrutamiento, rate limiting y transformación de protocolos.',
+      technologies: ['tech-7', 'tech-16'],
+      lifecycleStatus: 'active', serviceLevel: 'high', technicalLead: 'María García',
+      repository: 'https://github.com/tgp/api-gateway',
+      documentation: '<h2>Rutas expuestas</h2><ul><li><code>/api/v1/users/*</code> → user-profile-service</li><li><code>/api/v1/products/*</code> → product-service</li><li><code>/api/v1/orders/*</code> → order-service</li></ul>',
+      features: [
+        { id: 'mf-7', name: 'Rate Limiting', description: 'Límite de 1000 req/min por cliente', status: 'active', category: 'performance' },
+        { id: 'mf-8', name: 'Circuit Breaker', description: 'Aislamiento de fallos en servicios aguas abajo', status: 'active', category: 'observability' },
+      ],
+      roadmap: [
+        { id: 'mr-4', title: 'Migrar a Kong 3.x', description: 'Actualizar API Gateway de Kong 2.x a 3.x', type: 'upgrade', targetDate: '2026-07-30', status: 'planned', priority: 'high' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
+    { id: 'ms-5', applicationId: 'app-2', name: 'user-profile-service', description: 'Gestión de perfiles de usuario y preferencias', technologies: ['tech-8', 'tech-4'], lifecycleStatus: 'active', serviceLevel: 'medium', createdAt: new Date(), updatedAt: new Date() },
     // Payments (app-4) microservices
-    { id: 'ms-6', applicationId: 'app-4', name: 'payment-processor', description: 'Procesador de pagos transaccional', technologies: ['tech-2', 'tech-4', 'tech-17'], createdAt: new Date(), updatedAt: new Date() },
-    { id: 'ms-7', applicationId: 'app-4', name: 'fraud-detection', description: 'Detección de fraudes en tiempo real', technologies: ['tech-8', 'tech-6'], createdAt: new Date(), updatedAt: new Date() },
+    {
+      id: 'ms-6', applicationId: 'app-4', name: 'payment-processor',
+      description: 'Procesador de pagos transaccional. Maneja autorizaciones, capturas, reembolsos y conciliación.',
+      technologies: ['tech-2', 'tech-4', 'tech-17'],
+      lifecycleStatus: 'evolving', serviceLevel: 'critical', technicalLead: 'Laura Rodríguez',
+      repository: 'https://github.com/tgp/payment-processor',
+      documentation: '<h2>Flujo de pago</h2><p>Autorización → Captura → Conciliación → Liquidación</p><h2>Integraciones</h2><p>Adquirente externo vía ISO 8583, Webhook de notificaciones, Kafka para eventos</p>',
+      features: [
+        { id: 'mf-9', name: 'Pago con tarjeta', description: 'Autorización y captura de tarjetas crédito/débito', status: 'active', category: 'business' },
+        { id: 'mf-10', name: 'Reembolso automático', description: 'Reembolso total/parcial sin intervención manual', status: 'active', category: 'business' },
+        { id: 'mf-11', name: 'Pagos programados', description: 'Suscripciones y pagos recurrentes', status: 'in_progress', category: 'business' },
+        { id: 'mf-12', name: 'Detección de anomalías', description: 'ML-based anomaly detection en patrones de pago', status: 'planned', category: 'security' },
+      ],
+      roadmap: [
+        { id: 'mr-5', title: 'Migrar a ISO 8583:2024', description: 'Actualizar protocolo de comunicación con adquirente', type: 'migration', targetDate: '2026-10-01', status: 'planned', priority: 'critical' },
+        { id: 'mr-6', title: 'Soporte Pix / SPEI', description: 'Integrar pagos instantáneos Latinoamérica', type: 'feature', targetDate: '2026-12-01', status: 'planned', priority: 'high' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
+    {
+      id: 'ms-7', applicationId: 'app-4', name: 'fraud-detection',
+      description: 'Detección de fraudes en tiempo real usando machine learning. Analiza patrones de transacciones y genera alertas.',
+      technologies: ['tech-8', 'tech-6'],
+      lifecycleStatus: 'evolving', serviceLevel: 'high', technicalLead: 'Laura Rodríguez',
+      repository: 'https://github.com/tgp/fraud-detection',
+      features: [
+        { id: 'mf-13', name: 'Score de fraude', description: 'Modelo ML asigna score 0-100 a cada transacción', status: 'active', category: 'security' },
+        { id: 'mf-14', name: 'Reglas configurables', description: 'Reglas de negocio para umbrales por tipo de operación', status: 'active', category: 'business' },
+        { id: 'mf-15', name: 'Dashboard de alertas', description: 'Panel en tiempo real con alertas de fraude', status: 'in_progress', category: 'observability' },
+      ],
+      roadmap: [
+        { id: 'mr-7', title: 'Nuevo modelo ML v3', description: 'Implementar Random Forest para reducir falsos positivos', type: 'upgrade', targetDate: '2026-09-01', status: 'in_progress', priority: 'high' },
+        { id: 'mr-8', title: 'Integrar red neuronal', description: 'Deep learning para detección de fraudes complejos', type: 'feature', targetDate: '2027-01-15', status: 'planned', priority: 'medium' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
     // Data Lake (app-9) microservices
-    { id: 'ms-8', applicationId: 'app-9', name: 'data-ingestion', description: 'Ingesta de datos batch y streaming', technologies: ['tech-8', 'tech-17', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
-    { id: 'ms-9', applicationId: 'app-9', name: 'etl-orchestrator', description: 'Orquestación de pipelines ETL', technologies: ['tech-8', 'tech-18'], createdAt: new Date(), updatedAt: new Date() },
+    {
+      id: 'ms-8', applicationId: 'app-9', name: 'data-ingestion',
+      description: 'Ingesta de datos batch y streaming desde fuentes internas y externas. Kafka como backbone de eventos.',
+      technologies: ['tech-8', 'tech-17', 'tech-18'],
+      lifecycleStatus: 'active', serviceLevel: 'high', technicalLead: 'Pedro Sánchez',
+      repository: 'https://github.com/tgp/data-ingestion',
+      features: [
+        { id: 'mf-16', name: 'Streaming Kafka', description: 'Ingesta en tiempo real vía Kafka topics', status: 'active', category: 'performance' },
+        { id: 'mf-17', name: 'Carga batch', description: 'Carga programada de archivos CSV/Parquet', status: 'active', category: 'integration' },
+      ],
+      roadmap: [
+        { id: 'mr-9', title: 'Actualizar Kafka 3.9', description: 'Upgrade de Kafka 3.5 a 3.9 para mejor rendimiento', type: 'upgrade', targetDate: '2026-08-15', status: 'planned', priority: 'high' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
+    {
+      id: 'ms-9', applicationId: 'app-9', name: 'etl-orchestrator',
+      description: 'Orquestación de pipelines ETL con Apache Airflow. Programación, monitoreo y alertas de procesos de transformación.',
+      technologies: ['tech-8', 'tech-18'],
+      lifecycleStatus: 'deprecated', serviceLevel: 'medium', technicalLead: 'Pedro Sánchez',
+      repository: 'https://github.com/tgp/etl-orchestrator',
+      decommissionPlan: '<p>Este microservicio será reemplazado por <strong>data-ingestion</strong> (ms-8) que integrará las capacidades ETL en su nueva versión.</p><ul><li><strong>Fase 1</strong> (Q3 2026): Migrar pipelines batch críticos a data-ingestion</li><li><strong>Fase 2</strong> (Q4 2026): Migrar pipelines secundarios y desactivar Airflow</li><li><strong>Fase 3</strong> (Q1 2027): Retirar infraestructura y eliminar código</li></ul><p><strong>Responsable:</strong> Pedro Sánchez</p>',
+      roadmap: [
+        { id: 'mr-10', title: 'Migrar pipelines críticos', description: 'Mover pipelines batch a data-ingestion (ms-8)', type: 'migration', targetDate: '2026-09-30', status: 'planned', priority: 'critical' },
+        { id: 'mr-11', title: 'Retirar Airflow', description: 'Desactivar servidores Airflow tras migración completa', type: 'decommission', targetDate: '2027-01-15', status: 'planned', priority: 'high' },
+      ],
+      createdAt: new Date(), updatedAt: new Date(),
+    },
   ]
 
   // ── Databases ──
@@ -469,6 +574,69 @@ export async function seedDemoData(force = false) {
   await db.deliverables.bulkAdd(deliverables)
   await db.microservices.bulkAdd(microservices)
   await db.appDatabases.bulkAdd(databases)
+
+  // ── Junction: Microservice ←→ Vulnerabilities / Incidents / Risks / Audit ──
+  // auth-service (ms-1): SQL Injection ─ la vulnerabilidad de autenticación afecta al auth-service
+  const junctionVulns = [
+    { id: 'jv-1', vulnerabilityId: 'vuln-1', microserviceId: 'ms-1' },
+    // payment-processor (ms-6): Race condition en procesador de pagos
+    { id: 'jv-2', vulnerabilityId: 'vuln-6', microserviceId: 'ms-6' },
+    // account-service (ms-2): Deserialización insegura en API REST
+    { id: 'jv-3', vulnerabilityId: 'vuln-7', microserviceId: 'ms-2' },
+    // api-gateway (ms-4): XSS en formulario de búsqueda del portal
+    { id: 'jv-4', vulnerabilityId: 'vuln-2', microserviceId: 'ms-4' },
+    // fraud-detection (ms-7): Script injection en dashboard
+    { id: 'jv-5', vulnerabilityId: 'vuln-9', microserviceId: 'ms-7' },
+    // etl-orchestrator (ms-9): Desbordamiento de buffer en ETL
+    { id: 'jv-6', vulnerabilityId: 'vuln-3', microserviceId: 'ms-9' },
+  ]
+  const junctionIncidents = [
+    // auth-service (ms-1): Intento de acceso no autorizado (detectado hoy)
+    { id: 'ji-1', incidentId: 'inc-4', microserviceId: 'ms-1' },
+    // account-service (ms-2): Caída del servicio de pagos
+    { id: 'ji-2', incidentId: 'inc-1', microserviceId: 'ms-2' },
+    // payment-processor (ms-6): Caída del servicio de pagos (también afecta al procesador)
+    { id: 'ji-3', incidentId: 'inc-1', microserviceId: 'ms-6' },
+    // api-gateway (ms-4): Lentitud en portal
+    { id: 'ji-4', incidentId: 'inc-2', microserviceId: 'ms-4' },
+    // data-ingestion (ms-8): Caída del Data Lake
+    { id: 'ji-5', incidentId: 'inc-5', microserviceId: 'ms-8' },
+    // user-profile-service (ms-5): Error 500 en carrito — el perfil de usuario afecta al carrito
+    { id: 'ji-6', incidentId: 'inc-3', microserviceId: 'ms-5' },
+  ]
+  const junctionRisks = [
+    // auth-service (ms-1): Dependencia de tecnología EOL (SQL Server 2019)
+    { id: 'jr-1', riskId: 'risk-1', microserviceId: 'ms-1' },
+    // account-service (ms-2): Dependencia de tecnología EOL (SQL Server 2019)
+    { id: 'jr-2', riskId: 'risk-1', microserviceId: 'ms-2' },
+    // notification-service (ms-3): Dependencia de tecnología EOL (SQL Server 2019)
+    { id: 'jr-3', riskId: 'risk-1', microserviceId: 'ms-3' },
+  ]
+  const junctionAudit = [
+    // auth-service (ms-1): Controles de acceso insuficientes
+    { id: 'jf-1', auditFindingId: 'find-1', microserviceId: 'ms-1' },
+    // payment-processor (ms-6): Cifrado de datos en tránsito
+    { id: 'jf-2', auditFindingId: 'find-3', microserviceId: 'ms-6' },
+    // fraud-detection (ms-7): Cifrado de datos en tránsito
+    { id: 'jf-3', auditFindingId: 'find-3', microserviceId: 'ms-7' },
+    // api-gateway (ms-4): Política de backups
+    { id: 'jf-4', auditFindingId: 'find-4', microserviceId: 'ms-4' },
+    // user-profile-service (ms-5): Auditoría de accesos privilegiados
+    { id: 'jf-5', auditFindingId: 'find-5', microserviceId: 'ms-5' },
+  ]
+  // ── Junction: Microservice ←→ Databases ──
+  const junctionDatabases = databases.flatMap((db_) =>
+    db_.microserviceIds.map((msId, i) => ({
+      id: `jd-${db_.id}-${i}`,
+      appDatabaseId: db_.id,
+      microserviceId: msId,
+    }))
+  )
+  await db.vulnerabilityMicroservices.bulkAdd(junctionVulns)
+  await db.incidentMicroservices.bulkAdd(junctionIncidents)
+  await db.riskMicroservices.bulkAdd(junctionRisks)
+  await db.auditFindingMicroservices.bulkAdd(junctionAudit)
+  await db.appDatabaseMicroservices.bulkAdd(junctionDatabases)
   await db.healthIndexHistory.bulkAdd(healthHistory)
   await db.users.bulkAdd(users)
 

@@ -1,5 +1,18 @@
 import { db } from '@/services/db/database'
 
+/** Convert a number of days to human-readable Spanish duration. */
+export function formatDuration(days: number): string {
+  const abs = Math.abs(days)
+  if (abs === 0) return 'Hoy'
+  if (abs < 30) return `${abs} día${abs !== 1 ? 's' : ''}`
+  if (abs < 365) {
+    const months = Math.round(abs / 30)
+    return `${months} mes${months !== 1 ? 'es' : ''}`
+  }
+  const years = Math.round(abs / 365)
+  return `${years} año${years !== 1 ? 's' : ''}`
+}
+
 /**
  * Get ALL technology IDs for an application:
  * direct technologies + technologies from all its microservices.

@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import {
-  Database, Plus, Pencil, Trash2, ChevronDown, ChevronUp,
+  Database, Pencil, Trash2, ChevronDown, ChevronUp,
   Server, Box,
 } from 'lucide-react'
 import type { DatabaseType, EnvironmentType, SupportStatus, AppDatabase, Technology } from '@/types/domain'
@@ -60,14 +60,11 @@ const environmentColor: Record<EnvironmentType, string> = {
 
 interface DatabasesTabProps {
   applicationId: string
+  databases: AppDatabase[]
 }
 
-export function DatabasesTab({ applicationId }: DatabasesTabProps) {
+export function DatabasesTab({ applicationId, databases }: DatabasesTabProps) {
   const navigate = useNavigate()
-  const databases = useLiveQuery(
-    () => db.appDatabases.where('applicationId').equals(applicationId).toArray(),
-    [applicationId],
-  ) ?? []
   const microservices = useLiveQuery(
     () => db.microservices.where('applicationId').equals(applicationId).toArray(),
     [applicationId],
@@ -82,17 +79,11 @@ export function DatabasesTab({ applicationId }: DatabasesTabProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-start justify-between mb-4">
         <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
           Bases de Datos <span className="text-neutral-50 text-base font-normal">({databases.length})</span>
+          <p className="text-sm font-normal text-neutral-50 mt-0.5">Bases de datos heredadas de los microservicios de la aplicación.</p>
         </h4>
-        <button
-          onClick={() => navigate(`/catalog/applications/${applicationId}/databases/new`)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-        >
-          <Plus size={16} />
-          Nueva Base de Datos
-        </button>
       </div>
 
       <div className="space-y-3">

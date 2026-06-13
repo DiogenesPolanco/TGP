@@ -16,6 +16,7 @@ import { DeliverablesTab } from '../components/DeliverablesTab'
 import { MicroservicesTab } from '../components/MicroservicesTab'
 import { DatabasesTab } from '../components/DatabasesTab'
 import { ArchitectureTab } from '../components/ArchitectureTab'
+import { useInheritedEntityIds } from '@/hooks/useMicroserviceEntities'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -36,6 +37,13 @@ const criticalityColor: Record<string, string> = {
   high: 'bg-warning/10 text-warning border-warning/30',
   medium: 'bg-info/10 text-info border-info/30',
   low: 'bg-success/10 text-success border-success/30',
+}
+
+const statusColor: Record<string, string> = {
+  active: 'bg-success/10 text-success border-success/30',
+  deprecated: 'bg-warning/10 text-warning border-warning/30',
+  retired: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  planned: 'bg-info/10 text-info border-info/30',
 }
 
 const tabConfig = [
@@ -65,7 +73,73 @@ export function ApplicationDetailPage() {
   const findings = useLiveQuery(() => db.auditFindings.where('applicationId').equals(id!).toArray(), [id])
   const deliverables = useLiveQuery(() => db.deliverables.where('applicationId').equals(id!).toArray(), [id])
   const microservices = useLiveQuery(() => db.microservices.where('applicationId').equals(id!).toArray(), [id])
-  const databases = useLiveQuery(() => db.appDatabases.where('applicationId').equals(id!).toArray(), [id])
+  const microserviceIds = useMemo(() => (microservices ?? []).map(m => m.id), [microservices])
+
+  const { inheritedVulnIds, inheritedRiskIds, inheritedIncidentIds, inheritedAuditIds, inheritedDatabaseIds } =
+    useInheritedEntityIds(microserviceIds)
+
+  const inheritedVulns = useLiveQuery(
+    () => inheritedVulnIds.size > 0
+      ? db.vulnerabilities.where('id').anyOf([...inheritedVulnIds]).toArray()
+      : [],
+    [inheritedVulnIds.size],
+  ) ?? []
+
+  const inheritedRisks = useLiveQuery(
+    () => inheritedRiskIds.size > 0
+      ? db.risks.where('id').anyOf([...inheritedRiskIds]).toArray()
+      : [],
+    [inheritedRiskIds.size],
+  ) ?? []
+
+  const inheritedIncidents = useLiveQuery(
+    () => inheritedIncidentIds.size > 0
+      ? db.incidents.where('id').anyOf([...inheritedIncidentIds]).toArray()
+      : [],
+    [inheritedIncidentIds.size],
+  ) ?? []
+
+  const inheritedFindings = useLiveQuery(
+    () => inheritedAuditIds.size > 0
+      ? db.auditFindings.where('id').anyOf([...inheritedAuditIds]).toArray()
+      : [],
+    [inheritedAuditIds.size],
+  ) ?? []
+
+  const inheritedDatabases = useLiveQuery(
+    () => inheritedDatabaseIds.size > 0
+      ? db.appDatabases.where('id').anyOf([...inheritedDatabaseIds]).toArray()
+      : [],
+    [inheritedDatabaseIds.size],
+  ) ?? []
+
+  const allVulns = useMemo(() => {
+    const map = new Map<string, Vulnerability>()
+    for (const v of vulnerabilities ?? []) map.set(v.id, v)
+    for (const v of inheritedVulns) if (!map.has(v.id)) map.set(v.id, v)
+    return [...map.values()]
+  }, [vulnerabilities, inheritedVulns])
+
+  const allRisks = useMemo(() => {
+    const map = new Map<string, Risk>()
+    for (const r of risks ?? []) map.set(r.id, r)
+    for (const r of inheritedRisks) if (!map.has(r.id)) map.set(r.id, r)
+    return [...map.values()]
+  }, [risks, inheritedRisks])
+
+  const allIncidents = useMemo(() => {
+    const map = new Map<string, Incident>()
+    for (const i of incidents ?? []) map.set(i.id, i)
+    for (const i of inheritedIncidents) if (!map.has(i.id)) map.set(i.id, i)
+    return [...map.values()]
+  }, [incidents, inheritedIncidents])
+
+  const allFindings = useMemo(() => {
+    const map = new Map<string, AuditFinding>()
+    for (const f of findings ?? []) map.set(f.id, f)
+    for (const f of inheritedFindings) if (!map.has(f.id)) map.set(f.id, f)
+    return [...map.values()]
+  }, [findings, inheritedFindings])
 
   if (!application) {
     return (
@@ -78,16 +152,16 @@ export function ApplicationDetailPage() {
   const bu = businessUnits?.find((b) => b.id === application.businessUnitId)
   const appTechnologies = allTechnologies.filter((t) => application.technologies.includes(t.id))
 
-  const activeVulnCount = vulnerabilities?.filter((v) => v.status !== 'fixed').length ?? 0
+  const activeVulnCount = allVulns.filter((v) => v.status !== 'fixed').length
 
   const tabCounts: Record<string, number | undefined> = {
     tech: appTechnologies.length,
     microservices: microservices?.length,
-    databases: databases?.length,
+    databases: inheritedDatabases?.length,
     vulns: activeVulnCount,
-    risks: risks?.length,
-    incidents: incidents?.length,
-    audit: findings?.length,
+    risks: allRisks.length,
+    incidents: allIncidents.length,
+    audit: allFindings.length,
     deliverables: deliverables?.length,
   }
 
@@ -184,49 +258,54 @@ export function ApplicationDetailPage() {
             >
               {activeTab === 'summary' && (
                 <div className="space-y-8">
+                  {/* ── Información General ── */}
                   <div>
                     <h2 className="text-2xl font-bold text-neutral-90 dark:text-white mb-6">
                       Resumen
                     </h2>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                      {/* Left: Info */}
-                      <div className="lg:col-span-2 space-y-4">
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-3">
-                          {([
-                            ['Nombre', application.name],
-                            ['Owner', application.ownerName],
-                            ['Business Unit', bu?.name || '-'],
-                            ['Arquitectura', application.architecture],
-                            ['Estado', appStatusLabel[application.status]],
-                            ['Criticidad', criticalityLabel[application.criticality]],
-                            ...(application.supportEndDate
-                              ? [['Fin de soporte', new Date(application.supportEndDate).toLocaleDateString('es-ES')]]
-                              : [] as string[][]),
-                          ] as const).map(([label, value]) => (
-                            <div key={label}>
-                              <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-0.5">{label}</dt>
-                              <dd className="text-sm font-medium text-neutral-90 dark:text-white">{value}</dd>
-                            </div>
-                          ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {([
+                        ['Nombre', application.name, 'text-primary'],
+                        ['Owner', application.ownerName, 'text-neutral-90 dark:text-white'],
+                        ['Business Unit', bu?.name || '-', 'text-neutral-90 dark:text-white'],
+                        ['Arquitectura', application.architecture, 'text-neutral-90 dark:text-white'],
+                        ['Estado', appStatusLabel[application.status], `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor[application.status]}`],
+                        ['Criticidad', criticalityLabel[application.criticality], `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`],
+                        ...(application.supportEndDate
+                          ? [['Fin de Soporte', new Date(application.supportEndDate).toLocaleDateString('es-ES'), 'text-neutral-90 dark:text-white']]
+                          : []),
+                      ]).map(([label, value, className]) => (
+                        <div
+                          key={label}
+                          className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-neutral-20 dark:border-neutral-70 p-4"
+                        >
+                          <dt className="text-[11px] font-medium text-neutral-50 uppercase tracking-wider mb-1.5">
+                            {label}
+                          </dt>
+                          <dd className={`text-sm font-semibold ${className}`}>{value}</dd>
                         </div>
-                      </div>
-
-                      {/* Right: Metrics */}
-                      <div className="space-y-3">
-                        <h3 className="text-xs font-medium text-neutral-50 uppercase tracking-wider">Métricas</h3>
-                        <MetricHighlight icon={Shield} label="Vulnerabilidades" value={activeVulnCount} color="text-danger" />
-                        <MetricHighlight icon={AlertTriangle} label="Riesgos" value={risks?.length ?? 0} color="text-warning" />
-                        <MetricHighlight icon={Activity} label="Incidentes" value={incidents?.length ?? 0} color="text-info" />
-                        <MetricHighlight icon={FileWarning} label="Hallazgos" value={findings?.length ?? 0} color="text-neutral-60" />
-                      </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Tech Stack Preview */}
+                  {/* ── Métricas ── */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider mb-4">
+                      Métricas de Seguridad y Riesgo
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <MetricCard icon={Shield} label="Vulnerabilidades" value={activeVulnCount} color="text-danger" bg="bg-danger/5 border-danger/20" />
+                      <MetricCard icon={AlertTriangle} label="Riesgos" value={allRisks.length} color="text-warning" bg="bg-warning/5 border-warning/20" />
+                      <MetricCard icon={Activity} label="Incidentes" value={allIncidents.length} color="text-info" bg="bg-info/5 border-info/20" />
+                      <MetricCard icon={FileWarning} label="Hallazgos" value={allFindings.length} color="text-neutral-60" bg="bg-neutral-10 dark:bg-neutral-70/40 border-neutral-20 dark:border-neutral-70" />
+                    </div>
+                  </div>
+
+                  {/* ── Tech Stack Preview ── */}
                   {appTechnologies.length > 0 && (
                     <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider">
                           Stack Tecnológico
                         </h3>
                         <button
@@ -237,10 +316,10 @@ export function ApplicationDetailPage() {
                         </button>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {appTechnologies.slice(0, 8).map((tech) => (
+                        {appTechnologies.slice(0, 10).map((tech) => (
                           <span
                             key={tech.id}
-                            className={`inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full border ${
+                            className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border ${
                               tech.supportStatus === 'eol'
                                 ? 'bg-danger/5 text-danger border-danger/20'
                                 : tech.supportStatus === 'extended'
@@ -248,45 +327,57 @@ export function ApplicationDetailPage() {
                                   : 'bg-success/5 text-success border-success/20'
                             }`}
                           >
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              tech.supportStatus === 'eol'
+                                ? 'bg-danger'
+                                : tech.supportStatus === 'extended'
+                                  ? 'bg-warning'
+                                  : 'bg-success'
+                            }`} />
                             {tech.name}
-                            <span className="opacity-60 text-xs">{tech.version}</span>
+                            <span className="opacity-50 text-xs">{tech.version}</span>
                           </span>
                         ))}
-                        {appTechnologies.length > 8 && (
-                          <span className="text-sm text-neutral-50 self-center">
-                            +{appTechnologies.length - 8} más
+                        {appTechnologies.length > 10 && (
+                          <span className="text-sm text-neutral-50 self-center ml-1">
+                            +{appTechnologies.length - 10} más
                           </span>
                         )}
                       </div>
                     </div>
                   )}
 
-                  {/* Quick Links */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <QuickLinkCard
-                      icon={Server}
-                      label="Microservicios"
-                      value={microservices?.length ?? 0}
-                      onClick={() => setActiveTab('microservices')}
-                    />
-                    <QuickLinkCard
-                      icon={Database}
-                      label="Bases de Datos"
-                      value={databases?.length ?? 0}
-                      onClick={() => setActiveTab('databases')}
-                    />
-                    <QuickLinkCard
-                      icon={Package}
-                      label="Entregables"
-                      value={deliverables?.length ?? 0}
-                      onClick={() => setActiveTab('deliverables')}
-                    />
-                    <QuickLinkCard
-                      icon={Building2}
-                      label="Arquitectura"
-                      value={`${microservices?.length ?? 0} cont.`}
-                      onClick={() => setActiveTab('architecture')}
-                    />
+                  {/* ── Acceso Rápido ── */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider mb-4">
+                      Explorar
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <QuickLinkCard
+                        icon={Server}
+                        label="Microservicios"
+                        value={microservices?.length ?? 0}
+                        onClick={() => setActiveTab('microservices')}
+                      />
+                      <QuickLinkCard
+                        icon={Database}
+                        label="Bases de Datos"
+                        value={inheritedDatabases?.length ?? 0}
+                        onClick={() => setActiveTab('databases')}
+                      />
+                      <QuickLinkCard
+                        icon={Package}
+                        label="Entregables"
+                        value={deliverables?.length ?? 0}
+                        onClick={() => setActiveTab('deliverables')}
+                      />
+                      <QuickLinkCard
+                        icon={Building2}
+                        label="Arquitectura"
+                        value={`${microservices?.length ?? 0} cont.`}
+                        onClick={() => setActiveTab('architecture')}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -307,12 +398,12 @@ export function ApplicationDetailPage() {
               )}
 
               {activeTab === 'databases' && (
-                <DatabasesTab applicationId={id!} />
+                <DatabasesTab applicationId={id!} databases={inheritedDatabases ?? []} />
               )}
 
               {activeTab === 'vulns' && (
                 <VulnerabilitiesTab
-                  vulnerabilities={vulnerabilities ?? []}
+                  vulnerabilities={allVulns}
                   applicationId={id!}
                 />
               )}
@@ -321,7 +412,7 @@ export function ApplicationDetailPage() {
                 <EntityList
                   title="Riesgos"
                   entityType="risks"
-                  items={risks ?? []}
+                  items={allRisks}
                   applicationId={id!}
                   headers={['Título', 'Categoría', 'Score', 'Estado']}
                   renderCells={(r: Risk) => [r.title, r.category, r.riskScore.toString(), r.status]}
@@ -333,7 +424,7 @@ export function ApplicationDetailPage() {
                 <EntityList
                   title="Incidentes"
                   entityType="incidents"
-                  items={incidents ?? []}
+                  items={allIncidents}
                   applicationId={id!}
                   headers={['Título', 'Severidad', 'Estado', 'Downtime']}
                   renderCells={(i: Incident) => [i.title, i.severity, i.status, `${i.downtimeMinutes ?? 0} min`]}
@@ -345,7 +436,7 @@ export function ApplicationDetailPage() {
                 <EntityList
                   title="Hallazgos de Auditoría"
                   entityType="auditFindings"
-                  items={findings ?? []}
+                  items={allFindings}
                   applicationId={id!}
                   headers={['Título', 'Severidad', 'Estado', 'Vencimiento']}
                   renderCells={(f: AuditFinding) => [f.title, f.severity, f.status, new Date(f.dueDate).toLocaleDateString('es-ES')]}
@@ -497,6 +588,8 @@ function EntityList<T extends EntityForList>({
   ) ?? []
 
   const dissociate = async (item: T) => {
+    // Only allow dissociation for directly associated entities
+    if ((item as { applicationId?: string | null }).applicationId !== applicationId) return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (db[entityType] as Table<T, string>).update(item.id, { applicationId: null } as any)
   }
@@ -643,6 +736,7 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
   const activeVulns = useMemo(() => vulnerabilities.filter((v) => v.status !== 'fixed'), [vulnerabilities])
 
   const dissociate = async (vuln: Vulnerability) => {
+    if (vuln.applicationId !== applicationId) return
     await db.vulnerabilities.update(vuln.id, { applicationId: null })
   }
 
@@ -840,26 +934,26 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
 
 /* ─── Editorial Components ─── */
 
-function MetricHighlight({
+function MetricCard({
   icon: Icon,
   label,
   value,
   color,
+  bg,
 }: {
   icon: React.FC<{ size?: number }>
   label: string
   value: number
   color: string
+  bg: string
 }) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-neutral-10 dark:bg-neutral-70/50">
-      <div className={`p-2 rounded-lg bg-white dark:bg-neutral-70 shadow-sm ${color}`}>
-        <Icon size={18} />
+    <div className={`rounded-xl border ${bg} p-4`}>
+      <div className={`${color} mb-2`}>
+        <Icon size={20} />
       </div>
-      <div>
-        <p className="text-xl font-bold text-neutral-90 dark:text-white leading-none">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{label}</p>
-      </div>
+      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{label}</p>
     </div>
   )
 }
