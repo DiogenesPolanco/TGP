@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import {
   Plus, Search, Filter, Upload, X, Eye, Pencil, Trash2,
   AlertTriangle, Shield, CheckCircle, Server,
+  ChevronDown, ChevronRight,
 } from 'lucide-react'
 import type { Risk } from '@/types/domain'
 
@@ -39,6 +40,7 @@ export function RisksPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [showHeatMap, setShowHeatMap] = useState(false)
   const [selectedCell, setSelectedCell] = useState<{ prob: number; impact: number } | null>(null)
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
@@ -189,8 +191,6 @@ export function RisksPage() {
     )
   }
 
-  const cellSize = selectedCell ? 'w-14 h-14' : 'w-12 h-12'
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -261,52 +261,64 @@ export function RisksPage() {
       {/* Heat Map + Search Bar */}
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
         <div className="flex items-start gap-8">
-          {/* Heat Map */}
+          {/* Heat Map - collapsible */}
           <div className="shrink-0">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Matriz de Calor</h3>
+            <button
+              onClick={() => setShowHeatMap(!showHeatMap)}
+              className="flex items-center gap-2 text-sm font-bold text-neutral-90 dark:text-white mb-3 hover:text-primary transition-colors"
+            >
+              {showHeatMap ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              Matriz de Calor
               {selectedCell && (
-                <button
-                  onClick={() => setSelectedCell(null)}
-                  className="text-xs text-danger hover:text-danger-dark transition-colors"
-                >
-                  Limpiar
-                </button>
+                <span className="text-xs font-medium text-primary ml-1">
+                  (P{selectedCell.prob} · I{selectedCell.impact} = {selectedCell.prob * selectedCell.impact})
+                </span>
               )}
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[10px] font-medium text-neutral-50 -rotate-90 whitespace-nowrap mt-8">Probabilidad</span>
-                <div className="grid grid-cols-5 gap-1">
-                  {[5, 4, 3, 2, 1].map((prob) => (
-                    <div key={prob} className="contents">
-                      <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{prob}</div>
-                      {[1, 2, 3, 4, 5].map((impact) => (
-                        <button
-                          key={`${prob}-${impact}`}
-                          onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
-                          className={`${cellSize} rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
-                            selectedCell?.prob === prob && selectedCell?.impact === impact ? 'ring-2 ring-primary' : ''
-                          }`}
-                        >
-                          <div className="flex flex-col items-center justify-center h-full">
-                            <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
-                            {getCellRisks(prob, impact).length > 0 && (
-                              <span className="text-[9px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ))}
-                  <div className="w-6" />
-                  {[1, 2, 3, 4, 5].map((impact) => (
-                    <div key={impact} className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{impact}</div>
-                  ))}
+            </button>
+
+            {showHeatMap && (
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-[10px] font-medium text-neutral-50 -rotate-90 whitespace-nowrap mt-8">Probabilidad</span>
+                  <div className="grid grid-cols-5 gap-1">
+                    {[5, 4, 3, 2, 1].map((prob) => (
+                      <div key={prob} className="contents">
+                        <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{prob}</div>
+                        {[1, 2, 3, 4, 5].map((impact) => (
+                          <button
+                            key={`${prob}-${impact}`}
+                            onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
+                            className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
+                              selectedCell?.prob === prob && selectedCell?.impact === impact ? 'ring-2 ring-primary' : ''
+                            }`}
+                          >
+                            <div className="flex flex-col items-center justify-center h-full">
+                              <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
+                              {getCellRisks(prob, impact).length > 0 && (
+                                <span className="text-[9px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                    <div className="w-6" />
+                    {[1, 2, 3, 4, 5].map((impact) => (
+                      <div key={impact} className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{impact}</div>
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-medium text-neutral-50 mt-0.5">Impacto</span>
                 </div>
-                <span className="text-[10px] font-medium text-neutral-50 mt-0.5">Impacto</span>
+                {selectedCell && (
+                  <button
+                    onClick={() => setSelectedCell(null)}
+                    className="text-xs text-danger hover:text-danger-dark transition-colors self-start mt-1"
+                  >
+                    Limpiar
+                  </button>
+                )}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Search + Filters */}
