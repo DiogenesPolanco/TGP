@@ -302,14 +302,7 @@ export function VulnerabilitiesPage() {
         )}
       </div>
 
-      <SortableTable
-        columns={columns}
-        data={filteredVulns}
-        onRowClick={(vuln) => navigate(`${vuln.id}/edit`)}
-        emptyMessage="No se encontraron vulnerabilidades"
-      />
-
-      {showImport && (
+      {showImport ? (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-neutral-50 px-1">
             <Bug size={14} />
@@ -317,6 +310,13 @@ export function VulnerabilitiesPage() {
           </div>
           <FluidAttackImportPanel />
         </div>
+      ) : (
+        <SortableTable
+          columns={columns}
+          data={filteredVulns}
+          onRowClick={(vuln) => navigate(`${vuln.id}/edit`)}
+          emptyMessage="No se encontraron vulnerabilidades"
+        />
       )}
     </div>
   )
