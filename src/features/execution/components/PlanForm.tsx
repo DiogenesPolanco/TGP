@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Plan } from '@/types/domain'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
 
@@ -101,67 +102,67 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Equipo</label>
-            <select
+            <Select
+              label="Equipo"
               value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin equipo</option>
-              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+              onChange={setTeamId}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Unidad de Negocio</label>
-            <select
+            <Select
+              label="Unidad de Negocio"
               value={businessUnitId}
-              onChange={(e) => setBusinessUnitId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin BU</option>
-              {businessUnits.map((bu) => <option key={bu.id} value={bu.id}>{bu.name}</option>)}
-            </select>
+              onChange={setBusinessUnitId}
+              options={[
+                { value: '', label: 'Sin BU' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">OKR Asociado</label>
-            <select
+            <Select
+              label="OKR Asociado"
               value={objectiveId}
-              onChange={(e) => setObjectiveId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin OKR</option>
-              {objectives.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
-            </select>
+              onChange={setObjectiveId}
+              options={[
+                { value: '', label: 'Sin OKR' },
+                ...objectives.map((o) => ({ value: o.id, label: o.title })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Estado</label>
-            <select
+            <Select
+              label="Estado"
               value={status}
-              onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="planned">Planificado</option>
-              <option value="in_progress">En Progreso</option>
-              <option value="on_hold">En Pausa</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
-            </select>
+              onChange={(v) => setStatus(v as ProjectStatus)}
+              options={[
+                { value: 'planned', label: 'Planificado' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'on_hold', label: 'En Pausa' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' },
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Salud</label>
-            <select
+            <Select
+              label="Salud"
               value={health}
-              onChange={(e) => setHealth(e.target.value as ProjectHealth)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="green">Verde</option>
-              <option value="yellow">Amarillo</option>
-              <option value="red">Rojo</option>
-            </select>
+              onChange={(v) => setHealth(v as ProjectHealth)}
+              options={[
+                { value: 'green', label: 'Verde' },
+                { value: 'yellow', label: 'Amarillo' },
+                { value: 'red', label: 'Rojo' },
+              ]}
+            />
           </div>
 
           <div>

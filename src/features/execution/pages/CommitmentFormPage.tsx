@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { CommitmentStatus } from '@/constants/enums'
 
 const statusOptions: { value: CommitmentStatus; label: string }[] = [
@@ -129,44 +130,37 @@ export function CommitmentFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Equipo</label>
-            <select value={formData.teamId} onChange={(e) => setFormData({ ...formData, teamId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin equipo</option>
-              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+            <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
+              { value: '', label: 'Sin equipo' },
+              ...teams.map((t) => ({ value: t.id, label: t.name })),
+            ]} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Aplicación</label>
-            <select value={formData.applicationId} onChange={(e) => setFormData({ ...formData, applicationId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin app</option>
-              {applications.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
+            <Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
+              { value: '', label: 'Sin app' },
+              ...applications.map((a) => ({ value: a.id, label: a.name })),
+            ]} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">OKR asociado</label>
-            <select value={formData.objectiveId} onChange={(e) => setFormData({ ...formData, objectiveId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin OKR</option>
-              {objectives.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
-            </select>
+            <Select label="OKR asociado" value={formData.objectiveId} onChange={(v) => setFormData({ ...formData, objectiveId: v })} options={[
+              { value: '', label: 'Sin OKR' },
+              ...objectives.map((o) => ({ value: o.id, label: o.title })),
+            ]} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Entregable asociado</label>
-            <select value={formData.deliverableId} onChange={(e) => setFormData({ ...formData, deliverableId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin entregable</option>
-              {deliverables.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
-            </select>
+            <Select label="Entregable asociado" value={formData.deliverableId} onChange={(v) => setFormData({ ...formData, deliverableId: v })} options={[
+              { value: '', label: 'Sin entregable' },
+              ...deliverables.map((d) => ({ value: d.id, label: d.title })),
+            ]} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
-            <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as CommitmentStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {statusOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
+            <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as CommitmentStatus })} options={statusOptions} />
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha compromiso *</label>

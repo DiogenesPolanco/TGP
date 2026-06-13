@@ -211,6 +211,62 @@
   vertical-align: top;
 }
 
+/* ─── Normalize rich content inside table cells ─── */
+.ProseMirror td p,
+.ProseMirror th p {
+  margin: 0.15em 0;
+}
+.ProseMirror td h1,
+.ProseMirror td h2,
+.ProseMirror td h3,
+.ProseMirror th h1,
+.ProseMirror th h2,
+.ProseMirror th h3 {
+  font-size: inherit;
+  font-weight: 600;
+  margin: 0;
+  line-height: inherit;
+  color: inherit;
+}
+.ProseMirror td ul,
+.ProseMirror td ol,
+.ProseMirror th ul,
+.ProseMirror th ol {
+  margin: 0.15em 0;
+  padding-left: 1.2em;
+}
+.ProseMirror td li,
+.ProseMirror th li {
+  margin: 0;
+}
+.ProseMirror td li p,
+.ProseMirror th li p {
+  margin: 0;
+}
+.ProseMirror td pre,
+.ProseMirror th pre {
+  margin: 0.2em 0;
+  padding: 0.3em 0.5em;
+  font-size: 0.8em;
+}
+.ProseMirror td blockquote,
+.ProseMirror th blockquote {
+  margin: 0.2em 0;
+  padding-left: 0.5em;
+  font-style: normal;
+  font-size: inherit;
+}
+.ProseMirror td img,
+.ProseMirror th img {
+  max-height: 120px;
+  width: auto;
+  margin: 0.2em 0;
+}
+.ProseMirror td .ProseMirror table,
+.ProseMirror th .ProseMirror table {
+  margin: 0;
+}
+
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;

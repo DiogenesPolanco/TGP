@@ -3,8 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { usePagination } from '@/hooks/usePagination'
-import { Pagination } from '@/components/ui/Pagination'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import { Plus, Search, Upload, AlertTriangle, CheckCircle, XCircle, Clock, Pencil, Trash2 } from 'lucide-react'
 import { runEscalation } from '../services/escalationService'
 import type { CommitmentStatus } from '@/constants/enums'
@@ -43,24 +43,14 @@ export function CommitmentsPage() {
     return d
   }, [])
 
-  const filtered = commitments.filter((c) => {
+  const filtered = useMemo(() => commitments.filter((c) => {
     if (statusFilter !== 'all' && c.status !== statusFilter) return false
     if (search) {
       const q = search.toLowerCase()
       if (!c.title.toLowerCase().includes(q)) return false
     }
     return true
-  })
-
-  // Sort: breached first, then at_risk, then by date ascending
-  const sorted = [...filtered].sort((a, b) => {
-    const order: Record<string, number> = { breached: 0, at_risk: 1, active: 2, fulfilled: 3, cancelled: 4 }
-    const diff = (order[a.status] ?? 5) - (order[b.status] ?? 5)
-    if (diff !== 0) return diff
-    return new Date(a.commitmentDate).getTime() - new Date(b.commitmentDate).getTime()
-  })
-
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedCommitments } = usePagination(sorted, 5)
+  }), [commitments, statusFilter, search])
 
   const stats = useMemo(() => ({
     total: commitments.length,
@@ -158,127 +148,140 @@ export function CommitmentsPage() {
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as CommitmentStatus | 'all')}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos</option>
-            <option value="active">Activos</option>
-            <option value="at_risk">En Riesgo</option>
-            <option value="breached">Incumplidos</option>
-            <option value="fulfilled">Cumplidos</option>
-            <option value="cancelled">Cancelados</option>
-          </select>
+          <div className="min-w-[160px]">
+            <Select value={statusFilter} onChange={(v) => setStatusFilter(v as CommitmentStatus | 'all')} options={[
+              { value: 'all', label: 'Todos' },
+              { value: 'active', label: 'Activos' },
+              { value: 'at_risk', label: 'En Riesgo' },
+              { value: 'breached', label: 'Incumplidos' },
+              { value: 'fulfilled', label: 'Cumplidos' },
+              { value: 'cancelled', label: 'Cancelados' },
+            ]} />
+          </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-        {sorted.length === 0 ? (
-          <div className="p-12 text-center text-sm text-neutral-50">
-            No hay compromisos que coincidan con los filtros.
-          </div>
-        ) : (
-          <>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Compromiso</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Owner / Stakeholder</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Equipo / App</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Estado</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Fecha</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-60 uppercase">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-                {paginatedCommitments.map((c) => {
-                  const daysInfo = getDaysInfo(c.commitmentDate)
-                  const cfg = statusConfig[c.status]
-                  const isOverdue = (c.status === 'active' || c.status === 'at_risk') &&
-                    new Date(c.commitmentDate) < today
-
-                  return (
-                    <tr key={c.id}
-                      onClick={() => navigate(`/execution/commitments/${c.id}/edit`)}
-                      className={`hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group cursor-pointer ${
-                        isOverdue ? 'bg-danger/5' : ''
-                      }`}>
-                      <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
-                        {c.description && (
-                          <p className="text-xs text-neutral-50 mt-0.5 line-clamp-1">{c.description}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-neutral-70 dark:text-neutral-30">{c.ownerId}</p>
-                        <p className="text-xs text-neutral-50">a: {c.accountableId}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-neutral-70 dark:text-neutral-30">
-                          {teamMap.get(c.teamId ?? '')?.name ?? '-'}
-                        </p>
-                        <p className="text-xs text-neutral-50">{appMap.get(c.applicationId ?? '')?.name ?? ''}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={c.status}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
-                          className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
-                        >
-                          <option value="active">Activo</option>
-                          <option value="at_risk">En Riesgo</option>
-                          <option value="breached">Incumplido</option>
-                          <option value="fulfilled">Cumplido</option>
-                          <option value="cancelled">Cancelado</option>
-                        </select>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-neutral-70 dark:text-neutral-30">
-                            {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
-                          </span>
-                          <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>
-                            ({daysInfo.label})
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); navigate(`/execution/commitments/${c.id}/edit`) }}
-                            className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(c) }}
-                            className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              totalItems={sorted.length}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          </>
-        )}
-      </div>
+      {(() => {
+        const daysInfoMap = new Map(filtered.map((c) => [c.id, getDaysInfo(c.commitmentDate)]))
+        const columns: Column<Commitment>[] = [
+          {
+            key: 'title',
+            label: 'Compromiso',
+            sortable: true,
+            render: (c) => (
+              <>
+                <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
+                {c.description && (
+                  <p className="text-xs text-neutral-50 mt-0.5 line-clamp-1">{c.description}</p>
+                )}
+              </>
+            ),
+          },
+          {
+            key: 'ownerId',
+            label: 'Owner / Stakeholder',
+            sortable: true,
+            render: (c) => (
+              <>
+                <p className="text-sm text-neutral-70 dark:text-neutral-30">{c.ownerId}</p>
+                <p className="text-xs text-neutral-50">a: {c.accountableId}</p>
+              </>
+            ),
+          },
+          {
+            key: 'teamId',
+            label: 'Equipo / App',
+            sortable: true,
+            render: (c) => (
+              <>
+                <p className="text-sm text-neutral-70 dark:text-neutral-30">
+                  {teamMap.get(c.teamId ?? '')?.name ?? '-'}
+                </p>
+                <p className="text-xs text-neutral-50">{appMap.get(c.applicationId ?? '')?.name ?? ''}</p>
+              </>
+            ),
+          },
+          {
+            key: 'status',
+            label: 'Estado',
+            sortable: true,
+            render: (c) => {
+              const cfg = statusConfig[c.status]
+              return (
+                <select
+                  value={c.status}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
+                  className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
+                >
+                  <option value="active">Activo</option>
+                  <option value="at_risk">En Riesgo</option>
+                  <option value="breached">Incumplido</option>
+                  <option value="fulfilled">Cumplido</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
+              )
+            },
+          },
+          {
+            key: 'commitmentDate',
+            label: 'Fecha',
+            sortable: true,
+            render: (c) => {
+              const daysInfo = daysInfoMap.get(c.id)!
+              return (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-neutral-70 dark:text-neutral-30">
+                    {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
+                  </span>
+                  <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>
+                    ({daysInfo.label})
+                  </span>
+                </div>
+              )
+            },
+          },
+          {
+            key: 'actions',
+            label: 'Acciones',
+            sortable: false,
+            className: 'text-right',
+            render: (c) => (
+              <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigate(`/execution/commitments/${c.id}/edit`) }}
+                  className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                  title="Editar"
+                >
+                  <Pencil size={14} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(c) }}
+                  className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                  title="Eliminar"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ),
+          },
+        ]
+        return (
+          <SortableTable
+            columns={columns}
+            data={filtered}
+            onRowClick={(c) => navigate(`/execution/commitments/${c.id}/edit`)}
+            pageSize={5}
+            emptyMessage="No hay compromisos que coincidan con los filtros."
+            rowClassName={(c) => {
+              const isOverdue = (c.status === 'active' || c.status === 'at_risk') &&
+                new Date(c.commitmentDate) < today
+              return isOverdue ? 'bg-danger/5' : undefined
+            }}
+          />
+        )
+      })()}
 
     </div>
   )

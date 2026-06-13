@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { Select } from '@/components/ui/Select'
 import type { Severity, IncidentStatus } from '@/types/domain'
 
 export function IncidentFormPage() {
@@ -59,21 +60,25 @@ export function IncidentFormPage() {
         <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label><input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el incidente..." /></div>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Severidad *</label>
-            <select required value={formData.severity} onChange={(e) => setFormData({ ...formData, severity: e.target.value as Severity })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="critical">Crítica</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option>
-            </select></div>
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado *</label>
-            <select required value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as IncidentStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="detected">Detectado</option><option value="acknowledged">Reconocido</option><option value="in_progress">En progreso</option><option value="resolved">Resuelto</option><option value="closed">Cerrado</option>
-            </select></div>
+          <div><Select label="Severidad *" required value={formData.severity} onChange={(v) => setFormData({ ...formData, severity: v as Severity })} options={[
+            { value: 'critical', label: 'Crítica' },
+            { value: 'high', label: 'Alta' },
+            { value: 'medium', label: 'Media' },
+            { value: 'low', label: 'Baja' },
+          ]} /></div>
+          <div><Select label="Estado *" required value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as IncidentStatus })} options={[
+            { value: 'detected', label: 'Detectado' },
+            { value: 'acknowledged', label: 'Reconocido' },
+            { value: 'in_progress', label: 'En progreso' },
+            { value: 'resolved', label: 'Resuelto' },
+            { value: 'closed', label: 'Cerrado' },
+          ]} /></div>
         </div>
         <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Downtime (min)</label><input type="number" value={formData.downtimeMinutes ?? ''} onChange={(e) => setFormData({ ...formData, downtimeMinutes: e.target.value ? parseInt(e.target.value) : null })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Aplicación</label>
-          <select value={formData.applicationId} onChange={(e) => setFormData({ ...formData, applicationId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-            <option value="">Sin aplicación</option>
-            {applications.map((app) => (<option key={app.id} value={app.id}>{app.name}</option>))}
-          </select></div>
+        <div><Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
+          { value: '', label: 'Sin aplicación' },
+          ...applications.map((app) => ({ value: app.id, label: app.name })),
+        ]} /></div>
         <div className="flex justify-end gap-3 pt-4">
           <button type="button" onClick={() => navigate('/security/incidents')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
           <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{incident ? 'Actualizar' : 'Crear'}</button>

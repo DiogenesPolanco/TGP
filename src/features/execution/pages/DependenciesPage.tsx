@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import { Search, Trash2 } from 'lucide-react'
 import type { Dependency } from '@/types/domain'
 
@@ -86,14 +87,15 @@ export function DependenciesPage() {
             <input type="text" placeholder="Buscar dependencias..." value={search} onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
-          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-            <option value="all">Todos los tipos</option>
-            <option value="task">Tarea</option>
-            <option value="activity">Actividad</option>
-            <option value="plan">Plan</option>
-            <option value="commitment">Compromiso</option>
-          </select>
+          <div className="min-w-[170px]">
+            <Select value={typeFilter} onChange={setTypeFilter} options={[
+              { value: 'all', label: 'Todos los tipos' },
+              { value: 'task', label: 'Tarea' },
+              { value: 'activity', label: 'Actividad' },
+              { value: 'plan', label: 'Plan' },
+              { value: 'commitment', label: 'Compromiso' },
+            ]} />
+          </div>
         </div>
       </div>
 

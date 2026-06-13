@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select } from '@/components/ui/Select'
 import { Plus, Search, Upload, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Pencil, Trash2 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan } from '@/types/domain'
@@ -115,18 +116,16 @@ export function PlansPage() {
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | 'all')}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="planned">Planificado</option>
-            <option value="in_progress">En Progreso</option>
-            <option value="on_hold">En Pausa</option>
-            <option value="completed">Completado</option>
-            <option value="cancelled">Cancelado</option>
-          </select>
+          <div className="min-w-[170px]">
+            <Select value={statusFilter} onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')} options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'planned', label: 'Planificado' },
+              { value: 'in_progress', label: 'En Progreso' },
+              { value: 'on_hold', label: 'En Pausa' },
+              { value: 'completed', label: 'Completado' },
+              { value: 'cancelled', label: 'Cancelado' },
+            ]} />
+          </div>
         </div>
       </div>
 

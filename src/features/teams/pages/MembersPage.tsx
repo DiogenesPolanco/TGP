@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import type { MemberStatus } from '@/types/domain'
 import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3, Share2, Check, Copy } from 'lucide-react'
@@ -242,29 +243,17 @@ export function MembersPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
             <div>
               <label className="text-xs text-neutral-60 mr-2">Equipo</label>
-              <select
-                value={filterTeam}
-                onChange={(e) => setFilterTeam(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
-              >
-                <option value="">Todos</option>
-                {teamOptions.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+              <Select value={filterTeam} onChange={(v) => setFilterTeam(v)} options={[
+                { value: '', label: 'Todos' },
+                ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
+              ]} className="min-w-[140px]" />
             </div>
             <div>
               <label className="text-xs text-neutral-60 mr-2">Estado</label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
-              >
-                <option value="">Todos</option>
-                {Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
+              <Select value={filterStatus} onChange={(v) => setFilterStatus(v)} options={[
+                { value: '', label: 'Todos' },
+                ...Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v })),
+              ]} className="min-w-[140px]" />
             </div>
             {(filterTeam || filterStatus) && (
               <button

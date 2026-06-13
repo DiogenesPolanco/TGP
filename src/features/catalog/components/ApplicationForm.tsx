@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { TechSearch } from '@/components/ui/TechSearch'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Application } from '@/types/domain'
 
 interface ApplicationFormProps {
@@ -107,67 +108,42 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           />
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit *</label>
-            <select
-              required
-              value={formData.businessUnitId}
-              onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Seleccionar...</option>
-              {businessUnits.map((bu) => (
-                <option key={bu.id} value={bu.id}>{bu.name}</option>
-              ))}
-            </select>
+            <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
+              { value: '', label: 'Seleccionar...' },
+              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+            ]} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Criticidad *</label>
-              <select
-                required
-                value={formData.criticality}
-                onChange={(e) => setFormData({ ...formData, criticality: e.target.value as typeof formData.criticality })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="low">Baja</option>
-                <option value="medium">Media</option>
-                <option value="high">Alta</option>
-                <option value="critical">Crítica</option>
-              </select>
+              <Select label="Criticidad *" required value={formData.criticality} onChange={(v) => setFormData({ ...formData, criticality: v as typeof formData.criticality })} options={[
+                { value: 'low', label: 'Baja' },
+                { value: 'medium', label: 'Media' },
+                { value: 'high', label: 'Alta' },
+                { value: 'critical', label: 'Crítica' },
+              ]} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Arquitectura</label>
-              <select
-                value={formData.architecture}
-                onChange={(e) => setFormData({ ...formData, architecture: e.target.value as typeof formData.architecture })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="monolith">Monolito</option>
-                <option value="microservices">Microservicios</option>
-                <option value="serverless">Serverless</option>
-                <option value="soa">SOA</option>
-                <option value="event_driven">Event Driven</option>
-                <option value="hybrid">Híbrida</option>
-              </select>
+              <Select label="Arquitectura" value={formData.architecture} onChange={(v) => setFormData({ ...formData, architecture: v as typeof formData.architecture })} options={[
+                { value: 'monolith', label: 'Monolito' },
+                { value: 'microservices', label: 'Microservicios' },
+                { value: 'serverless', label: 'Serverless' },
+                { value: 'soa', label: 'SOA' },
+                { value: 'event_driven', label: 'Event Driven' },
+                { value: 'hybrid', label: 'Híbrida' },
+              ]} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado *</label>
-              <select
-                required
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as typeof formData.status })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="active">Activa</option>
-                <option value="deprecated">Deprecada</option>
-                <option value="retired">Retirada</option>
-                <option value="planned">Planificada</option>
-              </select>
+              <Select label="Estado *" required value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })} options={[
+                { value: 'active', label: 'Activa' },
+                { value: 'deprecated', label: 'Deprecada' },
+                { value: 'retired', label: 'Retirada' },
+                { value: 'planned', label: 'Planificada' },
+              ]} />
             </div>
 
             <div>

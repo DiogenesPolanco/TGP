@@ -5,6 +5,7 @@ import { Plus, Trash2, Edit3, AlertTriangle, CheckCircle2, Loader2, Calendar, Re
 import { useConfirm } from '@/hooks/useConfirm'
 import { useAppStore } from '@/stores/appStore'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import { isJiraConfigured } from '@/services/jira/jiraConfigService'
 import { getBoards, getSprints, getSprintIssues, calcSprintMetrics, syncJiraSprints } from '@/services/jira/jiraService'
 
@@ -359,16 +360,16 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Quarter</label>
-              <select
+              <Select
                 value={form.quarter}
-                onChange={(e) => setForm({ ...form, quarter: e.target.value })}
-                className={inputClass}
-              >
-                <option value="Q1">Q1</option>
-                <option value="Q2">Q2</option>
-                <option value="Q3">Q3</option>
-                <option value="Q4">Q4</option>
-              </select>
+                onChange={(v) => setForm({ ...form, quarter: v })}
+                options={[
+                  { value: 'Q1', label: 'Q1' },
+                  { value: 'Q2', label: 'Q2' },
+                  { value: 'Q3', label: 'Q3' },
+                  { value: 'Q4', label: 'Q4' },
+                ]}
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Año</label>

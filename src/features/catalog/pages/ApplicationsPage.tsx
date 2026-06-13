@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonTable } from '@/components/ui/Skeleton'
+import { Select } from '@/components/ui/Select'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, GitCompare, Trash2, Pencil, Eye, X, AppWindow } from 'lucide-react'
 import type { Application } from '@/types/domain'
@@ -254,44 +255,30 @@ export function ApplicationsPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Criticidad</label>
-              <select
-                value={filterCriticality}
-                onChange={(e) => setFilterCriticality(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Todas</option>
-                <option value="critical">Crítica</option>
-                <option value="high">Alta</option>
-                <option value="medium">Media</option>
-                <option value="low">Baja</option>
-              </select>
+              <Select value={filterCriticality} onChange={(v) => setFilterCriticality(v)} options={[
+                { value: '', label: 'Todas' },
+                { value: 'critical', label: 'Crítica' },
+                { value: 'high', label: 'Alta' },
+                { value: 'medium', label: 'Media' },
+                { value: 'low', label: 'Baja' },
+              ]} className="min-w-[120px]" />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Todos</option>
-                <option value="active">Activo</option>
-                <option value="deprecated">Deprecado</option>
-                <option value="retired">Retirado</option>
-                <option value="planned">Planeado</option>
-              </select>
+              <Select value={filterStatus} onChange={(v) => setFilterStatus(v)} options={[
+                { value: '', label: 'Todos' },
+                { value: 'active', label: 'Activo' },
+                { value: 'deprecated', label: 'Deprecado' },
+                { value: 'retired', label: 'Retirado' },
+                { value: 'planned', label: 'Planeado' },
+              ]} className="min-w-[120px]" />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">BU</label>
-              <select
-                value={filterBU}
-                onChange={(e) => setFilterBU(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Todas</option>
-                {businessUnits.map((bu) => (
-                  <option key={bu.id} value={bu.id}>{bu.name}</option>
-                ))}
-              </select>
+              <Select value={filterBU} onChange={(v) => setFilterBU(v)} options={[
+                { value: '', label: 'Todas' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]} className="min-w-[120px]" />
             </div>
             {(filterCriticality || filterStatus || filterBU) && (
               <button

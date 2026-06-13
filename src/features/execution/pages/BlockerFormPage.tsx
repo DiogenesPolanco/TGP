@@ -6,6 +6,7 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { PersonSelect } from '@/components/ui/PersonSelect'
+import { Select } from '@/components/ui/Select'
 
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 
@@ -132,46 +133,31 @@ export function BlockerFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Severidad</label>
-            <select
-              value={severity}
-              onChange={(e) => setSeverity(e.target.value as BlockerSeverity)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="low">Baja</option>
-              <option value="medium">Media</option>
-              <option value="high">Alta</option>
-              <option value="critical">Crítica</option>
-            </select>
+            <Select label="Severidad" value={severity} onChange={(v) => setSeverity(v as BlockerSeverity)} options={[
+              { value: 'low', label: 'Baja' },
+              { value: 'medium', label: 'Media' },
+              { value: 'high', label: 'Alta' },
+              { value: 'critical', label: 'Crítica' },
+            ]} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Estado</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as BlockerStatus)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="open">Abierto</option>
-              <option value="escalated">Escalado</option>
-              <option value="resolved">Resuelto</option>
-            </select>
+            <Select label="Estado" value={status} onChange={(v) => setStatus(v as BlockerStatus)} options={[
+              { value: 'open', label: 'Abierto' },
+              { value: 'escalated', label: 'Escalado' },
+              { value: 'resolved', label: 'Resuelto' },
+            ]} />
           </div>
 
           {isNew && (
             <>
               <div>
-                <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Tipo de Origen</label>
-                <select
-                  value={sourceType}
-                  onChange={(e) => setSourceType(e.target.value as 'task' | 'activity' | 'plan' | 'commitment')}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="plan">Plan</option>
-                  <option value="activity">Actividad</option>
-                  <option value="task">Tarea</option>
-                  <option value="commitment">Compromiso</option>
-                </select>
+                <Select label="Tipo de Origen" value={sourceType} onChange={(v) => setSourceType(v as 'task' | 'activity' | 'plan' | 'commitment')} options={[
+                  { value: 'plan', label: 'Plan' },
+                  { value: 'activity', label: 'Actividad' },
+                  { value: 'task', label: 'Tarea' },
+                  { value: 'commitment', label: 'Compromiso' },
+                ]} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">

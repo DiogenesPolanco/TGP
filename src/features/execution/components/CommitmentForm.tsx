@@ -5,6 +5,7 @@ import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Commitment } from '@/types/domain'
 import type { CommitmentStatus } from '@/constants/enums'
 
@@ -132,62 +133,60 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Equipo</label>
-            <select
+            <Select
+              label="Equipo"
               value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin equipo</option>
-              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+              onChange={setTeamId}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Aplicacion</label>
-            <select
+            <Select
+              label="Aplicación"
               value={applicationId}
-              onChange={(e) => setApplicationId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin app</option>
-              {applications.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
+              onChange={setApplicationId}
+              options={[
+                { value: '', label: 'Sin app' },
+                ...applications.map((a) => ({ value: a.id, label: a.name })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">OKR asociado</label>
-            <select
+            <Select
+              label="OKR asociado"
               value={objectiveId}
-              onChange={(e) => setObjectiveId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin OKR</option>
-              {objectives.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
-            </select>
+              onChange={setObjectiveId}
+              options={[
+                { value: '', label: 'Sin OKR' },
+                ...objectives.map((o) => ({ value: o.id, label: o.title })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Entregable asociado</label>
-            <select
+            <Select
+              label="Entregable asociado"
               value={deliverableId}
-              onChange={(e) => setDeliverableId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin entregable</option>
-              {deliverables.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
-            </select>
+              onChange={setDeliverableId}
+              options={[
+                { value: '', label: 'Sin entregable' },
+                ...deliverables.map((d) => ({ value: d.id, label: d.title })),
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Estado</label>
-            <select
+            <Select
+              label="Estado"
               value={status}
-              onChange={(e) => setStatus(e.target.value as CommitmentStatus)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              {statusOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
+              onChange={(v) => setStatus(v as CommitmentStatus)}
+              options={statusOptions}
+            />
           </div>
 
           <div>

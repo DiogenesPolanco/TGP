@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react'
 import type { Task, Criticality } from '@/types/domain'
 
@@ -194,17 +195,15 @@ export function TasksPage() {
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos</option>
-            <option value="todo">Por Hacer</option>
-            <option value="in_progress">En Progreso</option>
-            <option value="review">Revisión</option>
-            <option value="done">Completada</option>
-          </select>
+          <div className="min-w-[150px]">
+            <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
+              { value: 'all', label: 'Todos' },
+              { value: 'todo', label: 'Por Hacer' },
+              { value: 'in_progress', label: 'En Progreso' },
+              { value: 'review', label: 'Revisión' },
+              { value: 'done', label: 'Completada' },
+            ]} />
+          </div>
         </div>
       </div>
 

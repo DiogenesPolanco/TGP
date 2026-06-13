@@ -374,20 +374,96 @@ function TechStackManager({
   applicationId: string
   selectedIds: string[]
 }) {
+  const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
   const handleChange = async (ids: string[]) => {
     await db.applications.update(applicationId, { technologies: ids })
   }
 
+  const appTechs = useMemo(
+    () => allTechnologies.filter((t) => selectedIds.includes(t.id)),
+    [allTechnologies, selectedIds],
+  )
+
+  const supportStatusLabel: Record<string, string> = {
+    active: 'Activo',
+    extended: 'S. Extendido',
+    eol: 'EOL',
+    unknown: '?',
+  }
+
+  const supportStatusColor: Record<string, string> = {
+    active: 'bg-success/10 text-success border-success/30',
+    extended: 'bg-warning/10 text-warning border-warning/30',
+    eol: 'bg-danger/10 text-danger border-danger/30',
+    unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  }
+
+  const techColumns: Column<(typeof allTechnologies)[number]>[] = useMemo(() => [
+    {
+      key: 'name',
+      label: 'Tecnología',
+      sortable: true,
+      render: (t) => (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-90 dark:text-white">{t.name}</span>
+          <span className="text-xs text-neutral-50">{t.version}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'vendor',
+      label: 'Vendor',
+      sortable: true,
+      render: (t) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{t.vendor || '—'}</span>,
+    },
+    {
+      key: 'category',
+      label: 'Categoría',
+      sortable: true,
+      render: (t) => <span className="text-sm text-neutral-70 dark:text-neutral-30 capitalize">{t.category}</span>,
+    },
+    {
+      key: 'supportStatus',
+      label: 'Estado',
+      sortable: true,
+      render: (t) => (
+        <span className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[t.supportStatus]}`}>
+          {supportStatusLabel[t.supportStatus]}
+        </span>
+      ),
+    },
+    {
+      key: 'eolDate',
+      label: 'Fecha EOL',
+      sortable: true,
+      render: (t) => (
+        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+          {t.eolDate ? new Date(t.eolDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : '—'}
+        </span>
+      ),
+    },
+  ], [])
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">Stack Tecnológico</h4>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
+          Stack Tecnológico <span className="text-neutral-50 text-base font-normal">({selectedIds.length})</span>
+        </h4>
       </div>
       <TechSearch
         selectedIds={selectedIds}
         onChange={handleChange}
         enableDepsSearch={true}
       />
+      {appTechs.length > 0 && (
+        <SortableTable
+          columns={techColumns}
+          data={appTechs}
+          pageSize={10}
+          emptyMessage="Sin tecnologías asignadas"
+        />
+      )}
     </div>
   )
 }
@@ -439,20 +515,52 @@ function EntityList<T extends EntityForList>({
       (!search || (renderCells(item)[0] ?? '').toLowerCase().includes(search.toLowerCase()))
   ) as T[]
 
-  const severityBadge = (sev: string | null) => {
-    if (!sev) return null
+  const getSeverityColorClass = (sev: string): string => {
     const colors: Record<string, string> = {
       critical: 'bg-danger/10 text-danger',
       high: 'bg-warning/10 text-warning',
       medium: 'bg-info/10 text-info',
       low: 'bg-success/10 text-success',
     }
-    return (
-      <span className={`text-xs px-2 py-0.5 rounded-full ${colors[sev] || 'bg-neutral-10 text-neutral-60'}`}>
-        {sev}
-      </span>
-    )
+    return colors[sev] || 'bg-neutral-10 text-neutral-60'
   }
+
+  const columns: Column<T>[] = useMemo(() => {
+    const cols: Column<T>[] = headers.map((header, idx) => ({
+      key: `col-${idx}`,
+      label: header,
+      sortable: true,
+      render: (item: T) => {
+        const cells = renderCells(item)
+        const cell = cells[idx] ?? ''
+        const sev = severityColor(item)
+        if (idx === 1 && sev) {
+          return (
+            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColorClass(sev)}`}>
+              {cell}
+            </span>
+          )
+        }
+        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{cell}</span>
+      },
+    }))
+    cols.push({
+      key: 'actions',
+      label: 'Acción',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (item: T) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); dissociate(item) }}
+          className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-all"
+          title="Desasociar"
+        >
+          <Unlink size={14} />
+        </button>
+      ),
+    })
+    return cols
+  }, [headers, renderCells, severityColor])
 
   return (
     <div>
@@ -460,44 +568,14 @@ function EntityList<T extends EntityForList>({
         <h4 className="text-xl font-bold text-neutral-90 dark:text-white">{title}</h4>
       </div>
 
-      {items.length === 0 ? (
-        <p className="text-sm text-neutral-50 dark:text-neutral-50 mb-4">No hay {title.toLowerCase()} asociados</p>
-      ) : (
-        <table className="w-full mb-4">
-          <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70">
-              {headers.map((h) => (
-                <th key={h} className="text-left px-4 py-2 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">{h}</th>
-              ))}
-              <th className="text-right px-4 py-2 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase">Acción</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
-            {items.map((item) => {
-              const sev = severityColor(item)
-              const cells = renderCells(item)
-              return (
-                <tr key={item.id} className="group">
-                  {cells.map((cell, j) => (
-                    <td key={j} className="px-4 py-3 text-sm text-neutral-70 dark:text-neutral-30">
-                      {j === 1 && sev ? severityBadge(cell) : cell}
-                    </td>
-                  ))}
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => dissociate(item)}
-                      className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
-                      title="Desasociar"
-                    >
-                      <Unlink size={14} />
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      )}
+      <div className="mb-4">
+        <SortableTable
+          columns={columns}
+          data={items}
+          pageSize={10}
+          emptyMessage={`No hay ${title.toLowerCase()} asociados`}
+        />
+      </div>
 
       <div className="relative">
         <div className="relative">

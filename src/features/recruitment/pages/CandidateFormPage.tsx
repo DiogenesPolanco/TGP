@@ -10,6 +10,7 @@ import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { TechSearch } from '@/components/ui/TechSearch'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { EvalCategory } from '@/types/domain'
 
 export function CandidateFormPage() {
@@ -149,11 +150,10 @@ export function CandidateFormPage() {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Posición *</label>
-            <select value={position} onChange={(e) => setPosition(e.target.value)} required
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Seleccionar rol...</option>
-              {roleOptions.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
-            </select>
+            <Select value={position} onChange={(v) => setPosition(v)} required options={[
+              { value: '', label: 'Seleccionar rol...' },
+              ...roleOptions.map((r) => ({ value: r.value, label: r.label })),
+            ]} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Email</label>
@@ -172,21 +172,19 @@ export function CandidateFormPage() {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Estado</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as any)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="pending">Pendiente</option>
-              <option value="interviewed">Entrevistado</option>
-              <option value="selected">Seleccionado</option>
-              <option value="rejected">Rechazado</option>
-            </select>
+            <Select value={status} onChange={(v) => setStatus(v as any)} options={[
+              { value: 'pending', label: 'Pendiente' },
+              { value: 'interviewed', label: 'Entrevistado' },
+              { value: 'selected', label: 'Seleccionado' },
+              { value: 'rejected', label: 'Rechazado' },
+            ]} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Equipo (opcional)</label>
-            <select value={teamId} onChange={(e) => setTeamId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin equipo</option>
-              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+            <Select value={teamId} onChange={(v) => setTeamId(v)} options={[
+              { value: '', label: 'Sin equipo' },
+              ...teams.map((t) => ({ value: t.id, label: t.name })),
+            ]} />
           </div>
         </div>
 

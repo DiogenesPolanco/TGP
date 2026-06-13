@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/appStore'
 import { Server, ExternalLink, Layers, Box, Cpu, Database, Globe, Shield, ArrowRight, AlertTriangle, Wifi, Wrench, Plus, Unlink, Link } from 'lucide-react'
 import type { SupportStatus, Criticality } from '@/types/domain'
 import type { DependencyType } from '@/constants/enums'
+import { Select } from '@/components/ui/Select'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -412,29 +413,17 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
 
               <div>
                 <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Tipo</label>
-                <select
-                  value={depType}
-                  onChange={(e) => setDepType(e.target.value as DependencyType)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  {dependencyTypes.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
+                <Select value={depType} onChange={(v) => setDepType(v as DependencyType)} options={dependencyTypes.map((t) => ({ value: t.value, label: t.label }))} />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Criticidad</label>
-                <select
-                  value={depCriticality}
-                  onChange={(e) => setDepCriticality(e.target.value as Criticality)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="low">Baja</option>
-                  <option value="medium">Media</option>
-                  <option value="high">Alta</option>
-                  <option value="critical">Crítica</option>
-                </select>
+                <Select value={depCriticality} onChange={(v) => setDepCriticality(v as Criticality)} options={[
+                  { value: 'low', label: 'Baja' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'critical', label: 'Crítica' },
+                ]} />
               </div>
             </div>
 

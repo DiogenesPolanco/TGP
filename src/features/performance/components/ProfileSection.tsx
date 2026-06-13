@@ -3,6 +3,7 @@ import { db } from '@/services/db/database'
 import type { MemberProfile, MemberStatus } from '@/types/domain'
 import { MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import { Save, AtSign, Phone, Home, MapPin, Briefcase, Calendar, Umbrella, Clock } from 'lucide-react'
+import { Select } from '@/components/ui/Select'
 
 interface Props {
   memberId: string
@@ -93,39 +94,27 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
             <Briefcase size={14} /> Rol
           </label>
-          <select
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className={inputClass}
-          >
-            <option value="developer">Developer</option>
-            <option value="senior_developer">Senior Developer</option>
-            <option value="tech_lead">Tech Lead</option>
-            <option value="architect">Arquitecto</option>
-            <option value="qa">QA</option>
-            <option value="devops">DevOps</option>
-            <option value="product_owner">Product Owner</option>
-            <option value="scrum_master">Scrum Master</option>
-            <option value="ux_designer">UX Designer</option>
-            <option value="analyst">Analista</option>
-            <option value="manager">Manager</option>
-            <option value="intern">Intern</option>
-            <option value="other">Otro</option>
-          </select>
+          <Select value={form.role} onChange={(v) => setForm({ ...form, role: v })} options={[
+            { value: 'developer', label: 'Developer' },
+            { value: 'senior_developer', label: 'Senior Developer' },
+            { value: 'tech_lead', label: 'Tech Lead' },
+            { value: 'architect', label: 'Arquitecto' },
+            { value: 'qa', label: 'QA' },
+            { value: 'devops', label: 'DevOps' },
+            { value: 'product_owner', label: 'Product Owner' },
+            { value: 'scrum_master', label: 'Scrum Master' },
+            { value: 'ux_designer', label: 'UX Designer' },
+            { value: 'analyst', label: 'Analista' },
+            { value: 'manager', label: 'Manager' },
+            { value: 'intern', label: 'Intern' },
+            { value: 'other', label: 'Otro' },
+          ]} />
         </div>
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
             <Clock size={14} /> Estado
           </label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            className={inputClass}
-          >
-            {Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
-          </select>
+          <Select value={form.status} onChange={(v) => setForm({ ...form, status: v })} options={Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v }))} />
         </div>
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">

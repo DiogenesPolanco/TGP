@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { X } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Risk } from '@/types/domain'
 
 interface RiskFormProps {
@@ -85,47 +86,27 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Aplicación</label>
-              <select
-                value={formData.applicationId}
-                onChange={(e) => setFormData({ ...formData, applicationId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Sin aplicación</option>
-                {applications.map((app) => (
-                  <option key={app.id} value={app.id}>{app.name}</option>
-                ))}
-              </select>
+              <Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
+                { value: '', label: 'Sin aplicación' },
+                ...applications.map((app) => ({ value: app.id, label: app.name })),
+              ]} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit *</label>
-              <select
-                required
-                value={formData.businessUnitId}
-                onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Seleccionar...</option>
-                {businessUnits.map((bu) => (
-                  <option key={bu.id} value={bu.id}>{bu.name}</option>
-                ))}
-              </select>
+              <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
+                { value: '', label: 'Seleccionar...' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Categoría</label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as typeof formData.category })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="technical">Técnico</option>
-              <option value="security">Seguridad</option>
-              <option value="operational">Operacional</option>
-              <option value="regulatory">Regulatorio</option>
-              <option value="financial">Financiero</option>
-            </select>
+            <Select label="Categoría" value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as typeof formData.category })} options={[
+              { value: 'technical', label: 'Técnico' },
+              { value: 'security', label: 'Seguridad' },
+              { value: 'operational', label: 'Operacional' },
+              { value: 'regulatory', label: 'Regulatorio' },
+              { value: 'financial', label: 'Financiero' },
+            ]} />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
@@ -175,17 +156,12 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as typeof formData.status })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="open">Abierto</option>
-                <option value="mitigated">Mitigado</option>
-                <option value="accepted">Aceptado</option>
-                <option value="closed">Cerrado</option>
-              </select>
+              <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })} options={[
+                { value: 'open', label: 'Abierto' },
+                { value: 'mitigated', label: 'Mitigado' },
+                { value: 'accepted', label: 'Aceptado' },
+                { value: 'closed', label: 'Cerrado' },
+              ]} />
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha objetivo</label>

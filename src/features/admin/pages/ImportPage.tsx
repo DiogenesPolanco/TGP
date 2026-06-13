@@ -3,6 +3,7 @@ import { Upload, FileSpreadsheet, CheckCircle, Loader, AlertTriangle, Download, 
 import { parseExcel, importRows, getImportableEntities, ImportFileError } from '@/services/import/importService'
 import type { ParsedRow, ImportResult } from '@/services/import/importService'
 import { useAppStore } from '@/stores/appStore'
+import { Select } from '@/components/ui/Select'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -115,19 +116,10 @@ export function ImportPage() {
         <div className="space-y-5">
           {/* Entity type selector */}
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
-              Tipo de datos a importar
-            </label>
-            <select
-              value={selectedType}
-              onChange={(e) => handleTypeChange(e.target.value)}
-              className="w-full max-w-md px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Seleccionar...</option>
-              {entityTypes.map((et) => (
-                <option key={et.id} value={et.id}>{et.label}</option>
-              ))}
-            </select>
+            <Select label="Tipo de datos a importar" value={selectedType} onChange={(v) => handleTypeChange(v)} options={[
+              { value: '', label: 'Seleccionar...' },
+              ...entityTypes.map((et) => ({ value: et.id, label: et.label })),
+            ]} className="max-w-md" />
           </div>
 
           {/* File upload */}

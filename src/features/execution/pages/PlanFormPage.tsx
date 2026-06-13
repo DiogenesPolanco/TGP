@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
 
 export function PlanFormPage() {
@@ -100,49 +101,44 @@ export function PlanFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Equipo</label>
-            <select value={formData.teamId} onChange={(e) => setFormData({ ...formData, teamId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin equipo</option>
-              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+            <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
+              { value: '', label: 'Sin equipo' },
+              ...teams.map((t) => ({ value: t.id, label: t.name })),
+            ]} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Unidad de Negocio</label>
-            <select value={formData.businessUnitId} onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin BU</option>
-              {businessUnits.map((bu) => <option key={bu.id} value={bu.id}>{bu.name}</option>)}
-            </select>
+            <Select label="Unidad de Negocio" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
+              { value: '', label: 'Sin BU' },
+              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+            ]} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">OKR Asociado</label>
-            <select value={formData.objectiveId} onChange={(e) => setFormData({ ...formData, objectiveId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin OKR</option>
-              {objectives.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
-            </select>
+            <Select label="OKR Asociado" value={formData.objectiveId} onChange={(v) => setFormData({ ...formData, objectiveId: v })} options={[
+              { value: '', label: 'Sin OKR' },
+              ...objectives.map((o) => ({ value: o.id, label: o.title })),
+            ]} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
-            <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="planned">Planificado</option>
-              <option value="in_progress">En Progreso</option>
-              <option value="on_hold">En Pausa</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
-            </select>
+            <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ProjectStatus })} options={[
+              { value: 'planned', label: 'Planificado' },
+              { value: 'in_progress', label: 'En Progreso' },
+              { value: 'on_hold', label: 'En Pausa' },
+              { value: 'completed', label: 'Completado' },
+              { value: 'cancelled', label: 'Cancelado' },
+            ]} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Salud</label>
-            <select value={formData.health} onChange={(e) => setFormData({ ...formData, health: e.target.value as ProjectHealth })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="green">Verde</option>
-              <option value="yellow">Amarillo</option>
-              <option value="red">Rojo</option>
-            </select>
+            <Select label="Salud" value={formData.health} onChange={(v) => setFormData({ ...formData, health: v as ProjectHealth })} options={[
+              { value: 'green', label: 'Verde' },
+              { value: 'yellow', label: 'Amarillo' },
+              { value: 'red', label: 'Rojo' },
+            ]} />
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha Inicio *</label>

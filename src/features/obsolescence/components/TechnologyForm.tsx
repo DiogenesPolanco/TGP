@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import { db } from '@/services/db/database'
 import type { Technology, TechCategory, SupportStatus } from '@/types/domain'
 
@@ -105,17 +106,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Categoría *</label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as TechCategory })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                {categoryOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <Select label="Categoría *" required value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as TechCategory })} options={categoryOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Vendor *</label>
@@ -131,17 +122,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado de Soporte *</label>
-              <select
-                required
-                value={formData.supportStatus}
-                onChange={(e) => setFormData({ ...formData, supportStatus: e.target.value as SupportStatus })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                {statusOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <Select label="Estado de Soporte *" required value={formData.supportStatus} onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })} options={statusOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label>

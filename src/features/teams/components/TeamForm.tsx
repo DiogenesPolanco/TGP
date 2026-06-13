@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { PersonSelect } from '@/components/ui/PersonSelect'
+import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
 import type { MemberRole } from '@/constants/enums'
@@ -16,6 +18,23 @@ interface TeamFormProps {
 export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
   const { confirm } = useConfirm()
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
+  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
+  const users = useLiveQuery(() => db.users.toArray()) ?? []
+
+  const resolveDisplayName = (personId: string): string => {
+    for (const t of teams) {
+      const m = t.members.find((m) => m.id === personId)
+      if (m) return m.displayName
+    }
+    const u = users.find((u) => u.id === personId)
+    if (u) return u.displayName
+    return personId
+  }
+
+  const resolveUserPrincipal = (personId: string): string => {
+    const name = resolveDisplayName(personId)
+    return name.toLowerCase().replace(/\s+/g, '.')
+  }
   const [formData, setFormData] = useState({
     name: team?.name ?? '',
     businessUnitId: team?.businessUnitId ?? '',
@@ -60,7 +79,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
 
   const addMember = () => {
     const newMember: TeamMember = {
-      id: crypto.randomUUID(),
+      id: '',
       userPrincipal: '',
       displayName: '',
       role: 'developer',
@@ -68,6 +87,17 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
       status: 'activo',
     }
     setFormData({ ...formData, members: [...formData.members, newMember] })
+  }
+
+  const handlePersonChange = (index: number, personId: string) => {
+    const updated = [...formData.members]
+    updated[index] = {
+      ...updated[index],
+      id: personId,
+      userPrincipal: resolveUserPrincipal(personId),
+      displayName: resolveDisplayName(personId),
+    }
+    setFormData({ ...formData, members: updated })
   }
 
   const updateMember = (index: number, field: keyof TeamMember, value: string | number | boolean) => {
@@ -106,34 +136,21 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit *</label>
-              <select
-                required
-                value={formData.businessUnitId}
-                onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Seleccionar...</option>
-                {businessUnits.map((bu) => (
-                  <option key={bu.id} value={bu.id}>{bu.name}</option>
-                ))}
-              </select>
+              <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
+                { value: '', label: 'Seleccionar...' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Sistema Fuente</label>
-            <select
-              value={formData.sourceSystem}
-              onChange={(e) => setFormData({ ...formData, sourceSystem: e.target.value as typeof formData.sourceSystem })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="manual">Manual</option>
-              <option value="jira">Jira</option>
-              <option value="azure_devops">Azure DevOps</option>
-              <option value="github">GitHub</option>
-              <option value="gitlab">GitLab</option>
-            </select>
+            <Select label="Sistema Fuente" value={formData.sourceSystem} onChange={(v) => setFormData({ ...formData, sourceSystem: v as typeof formData.sourceSystem })} options={[
+              { value: 'manual', label: 'Manual' },
+              { value: 'jira', label: 'Jira' },
+              { value: 'azure_devops', label: 'Azure DevOps' },
+              { value: 'github', label: 'GitHub' },
+              { value: 'gitlab', label: 'GitLab' },
+            ]} />
           </div>
 
           <div>
@@ -149,14 +166,14 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
             </div>
             <div className="space-y-2">
               {formData.members.map((member, index) => (
-                <div key={member.id} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-                  <input
-                    type="text"
-                    placeholder="Nombre"
-                    value={member.displayName}
-                    onChange={(e) => updateMember(index, 'displayName', e.target.value)}
-                    className="flex-1 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
-                  />
+                <div key={member.id || index} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+                  <div className="flex-1 min-w-[180px]">
+                    <PersonSelect
+                      value={member.id}
+                      onChange={(personId) => handlePersonChange(index, personId)}
+                      placeholder="Buscar persona..."
+                    />
+                  </div>
                   <select
                     value={member.role}
                     onChange={(e) => updateMember(index, 'role', e.target.value)}

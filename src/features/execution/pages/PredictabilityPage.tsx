@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
@@ -184,16 +185,10 @@ export function PredictabilityPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-neutral-50" />
-            <select
-              value={selectedTeamId}
-              onChange={(e) => setSelectedTeamId(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 min-w-[200px]"
-            >
-              <option value="">Todos los equipos</option>
-              {teamOptions.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
+            <Select value={selectedTeamId} onChange={setSelectedTeamId} options={[
+              { value: '', label: 'Todos los equipos' },
+              ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
+            ]} />
           </div>
 
           <div className="flex items-center gap-1 bg-neutral-10 dark:bg-neutral-70 rounded-lg p-1">
@@ -356,7 +351,7 @@ export function PredictabilityPage() {
           </div>
           <SortableTable
             columns={periodColumns}
-            data={currentPeriods.map((p) => ({ ...p, id: p.periodKey }))}
+            data={currentPeriods.map((p) => ({ ...p, id: p.periodKey } as PredictabilityPeriod & { id: string }))}
             pageSize={10}
           />
         </div>

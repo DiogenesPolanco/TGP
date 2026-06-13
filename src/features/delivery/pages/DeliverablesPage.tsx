@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import {
   Filter,
   ArrowRight,
@@ -225,30 +226,20 @@ export function DeliverablesPage() {
           <div className="flex gap-3 mt-3 pt-3 border-t border-neutral-20 dark:border-neutral-70">
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Estado</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as DeliverableStatus | 'all')}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="all">Todos</option>
-                <option value="pending">Pendiente</option>
-                <option value="in_progress">En Progreso</option>
-                <option value="completed">Completado</option>
-                <option value="cancelled">Cancelado</option>
-              </select>
+              <Select value={statusFilter} onChange={(v) => setStatusFilter(v as DeliverableStatus | 'all')} options={[
+                { value: 'all', label: 'Todos' },
+                { value: 'pending', label: 'Pendiente' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' },
+              ]} />
             </div>
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Aplicación</label>
-              <select
-                value={appFilter}
-                onChange={(e) => setAppFilter(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Todas</option>
-                {allApplications.map((app) => (
-                  <option key={app.id} value={app.id}>{app.name}</option>
-                ))}
-              </select>
+              <Select value={appFilter} onChange={(v) => setAppFilter(v)} options={[
+                { value: '', label: 'Todas' },
+                ...allApplications.map((app) => ({ value: app.id, label: app.name })),
+              ]} />
             </div>
           </div>
         )}

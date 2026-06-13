@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import { Plus, Search, Pencil, Trash2, Ban } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
 
@@ -95,14 +96,15 @@ export function BlockersPage() {
             <input type="text" placeholder="Buscar bloqueos..." value={search} onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
-          <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-            <option value="all">Todas las severidades</option>
-            <option value="critical">Crítica</option>
-            <option value="high">Alta</option>
-            <option value="medium">Media</option>
-            <option value="low">Baja</option>
-          </select>
+          <div className="min-w-[180px]">
+            <Select value={sevFilter} onChange={setSevFilter} options={[
+              { value: 'all', label: 'Todas las severidades' },
+              { value: 'critical', label: 'Crítica' },
+              { value: 'high', label: 'Alta' },
+              { value: 'medium', label: 'Media' },
+              { value: 'low', label: 'Baja' },
+            ]} />
+          </div>
         </div>
       </div>
 

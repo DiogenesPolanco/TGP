@@ -6,6 +6,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select } from '@/components/ui/Select'
 import { Plus, Search, Filter, Upload, X, Target, TrendingUp, AlertCircle, CheckCircle2, Pencil, Trash2 } from 'lucide-react'
 import type { KeyResult } from '@/types/domain'
 
@@ -135,18 +136,14 @@ export function ObjectivesPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="all">Todos</option>
-                <option value="not_started">No Iniciado</option>
-                <option value="on_track">Encaminado</option>
-                <option value="at_risk">En Riesgo</option>
-                <option value="behind">Atrasado</option>
-                <option value="achieved">Logrado</option>
-              </select>
+              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
+                { value: 'all', label: 'Todos' },
+                { value: 'not_started', label: 'No Iniciado' },
+                { value: 'on_track', label: 'Encaminado' },
+                { value: 'at_risk', label: 'En Riesgo' },
+                { value: 'behind', label: 'Atrasado' },
+                { value: 'achieved', label: 'Logrado' },
+              ]} className="min-w-[120px]" />
             </div>
             {statusFilter !== 'all' && (
               <button

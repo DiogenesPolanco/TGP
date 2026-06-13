@@ -1,28 +1,14 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { TechSearch } from '@/components/ui/TechSearch'
+import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import {
   Plus, X, Pencil, Trash2, Server,
-  Layers, ChevronDown, ChevronUp,
+  AlertTriangle,
 } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import type { Technology, SupportStatus } from '@/types/domain'
-
-const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-success/10 text-success border-success/30',
-  extended: 'bg-warning/10 text-warning border-warning/30',
-  eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
-}
-
-const statusLabel: Record<SupportStatus, string> = {
-  active: 'Activo',
-  extended: 'S. Extendido',
-  eol: 'EOL',
-  unknown: '?',
-}
 
 interface MicroservicesTabProps {
   applicationId: string
@@ -44,6 +30,71 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
     await db.microservices.delete(msId)
   }
 
+  const columns: Column<(typeof microservices)[number]>[] = useMemo(() => [
+    {
+      key: 'name',
+      label: 'Nombre',
+      sortable: true,
+      render: (ms) => (
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+            <Server size={16} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-neutral-90 dark:text-white">{ms.name}</p>
+            {ms.description && (
+              <p className="text-xs text-neutral-60 dark:text-neutral-40 line-clamp-1">{ms.description}</p>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'technologies',
+      label: 'Tecnologías',
+      sortable: true,
+      render: (ms) => {
+        const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
+        const eolCount = techs.filter((t) => t.supportStatus === 'eol').length
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-neutral-70 dark:text-neutral-30">{techs.length} techs</span>
+            {eolCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger">
+                <AlertTriangle size={12} />
+                {eolCount} EOL
+              </span>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      key: 'actions',
+      label: '',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      render: (ms) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={(e) => { e.stopPropagation(); setEditingMs(ms.id); setShowForm(true) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
+            title="Editar"
+          >
+            <Pencil size={14} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}
+            className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+            title="Eliminar"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      ),
+    },
+  ], [allTechnologies])
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -59,23 +110,12 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {microservices.length === 0 && (
-          <p className="text-sm text-neutral-50 dark:text-neutral-50">
-            No hay microservicios registrados para esta aplicación.
-          </p>
-        )}
-
-        {microservices.map((ms) => (
-          <MicroserviceCard
-            key={ms.id}
-            microservice={ms}
-            allTechnologies={allTechnologies}
-            onEdit={() => { setEditingMs(ms.id); setShowForm(true) }}
-            onDelete={() => handleDelete(ms.id)}
-          />
-        ))}
-      </div>
+      <SortableTable
+        columns={columns}
+        data={microservices}
+        pageSize={10}
+        emptyMessage="No hay microservicios registrados para esta aplicación"
+      />
 
       {showForm && (
         <MicroserviceFormModal
@@ -83,101 +123,6 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
           editingId={editingMs}
           onClose={() => { setShowForm(false); setEditingMs(null) }}
         />
-      )}
-    </div>
-  )
-}
-
-/* ─── Microservice Card ─── */
-
-function MicroserviceCard({
-  microservice: ms,
-  allTechnologies,
-  onEdit,
-  onDelete,
-}: {
-  microservice: { id: string; name: string; description: string; technologies: string[] }
-  allTechnologies: Technology[]
-  onEdit: () => void
-  onDelete: () => void
-}) {
-  const [expanded, setExpanded] = useState(false)
-  const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
-  const eolCount = techs.filter((t) => t.supportStatus === 'eol').length
-
-  return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70/50 group">
-      {/* Header */}
-      <div className="flex items-center justify-between p-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
-            <Server size={18} />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-neutral-90 dark:text-white truncate">
-                {ms.name}
-              </span>
-              {eolCount > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger shrink-0">
-                  {eolCount} EOL
-                </span>
-              )}
-            </div>
-            {ms.description && (
-              <p className="text-xs text-neutral-60 dark:text-neutral-40 truncate mt-0.5">
-                {ms.description}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-neutral-50">{techs.length} tecnologías</span>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 transition-colors"
-          >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          <button
-            onClick={onEdit}
-            className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
-            title="Editar"
-          >
-            <Pencil size={14} />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger transition-colors"
-            title="Eliminar"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Expanded tech stack */}
-      {expanded && (
-        <div className="border-t border-neutral-20 dark:border-neutral-70 p-3 space-y-1.5">
-          {techs.length === 0 ? (
-            <p className="text-xs text-neutral-50">Sin tecnologías asignadas</p>
-          ) : (
-            techs.map((tech) => (
-              <div key={tech.id} className="flex items-center justify-between py-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Layers size={14} className="text-neutral-50 shrink-0" />
-                  <span className="text-sm text-neutral-90 dark:text-white truncate">
-                    {tech.name}
-                  </span>
-                  <span className="text-xs text-neutral-50 shrink-0">{tech.version}</span>
-                </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${statusColors[tech.supportStatus]}`}>
-                  {statusLabel[tech.supportStatus]}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
       )}
     </div>
   )

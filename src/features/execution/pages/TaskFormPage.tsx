@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import { criticalityOptions, taskStatusOptions } from '@/constants/options'
 import type { Task, Criticality } from '@/types/domain'
 
@@ -104,33 +105,41 @@ export function TaskFormPage() {
           </div>
           <div>
             <Label>Plan</Label>
-            <select {...register('planId')}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin plan</option>
-              {plans.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
-            </select>
+            <Controller name="planId" control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v || '')} options={[
+                  { value: '', label: 'Sin plan' },
+                  ...plans.map((p) => ({ value: p.id, label: p.title })),
+                ]} />
+              )}
+            />
           </div>
           <div>
             <Label>Actividad</Label>
-            <select {...register('activityId')}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Sin actividad</option>
-              {activities.map((a) => <option key={a.id} value={a.id}>{a.title}</option>)}
-            </select>
+            <Controller name="activityId" control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v || '')} options={[
+                  { value: '', label: 'Sin actividad' },
+                  ...activities.map((a) => ({ value: a.id, label: a.title })),
+                ]} />
+              )}
+            />
           </div>
           <div>
             <Label>Prioridad</Label>
-            <select {...register('priority', { required: true })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {criticalityOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <Controller name="priority" control={control} rules={{ required: true }}
+              render={({ field }) => (
+                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v)} options={criticalityOptions} />
+              )}
+            />
           </div>
           <div>
             <Label>Estado</Label>
-            <select {...register('status', { required: true })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {taskStatusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <Controller name="status" control={control} rules={{ required: true }}
+              render={({ field }) => (
+                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v)} options={taskStatusOptions} />
+              )}
+            />
           </div>
           <div>
             <PersonSelect

@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import type { User } from '@/types/domain'
+import { Select } from '@/components/ui/Select'
 
 interface FormData {
   displayName: string
@@ -28,7 +29,7 @@ export function UserFormPage() {
   const isEdit = !!id
 
   const user = useLiveQuery(() => (id ? db.users.get(id) : undefined), [id])
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>()
+  const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormData>()
 
   useEffect(() => {
     if (user) {
@@ -79,10 +80,9 @@ export function UserFormPage() {
           </div>
           <div>
             <Label>Rol</Label>
-            <select {...register('role', { required: true })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {roleOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <Controller name="role" control={control} render={({ field }) => (
+              <Select value={field.value} onChange={(v) => field.onChange(v)} options={roleOptions.map((o) => ({ value: o.value, label: o.label }))} />
+            )} />
           </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" {...register('isActive')} id="isActive" className="rounded border-neutral-30" />

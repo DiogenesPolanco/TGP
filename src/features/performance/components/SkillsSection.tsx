@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Skill } from '@/types/domain'
 import { Plus, X, Search, Edit3 } from 'lucide-react'
+import { Select } from '@/components/ui/Select'
 
 interface Props {
   memberId: string
@@ -171,16 +172,17 @@ export function SkillsSection({ memberId }: Props) {
           className="w-[140px] rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
           onKeyDown={(e) => e.key === 'Enter' && addSkill()}
         />
-        <select
+        <Select
           value={newLevel}
-          onChange={(e) => setNewLevel(e.target.value as Skill['level'])}
-          className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
-        >
-          <option value="beginner">Principiante</option>
-          <option value="intermediate">Intermedio</option>
-          <option value="advanced">Avanzado</option>
-          <option value="expert">Experto</option>
-        </select>
+          onChange={(v) => setNewLevel(v as Skill['level'])}
+          options={[
+            { value: 'beginner', label: 'Principiante' },
+            { value: 'intermediate', label: 'Intermedio' },
+            { value: 'advanced', label: 'Avanzado' },
+            { value: 'expert', label: 'Experto' },
+          ]}
+          placeholder="Nivel"
+        />
         <button
           onClick={() => addSkill()}
           className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"

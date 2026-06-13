@@ -12,6 +12,7 @@ import { createShareLink, getPublicTimelineData } from '@/services/share/publicS
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
+import { Select } from '@/components/ui/Select'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -287,37 +288,27 @@ export function ExecutiveTimelinePage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Filter size={16} className="text-neutral-50" />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | 'all')}
-          className="text-sm bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-70 rounded-lg px-3 py-1.5 text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="all">Todos los estados</option>
-          <option value="planned">Planificado</option>
-          <option value="in_progress">En Progreso</option>
-          <option value="on_hold">En Pausa</option>
-          <option value="completed">Completado</option>
-        </select>
-        <select
-          value={buFilter}
-          onChange={(e) => setBuFilter(e.target.value)}
-          className="text-sm bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-70 rounded-lg px-3 py-1.5 text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="all">Todas las UB</option>
-          {businessUnits.map((bu) => (
-            <option key={bu.id} value={bu.id}>{bu.name}</option>
-          ))}
-        </select>
-        <select
-          value={teamFilter}
-          onChange={(e) => setTeamFilter(e.target.value)}
-          className="text-sm bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-70 rounded-lg px-3 py-1.5 text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="all">Todos los equipos</option>
-          {teams.map((t) => (
-            <option key={t.id} value={t.id}>{t.name}</option>
-          ))}
-        </select>
+        <div className="min-w-[170px]">
+          <Select value={statusFilter} onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')} options={[
+            { value: 'all', label: 'Todos los estados' },
+            { value: 'planned', label: 'Planificado' },
+            { value: 'in_progress', label: 'En Progreso' },
+            { value: 'on_hold', label: 'En Pausa' },
+            { value: 'completed', label: 'Completado' },
+          ]} />
+        </div>
+        <div className="min-w-[170px]">
+          <Select value={buFilter} onChange={setBuFilter} options={[
+            { value: 'all', label: 'Todas las UB' },
+            ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+          ]} />
+        </div>
+        <div className="min-w-[170px]">
+          <Select value={teamFilter} onChange={setTeamFilter} options={[
+            { value: 'all', label: 'Todos los equipos' },
+            ...teams.map((t) => ({ value: t.id, label: t.name })),
+          ]} />
+        </div>
         <span className="text-xs text-neutral-50 ml-auto">{filteredPlans.length} plan(es)</span>
       </div>
 

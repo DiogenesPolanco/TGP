@@ -5,6 +5,7 @@ import { Plus, Award, Trophy, Star, BookOpen, TrendingUp, Trash2, Edit3 } from '
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 
 interface Props {
   memberId: string
@@ -147,16 +148,16 @@ export function AchievementsSection({ memberId }: Props) {
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
-              <select
+              <Select
                 value={newAchievement.type}
-                onChange={(e) => setNewAchievement({ ...newAchievement, type: e.target.value as Achievement['type'] })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
-              >
-                <option value="logro">Logro</option>
-                <option value="reconocimiento">Reconocimiento</option>
-                <option value="certificacion">Certificación</option>
-                <option value="ascenso">Ascenso</option>
-              </select>
+                onChange={(v) => setNewAchievement({ ...newAchievement, type: v as Achievement['type'] })}
+                options={[
+                  { value: 'logro', label: 'Logro' },
+                  { value: 'reconocimiento', label: 'Reconocimiento' },
+                  { value: 'certificacion', label: 'Certificación' },
+                  { value: 'ascenso', label: 'Ascenso' },
+                ]}
+              />
             </div>
           </div>
           <div className="mb-4">
@@ -223,16 +224,16 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
-                    <select
+                    <Select
                       value={editData.type}
-                      onChange={(e) => setEditData({ ...editData, type: e.target.value as Achievement['type'] })}
-                      className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
-                    >
-                      <option value="logro">Logro</option>
-                      <option value="reconocimiento">Reconocimiento</option>
-                      <option value="certificacion">Certificación</option>
-                      <option value="ascenso">Ascenso</option>
-                    </select>
+                      onChange={(v) => setEditData({ ...editData, type: v as Achievement['type'] })}
+                      options={[
+                        { value: 'logro', label: 'Logro' },
+                        { value: 'reconocimiento', label: 'Reconocimiento' },
+                        { value: 'certificacion', label: 'Certificación' },
+                        { value: 'ascenso', label: 'Ascenso' },
+                      ]}
+                    />
                   </div>
                 </div>
                 <div className="mb-3">

@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Severity, AuditStatus, AuditCategory } from '@/types/domain'
 
 const CATEGORY_OPTIONS: { value: AuditCategory; label: string }[] = [
@@ -80,28 +81,28 @@ export function AuditFormPage() {
         <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label><input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el hallazgo..." /></div>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Categoría *</label>
-            <select required value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value as AuditCategory })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {CATEGORY_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
-            </select></div>
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Severidad *</label>
-            <select required value={formData.severity} onChange={(e) => setFormData({ ...formData, severity: e.target.value as Severity })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="critical">Crítica</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option>
-            </select></div>
+          <div><Select label="Categoría *" required value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as AuditCategory })} options={CATEGORY_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))} /></div>
+          <div><Select label="Severidad *" required value={formData.severity} onChange={(v) => setFormData({ ...formData, severity: v as Severity })} options={[
+            { value: 'critical', label: 'Crítica' },
+            { value: 'high', label: 'Alta' },
+            { value: 'medium', label: 'Media' },
+            { value: 'low', label: 'Baja' },
+          ]} /></div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado *</label>
-            <select required value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as AuditStatus })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="open">Abierto</option><option value="in_progress">En progreso</option><option value="overdue">Vencido</option><option value="resolved">Resuelto</option>
-            </select></div>
+          <div><Select label="Estado *" required value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as AuditStatus })} options={[
+            { value: 'open', label: 'Abierto' },
+            { value: 'in_progress', label: 'En progreso' },
+            { value: 'overdue', label: 'Vencido' },
+            { value: 'resolved', label: 'Resuelto' },
+          ]} /></div>
           <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha límite</label><DatePicker value={formData.dueDate} onChange={(v) => setFormData({ ...formData, dueDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Aplicación</label>
-          <select value={formData.applicationId} onChange={(e) => setFormData({ ...formData, applicationId: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-            <option value="">Sin aplicación</option>
-            {applications.map((app) => (<option key={app.id} value={app.id}>{app.name}</option>))}
-          </select>
+          <Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
+            { value: '', label: 'Sin aplicación' },
+            ...applications.map((app) => ({ value: app.id, label: app.name })),
+          ]} />
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Plan de Acción</label>

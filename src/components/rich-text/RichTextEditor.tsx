@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
@@ -12,6 +12,7 @@ import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown } from '@tiptap/markdown'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { Plugin } from '@tiptap/pm/state'
 import { common, createLowlight } from 'lowlight'
 import {
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
@@ -59,6 +60,47 @@ const Divider = () => (
   <div className="w-px h-5 bg-neutral-20 dark:bg-neutral-60 mx-1" />
 )
 
+const PasteMarkdown = Extension.create({
+  name: 'pasteMarkdown',
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        props: {
+          handlePaste: (_view, event) => {
+            const text = event.clipboardData?.getData('text/plain')
+            if (!text || !looksLikeMarkdown(text)) return false
+
+            const { editor } = this
+            if (!editor?.markdown) return false
+
+            try {
+              const json = editor.markdown.parse(text)
+              editor.commands.insertContent(json)
+              return true
+            } catch {
+              return false
+            }
+          },
+        },
+      }),
+    ]
+  },
+})
+
+function looksLikeMarkdown(text: string): boolean {
+  return (
+    /^#{1,6}\s/.test(text) ||              // Headings
+    /\*\*[^*]+\*\*/.test(text) ||           // Bold
+    /__[^_]+__/.test(text) ||              // Bold (underscore)
+    /`{3}/.test(text) ||                    // Code blocks
+    /\[.+\]\(.+\)/.test(text) ||            // Links
+    /^[-*+]\s/.test(text) ||                // Unordered lists
+    /^\d+\.\s/.test(text) ||                // Ordered lists
+    /^>\s/.test(text)                       // Blockquotes
+  )
+}
+
 export function RichTextEditor({
   value,
   onChange,
@@ -85,6 +127,7 @@ export function RichTextEditor({
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Placeholder.configure({ placeholder }),
       Markdown,
+      PasteMarkdown,
       CodeBlockLowlight.configure({ lowlight }),
     ],
     content: value,

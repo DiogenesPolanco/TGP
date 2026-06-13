@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Select } from '@/components/ui/Select'
 import {
   Plus,
   Search,
@@ -364,28 +365,18 @@ export function ObsolescencePage() {
             />
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as SupportStatus | 'all')}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="active">Activo</option>
-            <option value="extended">Soporte Extendido</option>
-            <option value="eol">EOL</option>
-            <option value="unknown">Desconocido</option>
-          </select>
+          <Select value={statusFilter} onChange={(v) => setStatusFilter(v as SupportStatus | 'all')} options={[
+            { value: 'all', label: 'Todos los estados' },
+            { value: 'active', label: 'Activo' },
+            { value: 'extended', label: 'Soporte Extendido' },
+            { value: 'eol', label: 'EOL' },
+            { value: 'unknown', label: 'Desconocido' },
+          ]} className="min-w-[180px]" />
 
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value as TechCategory | 'all')}
-            className="px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todas las categorías</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{categoryLabels[cat] || cat}</option>
-            ))}
-          </select>
+          <Select value={categoryFilter} onChange={(v) => setCategoryFilter(v as TechCategory | 'all')} options={[
+            { value: 'all', label: 'Todas las categorías' },
+            ...categories.map((cat) => ({ value: cat, label: categoryLabels[cat] || cat })),
+          ]} className="min-w-[180px]" />
 
           {(search || statusFilter !== 'all' || categoryFilter !== 'all') && (
             <button

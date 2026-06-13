@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
 import { PersonSelect } from '@/components/ui/PersonSelect'
+import { Select } from '@/components/ui/Select'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Blocker } from '@/types/domain'
@@ -95,30 +96,30 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Severidad</label>
-            <select
+            <Select
+              label="Severidad"
               value={severity}
-              onChange={(e) => setSeverity(e.target.value as BlockerSeverity)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="low">Baja</option>
-              <option value="medium">Media</option>
-              <option value="high">Alta</option>
-              <option value="critical">Critica</option>
-            </select>
+              onChange={(v) => setSeverity(v as BlockerSeverity)}
+              options={[
+                { value: 'low', label: 'Baja' },
+                { value: 'medium', label: 'Media' },
+                { value: 'high', label: 'Alta' },
+                { value: 'critical', label: 'Crítica' },
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Estado</label>
-            <select
+            <Select
+              label="Estado"
               value={status}
-              onChange={(e) => setStatus(e.target.value as BlockerStatus)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="open">Abierto</option>
-              <option value="escalated">Escalado</option>
-              <option value="resolved">Resuelto</option>
-            </select>
+              onChange={(v) => setStatus(v as BlockerStatus)}
+              options={[
+                { value: 'open', label: 'Abierto' },
+                { value: 'escalated', label: 'Escalado' },
+                { value: 'resolved', label: 'Resuelto' },
+              ]}
+            />
           </div>
 
           <div className="col-span-2">

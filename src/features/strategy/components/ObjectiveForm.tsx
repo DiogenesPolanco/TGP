@@ -5,6 +5,7 @@ import { X, Plus, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 
 interface ObjectiveFormProps {
@@ -114,59 +115,35 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Tipo</label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as typeof formData.type })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="okr">OKR</option>
-                <option value="kpi">KPI</option>
-                <option value="balanced_scorecard">Balanced Scorecard</option>
-              </select>
+              <Select label="Tipo" value={formData.type} onChange={(v) => setFormData({ ...formData, type: v as typeof formData.type })} options={[
+                { value: 'okr', label: 'OKR' },
+                { value: 'kpi', label: 'KPI' },
+                { value: 'balanced_scorecard', label: 'Balanced Scorecard' },
+              ]} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Equipo</label>
-              <select
-                value={formData.teamId}
-                onChange={(e) => setFormData({ ...formData, teamId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Sin equipo</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>{team.name}</option>
-                ))}
-              </select>
+              <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((team) => ({ value: team.id, label: team.name })),
+              ]} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Business Unit</label>
-              <select
-                value={formData.businessUnitId}
-                onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="">Sin BU</option>
-                {businessUnits.map((bu) => (
-                  <option key={bu.id} value={bu.id}>{bu.name}</option>
-                ))}
-              </select>
+              <Select label="Business Unit" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
+                { value: '', label: 'Sin BU' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]} />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as ObjectiveStatus })}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="not_started">No iniciado</option>
-                <option value="on_track">Encaminado</option>
-                <option value="at_risk">En riesgo</option>
-                <option value="behind">Atrasado</option>
-                <option value="achieved">Logrado</option>
-              </select>
+              <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })} options={[
+                { value: 'not_started', label: 'No iniciado' },
+                { value: 'on_track', label: 'Encaminado' },
+                { value: 'at_risk', label: 'En riesgo' },
+                { value: 'behind', label: 'Atrasado' },
+                { value: 'achieved', label: 'Logrado' },
+              ]} />
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Inicio *</label>

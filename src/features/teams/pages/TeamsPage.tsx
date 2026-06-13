@@ -11,6 +11,7 @@ import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select } from '@/components/ui/Select'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Filter, Upload, X, Users, TrendingUp, Award, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
 
@@ -178,16 +179,10 @@ export function TeamsPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Unidad de Negocio</label>
-              <select
-                value={buFilter}
-                onChange={(e) => setBuFilter(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                <option value="all">Todas</option>
-                {businessUnits.map((bu) => (
-                  <option key={bu.id} value={bu.id}>{bu.name}</option>
-                ))}
-              </select>
+              <Select value={buFilter} onChange={(v) => setBuFilter(v)} options={[
+                { value: 'all', label: 'Todas' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]} className="min-w-[140px]" />
             </div>
             {buFilter !== 'all' && (
               <button

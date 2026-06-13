@@ -8,6 +8,7 @@ import type { DatabaseType } from '@/types/domain'
 import { ArrowLeft, Plus, X, Server } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { TechSearch } from '@/components/ui/TechSearch'
+import { Select } from '@/components/ui/Select'
 
 const dbTypeLabel: Record<DatabaseType, string> = {
   relational: 'Relacional',
@@ -190,16 +191,7 @@ export function DatabaseFormPage() {
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
               Tipo <span className="text-danger">*</span>
             </label>
-            <select
-              required
-              value={dbType}
-              onChange={(e) => { setDbType(e.target.value as DatabaseType); setEngine('') }}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              {DB_TYPES.map((t) => (
-                <option key={t} value={t}>{dbTypeLabel[t]}</option>
-              ))}
-            </select>
+            <Select required value={dbType} onChange={(v) => { setDbType(v as DatabaseType); setEngine('') }} options={DB_TYPES.map((t) => ({ value: t, label: dbTypeLabel[t] }))} />
           </div>
         </div>
 

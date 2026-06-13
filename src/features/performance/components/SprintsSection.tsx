@@ -5,6 +5,7 @@ import { Plus, Trash2, Edit3, BarChart3, List } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
 import { cn } from '@/lib/utils'
+import { Select } from '@/components/ui/Select'
 
 interface Props {
   memberId: string
@@ -212,27 +213,25 @@ export function SprintsSection({ memberId, teamId }: Props) {
 
       {sprints.length > 0 && (
         <div className="flex items-center gap-3 mb-4">
-          <select
-            value={yearFilter === 'all' ? 'all' : yearFilter}
-            onChange={(e) => setYearFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-            className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos los años</option>
-            {availableYears.map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <select
+          <Select
+            value={typeof yearFilter === 'number' ? String(yearFilter) : 'all'}
+            onChange={(v) => setYearFilter(v === 'all' ? 'all' : Number(v))}
+            options={[
+              { value: 'all', label: 'Todos los años' },
+              ...availableYears.map((y) => ({ value: String(y), label: String(y) })),
+            ]}
+          />
+          <Select
             value={quarterFilter}
-            onChange={(e) => setQuarterFilter(e.target.value)}
-            className="px-2 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">Todos los quarters</option>
-            <option value="Q1">Q1</option>
-            <option value="Q2">Q2</option>
-            <option value="Q3">Q3</option>
-            <option value="Q4">Q4</option>
-          </select>
+            onChange={(v) => setQuarterFilter(v)}
+            options={[
+              { value: 'all', label: 'Todos los quarters' },
+              { value: 'Q1', label: 'Q1' },
+              { value: 'Q2', label: 'Q2' },
+              { value: 'Q3', label: 'Q3' },
+              { value: 'Q4', label: 'Q4' },
+            ]}
+          />
         </div>
       )}
 
@@ -306,16 +305,16 @@ export function SprintsSection({ memberId, teamId }: Props) {
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Quarter</label>
-              <select
+              <Select
                 value={newSprint.quarter}
-                onChange={(e) => setNewSprint({ ...newSprint, quarter: e.target.value })}
-                className={inputClass}
-              >
-                <option value="Q1">Q1</option>
-                <option value="Q2">Q2</option>
-                <option value="Q3">Q3</option>
-                <option value="Q4">Q4</option>
-              </select>
+                onChange={(v) => setNewSprint({ ...newSprint, quarter: v })}
+                options={[
+                  { value: 'Q1', label: 'Q1' },
+                  { value: 'Q2', label: 'Q2' },
+                  { value: 'Q3', label: 'Q3' },
+                  { value: 'Q4', label: 'Q4' },
+                ]}
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Año</label>
