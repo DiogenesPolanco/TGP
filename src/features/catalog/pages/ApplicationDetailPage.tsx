@@ -833,9 +833,9 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
       render: (v) => (
         <div className="flex items-center justify-end gap-1">
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/security/vulnerabilities/${v.id}/edit`) }}
+            onClick={(e) => { e.stopPropagation(); navigate(`/security/vulnerabilities/${v.id}`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
-            title="Ir a vulnerabilidad"
+            title="Ver vulnerabilidad"
           >
             <ExternalLink size={14} />
           </button>
@@ -877,7 +877,7 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
             columns={vulnColumns}
             data={activeVulns}
             pageSize={10}
-            onRowClick={(v) => navigate(`/security/vulnerabilities/${v.id}/edit`)}
+            onRowClick={(v) => navigate(`/security/vulnerabilities/${v.id}`)}
           />
         </div>
       )}

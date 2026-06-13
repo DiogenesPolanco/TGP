@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Server, Box, Shield, Activity, FileWarning,
-  ArrowRight, ExternalLink, Search, Database,
+  ArrowRight, Search, Database,
 } from 'lucide-react'
 import type { Application, Microservice, Vulnerability, Incident, Risk, AuditFinding } from '@/types/domain'
 
@@ -100,27 +100,27 @@ export function RelatedEntitiesView({ data, entityLabel }: Props) {
           ))}
         </EntitySection>
 
-        <EntitySection title="Vulnerabilidades" count={data.vulns.length} icon={<Shield size={16} />} color={counts.vulns > 0 ? 'danger' : 'neutral'} empty="Sin vulnerabilidades" href={data.vulns.length > 0 ? '/security/vulnerabilities' : undefined} linkLabel="Ver todas">
+        <EntitySection title="Vulnerabilidades" count={data.vulns.length} icon={<Shield size={16} />} color={counts.vulns > 0 ? 'danger' : 'neutral'} empty="Sin vulnerabilidades">
           {data.vulns.map((v) => (
-            <SimpleCard key={v.id} title={v.title} subtitle={severityLabel[v.severity] ?? v.severity} />
+            <SimpleCard key={v.id} title={v.title} subtitle={severityLabel[v.severity] ?? v.severity} onClick={() => navigate(`/security/vulnerabilities/${v.id}`)} />
           ))}
         </EntitySection>
 
-        <EntitySection title="Incidentes" count={data.incidents.length} icon={<Activity size={16} />} color={counts.incidents > 0 ? 'danger' : 'neutral'} empty="Sin incidentes" href={data.incidents.length > 0 ? '/security/incidents' : undefined} linkLabel="Ver todos">
+        <EntitySection title="Incidentes" count={data.incidents.length} icon={<Activity size={16} />} color={counts.incidents > 0 ? 'danger' : 'neutral'} empty="Sin incidentes">
           {data.incidents.map((i) => (
-            <SimpleCard key={i.id} title={i.title} subtitle={severityLabel[i.severity] ?? i.severity} />
+            <SimpleCard key={i.id} title={i.title} subtitle={severityLabel[i.severity] ?? i.severity} onClick={() => navigate(`/security/incidents/${i.id}`)} />
           ))}
         </EntitySection>
 
-        <EntitySection title="Riesgos" count={data.risks.length} icon={<FileWarning size={16} />} color={counts.risks > 0 ? 'warning' : 'neutral'} empty="Sin riesgos" href={data.risks.length > 0 ? '/governance/risks' : undefined} linkLabel="Ver todos">
+        <EntitySection title="Riesgos" count={data.risks.length} icon={<FileWarning size={16} />} color={counts.risks > 0 ? 'warning' : 'neutral'} empty="Sin riesgos">
           {data.risks.map((r) => (
-            <SimpleCard key={r.id} title={r.title} subtitle={`Score: ${r.riskScore}`} />
+            <SimpleCard key={r.id} title={r.title} subtitle={`Score: ${r.riskScore}`} onClick={() => navigate(`/governance/risks/${r.id}`)} />
           ))}
         </EntitySection>
 
-        <EntitySection title="Hallazgos de Auditoría" count={data.auditFindings.length} icon={<Database size={16} />} color={counts.audit > 0 ? 'warning' : 'neutral'} empty="Sin hallazgos" href={data.auditFindings.length > 0 ? '/governance/audit' : undefined} linkLabel="Ver todos">
+        <EntitySection title="Hallazgos de Auditoría" count={data.auditFindings.length} icon={<Database size={16} />} color={counts.audit > 0 ? 'warning' : 'neutral'} empty="Sin hallazgos">
           {data.auditFindings.map((a) => (
-            <SimpleCard key={a.id} title={a.title} subtitle={severityLabel[a.severity] ?? a.severity} />
+            <SimpleCard key={a.id} title={a.title} subtitle={severityLabel[a.severity] ?? a.severity} onClick={() => navigate(`/governance/audit/${a.id}`)} />
           ))}
         </EntitySection>
       </div>
@@ -170,8 +170,8 @@ function StatBadge({ icon, value, label, color }: { icon: ReactNode; value: numb
   )
 }
 
-function EntitySection({ title, count, icon, color, empty, children, href, linkLabel }: {
-  title: string; count: number; icon: ReactNode; color: string; empty: string; children: ReactNode; href?: string; linkLabel?: string
+function EntitySection({ title, count, icon, color, empty, children }: {
+  title: string; count: number; icon: ReactNode; color: string; empty: string; children: ReactNode
 }) {
   const colorMap: Record<string, { bg: string; text: string }> = {
     primary: { bg: 'bg-primary/5 border-primary/20', text: 'text-primary' },
@@ -195,12 +195,6 @@ function EntitySection({ title, count, icon, color, empty, children, href, linkL
       ) : (
         <p className="text-xs text-neutral-50">{empty}</p>
       )}
-      {count > 0 && href && linkLabel && (
-        <a href={href} onClick={(e) => { e.preventDefault(); window.location.href = href }}
-          className="inline-flex items-center gap-1 mt-2 text-xs text-primary hover:text-primary-dark transition-colors">
-          {linkLabel} <ExternalLink size={12} />
-        </a>
-      )}
     </div>
   )
 }
@@ -223,11 +217,17 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
   )
 }
 
-function SimpleCard({ title, subtitle }: { title: string; subtitle: string }) {
+function SimpleCard({ title, subtitle, onClick }: { title: string; subtitle: string; onClick?: () => void }) {
+  const Comp = onClick ? 'button' : 'div'
   return (
-    <div className="flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70">
-      <span className="text-sm text-neutral-90 dark:text-white truncate min-w-0 flex-1">{title}</span>
+    <Comp
+      onClick={onClick}
+      className={`w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 ${
+        onClick ? 'hover:border-primary/30 hover:shadow-sm transition-all group cursor-pointer text-left' : ''
+      }`}
+    >
+      <span className={`text-sm truncate min-w-0 flex-1 ${onClick ? 'group-hover:text-primary transition-colors' : 'text-neutral-90 dark:text-white'}`}>{title}</span>
       <span className="text-xs text-neutral-50 shrink-0 ml-2">{subtitle}</span>
-    </div>
+    </Comp>
   )
 }
