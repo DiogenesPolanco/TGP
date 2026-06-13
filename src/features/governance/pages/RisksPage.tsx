@@ -6,8 +6,10 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, Eye, Pencil, Trash2 } from 'lucide-react'
-
+import {
+  Plus, Search, Filter, Upload, X, Eye, Pencil, Trash2,
+  AlertTriangle, Shield, CheckCircle, Server,
+} from 'lucide-react'
 import type { Risk } from '@/types/domain'
 
 const statusLabel: Record<string, string> = {
@@ -15,6 +17,20 @@ const statusLabel: Record<string, string> = {
   mitigated: 'Mitigado',
   accepted: 'Aceptado',
   closed: 'Cerrado',
+}
+
+const statusColor: Record<string, string> = {
+  open: 'bg-danger/10 text-danger border-danger/20',
+  mitigated: 'bg-info/10 text-info border-info/20',
+  accepted: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  closed: 'bg-success/10 text-success border-success/20',
+}
+
+const statusIcon: Record<string, React.ReactNode> = {
+  open: <AlertTriangle size={20} />,
+  mitigated: <Shield size={20} />,
+  accepted: <CheckCircle size={20} />,
+  closed: <CheckCircle size={20} />,
 }
 
 export function RisksPage() {
@@ -29,6 +45,14 @@ export function RisksPage() {
 
   const risks = useLiveQuery(() => db.risks.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
+
+  const statusCounts = {
+    total: risks.length,
+    open: risks.filter((r) => r.status === 'open').length,
+    mitigated: risks.filter((r) => r.status === 'mitigated').length,
+    accepted: risks.filter((r) => r.status === 'accepted').length,
+    closed: risks.filter((r) => r.status === 'closed').length,
+  }
 
   const filteredRisks = risks.filter((r) =>
     r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -84,18 +108,6 @@ export function RisksPage() {
       render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.category}</span>,
     },
     {
-      key: 'probability',
-      label: 'Prob',
-      sortable: true,
-      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.probability}</span>,
-    },
-    {
-      key: 'impact',
-      label: 'Impacto',
-      sortable: true,
-      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.impact}</span>,
-    },
-    {
       key: 'riskScore',
       label: 'Score',
       sortable: true,
@@ -116,10 +128,7 @@ export function RisksPage() {
       sortable: true,
       render: (risk) => (
         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          risk.status === 'open' ? 'bg-danger/10 text-danger' :
-          risk.status === 'mitigated' ? 'bg-info/10 text-info' :
-          risk.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
-          'bg-success/10 text-success'
+          statusColor[risk.status] || 'bg-neutral-10 text-neutral-60'
         }`}>
           {statusLabel[risk.status]}
         </span>
@@ -158,8 +167,33 @@ export function RisksPage() {
     },
   ]
 
+  const StatCard = ({
+    icon, label, value, color, active, onClick,
+  }: {
+    icon: React.ReactNode; label: string; value: number; color: string; active?: boolean; onClick?: () => void
+  }) => {
+    const Comp = onClick ? 'button' : 'div'
+    return (
+      <Comp
+        onClick={onClick}
+        className={`rounded-xl border p-4 text-left transition-all ${
+          active
+            ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
+            : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+        }${onClick ? ' cursor-pointer' : ''}`}
+      >
+        <div className={`${color} mb-2`}>{icon}</div>
+        <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
+        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      </Comp>
+    )
+  }
+
+  const cellSize = selectedCell ? 'w-14 h-14' : 'w-12 h-12'
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Riesgos</h2>
         <div className="flex items-center gap-2">
@@ -180,115 +214,169 @@ export function RisksPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Matriz de Calor</h3>
+      {/* KPI Cards by Status */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <StatCard
+          icon={<Server size={20} />}
+          label="Total Riesgos"
+          value={statusCounts.total}
+          color="text-primary"
+          active={statusFilter === 'all' && !selectedCell}
+          onClick={() => { setStatusFilter('all'); setSelectedCell(null) }}
+        />
+        <StatCard
+          icon={statusIcon.open}
+          label="Abiertos"
+          value={statusCounts.open}
+          color="text-danger"
+          active={statusFilter === 'open'}
+          onClick={() => setStatusFilter(statusFilter === 'open' ? 'all' : 'open')}
+        />
+        <StatCard
+          icon={statusIcon.mitigated}
+          label="Mitigados"
+          value={statusCounts.mitigated}
+          color="text-info"
+          active={statusFilter === 'mitigated'}
+          onClick={() => setStatusFilter(statusFilter === 'mitigated' ? 'all' : 'mitigated')}
+        />
+        <StatCard
+          icon={statusIcon.accepted}
+          label="Aceptados"
+          value={statusCounts.accepted}
+          color="text-neutral-60"
+          active={statusFilter === 'accepted'}
+          onClick={() => setStatusFilter(statusFilter === 'accepted' ? 'all' : 'accepted')}
+        />
+        <StatCard
+          icon={statusIcon.closed}
+          label="Cerrados"
+          value={statusCounts.closed}
+          color="text-success"
+          active={statusFilter === 'closed'}
+          onClick={() => setStatusFilter(statusFilter === 'closed' ? 'all' : 'closed')}
+        />
+      </div>
+
+      {/* Heat Map + Search Bar */}
+      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
         <div className="flex items-start gap-8">
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-2 -rotate-90 whitespace-nowrap">Probabilidad</span>
-            <div className="grid grid-cols-5 gap-1">
-              {[5, 4, 3, 2, 1].map((prob) => (
-                <div key={prob} className="contents">
-                  <div className="flex items-center justify-center w-8 h-8 text-xs text-neutral-60 dark:text-neutral-40">{prob}</div>
+          {/* Heat Map */}
+          <div className="shrink-0">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Matriz de Calor</h3>
+              {selectedCell && (
+                <button
+                  onClick={() => setSelectedCell(null)}
+                  className="text-xs text-danger hover:text-danger-dark transition-colors"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[10px] font-medium text-neutral-50 -rotate-90 whitespace-nowrap mt-8">Probabilidad</span>
+                <div className="grid grid-cols-5 gap-1">
+                  {[5, 4, 3, 2, 1].map((prob) => (
+                    <div key={prob} className="contents">
+                      <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{prob}</div>
+                      {[1, 2, 3, 4, 5].map((impact) => (
+                        <button
+                          key={`${prob}-${impact}`}
+                          onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
+                          className={`${cellSize} rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
+                            selectedCell?.prob === prob && selectedCell?.impact === impact ? 'ring-2 ring-primary' : ''
+                          }`}
+                        >
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
+                            {getCellRisks(prob, impact).length > 0 && (
+                              <span className="text-[9px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                  <div className="w-6" />
                   {[1, 2, 3, 4, 5].map((impact) => (
-                    <button
-                      key={`${prob}-${impact}`}
-                      onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
-                      className={`w-16 h-16 rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
-                        selectedCell?.prob === prob && selectedCell?.impact === impact ? 'ring-2 ring-primary' : ''
-                      }`}
-                    >
-                      <div className="flex flex-col items-center justify-center h-full">
-                        <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
-                        {getCellRisks(prob, impact).length > 0 && (
-                          <span className="text-[10px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
-                        )}
-                      </div>
-                    </button>
+                    <div key={impact} className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{impact}</div>
                   ))}
                 </div>
-              ))}
-              <div className="w-8" />
-              {[1, 2, 3, 4, 5].map((impact) => (
-                <div key={impact} className="flex items-center justify-center w-16 h-8 text-xs text-neutral-60 dark:text-neutral-40">{impact}</div>
-              ))}
+                <span className="text-[10px] font-medium text-neutral-50 mt-0.5">Impacto</span>
+              </div>
             </div>
-            <span className="text-sm font-medium text-neutral-60 dark:text-neutral-40 mt-2">Impacto</span>
           </div>
-        </div>
-      </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
-            <input
-              type="text"
-              placeholder="Buscar riesgos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
-              showFilters || statusFilter !== 'all' || categoryFilter !== 'all'
-                ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
-            }`}
-          >
-            <Filter size={16} />
-            Filtros
-            {(statusFilter !== 'all' || categoryFilter !== 'all') && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
-          </button>
-          {selectedCell && (
-            <button
-              onClick={() => setSelectedCell(null)}
-              className="px-3 py-2 text-sm text-primary hover:underline"
-            >
-              Limpiar calor
-            </button>
-          )}
-        </div>
-
-        {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'open', label: 'Abierto' },
-                { value: 'mitigated', label: 'Mitigado' },
-                { value: 'accepted', label: 'Aceptado' },
-                { value: 'closed', label: 'Cerrado' },
-              ]} className="min-w-[120px]" />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-neutral-60">Categoría</label>
-              <Select value={categoryFilter} onChange={(v) => setCategoryFilter(v)} options={[
-                { value: 'all', label: 'Todas' },
-                { value: 'technical', label: 'Técnico' },
-                { value: 'security', label: 'Seguridad' },
-                { value: 'operational', label: 'Operacional' },
-                { value: 'regulatory', label: 'Regulatorio' },
-                { value: 'financial', label: 'Financiero' },
-              ]} className="min-w-[120px]" />
-            </div>
-            {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+          {/* Search + Filters */}
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+                <input
+                  type="text"
+                  placeholder="Buscar riesgos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
               <button
-                onClick={() => { setStatusFilter('all'); setCategoryFilter('all') }}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+                  showFilters || statusFilter !== 'all' || categoryFilter !== 'all'
+                    ? 'border-primary text-primary bg-primary/5'
+                    : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                }`}
               >
-                <X size={14} />
-                Limpiar filtros
+                <Filter size={16} />
+                Filtros
+                {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                )}
               </button>
+            </div>
+
+            {showFilters && (
+              <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-neutral-60">Estado</label>
+                  <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
+                    { value: 'all', label: 'Todos' },
+                    { value: 'open', label: 'Abierto' },
+                    { value: 'mitigated', label: 'Mitigado' },
+                    { value: 'accepted', label: 'Aceptado' },
+                    { value: 'closed', label: 'Cerrado' },
+                  ]} className="min-w-[120px]" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-neutral-60">Categoría</label>
+                  <Select value={categoryFilter} onChange={(v) => setCategoryFilter(v)} options={[
+                    { value: 'all', label: 'Todas' },
+                    { value: 'technical', label: 'Técnico' },
+                    { value: 'security', label: 'Seguridad' },
+                    { value: 'operational', label: 'Operacional' },
+                    { value: 'regulatory', label: 'Regulatorio' },
+                    { value: 'financial', label: 'Financiero' },
+                  ]} className="min-w-[120px]" />
+                </div>
+                {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+                  <button
+                    onClick={() => { setStatusFilter('all'); setCategoryFilter('all') }}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+                  >
+                    <X size={14} />
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        )}
+        </div>
       </div>
 
+      {/* Table */}
       <SortableTable
         columns={columns}
         data={filteredRisks}
