@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { StrictMode, useState, useEffect, useCallback } from 'react'
+import { StrictMode, useState, useEffect, useCallback, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
@@ -24,6 +24,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const [checking, setChecking] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [showTerms, setShowTerms] = useState<'loading' | 'terms' | 'declined' | 'done'>('loading')
+  const expiryRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     if (isPublicRoute()) {
@@ -37,6 +38,21 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       setChecking(false)
     })
   }, [sessionExpired])
+
+  // Periodic session expiry check — runs every 30s while authenticated
+  useEffect(() => {
+    if (!authed) return
+    expiryRef.current = setInterval(() => {
+      const session = getSession()
+      if (!session) {
+        setAuthed(false)
+        setSessionExpired((s) => !s)
+      }
+    }, 30_000)
+    return () => {
+      if (expiryRef.current) clearInterval(expiryRef.current)
+    }
+  }, [authed])
 
   const handleInactivityExpired = useCallback(() => {
     setAuthed(false)

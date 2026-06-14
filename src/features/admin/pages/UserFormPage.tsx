@@ -13,6 +13,7 @@ interface FormData {
   email: string
   role: string
   isActive: boolean
+  otpRequestIntervalHours: number
 }
 
 const roleOptions = [
@@ -33,7 +34,7 @@ export function UserFormPage() {
 
   useEffect(() => {
     if (user) {
-      reset({ displayName: user.displayName, email: user.email, role: user.role, isActive: user.isActive })
+      reset({ displayName: user.displayName, email: user.email, role: user.role, isActive: user.isActive, otpRequestIntervalHours: user.otpRequestIntervalHours ?? 1 })
     }
   }, [user, reset])
 
@@ -50,6 +51,7 @@ export function UserFormPage() {
       await db.users.add({
         id: crypto.randomUUID(),
         ...data,
+        otpRequestIntervalHours: data.otpRequestIntervalHours ?? 1,
         businessUnitIds: [],
         createdAt: new Date(),
       } as User)
@@ -87,6 +89,13 @@ export function UserFormPage() {
           <div className="flex items-center gap-2">
             <input type="checkbox" {...register('isActive')} id="isActive" className="rounded border-neutral-30" />
             <label htmlFor="isActive" className="text-sm text-neutral-90 dark:text-white">Usuario activo</label>
+          </div>
+          <div>
+            <Label>Intervalo OTP (horas)</Label>
+            <p className="text-xs text-neutral-50 dark:text-neutral-40 mb-1.5">Tiempo antes de solicitar nuevamente el código OTP</p>
+            <input type="number" min={1} max={720} step={1} {...register('otpRequestIntervalHours', { valueAsNumber: true, min: { value: 1, message: 'Mínimo 1 hora' } })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            {errors.otpRequestIntervalHours && <p className="text-xs text-danger mt-1">{errors.otpRequestIntervalHours.message}</p>}
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">

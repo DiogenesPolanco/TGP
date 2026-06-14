@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight, Lock } from 'lucide-react'
+import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight, Lock, Users, ChevronRight } from 'lucide-react'
 import {
   generateSecret,
   verifyTotp,
@@ -13,6 +13,9 @@ import {
   getLockoutStatus,
   resetRateLimit,
 } from '@/services/auth/authService'
+import { db } from '@/services/db/database'
+import { useUserStore } from '@/stores/userStore'
+import type { User } from '@/types/domain'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
   const [mode, setMode] = useState<'setup' | 'login'>(
@@ -28,6 +31,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
   const [verifying, setVerifying] = useState(false)
   const [locked, setLocked] = useState(false)
   const [lockoutMs, setLockoutMs] = useState(0)
+  const [userStep, setUserStep] = useState<'idle' | 'selecting' | 'complete'>('idle')
+  const [userList, setUserList] = useState<User[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -117,11 +122,28 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
       if (mode === 'setup' && secret) {
         await confirmSetup(secret.base32)
         setMode('login')
-      } else {
-        createSession()
+        setVerifying(false)
+        setOtp('')
+        return
       }
 
-      onAuth()
+      const activeUsers = await db.users.where('isActive').equals(1).toArray()
+      if (activeUsers.length === 0) {
+        createSession(1)
+        onAuth()
+        return
+      }
+
+      if (activeUsers.length === 1) {
+        const user = activeUsers[0]
+        useUserStore.getState().login(user)
+        createSession(user.otpRequestIntervalHours ?? 1)
+        onAuth()
+        return
+      }
+
+      setUserList(activeUsers)
+      setUserStep('selecting')
     } catch {
       setError('Error inesperado. Intenta de nuevo.')
     } finally {
@@ -191,6 +213,76 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="flex items-center justify-center gap-2 text-danger font-medium">
                 <Clock size={18} />
                 <span>{formatLockout(lockoutMs)}</span>
+              </div>
+            </div>
+          ) : userStep === 'selecting' ? (
+            /* ── User selection after OTP ── */
+            <div className="flex flex-col lg:flex-row min-h-[480px]">
+              <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
+                }} />
+                <div className="relative flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
+                    <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold tracking-tight">TGP</p>
+                    <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                  </div>
+                </div>
+                <div className="relative flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Users size={16} />
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Identidad</span>
+                  </div>
+                  <h2 className="text-3xl font-bold leading-tight mb-4">
+                    ¿Quién eres?
+                  </h2>
+                  <p className="text-base leading-relaxed opacity-85">
+                    Selecciona tu perfil para personalizar tu experiencia y determinar el intervalo de re-autenticación OTP.
+                  </p>
+                </div>
+              </div>
+              <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:border-neutral-70" />
+                  ))}
+                </div>
+              </div>
+              <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
+                <div className="max-w-lg mx-auto w-full space-y-4">
+                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Selecciona tu usuario</h3>
+                  <p className="text-sm text-neutral-60 dark:text-neutral-40">Cuentas activas encontradas en el sistema</p>
+                  <div className="space-y-2 max-h-[320px] overflow-y-auto">
+                    {userList.map((u) => (
+                      <button key={u.id} onClick={() => {
+                        useUserStore.getState().login(u)
+                        createSession(u.otpRequestIntervalHours ?? 1)
+                        onAuth()
+                      }}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border border-neutral-20 dark:border-neutral-70 hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group text-left">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
+                            {u.displayName.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-neutral-90 dark:text-white">{u.displayName}</p>
+                            <p className="text-xs text-neutral-50">{u.email} · {u.role}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-neutral-40 dark:text-neutral-50">{u.otpRequestIntervalHours ?? 1}h OTP</span>
+                          <ChevronRight size={16} className="text-neutral-30 group-hover:text-primary transition-colors" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-neutral-50 dark:text-neutral-40 pt-2 border-t border-neutral-10 dark:border-neutral-80">
+                    La sesión expirará según el intervalo OTP configurado para cada usuario
+                  </p>
+                </div>
               </div>
             </div>
           ) : mode === 'setup' && secret ? (

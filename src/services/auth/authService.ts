@@ -22,8 +22,6 @@ function removeSession(): void {
   sessionStorage.removeItem(STORAGE_KEYS.session)
 }
 
-const SESSION_DURATION_MS = 24 * 60 * 60 * 1000
-
 /* ─── Rate limiting ─── */
 
 const RATE_LIMIT_KEY = 'tgp-auth-attempts'
@@ -219,11 +217,12 @@ export function verifyTotp(token: string, base32Secret: string): boolean {
 
 /* ─── Session management ─── */
 
-export function createSession(): AuthSession {
+export function createSession(otpIntervalHours: number = 1): AuthSession {
+  const hours = Math.max(1, Math.min(720, otpIntervalHours))
   const session: AuthSession = {
     token: crypto.randomUUID(),
     createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_DURATION_MS,
+    expiresAt: Date.now() + hours * 60 * 60 * 1000,
   }
   writeSession(session)
   return session
@@ -267,4 +266,10 @@ export interface AuthSession {
   token: string
   createdAt: number
   expiresAt: number
+}
+
+export function getSessionRemainingHours(): number {
+  const session = readSession()
+  if (!session) return 0
+  return Math.max(0, Math.floor((session.expiresAt - Date.now()) / 3600000))
 }

@@ -415,6 +415,7 @@ export interface User {
   role: UserRole
   businessUnitIds: string[]
   isActive: boolean
+  otpRequestIntervalHours: number
   createdAt: Date
 }
 
