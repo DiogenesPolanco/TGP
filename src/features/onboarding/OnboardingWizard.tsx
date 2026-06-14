@@ -390,10 +390,7 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
       if (adminUser) {
         const updated = { ...adminUser, displayName: trimmedName, email: trimmedEmail }
         await db.users.put(updated)
-        const currentUser = useUserStore.getState().currentUser
-        if (currentUser?.id === 'user-1') {
-          useUserStore.getState().login(updated)
-        }
+        useUserStore.getState().login(updated)
       }
 
       setDone(true)
