@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { seedDemoData, seedComplianceFindings } from '@/services/demo/seedData'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
+import { useUserStore } from '@/stores/userStore'
 
-import { Check, ChevronRight, ChevronLeft, Building2, Database, Bell, Sparkles, AppWindow, Cpu, Users, Shield, Target, LayoutDashboard } from 'lucide-react'
+import { Check, ChevronRight, ChevronLeft, Building2, Bell, Sparkles, AppWindow, Cpu, Users, Shield, Target, LayoutDashboard, User } from 'lucide-react'
 
 const STORAGE_KEY = 'tgp-onboarding-done'
 
@@ -367,15 +368,34 @@ function StepDashboard({ onNext, onSkip }: StepProps) {
 // ── Step 9: Demo Data ──
 function StepDemoData({ onNext, onSkip }: StepProps) {
   void onSkip;
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [nameError, setNameError] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
   const handleLoad = async () => {
+    const trimmedName = displayName.trim()
+    const trimmedEmail = email.trim()
+    if (!trimmedName) { setNameError('Ingresa tu nombre'); return }
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) { setNameError('Ingresa un email válido'); return }
+    setNameError('')
     setLoading(true)
     try {
-      await seedDemoData(true) // force re-seed
+      await seedDemoData(true)
       await seedComplianceFindings()
       await seedTechnologies()
+
+      const adminUser = await db.users.get('user-1')
+      if (adminUser) {
+        const updated = { ...adminUser, displayName: trimmedName, email: trimmedEmail }
+        await db.users.put(updated)
+        const currentUser = useUserStore.getState().currentUser
+        if (currentUser?.id === 'user-1') {
+          useUserStore.getState().login(updated)
+        }
+      }
+
       setDone(true)
     } catch (err) { console.error(err) }
     finally { setLoading(false) }
@@ -388,8 +408,8 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
           <Check size={36} className="text-success" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-neutral-90 dark:text-white">Demo cargada</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40">Datos de ejemplo listos para explorar.</p>
+          <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¡Bienvenido, {displayName.split(' ')[0]}!</h2>
+          <p className="text-sm text-neutral-60 dark:text-neutral-40">Datos de ejemplo cargados con tu perfil.</p>
         </div>
         <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Finalizar <ChevronRight size={16} />
@@ -401,15 +421,33 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
   return (
     <div className="space-y-5">
       <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto">
-        <Database size={36} className="text-success" />
+        <User size={36} className="text-success" />
       </div>
       <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¿Datos de demostración?</h2>
+        <h2 className="text-xl font-bold text-neutral-90 dark:text-white">Tu perfil</h2>
         <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
-          Carga datos de ejemplo para explorar todas las funcionalidades sin tener que
-          registrar nada manualmente. Incluye 10 apps, 9 microservicios con entidades asociadas
-          (vulnerabilidades, incidentes, riesgos, hallazgos vía M:N),
-          18+ tecnologías, equipos, OKRs y más.
+          Antes de cargar los datos demo, ingresa tu nombre y correo para personalizar tu usuario administrador.
+        </p>
+      </div>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1">Nombre completo</label>
+          <input type="text" value={displayName} onChange={(e) => { setDisplayName(e.target.value); setNameError('') }}
+            placeholder="Ej: Juan Pérez"
+            className="w-full px-3 py-2.5 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-neutral-40 dark:placeholder:text-neutral-50" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1">Correo electrónico</label>
+          <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setNameError('') }}
+            placeholder="Ej: juan@empresa.com"
+            className="w-full px-3 py-2.5 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-neutral-40 dark:placeholder:text-neutral-50" />
+        </div>
+        {nameError && <p className="text-xs text-danger text-center">{nameError}</p>}
+      </div>
+      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-3 space-y-1">
+        <p className="text-xs text-neutral-60 dark:text-neutral-40">
+          Se cargarán automáticamente: <strong>10 apps</strong>, microservicios con vulnerabilidades, incidentes, riesgos y hallazgos,
+          180+ tecnologías, equipos, OKRs y más.
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
