@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Printer, Image, Loader2 } from 'lucide-react'
+import { useUserStore } from '@/stores/userStore'
 
 function inlineComputedStyles(source: HTMLElement, target: HTMLElement) {
   const queue: [HTMLElement, HTMLElement][] = [[source, target]]
@@ -41,6 +42,7 @@ async function inlineImagesAsBase64(root: HTMLElement) {
 }
 
 export function PrintButton() {
+  const currentUser = useUserStore((s) => s.currentUser)
   const [capturing, setCapturing] = useState(false)
 
   const captureImage = async () => {
@@ -160,7 +162,7 @@ export function PrintButton() {
           display: 'none',
         }}
       >
-        Generado por TGP — Diógenes Polanco
+        {`Generado por TGP — ${currentUser?.displayName ?? ''}`}
       </div>
 
       <style>{`
