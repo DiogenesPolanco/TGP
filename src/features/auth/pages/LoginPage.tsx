@@ -122,8 +122,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
       if (mode === 'setup' && secret) {
         await confirmSetup(secret.base32)
         setMode('login')
-        setVerifying(false)
-        setOtp('')
+        createSession(1)
+        onAuth()
         return
       }
 

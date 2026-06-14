@@ -143,6 +143,9 @@ export class TGPDatabase extends Dexie {
     this.version(15).stores({
       appDatabaseMicroservices: 'id, appDatabaseId, microserviceId',
     })
+    this.version(16).stores({
+      users: 'id, email, role, isActive',
+    })
   }
 }
 
