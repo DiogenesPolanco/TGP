@@ -1,8 +1,9 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppStore } from '@/stores/appStore'
 import { useFilterStore } from '@/stores/filterStore'
+import { useUserStore } from '@/stores/userStore'
 import { cn } from '@/lib/utils'
-import { Search, Bell, Moon, Sun, Calendar, LogOut, Speaker } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Calendar, LogOut, Speaker, User } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { GlobalSearch } from './GlobalSearch'
 import { clearSession } from '@/services/auth/authService'
@@ -21,8 +22,10 @@ const periodOptions = [
 
 export function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, setTheme } = useAppStore()
   const { selectedPeriod, setPeriod } = useFilterStore()
+  const currentUser = useUserStore((s) => s.currentUser)
   const [searchOpen, setSearchOpen] = useState(false)
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
   const [showAlerts, setShowAlerts] = useState(false)
@@ -212,12 +215,26 @@ export function Header() {
         </button>
 
         <div className="flex items-center gap-2 pl-3 border-l border-neutral-20 dark:border-neutral-70">
-          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="text-primary font-semibold text-sm">AD</span>
-          </div>
-          <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 hidden lg:block">
-            Admin
-          </span>
+          {currentUser ? (
+            <button onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-primary font-semibold text-sm">
+                  {currentUser.displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 hidden lg:block group-hover:text-primary transition-colors">
+                {currentUser.displayName}
+              </span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-neutral-20 dark:bg-neutral-70 rounded-full flex items-center justify-center">
+                <User size={16} className="text-neutral-50" />
+              </div>
+              <span className="text-sm text-neutral-50 hidden lg:block">Sin usuario</span>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="p-1.5 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors ml-1"
