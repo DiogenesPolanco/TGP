@@ -17,6 +17,7 @@ import { PublicObjectivesPage } from '@/features/share/PublicObjectivesPage'
 import { PublicObsolescenceMapPage } from '@/features/share/PublicObsolescenceMapPage'
 import { PublicDependencyMapPage } from '@/features/share/PublicDependencyMapPage'
 import { TermsPage } from '@/features/share/TermsPage'
+import { MobileDashboardPage } from '@/features/mobile/dashboard/MobileDashboardPage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
 
 export const router = createBrowserRouter([
@@ -87,6 +88,10 @@ export const router = createBrowserRouter([
   {
     path: '/terms',
     element: <TermsPage />,
+  },
+  {
+    path: '/mobile/dashboard',
+    element: <MobileDashboardPage />,
   },
   {
     path: '/',
