@@ -12,6 +12,7 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button';
 import { Link } from 'react-router-dom'
 import { Plus, Search, Filter, Upload, X, Users, TrendingUp, Award, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
 
@@ -68,16 +69,15 @@ export function TeamsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Equipos</h2>
+        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Equipos</h2>
         <div className="flex items-center gap-2">
-          <button
+          <Button variant="secondary" size="sm"
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button variant="secondary" size="sm"
             onClick={async () => {
               if (!isTermsAccepted()) {
                 setShowTerms(true)
@@ -85,33 +85,33 @@ export function TeamsPage() {
               }
               await doShare()
             }}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="text-neutral-60 dark:text-neutral-40"
           >
             <Share2 size={16} />
             Compartir
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Equipo
-          </button>
+          </Button>
         </div>
       </div>
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
+          <Button variant="ghost" size="sm" className="bg-primary/10 text-primary hover:bg-primary/20"
+            onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}>
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )})()}
 
@@ -126,16 +126,18 @@ export function TeamsPage() {
           title="Proteger enlace compartido"
           buttonLabel="Proteger"
           description="Opcional: agrega una contraseña para cifrar los datos."
-          onSubmit={async (pass) => {
+          onSubmit={async (pass, hours) => {
             const data = sharePending
             const payload = pass ? await encryptData(data, pass) : data
-            const { url } = await createShareLink(48, 'performance', undefined, payload)
+            const { url } = await createShareLink(hours ?? 48, 'performance', undefined, payload)
             setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            addNotification({ type: 'success', message: 'Enlace de rendimiento generado' })
           }}
-          onSkip={async () => {
+          onSkip={async (hours) => {
             const data = sharePending
-            const { url } = await createShareLink(48, 'performance', undefined, data)
+            const { url } = await createShareLink(hours ?? 48, 'performance', undefined, data)
             setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            addNotification({ type: 'success', message: 'Enlace de rendimiento generado' })
           }}
           onClose={() => { setShowPassphrase(false); setSharePending(null) }}
         />
@@ -147,7 +149,7 @@ export function TeamsPage() {
         <StatCard icon={<TrendingUp size={20} />} label="Velocidad Promedio" value={teams.length > 0 ? Math.round(teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) / teams.length) : 0} color="text-info" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -159,9 +161,9 @@ export function TeamsPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button variant="ghost" size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
+            className={`px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || buFilter !== 'all'
                 ? 'border-primary text-primary bg-primary/5'
                 : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
@@ -172,7 +174,7 @@ export function TeamsPage() {
             {buFilter !== 'all' && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -185,13 +187,13 @@ export function TeamsPage() {
               ]} className="min-w-[140px]" />
             </div>
             {buFilter !== 'all' && (
-              <button
+              <Button
                 onClick={() => setBuFilter('all')}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
                 Limpiar filtros
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -204,7 +206,7 @@ export function TeamsPage() {
           return (
             <div key={team.id}
               onClick={() => navigate(`/teams/${team.id}`)}
-              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -228,20 +230,20 @@ export function TeamsPage() {
               )}
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
-                <button
+                <Button
                   onClick={(e) => { e.stopPropagation(); navigate(`${team.id}/edit`) }}
-                  className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                  variant="ghost" size="sm" className="p-1.5"
                   title="Editar"
                 >
                   <Pencil size={16} />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={(e) => { e.stopPropagation(); handleDelete(team.id) }}
-                  className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                  variant="ghost" size="sm" className="p-1.5 text-neutral-50 hover:text-danger"
                   title="Eliminar"
                 >
                   <Trash2 size={16} />
-                </button>
+                </Button>
               </div>
             </div>
           )
@@ -258,7 +260,7 @@ export function TeamsPage() {
       />
 
       {filteredTeams.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
           <p className="text-neutral-50 dark:text-neutral-50">No se encontraron equipos</p>
         </div>
       )}
@@ -268,13 +270,18 @@ export function TeamsPage() {
 }
 
 function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+  const iconClasses: Record<string, string> = {
+    'text-primary': 'bg-primary/10 text-primary',
+    'text-success': 'bg-success/10 text-success',
+    'text-info': 'bg-info/10 text-info',
+  }
   const Comp = onClick ? 'button' : 'div'
   return (
     <Comp
       onClick={onClick}
-      className={`bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm${onClick ? ' cursor-pointer hover:shadow-md transition-all text-left' : ''}`}
+      className={`bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
-      <div className={`${color} mb-2`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
     </Comp>

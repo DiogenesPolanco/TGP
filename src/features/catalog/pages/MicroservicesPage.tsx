@@ -20,6 +20,7 @@ import {
   RefreshCw, Clock, Ban, Calendar,
 } from 'lucide-react'
 import type { Microservice, MicroserviceLifecycleStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const lifecycleLabel: Record<MicroserviceLifecycleStatus, string> = {
   active: 'Activo',
@@ -353,7 +354,7 @@ export function MicroservicesPage() {
           >
             <Eye size={16} className="text-neutral-60 dark:text-neutral-40" />
           </Link>
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation()
               navigate(`/catalog/microservices/${ms.id}`)
@@ -361,13 +362,13 @@ export function MicroservicesPage() {
             className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
           >
             <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}
             className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
           >
             <Trash2 size={16} className="text-danger" />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -381,14 +382,21 @@ export function MicroservicesPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Catálogo de Microservicios</h2>
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            onClick={() => navigate('/catalog/microservices/new')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+          >
+            <Server size={16} />
+            Nuevo Microservicio
+          </Button>
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={async () => {
               if (!isTermsAccepted()) {
                 setShowTerms(true)
@@ -400,14 +408,14 @@ export function MicroservicesPage() {
           >
             <Share2 size={16} />
             Compartir
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleExport}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Download size={16} />
             Exportar
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -418,13 +426,13 @@ export function MicroservicesPage() {
           <span className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary font-mono min-w-0 truncate">
             {shareUrl.split('#')[0]}
           </span>
-          <button
+          <Button
             onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -518,7 +526,7 @@ export function MicroservicesPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterLifecycle || filterApp
@@ -531,7 +539,7 @@ export function MicroservicesPage() {
             {(filterLifecycle || filterApp) && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -562,13 +570,13 @@ export function MicroservicesPage() {
                 />
               </div>
               {(filterLifecycle || filterApp) && (
-                <button
+                <Button
                   onClick={() => { setFilterLifecycle(''); setFilterApp('') }}
                   className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
                 >
                   <X size={14} />
                   Limpiar filtros
-                </button>
+                </Button>
               )}
             </div>
             </div>
@@ -616,19 +624,27 @@ function StatCard({
   active?: boolean
   onClick?: () => void
 }) {
+  const iconClasses: Record<string, string> = {
+    'text-primary': 'bg-primary/10 text-primary',
+    'text-danger': 'bg-danger/10 text-danger',
+    'text-severity-high': 'bg-danger/10 text-danger',
+    'text-warning': 'bg-warning/10 text-warning',
+    'text-info': 'bg-info/10 text-info',
+    'text-purple-500': 'bg-purple-500/10 text-purple-500',
+  }
   const Comp = onClick ? 'button' : 'div'
   return (
     <Comp
       onClick={onClick}
-      className={`rounded-xl border p-4 text-left transition-all ${
-        active
-          ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
-          : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
-      }${onClick ? ' cursor-pointer' : ''}`}
-    >
-      <div className={`${color} mb-2`}>{icon}</div>
-      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
+          active
+            ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
+            : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+        }${onClick ? ' cursor-pointer' : ''}`}
+      >
+        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+        <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
+        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
     </Comp>
   )
 }

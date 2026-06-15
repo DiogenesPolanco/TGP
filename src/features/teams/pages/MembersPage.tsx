@@ -14,6 +14,7 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
+import { Button } from '@/components/ui/Button'
 
 type TeamEntry = { id: string; name: string }
 
@@ -101,7 +102,7 @@ export function MembersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Rendimiento</h2>
-        <button
+        <Button
           onClick={async () => {
             if (!isTermsAccepted()) {
               setShowTerms(true)
@@ -113,7 +114,7 @@ export function MembersPage() {
         >
           <Share2 size={16} />
           Compartir
-        </button>
+        </Button>
       </div>
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
@@ -123,11 +124,11 @@ export function MembersPage() {
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button onClick={async () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+          <Button onClick={async () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )})()}
 
@@ -223,7 +224,7 @@ export function MembersPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterTeam || filterStatus
@@ -236,7 +237,7 @@ export function MembersPage() {
             {(filterTeam || filterStatus) && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -256,13 +257,13 @@ export function MembersPage() {
               ]} className="min-w-[140px]" />
             </div>
             {(filterTeam || filterStatus) && (
-              <button
+              <Button
                 onClick={async () => { setFilterTeam(''); setFilterStatus('') }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger"
               >
                 <X size={14} />
                 Limpiar
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -352,14 +353,18 @@ export function MembersPage() {
 function KpiCard({ icon, label, value, subtitle, memberId, onMemberClick, color, info }: {
   icon: React.ReactNode; label: string; value: string; subtitle?: string; memberId?: string; onMemberClick?: (id: string) => void; color: string; info?: React.ReactNode
 }) {
+  const iconClasses: Record<string, string> = {
+    'text-success': 'bg-success/10 text-success',
+    'text-danger': 'bg-danger/10 text-danger',
+    'text-warning': 'bg-warning/10 text-warning',
+  }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm relative">
-      <div className="flex items-center justify-between mb-3">
-        <div className={color}>{icon}</div>
-      </div>
-      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <div className="flex items-center gap-1.5 mt-1">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm relative">
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+        <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
         <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      </div>
         {info && (
           <div className="relative group">
             <Info size={13} className="text-neutral-50 cursor-help" />
@@ -369,16 +374,15 @@ function KpiCard({ icon, label, value, subtitle, memberId, onMemberClick, color,
             </div>
           </div>
         )}
-      </div>
       {subtitle && memberId && onMemberClick && (
-        <button
+        <Button
           type="button"
           onClick={() => onMemberClick(memberId)}
           className="mt-1.5 text-sm font-semibold text-primary hover:text-primary-dark hover:underline truncate w-full text-left cursor-pointer"
           title="Editar miembro"
         >
           {subtitle}
-        </button>
+        </Button>
       )}
       {subtitle && !(memberId && onMemberClick) && (
         <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>

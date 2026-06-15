@@ -8,6 +8,7 @@ import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Eye, Pencil, Trash2 } from 'lucide-react'
 import type { AuditFinding } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -170,27 +171,27 @@ export function AuditPage() {
       headerClassName: 'text-right',
       render: (finding) => (
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver detalle"
           >
             <Eye size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -201,20 +202,20 @@ export function AuditPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Auditoría</h2>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Hallazgo
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -237,7 +238,7 @@ export function AuditPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || statusFilter !== 'all' || severityFilter !== 'all'
@@ -250,7 +251,7 @@ export function AuditPage() {
             {(statusFilter !== 'all' || severityFilter !== 'all') && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -277,13 +278,13 @@ export function AuditPage() {
               ]} className="min-w-[120px]" />
             </div>
             {(statusFilter !== 'all' || severityFilter !== 'all') && (
-              <button
+              <Button
                 onClick={() => { setStatusFilter('all'); setSeverityFilter('all') }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
                 Limpiar filtros
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -300,13 +301,19 @@ export function AuditPage() {
 }
 
 function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+  const iconClasses: Record<string, string> = {
+    'text-primary': 'bg-primary/10 text-primary',
+    'text-warning': 'bg-warning/10 text-warning',
+    'text-danger': 'bg-danger/10 text-danger',
+    'text-success': 'bg-success/10 text-success',
+  }
   const Comp = onClick ? 'button' : 'div'
   return (
     <Comp
       onClick={onClick}
-      className={`bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm${onClick ? ' cursor-pointer hover:shadow-md transition-all text-left' : ''}`}
+      className={`bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
-      <div className={`${color} mb-2`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
     </Comp>

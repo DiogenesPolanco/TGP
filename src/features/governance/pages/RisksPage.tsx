@@ -12,6 +12,7 @@ import {
   ChevronDown, ChevronRight,
 } from 'lucide-react'
 import type { Risk } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusLabel: Record<string, string> = {
   open: 'Abierto',
@@ -143,27 +144,27 @@ export function RisksPage() {
       headerClassName: 'text-right',
       render: (risk) => (
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver detalle"
           >
             <Eye size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -174,17 +175,25 @@ export function RisksPage() {
   }: {
     icon: React.ReactNode; label: string; value: number; color: string; active?: boolean; onClick?: () => void
   }) => {
+    const iconClasses: Record<string, string> = {
+      'text-primary': 'bg-primary/10 text-primary',
+      'text-danger': 'bg-danger/10 text-danger',
+      'text-warning': 'bg-warning/10 text-warning',
+      'text-info': 'bg-info/10 text-info',
+      'text-success': 'bg-success/10 text-success',
+      'text-neutral-60': 'bg-neutral-60/10 text-neutral-60',
+    }
     const Comp = onClick ? 'button' : 'div'
     return (
       <Comp
         onClick={onClick}
-        className={`rounded-xl border p-4 text-left transition-all ${
+        className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
           active
             ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
             : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
-        <div className={`${color} mb-2`}>{icon}</div>
+        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
         <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
       </Comp>
@@ -197,20 +206,20 @@ export function RisksPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Riesgos</h2>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Riesgo
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -263,7 +272,7 @@ export function RisksPage() {
         <div className="flex items-start gap-8">
           {/* Heat Map - collapsible */}
           <div className="shrink-0">
-            <button
+            <Button
               onClick={() => setShowHeatMap(!showHeatMap)}
               className="flex items-center gap-2 text-sm font-bold text-neutral-90 dark:text-white mb-3 hover:text-primary transition-colors"
             >
@@ -274,7 +283,7 @@ export function RisksPage() {
                   (P{selectedCell.prob} · I{selectedCell.impact} = {selectedCell.prob * selectedCell.impact})
                 </span>
               )}
-            </button>
+            </Button>
 
             {showHeatMap && (
               <div className="flex items-start gap-4">
@@ -285,7 +294,7 @@ export function RisksPage() {
                       <div key={prob} className="contents">
                         <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{prob}</div>
                         {[1, 2, 3, 4, 5].map((impact) => (
-                          <button
+                          <Button
                             key={`${prob}-${impact}`}
                             onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
                             className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
@@ -298,7 +307,7 @@ export function RisksPage() {
                                 <span className="text-[9px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
                               )}
                             </div>
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     ))}
@@ -310,12 +319,12 @@ export function RisksPage() {
                   <span className="text-[10px] font-medium text-neutral-50 mt-0.5">Impacto</span>
                 </div>
                 {selectedCell && (
-                  <button
+                  <Button
                     onClick={() => setSelectedCell(null)}
                     className="text-xs text-danger hover:text-danger-dark transition-colors self-start mt-1"
                   >
                     Limpiar
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
@@ -334,7 +343,7 @@ export function RisksPage() {
                   className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
-              <button
+              <Button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
                   showFilters || statusFilter !== 'all' || categoryFilter !== 'all'
@@ -347,7 +356,7 @@ export function RisksPage() {
                 {(statusFilter !== 'all' || categoryFilter !== 'all') && (
                   <span className="w-2 h-2 rounded-full bg-primary" />
                 )}
-              </button>
+              </Button>
             </div>
 
             {showFilters && (
@@ -374,13 +383,13 @@ export function RisksPage() {
                   ]} className="min-w-[120px]" />
                 </div>
                 {(statusFilter !== 'all' || categoryFilter !== 'all') && (
-                  <button
+                  <Button
                     onClick={() => { setStatusFilter('all'); setCategoryFilter('all') }}
                     className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
                   >
                     <X size={14} />
                     Limpiar filtros
-                  </button>
+                  </Button>
                 )}
               </div>
             )}

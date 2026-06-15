@@ -6,8 +6,9 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, ListTodo, Clock, Play, CheckCircle2 } from 'lucide-react'
 import type { Task, Criticality } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const priorityLabel: Record<Criticality, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' }
 const priorityColor: Record<Criticality, string> = {
@@ -16,13 +17,6 @@ const priorityColor: Record<Criticality, string> = {
   medium: 'bg-info/10 text-info',
   low: 'bg-success/10 text-success',
 }
-const statusColor: Record<string, string> = {
-  todo: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60',
-  in_progress: 'bg-info/10 text-info',
-  review: 'bg-warning/10 text-warning',
-  done: 'bg-success/10 text-success',
-}
-
 export function TasksPage() {
   const navigate = useNavigate()
   const { confirm } = useConfirm()
@@ -82,17 +76,16 @@ export function TasksPage() {
       label: 'Estado',
       sortable: true,
       render: (t) => (
-        <select
+        <Select
           value={t.status}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => handleQuickStatus(t.id, e.target.value)}
-          className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${statusColor[t.status]}`}
-        >
-          <option value="todo">Por Hacer</option>
-          <option value="in_progress">En Progreso</option>
-          <option value="review">Revisión</option>
-          <option value="done">Completada</option>
-        </select>
+          onChange={(v) => handleQuickStatus(t.id, v)}
+          options={[
+            { value: 'todo', label: 'Por Hacer' },
+            { value: 'in_progress', label: 'En Progreso' },
+            { value: 'review', label: 'Revisión' },
+            { value: 'done', label: 'Completada' },
+          ]}
+        />
       ),
     },
     {
@@ -133,20 +126,20 @@ export function TasksPage() {
       label: '',
       render: (t) => (
         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all" onClick={(e) => e.stopPropagation()}>
-          <button
+          <Button
             onClick={() => navigate(`/execution/tasks/${t.id}/edit`)}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDelete(t)}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
       className: 'text-right w-20',
@@ -164,26 +157,26 @@ export function TasksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Tareas</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Tareas</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Gestión de tareas operativas</p>
         </div>
-        <button
+        <Button
           onClick={() => navigate('/execution/tasks/new')}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={18} />
           Nueva Tarea
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard label="Total" value={stats.total} color="text-primary" />
-        <StatCard label="Por Hacer" value={stats.todo} color="text-neutral-60" />
-        <StatCard label="En Progreso" value={stats.inProgress} color="text-info" />
-        <StatCard label="Completadas" value={stats.done} color="text-success" />
+        <StatCard icon={<ListTodo size={18} />} label="Total" value={stats.total} color="text-primary" />
+        <StatCard icon={<Clock size={18} />} label="Por Hacer" value={stats.todo} color="text-neutral-60" />
+        <StatCard icon={<Play size={18} />} label="En Progreso" value={stats.inProgress} color="text-info" />
+        <StatCard icon={<CheckCircle2 size={18} />} label="Completadas" value={stats.done} color="text-success" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -217,9 +210,16 @@ export function TasksPage() {
   )
 }
 
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+  const iconClasses: Record<string, string> = {
+    'text-primary': 'bg-primary/10 text-primary',
+    'text-neutral-60': 'bg-neutral-60/10 text-neutral-60',
+    'text-info': 'bg-info/10 text-info',
+    'text-success': 'bg-success/10 text-success',
+  }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3">
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
     </div>

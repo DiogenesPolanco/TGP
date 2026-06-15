@@ -16,6 +16,7 @@ import type { Blocker } from '@/types/domain'
 
 import { UpNextPanel } from '../components/UpNextPanel'
 import { WeeklyTimeline } from '../components/WeeklyTimeline'
+import { Button } from '@/components/ui/Button'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -191,13 +192,13 @@ export function DailyPage() {
             {today.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <button
+        <Button
           onClick={handleShare}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Share2 size={16} />
           Compartir
-        </button>
+        </Button>
       </div>
 
       {shareUrl && (
@@ -207,13 +208,13 @@ export function DailyPage() {
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button
+          <Button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -233,7 +234,6 @@ export function DailyPage() {
           label="Bloqueos"
           value={agenda.activeBlockers.length}
           color={criticalBlockers.length > 0 ? 'text-danger' : 'text-warning'}
-          bgColor={criticalBlockers.length > 0 ? 'bg-danger/10' : 'bg-warning/10'}
           onClick={() => navigate('/execution/plans')}
         />
         <StatCard
@@ -241,35 +241,30 @@ export function DailyPage() {
           label="Vence Hoy"
           value={agenda.dueToday.length + agenda.commitmentsDueSoon.length}
           color="text-warning"
-          bgColor="bg-warning/10"
         />
         <StatCard
           icon={<XCircle size={18} />}
           label="Vencido"
           value={agenda.overdue.length + agenda.commitmentsOverdue.length}
           color="text-danger"
-          bgColor="bg-danger/10"
         />
         <StatCard
           icon={<CheckCircle2 size={18} />}
           label={selectedWeek ? 'Completado Semana' : 'Completado Hoy'}
           value={agenda.completedToday.length}
           color="text-success"
-          bgColor="bg-success/10"
         />
         <StatCard
           icon={<ListTodo size={18} />}
           label="Tareas Pendientes"
           value={agenda.tasksDue.length}
           color="text-info"
-          bgColor="bg-info/10"
         />
         <StatCard
           icon={<Target size={18} />}
           label="Planes Activos"
           value={agenda.activePlans.length}
           color="text-primary"
-          bgColor="bg-primary/10"
           onClick={() => navigate('/execution/plans')}
         />
       </div>
@@ -338,12 +333,12 @@ export function DailyPage() {
                           {act.assigneeId && <span> &middot; {act.assigneeId}</span>}
                         </p>
                       </div>
-                      <button
+                      <Button
                         onClick={() => navigate(`/execution/plans/${act.planId}`)}
                         className="shrink-0 p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
                       >
                         <ArrowRight size={16} />
-                      </button>
+                      </Button>
                     </div>
                   )
                 })}
@@ -497,23 +492,30 @@ export function DailyPage() {
 }
 
 function StatCard({
-  icon, label, value, color, bgColor, onClick,
+  icon, label, value, color, onClick,
 }: {
   icon: React.ReactNode
   label: string
   value: number
   color: string
-  bgColor: string
   onClick?: () => void
 }) {
+  const iconClasses: Record<string, string> = {
+    'text-primary': 'bg-primary/10 text-primary',
+    'text-danger': 'bg-danger/10 text-danger',
+    'text-warning': 'bg-warning/10 text-warning',
+    'text-success': 'bg-success/10 text-success',
+    'text-info': 'bg-info/10 text-info',
+  }
+  const CardComp = onClick ? Button : 'div'
   return (
-    <button
+    <CardComp
       onClick={onClick}
-      className={`${bgColor} rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 text-left hover:shadow-sm transition-shadow`}
+      className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3"
     >
-      <div className={`${color} mb-2`}>{icon}</div>
-      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </button>
+    </CardComp>
   )
 }
