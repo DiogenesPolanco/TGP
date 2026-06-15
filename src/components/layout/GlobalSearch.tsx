@@ -56,6 +56,7 @@ function priorityLabel(priority: string): string {
   }
   return map[priority] ?? priority
 }
+import { Button } from '@/components/ui/Button'
 import {
   Search,
   AppWindow,
@@ -546,19 +547,19 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           {loading && (
             <div className="w-5 h-5 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
           )}
-          <button
+          <Button
             onClick={onClose}
             className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <X size={18} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
 
         {/* Category chips (when searching) */}
         {query.trim() && groups.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3 pb-1 border-b border-neutral-10 dark:border-neutral-75">
             <span className="text-xs text-neutral-50 font-medium mr-1">Filtrar:</span>
-            <button
+            <Button
               onClick={() => {
                 setActiveCategory(null)
                 if (query.trim()) runSearch(query.trim(), null)
@@ -571,12 +572,12 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
               )}
             >
               Todas
-            </button>
+            </Button>
             {CATEGORIES.map((cat) => {
               const hasItems = groups.some((g) => g.key === cat.key)
               if (!hasItems) return null
               return (
-                <button
+                <Button
                   key={cat.key}
                   onClick={() => handleCategoryClick(cat.key)}
                   className={cn(
@@ -588,7 +589,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                 >
                   <cat.icon size={12} />
                   {cat.label}
-                </button>
+                </Button>
               )
             })}
           </div>
@@ -623,7 +624,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                   const route = group.route(item)
 
                   return (
-                    <button
+                    <Button
                       key={`${group.key}-${item.id}`}
                       onClick={() => handleSelect(route)}
                       onMouseEnter={() => setSelectedIndex(idx)}
@@ -657,7 +658,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                         </p>
                         <p className="text-xs text-neutral-50 truncate">{item.subtitle}</p>
                       </div>
-                    </button>
+                    </Button>
                   )
                 })}
               </div>
@@ -673,7 +674,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {CATEGORIES.map((cat) => (
-                <button
+                <Button
                   key={cat.key}
                   onClick={() => {
                     setActiveCategory(cat.key)
@@ -687,7 +688,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                   <span className="text-xs font-medium text-neutral-70 dark:text-neutral-30 group-hover:text-neutral-90 dark:group-hover:text-white transition-colors leading-tight">
                     {cat.label}
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
             <div className="flex items-center justify-center gap-4 mt-5 text-xs text-neutral-40">

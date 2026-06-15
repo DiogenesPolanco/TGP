@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
 
@@ -59,17 +60,17 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
       </div>
       {totalPages > 1 && (
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
             className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Página anterior"
           >
             <ChevronLeft size={16} className="text-neutral-60 dark:text-neutral-40" />
-          </button>
+          </Button>
           {getVisiblePages().map((p, idx) =>
             typeof p === 'number' ? (
-              <button
+              <Button
                 key={p}
                 onClick={() => onPageChange(p)}
                 className={`min-w-[32px] h-8 rounded-md text-sm font-medium transition-colors ${
@@ -81,21 +82,21 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
                 aria-current={p === page ? 'page' : undefined}
               >
                 {p}
-              </button>
+              </Button>
             ) : (
               <span key={`ellipsis-${idx}`} className="px-1 text-neutral-40 dark:text-neutral-50 select-none">
                 ...
               </span>
             ),
           )}
-          <button
+          <Button
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
             className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Página siguiente"
           >
             <ChevronRight size={16} className="text-neutral-60 dark:text-neutral-40" />
-          </button>
+          </Button>
         </div>
       )}
     </div>

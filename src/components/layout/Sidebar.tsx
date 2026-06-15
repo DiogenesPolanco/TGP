@@ -18,6 +18,7 @@ import {
   FileSignature,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/Button'
 
 interface NavItem {
   label: string
@@ -126,12 +127,9 @@ export function Sidebar() {
             <span className="font-semibold text-neutral-90 dark:text-neutral-0 text-sm">TGP</span>
           </div>
         )}
-        <button
-          onClick={toggleSidebar}
-          className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-        >
+        <Button variant="ghost" onClick={toggleSidebar} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-        </button>
+        </Button>
       </div>
 
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
@@ -154,8 +152,7 @@ export function Sidebar() {
               </NavLink>
             ) : (
               <div>
-                <button
-                  onClick={() => sidebarOpen && toggleItem(item.label)}
+                <Button onClick={() => sidebarOpen && toggleItem(item.label)}
                   className={cn(
                     'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
                     item.children?.some((c) =>
@@ -174,7 +171,7 @@ export function Sidebar() {
                     ) : (
                       <ChevronDown size={16} />
                     ))}
-                </button>
+                </Button>
                 {sidebarOpen && expandedItems.has(item.label) && item.children && (
                   <div className="ml-9 mt-1 space-y-1">
                     {item.children.map((child) => (

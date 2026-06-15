@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Printer, Image, Loader2 } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
+import { Button } from '@/components/ui/Button'
 
 function inlineComputedStyles(source: HTMLElement, target: HTMLElement) {
   const queue: [HTMLElement, HTMLElement][] = [[source, target]]
@@ -124,15 +125,15 @@ export function PrintButton() {
   return (
     <>
       <div className="flex items-center gap-2 no-print">
-        <button
+        <Button
           onClick={() => window.print()}
           className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
           title="Descargar PDF"
         >
           <Printer size={16} />
           PDF
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={captureImage}
           disabled={capturing}
           className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm disabled:opacity-50"
@@ -140,7 +141,7 @@ export function PrintButton() {
         >
           {capturing ? <Loader2 size={16} className="animate-spin" /> : <Image size={16} />}
           Imagen
-        </button>
+        </Button>
       </div>
 
       <div

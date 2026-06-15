@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { searchTechnologies, COMMON_SKILLS } from '@/constants/commonSkills'
 import { lookupDepsPackage, type DepsPackageResult, DEPS_SYSTEMS, type DepsSystem } from '@/services/security/depsDevService'
 import { Plus, X, AlertTriangle, Search, ExternalLink, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<string, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -182,17 +183,17 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
             <span key={t.id} className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${statusColors[t.supportStatus ?? 'unknown']}`}>
               {t.supportStatus === 'eol' && <AlertTriangle size={10} />}
               {t.name}{t.version ? ` ${t.version}` : ''}
-              <button type="button" onClick={() => removeItem(t.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
+              <Button type="button" onClick={() => removeItem(t.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
                 <X size={12} />
-              </button>
+              </Button>
             </span>
           ))}
           {selectedSkills.map((s) => (
             <span key={s.id} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30">
               {s.name}
-              <button type="button" onClick={() => removeItem(s.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
+              <Button type="button" onClick={() => removeItem(s.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
                 <X size={12} />
-              </button>
+              </Button>
             </span>
           ))}
         </div>
@@ -233,7 +234,7 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
           {results.length > 0 && results.map((r) => {
             const alreadySelected = selectedIds.includes(r.id) || selectedSkills.some((s) => s.id === r.id)
             return (
-              <button
+              <Button
                 key={r.id}
                 type="button"
                 disabled={alreadySelected}
@@ -249,7 +250,7 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
                   )}
                 </div>
                 <span className="text-[10px] capitalize text-neutral-50 shrink-0 ml-2">{r.category}</span>
-              </button>
+              </Button>
             )
           })}
 
@@ -262,7 +263,7 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
                   Buscando en {DEPS_SYSTEMS.find((s) => s.value === depsSystem)?.label ?? depsSystem}…
                 </div>
               ) : depsResult ? (
-                <button
+                <Button
                   type="button"
                   onClick={() => handleDepsSelect(depsResult)}
                   className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
@@ -276,32 +277,32 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
                   <span className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${statusColors[depsResult.supportStatus]}`}>
                     {statusLabel[depsResult.supportStatus]}
                   </span>
-                </button>
+                </Button>
               ) : depsError ? (
                 <div className="px-4 py-3">
                   <p className="text-xs text-danger mb-2">{depsError}</p>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleDepsSearch}
                     className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors"
                   >
                     <Search size={14} />
                     Reintentar
-                  </button>
+                  </Button>
                 </div>
               ) : results.length === 0 && query.trim() && (
                 <div className="px-4 py-3">
                   <p className="text-sm text-neutral-50 mb-2">
                     No hay resultados locales para "{query}"
                   </p>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleDepsSearch}
                     className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors"
                   >
                     <Search size={14} />
                     Buscar en {DEPS_SYSTEMS.find((s) => s.value === depsSystem)?.label ?? depsSystem}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

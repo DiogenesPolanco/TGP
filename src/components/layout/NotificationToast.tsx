@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { CheckCircle, AlertTriangle, XCircle, Info, X } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const iconMap = {
   success: CheckCircle,
@@ -90,13 +91,9 @@ function ToastItem({
           />
         </div>
       </div>
-      <button
-        onClick={handleClose}
-        className="shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors"
-        aria-label="Cerrar"
-      >
+      <Button onClick={handleClose} className="shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors" aria-label="Cerrar">
         <X size={14} />
-      </button>
+      </Button>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { ChevronDown, X } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export interface SelectOption {
   value: string
@@ -161,7 +162,7 @@ export function Select({
               {selectedLabel}
             </span>
             {clearable && !disabled && (
-              <button
+              <Button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -170,7 +171,7 @@ export function Select({
                 className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0"
               >
                 <X size={14} className="text-neutral-50" />
-              </button>
+              </Button>
             )}
           </>
         ) : (
@@ -216,7 +217,7 @@ export function Select({
             </p>
           ) : (
             filtered.map((option, idx) => (
-              <button
+              <Button
                 key={option.value}
                 type="button"
                 data-option
@@ -234,7 +235,7 @@ export function Select({
                 {value === option.value && (
                   <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                 )}
-              </button>
+              </Button>
             ))
           )}
         </div>

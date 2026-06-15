@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AlertTriangle, Shield, Lock, Clock, Eye, Database, CheckCircle, FileSignature } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   onAccept: () => void
@@ -114,19 +115,14 @@ export function TermsModal({ onAccept, onClose }: Props) {
               </span>
             </label>
             <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors"
-              >
+              <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors">
                 Cancelar
-              </button>
-              <button
-                onClick={onAccept}
+              </Button>
+              <Button onClick={onAccept}
                 disabled={!accepted}
-                className="px-5 py-2 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25"
-              >
+                className="px-5 py-2 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25">
                 Aceptar y Continuar
-              </button>
+              </Button>
             </div>
           </div>
         </div>

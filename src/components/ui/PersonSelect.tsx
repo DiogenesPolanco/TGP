@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useUserStore } from '@/stores/userStore'
 import { ChevronDown, X, User } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface PersonOption {
   id: string
@@ -187,13 +188,13 @@ export function PersonSelect({
             <span className="text-xs text-neutral-50 truncate max-w-[120px] hidden sm:inline">
               {selectedPerson.subtitle}
             </span>
-            <button
+            <Button
               type="button"
               onClick={(e) => { e.stopPropagation(); clear() }}
               className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0"
             >
               <X size={14} className="text-neutral-50" />
-            </button>
+            </Button>
           </>
         ) : (
           <>
@@ -227,7 +228,7 @@ export function PersonSelect({
             </p>
           ) : (
             filtered.map((option, idx) => (
-              <button
+              <Button
                 key={option.id}
                 type="button"
                 data-option
@@ -255,7 +256,7 @@ export function PersonSelect({
                 }`}>
                   {option.source === 'user' ? 'Usuario' : option.source === 'current' ? 'Tú' : 'Miembro'}
                 </span>
-              </button>
+              </Button>
             ))
           )}
         </div>

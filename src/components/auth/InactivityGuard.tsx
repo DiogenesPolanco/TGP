@@ -8,6 +8,7 @@ import {
   WARNING_DURATION_MS,
 } from '@/services/auth/inactivityService'
 import { logout } from '@/services/auth/authService'
+import { Button } from '@/components/ui/Button'
 
 interface InactivityGuardProps {
   onExpired: () => void
@@ -147,19 +148,19 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
             </div>
 
             <div className="flex items-center gap-3 pt-2">
-              <button
+              <Button
                 onClick={handleExpired}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-neutral-30 dark:border-neutral-60 text-neutral-70 dark:text-neutral-30 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-sm font-medium"
               >
                 <LogOut size={16} />
                 Cerrar sesión
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDismiss}
                 className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
               >
                 Continuar sesión
-              </button>
+              </Button>
             </div>
           </div>
         </div>

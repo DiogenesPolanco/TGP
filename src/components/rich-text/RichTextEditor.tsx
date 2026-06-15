@@ -14,6 +14,7 @@ import { Markdown } from '@tiptap/markdown'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { Plugin } from '@tiptap/pm/state'
 import { common, createLowlight } from 'lowlight'
+import { Button } from '@/components/ui/Button'
 import {
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Table as TableIcon,
@@ -42,7 +43,7 @@ const MenuButton = ({
   title: string
   children: React.ReactNode
 }) => (
-  <button
+  <Button
     type="button"
     onClick={onClick}
     title={title}
@@ -53,7 +54,7 @@ const MenuButton = ({
     }`}
   >
     {children}
-  </button>
+  </Button>
 )
 
 const Divider = () => (

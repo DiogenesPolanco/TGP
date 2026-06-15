@@ -1,4 +1,5 @@
 import { RefreshCw, Sparkles, Download } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export function UpdateAvailable({ onReload }: { onReload: () => void }) {
   return (
@@ -82,13 +83,10 @@ export function UpdateAvailable({ onReload }: { onReload: () => void }) {
                   </p>
                 </div>
 
-                <button
-                  onClick={onReload}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
-                >
+                <Button onClick={onReload} className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25">
                   <RefreshCw size={20} />
                   Instalar ahora
-                </button>
+                </Button>
               </div>
             </div>
           </div>

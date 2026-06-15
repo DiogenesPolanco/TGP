@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, startTransition } from 'react'
 import { AlertTriangle, X } from 'lucide-react'
 import { useConfirmStore } from '@/stores/confirmStore'
+import { Button } from '@/components/ui/Button'
 
 export function ConfirmDialog() {
   const { message, dismiss } = useConfirmStore()
@@ -68,12 +69,9 @@ export function ConfirmDialog() {
                 <h3 className="text-base font-semibold text-neutral-90 dark:text-white">
                   Confirmar
                 </h3>
-                <button
-                  onClick={handleCancel}
-                  className="p-0.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
-                >
+                <Button onClick={handleCancel} className="p-0.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
                   <X size={16} className="text-neutral-50" />
-                </button>
+                </Button>
               </div>
 
               {/* Message */}
@@ -83,18 +81,12 @@ export function ConfirmDialog() {
 
               {/* Actions */}
               <div className="flex items-center justify-end gap-3 mt-5">
-                <button
-                  onClick={handleCancel}
-                  className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors"
-                >
+                <Button onClick={handleCancel} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
                   Cancelar
-                </button>
-                <button
-                  onClick={handleConfirm}
-                  className="px-4 py-2 text-sm font-medium bg-danger text-white rounded-lg hover:bg-danger-dark transition-colors"
-                >
+                </Button>
+                <Button onClick={handleConfirm} className="px-4 py-2 text-sm font-medium bg-danger text-white rounded-lg hover:bg-danger-dark transition-colors">
                   Confirmar
-                </button>
+                </Button>
               </div>
             </div>
           </div>

@@ -54,7 +54,7 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
     <div
       onClick={onClick}
       className={cn(
-        'group relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5',
+        'group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5',
         'shadow-sm hover:shadow-lg transition-all duration-300',
         'hover:-translate-y-0.5',
         styles.shadow,

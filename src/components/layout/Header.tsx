@@ -7,6 +7,7 @@ import { Search, Bell, Moon, Sun, Calendar, LogOut, Speaker, User } from 'lucide
 import { useState, useEffect, useRef } from 'react'
 import { GlobalSearch } from './GlobalSearch'
 import { clearSession } from '@/services/auth/authService'
+import { Button } from '@/components/ui/Button'
 import {
   areBrowserNotificationsEnabled,
   setBrowserNotificationsEnabled,
@@ -95,26 +96,26 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-        <button
+        <Button
           onClick={() => setSearchOpen(true)}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           title="Buscar (⌘K)"
         >
           <Search size={18} className="text-neutral-60 dark:text-neutral-40" />
-        </button>
+        </Button>
 
         <div className="relative">
-          <button
+          <Button
             onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Calendar size={16} />
             <span>{periodOptions.find((p) => p.value === selectedPeriod)?.label}</span>
-          </button>
+          </Button>
           {showPeriodDropdown && (
             <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-50">
               {periodOptions.map((option) => (
-                <button
+                <Button
                   key={option.value}
                   onClick={() => {
                     setPeriod(option.value)
@@ -128,14 +129,14 @@ export function Header() {
                   )}
                 >
                   {option.label}
-                </button>
+                </Button>
               ))}
             </div>
           )}
         </div>
 
         <div className="relative" ref={alertsRef}>
-          <button
+          <Button
             onClick={() => setShowAlerts(!showAlerts)}
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors relative"
           >
@@ -145,7 +146,7 @@ export function Header() {
                 {alerts.length > 99 ? '99+' : alerts.length}
               </span>
             )}
-          </button>
+          </Button>
 
           {showAlerts && (
             <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
@@ -153,7 +154,7 @@ export function Header() {
                 <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">
                   Alertas ({alerts.length})
                 </h4>
-                <button
+                <Button
                   onClick={handleToggleBrowserNotifs}
                   className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     browserNotifs
@@ -164,7 +165,7 @@ export function Header() {
                 >
                   <Speaker size={14} />
                   {browserNotifs ? 'Activadas' : 'Notificar'}
-                </button>
+                </Button>
               </div>
               {alerts.length > 0 ? (
                 <div className="p-2 space-y-1">
@@ -203,7 +204,7 @@ export function Header() {
           )}
         </div>
 
-        <button
+        <Button
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
@@ -212,11 +213,11 @@ export function Header() {
           ) : (
             <Sun size={18} className="text-neutral-40" />
           )}
-        </button>
+        </Button>
 
         <div className="flex items-center gap-2 pl-3 border-l border-neutral-20 dark:border-neutral-70">
           {currentUser ? (
-            <button onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
+            <Button onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <span className="text-primary font-semibold text-sm">
@@ -226,7 +227,7 @@ export function Header() {
               <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 hidden lg:block group-hover:text-primary transition-colors">
                 {currentUser.displayName}
               </span>
-            </button>
+            </Button>
           ) : (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-neutral-20 dark:bg-neutral-70 rounded-full flex items-center justify-center">
@@ -235,13 +236,13 @@ export function Header() {
               <span className="text-sm text-neutral-50 hidden lg:block">Sin usuario</span>
             </div>
           )}
-          <button
+          <Button
             onClick={handleLogout}
             className="p-1.5 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors ml-1"
             title="Cerrar sesión"
           >
             <LogOut size={16} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
       </div>
 

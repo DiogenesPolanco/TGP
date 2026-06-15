@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface DatePickerProps {
   value?: string
@@ -171,7 +172,7 @@ export function DatePicker({
         </label>
       )}
 
-      <button
+      <Button
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
@@ -185,28 +186,28 @@ export function DatePicker({
           <span className={`${displayValue ? '' : 'opacity-60'}`}>
           {displayValue || placeholder}
         </span>
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute top-full left-0 mt-1 z-50 w-[280px] bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-lg p-3">
           <div className="flex items-center justify-between mb-2">
-            <button
+            <Button
               type="button"
               onClick={prevMonth}
               className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-neutral-60 hover:text-neutral-90 dark:hover:text-white"
             >
               <ChevronLeft size={16} />
-            </button>
+            </Button>
             <span className="text-sm font-semibold text-neutral-90 dark:text-white">
               {MONTHS[month]} {year}
             </span>
-            <button
+            <Button
               type="button"
               onClick={nextMonth}
               className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-neutral-60 hover:text-neutral-90 dark:hover:text-white"
             >
               <ChevronRight size={16} />
-            </button>
+            </Button>
           </div>
 
           <div className="grid grid-cols-7 mb-1">
@@ -228,7 +229,7 @@ export function DatePicker({
               const isToday = dateStr === todayStr
 
               return (
-                <button
+                <Button
                   key={i}
                   type="button"
                   disabled={cell.disabled}
@@ -244,20 +245,20 @@ export function DatePicker({
                   }`}
                 >
                   {cell.day}
-                </button>
+                </Button>
               )
             })}
           </div>
 
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-20 dark:border-neutral-70">
-            <button
+            <Button
               type="button"
               onClick={goToToday}
               className="text-xs font-medium text-primary hover:text-primary-dark transition-colors"
             >
               Hoy
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => {
                 onChange?.('')
@@ -266,7 +267,7 @@ export function DatePicker({
               className="text-xs text-neutral-50 hover:text-neutral-70 dark:hover:text-neutral-30 transition-colors"
             >
               Limpiar
-            </button>
+            </Button>
           </div>
         </div>
       )}
