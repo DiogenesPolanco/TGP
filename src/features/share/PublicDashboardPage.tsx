@@ -361,7 +361,7 @@ export function PublicDashboardPage() {
                 { label: 'Medio (5-9)', range: [5, 9] as const, color: 'bg-info' },
                 { label: 'Bajo (1-4)', range: [1, 4] as const, color: 'bg-success' },
               ] as const).map(({ label, range, color }) => {
-                const count = data.risks.filter((r) => r.riskScore >= range[0] && r.riskScore <= range[1]).length
+                const count = data.risks.filter((r: any) => (r.riskScore ?? 0) >= range[0] && (r.riskScore ?? 0) <= range[1]).length
                 const total = data.risks.length || 1
                 const pct = Math.round((count / total) * 100)
                 return (
@@ -426,7 +426,7 @@ function StatCard({ title, value, subtitle, icon, color }: {
     danger: 'bg-danger', warning: 'bg-warning', success: 'bg-success', info: 'bg-info', primary: 'bg-primary',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
       <div className="flex items-start justify-between mb-3">
         <div className={cn('p-2 rounded-lg', {
           'bg-danger/10 text-danger': color === 'danger',

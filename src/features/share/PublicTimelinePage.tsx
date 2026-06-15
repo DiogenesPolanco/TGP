@@ -169,22 +169,22 @@ export function PublicTimelinePage() {
       <main className="px-6 py-8 space-y-6">
         {/* Stats summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <Target size={16} className="text-primary mb-1" />
             <p className="text-2xl font-bold text-primary">{stats.total}</p>
             <p className="text-xs text-neutral-60">Total Planes</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <Clock size={16} className="text-success mb-1" />
             <p className="text-2xl font-bold text-success">{stats.active}</p>
             <p className="text-xs text-neutral-60">Activos</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <AlertTriangle size={16} className="text-warning mb-1" />
             <p className="text-2xl font-bold text-warning">{stats.atRisk}</p>
             <p className="text-xs text-neutral-60">En Riesgo</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <XCircle size={16} className="text-danger mb-1" />
             <p className="text-2xl font-bold text-danger">{stats.overdue}</p>
             <p className="text-xs text-neutral-60">Vencidos</p>
@@ -192,7 +192,7 @@ export function PublicTimelinePage() {
         </div>
 
         {/* Main content: Gantt full width (no alerts sidebar) */}
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
               <div className="flex items-center gap-2">
                 <Calendar size={15} className="text-primary" />

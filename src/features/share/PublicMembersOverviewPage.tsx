@@ -230,7 +230,7 @@ function SummaryCard({ label, value, icon, color }: { label: string; value: stri
     success: 'text-success bg-success/10', warning: 'text-warning bg-warning/10', danger: 'text-danger bg-danger/10',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
       <div className={cn('p-2 rounded-lg w-fit mb-2', colors[color] ?? colors.primary)}>{icon}</div>
       <p className="text-xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>

@@ -131,19 +131,19 @@ export function PublicPlanPage() {
         <p className="text-sm text-neutral-60">{plan.description}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <p className="text-2xl font-bold text-neutral-90 dark:text-white">{activities.length}</p>
             <p className="text-xs text-neutral-60">Actividades</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <p className="text-2xl font-bold text-success">{actPct}%</p>
             <p className="text-xs text-neutral-60">Completado</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <p className="text-2xl font-bold text-info">{tasks.length}</p>
             <p className="text-xs text-neutral-60">Tareas ({doneTasks} hechas)</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
             <p className={`text-2xl font-bold ${openBlockers.length > 0 ? 'text-danger' : 'text-success'}`}>{openBlockers.length}</p>
             <p className="text-xs text-neutral-60">Bloqueos</p>
           </div>

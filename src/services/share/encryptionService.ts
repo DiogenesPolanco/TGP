@@ -15,10 +15,14 @@ async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKe
 }
 
 export interface EncryptedPayload {
-  e: true        // encrypted flag
-  s: string      // salt (base64)
-  i: string      // iv (base64)
-  d: string      // data (base64)
+  e: true
+  s: string
+  i: string
+  d: string
+}
+
+export function isEncryptedPayload(data: unknown): data is EncryptedPayload {
+  return typeof data === 'object' && data !== null && (data as Record<string, unknown>).e === true
 }
 
 export async function encryptData(data: unknown, passphrase: string): Promise<EncryptedPayload> {

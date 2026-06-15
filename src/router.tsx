@@ -8,6 +8,14 @@ import { PublicRecruitmentPage } from '@/features/share/PublicRecruitmentPage'
 import { PublicDailyPage } from '@/features/share/PublicDailyPage'
 import { PublicPlanPage } from '@/features/share/PublicPlanPage'
 import { PublicTimelinePage } from '@/features/share/PublicTimelinePage'
+import { PublicPredictabilityPage } from '@/features/share/PublicPredictabilityPage'
+import { PublicVulnerabilitiesPage } from '@/features/share/PublicVulnerabilitiesPage'
+import { PublicIncidentsPage } from '@/features/share/PublicIncidentsPage'
+import { PublicRisksPage } from '@/features/share/PublicRisksPage'
+import { PublicAuditPage } from '@/features/share/PublicAuditPage'
+import { PublicObjectivesPage } from '@/features/share/PublicObjectivesPage'
+import { PublicObsolescenceMapPage } from '@/features/share/PublicObsolescenceMapPage'
+import { PublicDependencyMapPage } from '@/features/share/PublicDependencyMapPage'
 import { TermsPage } from '@/features/share/TermsPage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
 
@@ -45,6 +53,38 @@ export const router = createBrowserRouter([
     element: <PublicTimelinePage />,
   },
   {
+    path: '/public/predictability/:hash',
+    element: <PublicPredictabilityPage />,
+  },
+  {
+    path: '/public/vulnerabilities/:hash',
+    element: <PublicVulnerabilitiesPage />,
+  },
+  {
+    path: '/public/incidents/:hash',
+    element: <PublicIncidentsPage />,
+  },
+  {
+    path: '/public/risks/:hash',
+    element: <PublicRisksPage />,
+  },
+  {
+    path: '/public/audit/:hash',
+    element: <PublicAuditPage />,
+  },
+  {
+    path: '/public/objectives/:hash',
+    element: <PublicObjectivesPage />,
+  },
+  {
+    path: '/public/obsolescence/:hash',
+    element: <PublicObsolescenceMapPage />,
+  },
+  {
+    path: '/public/dependencies/:hash',
+    element: <PublicDependencyMapPage />,
+  },
+  {
     path: '/terms',
     element: <TermsPage />,
   },
@@ -69,6 +109,7 @@ export const router = createBrowserRouter([
       { path: 'catalog/applications/:appId/databases/:id/edit', lazy: () => import('@/features/catalog/pages/DatabaseFormPage').then((m) => ({ Component: m.DatabaseFormPage })) },
       { path: 'catalog/applications/:id', lazy: () => import('@/features/catalog/pages/ApplicationDetailPage').then((m) => ({ Component: m.ApplicationDetailPage })) },
       { path: 'catalog/microservices', lazy: () => import('@/features/catalog/pages/MicroservicesPage').then((m) => ({ Component: m.MicroservicesPage })) },
+      { path: 'catalog/microservices/new', lazy: () => import('@/features/catalog/pages/MicroserviceDetailPage').then((m) => ({ Component: m.MicroserviceDetailPage })) },
       { path: 'catalog/microservices/:id', lazy: () => import('@/features/catalog/pages/MicroserviceDetailPage').then((m) => ({ Component: m.MicroserviceDetailPage })) },
 
       { path: 'catalog/obsolescence', lazy: () => import('@/features/obsolescence/pages/ObsolescencePage').then((m) => ({ Component: m.ObsolescencePage })) },

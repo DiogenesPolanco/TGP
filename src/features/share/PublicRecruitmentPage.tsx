@@ -8,6 +8,7 @@ import { PrintButton } from '@/components/ui/PrintButton'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { Users, Calendar, UserCheck, Star, ChevronDown, ChevronUp } from 'lucide-react'
+import { Button } from '@/components/ui/Button';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
@@ -153,7 +154,7 @@ export function PublicRecruitmentPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Proceso de Reclutamiento</h1>
+              <h1 className="text-lg font-semibold">Proceso de Reclutamiento</h1>
               <p className="text-base opacity-80 mt-1">Evaluación de candidatos — {candidates.length} registro{candidates.length !== 1 ? 's' : ''}</p>
             </div>
             <PrintButton />
@@ -164,7 +165,7 @@ export function PublicRecruitmentPage() {
       <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
         <div className="grid grid-cols-4 gap-4">
           {stats.map((s) => (
-            <div key={s.label} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+            <div key={s.label} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
               <div className={`${s.color} mb-2`}>{s.icon}</div>
               <p className="text-2xl font-bold text-neutral-90 dark:text-white">{s.value}</p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40">{s.label}</p>
@@ -183,8 +184,8 @@ export function PublicRecruitmentPage() {
             const evalAvg = evals.length > 0 ? Math.round(evals.reduce((s, e) => s + e.points, 0) / evals.length) : 0
 
             return (
-              <div key={c.id} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-                <button onClick={() => toggleExpand(c.id)} className="w-full flex items-center gap-4 p-4 hover:bg-neutral-5 dark:hover:bg-neutral-75/50 transition-colors text-left">
+              <div key={c.id} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+                <Button onClick={() => toggleExpand(c.id)} className="w-full flex items-center gap-4 p-4 hover:bg-neutral-5 dark:hover:bg-neutral-75/50 transition-colors text-left">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-sm font-semibold text-neutral-90 dark:text-white">{c.name}</span>
@@ -210,7 +211,7 @@ export function PublicRecruitmentPage() {
                     </div>
                     {isOpen ? <ChevronUp size={18} className="text-neutral-50" /> : <ChevronDown size={18} className="text-neutral-50" />}
                   </div>
-                </button>
+                </Button>
 
                 {isOpen && (
                   <div className="border-t border-neutral-20 dark:border-neutral-70 px-4 py-4 space-y-4 bg-neutral-5/50 dark:bg-neutral-85/50">

@@ -245,7 +245,7 @@ function StatCard({ title, value, subtitle, icon, color }: {
     danger: 'text-danger bg-danger/10', info: 'text-info bg-info/10', primary: 'text-primary bg-primary/10',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
       <div className={cn('p-2 rounded-lg w-fit mb-3', colors[color])}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40 font-medium mt-0.5">{title}</p>
