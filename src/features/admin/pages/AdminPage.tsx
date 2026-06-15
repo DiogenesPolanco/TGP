@@ -11,6 +11,7 @@ import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 import { AzureCloudConfig } from '@/features/admin/components/AzureCloudConfig'
 import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConfig'
+import { MobileSnapshotConfig } from '@/features/admin/components/MobileSnapshotConfig'
 import { JiraConfigPanel } from '@/components/jira/JiraConfigPanel'
 
 import { cn } from '@/lib/utils'
@@ -168,6 +169,10 @@ export function AdminPage() {
         <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
           <AzureCloudConfig />
         </div>
+      </div>
+
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+        <MobileSnapshotConfig />
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
