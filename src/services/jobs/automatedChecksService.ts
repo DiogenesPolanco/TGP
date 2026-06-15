@@ -4,6 +4,7 @@ import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { exportDatabase, saveBackupToStorage } from '@/services/export/exportService'
 import { getAzureConfig, uploadBackupToAzure } from '@/services/backup/azureBackupService'
 import { notifyAlerts } from '@/services/notifications/browserNotificationService'
+import { computeMobileSnapshot, uploadMobileSnapshot, getMobileSnapshotPassphrase, hasMobileSnapshotPassphrase } from '@/services/share/metricsSnapshotService'
 import type { DashboardAlert } from '@/stores/appStore'
 
 const STORAGE_KEY = 'tgp-last-automated-check'
@@ -382,6 +383,33 @@ async function cleanExpiredShares(): Promise<DashboardAlert[]> {
   return alerts
 }
 
+// ─── Mobile snapshot sync ──────────────────────────────────────────
+
+async function syncMobileSnapshot(): Promise<DashboardAlert[]> {
+  if (!hasMobileSnapshotPassphrase()) return []
+
+  try {
+    const snapshot = await computeMobileSnapshot()
+    const passphrase = getMobileSnapshotPassphrase()
+    const result = await uploadMobileSnapshot(snapshot, passphrase)
+    if (result.success) {
+      return [{
+        type: 'success',
+        message: `Mobile snapshot subido: THI ${snapshot.thi.score}pts, ${snapshot.alerts.length} alertas`,
+      }]
+    }
+    return [{
+      type: 'warning',
+      message: `Mobile snapshot falló: ${result.error ?? 'error desconocido'}`,
+    }]
+  } catch (err) {
+    return [{
+      type: 'warning',
+      message: `Mobile snapshot error: ${err instanceof Error ? err.message : String(err)}`,
+    }]
+  }
+}
+
 // ─── Runner ──────────────────────────────────────────────────────────
 
 export async function runAutomatedChecks(): Promise<{
@@ -399,10 +427,11 @@ export async function runAutomatedChecks(): Promise<{
     checkLibraryVulnerabilities(),
     runBackup(),
     cleanExpiredShares(),
+    syncMobileSnapshot(),
   ])
 
   const alerts = checks.flat()
-  const totalChecks = 10
+  const totalChecks = 11
 
   // Fire toast notifications via the store
   const store = useAppStore.getState?.()
