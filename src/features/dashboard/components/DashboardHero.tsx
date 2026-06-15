@@ -37,10 +37,10 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
   if (loading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
-        <div className="lg:col-span-1 bg-white dark:bg-neutral-80 rounded-xl p-6 h-80" />
+        <div className="lg:col-span-1 bg-white dark:bg-neutral-80 rounded-2xl p-6 h-80" />
         <div className="lg:col-span-2 grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-neutral-80 rounded-xl p-5 h-32" />
+            <div key={i} className="bg-white dark:bg-neutral-80 rounded-2xl p-5 h-32" />
           ))}
         </div>
       </div>

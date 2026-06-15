@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface BlockerPanelProps {
   sourceType: 'task' | 'activity' | 'plan' | 'commitment'
@@ -117,7 +118,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
 
   return (
     <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl overflow-hidden">
-      <button
+      <Button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
       >
@@ -131,16 +132,16 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); resetForm(); setShowForm(!showForm) }}
             className="p-1 rounded-md hover:bg-neutral-30 dark:hover:bg-neutral-60 transition-colors"
             title="Agregar bloqueo"
           >
             <Plus size={16} className="text-neutral-50" />
-          </button>
+          </Button>
           {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
         </div>
-      </button>
+      </Button>
 
       {!collapsed && (
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -210,21 +211,21 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                 </div>
               )}
               <div className="flex justify-end gap-2">
-                <button
+                <Button
                   onClick={resetForm}
                   className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-neutral-70 hover:bg-neutral-20 rounded-lg transition-colors"
                 >
                   <X size={14} />
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSave}
                   disabled={!editTitle.trim()}
                   className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
                 >
                   <Check size={14} />
                   {editId ? 'Actualizar' : 'Agregar'}
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -267,29 +268,29 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                 </div>
                 <div className="flex items-center gap-1 shrink-0 ml-2">
                   {blocker.status === 'resolved' ? (
-                    <button
+                    <Button
                       onClick={() => handleReactivate(blocker.id)}
                       className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
                       title="Reabrir"
                     >
                       <RotateCcw size={14} className="text-neutral-50" />
-                    </button>
+                    </Button>
                   ) : (
-                    <button
+                    <Button
                       onClick={() => handleEdit(blocker)}
                       className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary transition-colors"
                       title="Editar"
                     >
                       <Pencil size={14} />
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
                     onClick={() => handleDelete(blocker.id)}
                     className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 size={14} className="text-neutral-50" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

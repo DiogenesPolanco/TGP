@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, GitCompare, Trash2, Pencil, Eye, X, AppWindow } from 'lucide-react'
 import type { Application } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -176,12 +177,12 @@ export function ApplicationsPage() {
           >
             <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
           </Link>
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
             className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
           >
             <Trash2 size={16} className="text-danger" />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -192,27 +193,27 @@ export function ApplicationsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Catálogo de Aplicaciones</h2>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('/compare')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <GitCompare size={16} />
             Comparar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nueva Aplicación
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -228,7 +229,7 @@ export function ApplicationsPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterCriticality || filterStatus || filterBU
@@ -241,14 +242,14 @@ export function ApplicationsPage() {
             {(filterCriticality || filterStatus || filterBU) && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleExport}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Download size={16} />
             Exportar
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -281,13 +282,13 @@ export function ApplicationsPage() {
               ]} className="min-w-[120px]" />
             </div>
             {(filterCriticality || filterStatus || filterBU) && (
-              <button
+              <Button
                 onClick={() => { setFilterCriticality(''); setFilterStatus(''); setFilterBU('') }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
                 Limpiar filtros
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -307,13 +308,13 @@ export function ApplicationsPage() {
               : 'Crea tu primera aplicación para empezar'}
             action={
               !searchTerm && !filterCriticality && !filterStatus && !filterBU ? (
-                <button
+                <Button
                   onClick={() => navigate('new')}
                   className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
                 >
                   <Plus size={16} />
                   Nueva Aplicación
-                </button>
+                </Button>
               ) : undefined
             }
           />

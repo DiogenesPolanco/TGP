@@ -13,6 +13,7 @@ import { BlockerPanel } from '../components/BlockerPanel'
 import { DependencyList } from '../components/DependencyList'
 import { ActivityGantt } from '../components/ActivityGantt'
 import type { Activity } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function PlanDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -109,9 +110,9 @@ export function PlanDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-neutral-50">Plan no encontrado</p>
-        <button onClick={() => navigate('/execution/plans')} className="mt-4 text-sm text-primary hover:underline">
+        <Button onClick={() => navigate('/execution/plans')} className="mt-4 text-sm text-primary hover:underline">
           Volver a planes
-        </button>
+        </Button>
       </div>
     )
   }
@@ -127,26 +128,26 @@ export function PlanDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/execution/plans')} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/execution/plans')} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{plan.title}</h2>
-            <button
+            <Button
               onClick={() => navigate(`/execution/plans/${plan.id}/edit`)}
               className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors"
               title="Editar Plan"
             >
               <Pencil size={18} />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleShare}
               className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors"
               title="Compartir Plan"
             >
               <Share2 size={18} />
-            </button>
+            </Button>
             <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
               plan.health === 'red' ? 'bg-danger/10 text-danger border-danger/30' :
               plan.health === 'yellow' ? 'bg-warning/10 text-warning border-warning/30' :
@@ -168,13 +169,13 @@ export function PlanDetailPage() {
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button
+          <Button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )}
 

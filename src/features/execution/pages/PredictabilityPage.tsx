@@ -10,6 +10,7 @@ import {
 import { ChartGradients } from '@/components/charts/ChartGradients'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
@@ -193,7 +194,7 @@ export function PredictabilityPage() {
 
           <div className="flex items-center gap-1 bg-neutral-10 dark:bg-neutral-70 rounded-lg p-1">
             {granularityTabs.map((tab) => (
-              <button
+              <Button
                 key={tab.key}
                 onClick={() => setGranularity(tab.key)}
                 className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
@@ -203,7 +204,7 @@ export function PredictabilityPage() {
                 }`}
               >
                 {tab.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

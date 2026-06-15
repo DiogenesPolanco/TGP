@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil } from 'lucide-react'
 import type { Criticality } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const priorityLabel: Record<Criticality, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' }
 const priorityColor: Record<Criticality, string> = { critical: 'bg-danger/10 text-danger', high: 'bg-warning/10 text-warning', medium: 'bg-info/10 text-info', low: 'bg-success/10 text-success' }
@@ -28,13 +29,13 @@ export function TaskDetailPage() {
       onBack={() => navigate('/execution/tasks')}
       backLabel="Tareas"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/execution/tasks/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { Button } from '@/components/ui/Button';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react'
 import type { User } from '@/types/domain'
 
@@ -44,8 +45,8 @@ export function UsersPage() {
     { key: 'createdAt', label: 'Creado', sortable: true, render: (u) => <span className="text-sm text-neutral-50">{new Date(u.createdAt).toLocaleDateString('es-ES')}</span> },
     { key: 'actions', label: '', render: (u) => (
       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all" onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => navigate(`/admin/users/${u.id}/edit`)} className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors" title="Editar"><Pencil size={14} /></button>
-        <button onClick={() => handleDelete(u)} className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors" title="Eliminar"><Trash2 size={14} /></button>
+        <Button onClick={() => navigate(`/admin/users/${u.id}/edit`)} variant="ghost" size="sm" className="p-1.5" title="Editar"><Pencil size={14} /></Button>
+        <Button onClick={() => handleDelete(u)} variant="ghost" size="sm" className="p-1.5 text-neutral-50 hover:text-danger" title="Eliminar"><Trash2 size={14} /></Button>
       </div>
     ), className: 'text-right w-20' },
   ]
@@ -53,16 +54,21 @@ export function UsersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Usuarios</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Gestión de usuarios del sistema</p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Usuarios</h2>
+            <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">Gestión de usuarios del sistema</p>
+          </div>
+          <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            {filtered.length}
+          </span>
         </div>
-        <button onClick={() => navigate('/admin/users/new')} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+        <Button onClick={() => navigate('/admin/users/new')} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
           <Plus size={18} /> Nuevo Usuario
-        </button>
+        </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
           <input type="text" placeholder="Buscar por nombre o email..." value={search} onChange={(e) => setSearch(e.target.value)}

@@ -8,6 +8,7 @@ import {
   Server, Box,
 } from 'lucide-react'
 import type { DatabaseType, EnvironmentType, SupportStatus, AppDatabase, Technology } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -173,26 +174,26 @@ function DatabaseCard({
           {relatedMs.length > 0 && (
             <span className="text-xs text-neutral-50">{relatedMs.length} microservicio(s)</span>
           )}
-          <button
+          <Button
             onClick={() => setExpanded(!expanded)}
             className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 transition-colors"
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onEdit}
             className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
             title="Editar"
           >
             <Pencil size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onDelete}
             className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       </div>
 

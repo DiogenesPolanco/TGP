@@ -3,6 +3,7 @@ import { generateReport, type ReportSection } from '@/services/reports/pdfServic
 import { generateExcel } from '@/services/reports/excelService'
 import * as reportData from '@/services/reports/reportDataService'
 import { Loader2, FileText, Download, AlertTriangle, TrendingUp, Bug, ShieldHalf, GitBranch, Goal, ClipboardCheck, Package, FileSpreadsheet } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface TabDef {
   id: string
@@ -107,7 +108,7 @@ export default function ReportsPage() {
           <h1 className="text-lg font-semibold text-neutral-90 dark:text-neutral-10">Reportes</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={handleExportExcel}
             disabled={!data || exportingExcel}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -118,8 +119,8 @@ export default function ReportsPage() {
               <FileSpreadsheet className="w-4 h-4" />
             )}
             {exportingExcel ? 'Generando...' : 'Exportar Excel'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleExportPDF}
             disabled={!data || exportingPDF}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -130,13 +131,13 @@ export default function ReportsPage() {
               <Download className="w-4 h-4" />
             )}
             {exportingPDF ? 'Generando...' : 'Exportar PDF'}
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="flex overflow-x-auto border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-85 px-2">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
@@ -147,7 +148,7 @@ export default function ReportsPage() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 

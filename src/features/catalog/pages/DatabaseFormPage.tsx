@@ -9,6 +9,7 @@ import { ArrowLeft, Plus, X, Server } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { TechSearch } from '@/components/ui/TechSearch'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 const dbTypeLabel: Record<DatabaseType, string> = {
   relational: 'Relacional',
@@ -168,12 +169,12 @@ export function DatabaseFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button
+        <Button
           onClick={() => navigate(`/catalog/applications/${appId}`)}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <div>
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
             {existing ? 'Editar Base de Datos' : 'Nueva Base de Datos'}
@@ -216,7 +217,7 @@ export function DatabaseFormPage() {
           </label>
           <div className="flex flex-wrap gap-2">
             {ENVIRONMENTS.map((env) => (
-              <button
+              <Button
                 key={env}
                 type="button"
                 onClick={() => setEnvironment(env)}
@@ -227,7 +228,7 @@ export function DatabaseFormPage() {
                 }`}
               >
                 {environmentLabel[env]}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -353,13 +354,13 @@ export function DatabaseFormPage() {
                 >
                   <Server size={12} />
                   {ms.name}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeMicroservice(msId)}
                     className="ml-0.5 hover:opacity-70 transition-opacity"
                   >
                     <X size={14} />
-                  </button>
+                  </Button>
                 </span>
               )
             })}
@@ -390,7 +391,7 @@ export function DatabaseFormPage() {
                     </p>
                   ) : (
                     availableMs.map((ms) => (
-                      <button
+                      <Button
                         key={ms.id}
                         type="button"
                         onClick={() => addMicroservice(ms.id)}
@@ -398,7 +399,7 @@ export function DatabaseFormPage() {
                       >
                         <Plus size={14} className="text-primary shrink-0" />
                         <span className="text-neutral-90 dark:text-white truncate">{ms.name}</span>
-                      </button>
+                      </Button>
                     ))
                   )}
                 </div>
@@ -416,19 +417,19 @@ export function DatabaseFormPage() {
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
-          <button
+          <Button
             type="button"
             onClick={() => navigate(`/catalog/applications/${appId}`)}
             className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
           >
             {existing ? 'Actualizar' : 'Crear'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

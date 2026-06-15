@@ -14,6 +14,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import type { DeliverableStatus, Deliverable } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<DeliverableStatus, string> = {
   pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40',
@@ -133,21 +134,21 @@ export function DeliverablesPage() {
       render: (del) => (
         <div className="flex items-center justify-end gap-1">
           {del.applicationId && (
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); navigate(`/catalog/applications/${del.applicationId}`) }}
               className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
               title="Ver aplicación"
             >
               <ArrowRight size={14} />
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={() => handleDelete(del.id)}
             className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -157,20 +158,20 @@ export function DeliverablesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
             Entregables Generales
           </h2>
           <span className="text-sm text-neutral-50 px-3 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70">
             {filtered.length} de {allDeliverables.length}
           </span>
         </div>
-        <button
+        <Button
           onClick={() => navigate('/admin/import')}
           className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <Upload size={16} />
           Importar
-        </button>
+        </Button>
       </div>
 
       {/* Summary cards */}
@@ -178,7 +179,7 @@ export function DeliverablesPage() {
         {(['pending', 'in_progress', 'completed', 'cancelled'] as const).map((st) => {
           const count = allDeliverables.filter((d) => d.status === st).length
           return (
-            <button
+            <Button
               key={st}
               onClick={() => { setStatusFilter(st); setShowFilters(true) }}
               className={cn(
@@ -190,13 +191,13 @@ export function DeliverablesPage() {
             >
               <p className={cn('text-2xl font-bold', statusColors[st])}>{count}</p>
               <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1">{statusLabel[st]}</p>
-            </button>
+            </Button>
           )
         })}
       </div>
 
       {/* Filters bar */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -208,7 +209,7 @@ export function DeliverablesPage() {
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm transition-colors',
@@ -219,7 +220,7 @@ export function DeliverablesPage() {
           >
             <Filter size={16} />
             Filtros
-          </button>
+          </Button>
         </div>
 
         {showFilters && (

@@ -5,18 +5,11 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Upload, AlertTriangle, CheckCircle, XCircle, Clock, Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/Button';
+import { Plus, Search, Upload, Pencil, Trash2 } from 'lucide-react'
 import { runEscalation } from '../services/escalationService'
 import type { CommitmentStatus } from '@/constants/enums'
 import type { Commitment } from '@/types/domain'
-
-const statusConfig: Record<CommitmentStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  active: { label: 'Activo', color: 'bg-info/10 text-info', icon: <Clock size={14} /> },
-  at_risk: { label: 'En Riesgo', color: 'bg-warning/10 text-warning', icon: <AlertTriangle size={14} /> },
-  breached: { label: 'Incumplido', color: 'bg-danger/10 text-danger', icon: <XCircle size={14} /> },
-  fulfilled: { label: 'Cumplido', color: 'bg-success/10 text-success', icon: <CheckCircle size={14} /> },
-  cancelled: { label: 'Cancelado', color: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60', icon: <XCircle size={14} /> },
-}
 
 export function CommitmentsPage() {
   const navigate = useNavigate()
@@ -88,55 +81,55 @@ export function CommitmentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Compromisos</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Compromisos</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
             Seguimiento de compromisos, promesas y deadlines cross-equipo
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('/execution/commitments/new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Compromiso
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-4">
-        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Total</p>
-        </button>
-        <button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        </Button>
+        <Button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-info">{stats.active}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Activos</p>
-        </button>
-        <button onClick={() => setStatusFilter('at_risk')} className="bg-white dark:bg-neutral-80 rounded-xl border border-warning/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        </Button>
+        <Button onClick={() => setStatusFilter('at_risk')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-warning/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-warning">{stats.atRisk}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">En Riesgo</p>
-        </button>
-        <button onClick={() => setStatusFilter('breached')} className="bg-white dark:bg-neutral-80 rounded-xl border border-danger/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        </Button>
+        <Button onClick={() => setStatusFilter('breached')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-danger/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-danger">{stats.breached}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Incumplidos</p>
-        </button>
-        <button onClick={() => setStatusFilter('fulfilled')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        </Button>
+        <Button onClick={() => setStatusFilter('fulfilled')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-success">{stats.fulfilled}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Cumplidos</p>
-        </button>
+        </Button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -206,23 +199,19 @@ export function CommitmentsPage() {
             key: 'status',
             label: 'Estado',
             sortable: true,
-            render: (c) => {
-              const cfg = statusConfig[c.status]
-              return (
-                <select
-                  value={c.status}
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => handleQuickStatus(c.id, e.target.value as CommitmentStatus)}
-                  className={`text-xs px-2 py-1 rounded-full border font-medium cursor-pointer ${cfg.color}`}
-                >
-                  <option value="active">Activo</option>
-                  <option value="at_risk">En Riesgo</option>
-                  <option value="breached">Incumplido</option>
-                  <option value="fulfilled">Cumplido</option>
-                  <option value="cancelled">Cancelado</option>
-                </select>
-              )
-            },
+            render: (c) => (
+              <Select
+                value={c.status}
+                onChange={(v) => handleQuickStatus(c.id, v as CommitmentStatus)}
+                options={[
+                  { value: 'active', label: 'Activo' },
+                  { value: 'at_risk', label: 'En Riesgo' },
+                  { value: 'breached', label: 'Incumplido' },
+                  { value: 'fulfilled', label: 'Cumplido' },
+                  { value: 'cancelled', label: 'Cancelado' },
+                ]}
+              />
+            ),
           },
           {
             key: 'commitmentDate',
@@ -249,20 +238,20 @@ export function CommitmentsPage() {
             className: 'text-right',
             render: (c) => (
               <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                <button
+                <Button
                   onClick={(e) => { e.stopPropagation(); navigate(`/execution/commitments/${c.id}/edit`) }}
-                  className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
+                  variant="ghost" size="sm" className="p-1.5"
                   title="Editar"
                 >
                   <Pencil size={14} />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={(e) => { e.stopPropagation(); handleDelete(c) }}
-                  className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
+                  variant="ghost" size="sm" className="p-1.5 text-neutral-50 hover:text-danger"
                   title="Eliminar"
                 >
                   <Trash2 size={14} />
-                </button>
+                </Button>
               </div>
             ),
           },

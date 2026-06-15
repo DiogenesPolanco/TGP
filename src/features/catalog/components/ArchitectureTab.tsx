@@ -6,6 +6,7 @@ import { Server, ExternalLink, Layers, Box, Cpu, Database, Globe, Shield, ArrowR
 import type { SupportStatus, Criticality } from '@/types/domain'
 import type { DependencyType } from '@/constants/enums'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -144,7 +145,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* C4 Diagram */}
-      <div className="relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+      <div className="relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
         {/* Zoom/pan container */}
         <div className="overflow-auto p-8">
           {/* Level 1: System Boundary */}
@@ -359,7 +360,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* Dependency Management */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
         <div className="px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
           <div>
             <h4 className="text-lg font-bold text-neutral-90 dark:text-white">
@@ -367,13 +368,13 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </h4>
             <p className="text-xs text-neutral-50 mt-0.5">{dependencies.length} registradas</p>
           </div>
-          <button
+          <Button
             onClick={() => setShowDepForm(!showDepForm)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
           >
             <Plus size={16} />
             Agregar Dependencia
-          </button>
+          </Button>
         </div>
 
         {/* Add dependency form */}
@@ -395,14 +396,14 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                 {depSearch && availableApps.length > 0 && (
                   <div className="mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                     {availableApps.map((app) => (
-                      <button
+                      <Button
                         key={app.id}
                         onClick={() => handleAddDependency(app.id)}
                         className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                       >
                         <span className="text-neutral-90 dark:text-white">{app.name}</span>
                         <span className="text-xs text-neutral-50">{app.architecture} · {appStatusLabel[app.status]}</span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
@@ -483,13 +484,13 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                         )}
                       </div>
                     </div>
-                    <button
+                    <Button
                       onClick={() => depRel && handleRemoveDependency(depRel.id)}
                       className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all shrink-0 ml-2"
                       title="Eliminar dependencia"
                     >
                       <Unlink size={14} />
-                    </button>
+                    </Button>
                   </div>
                 )
               })}
@@ -505,7 +506,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* Legend */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <h5 className="text-xs font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider mb-3">
           Leyenda — Niveles C4
         </h5>

@@ -8,6 +8,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Severity, AuditStatus, AuditCategory } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const CATEGORY_OPTIONS: { value: AuditCategory; label: string }[] = [
   { value: 'compliance', label: 'Cumplimiento' },
@@ -73,7 +74,7 @@ export function AuditFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/governance/audit')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></button>
+        <Button onClick={() => navigate('/governance/audit')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{finding ? 'Editar Hallazgo' : 'Nuevo Hallazgo'}</h1>
       </div>
 
@@ -109,8 +110,8 @@ export function AuditFormPage() {
           <RichTextEditor value={formData.actionPlan} onChange={(html) => setFormData({ ...formData, actionPlan: html })} placeholder="Plan de acción..." />
         </div>
         <div className="flex justify-end gap-3 pt-4">
-          <button type="button" onClick={() => navigate('/governance/audit')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
-          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{finding ? 'Actualizar' : 'Crear'}</button>
+          <Button type="button" onClick={() => navigate('/governance/audit')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{finding ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>
     </div>

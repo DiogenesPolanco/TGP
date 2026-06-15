@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 interface ObjectiveFormProps {
   objective: Objective | null
@@ -87,9 +88,9 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -168,14 +169,14 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Key Results</label>
-              <button
+              <Button
                 type="button"
                 onClick={addKeyResult}
                 className="flex items-center gap-1 text-sm text-primary hover:underline"
               >
                 <Plus size={14} />
                 Agregar KR
-              </button>
+              </Button>
             </div>
             <div className="space-y-2">
               {formData.keyResults.map((kr, index) => (
@@ -225,33 +226,33 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
                     <option value="behind">Atrasado</option>
                     <option value="achieved">Logrado</option>
                   </select>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeKeyResult(index)}
                     className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
                     title="Eliminar KR"
                   >
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
             >
               {objective ? 'Actualizar' : 'Crear'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

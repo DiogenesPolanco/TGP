@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/Button'
 import {
   Server, Box, Shield, Activity, FileWarning,
   ArrowRight, Search, Database,
@@ -203,8 +204,8 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
   name: string; subtitle: string; badge?: string; badgeColor?: string; onClick: () => void
 }) {
   return (
-    <button onClick={onClick}
-      className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 hover:border-primary/30 hover:shadow-sm transition-all group text-left">
+    <Button variant="ghost" size="md" onClick={onClick}
+      className="w-full justify-between px-3.5 py-2.5 rounded-lg border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group text-left">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-neutral-90 dark:text-white group-hover:text-primary transition-colors truncate">{name}</span>
@@ -213,21 +214,32 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
         <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
       </div>
       <ArrowRight size={14} className="text-neutral-40 group-hover:text-primary transition-colors shrink-0" />
-    </button>
+    </Button>
   )
 }
 
 function SimpleCard({ title, subtitle, onClick }: { title: string; subtitle: string; onClick?: () => void }) {
-  const Comp = onClick ? 'button' : 'div'
-  return (
-    <Comp
-      onClick={onClick}
-      className={`w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 ${
-        onClick ? 'hover:border-primary/30 hover:shadow-sm transition-all group cursor-pointer text-left' : ''
-      }`}
-    >
+  const content = (
+    <>
       <span className={`text-sm truncate min-w-0 flex-1 ${onClick ? 'group-hover:text-primary transition-colors' : 'text-neutral-90 dark:text-white'}`}>{title}</span>
       <span className="text-xs text-neutral-50 shrink-0 ml-2">{subtitle}</span>
-    </Comp>
+    </>
+  )
+
+  if (onClick) {
+    return (
+      <Button variant="ghost" size="md" onClick={onClick}
+        className="w-full justify-between px-3.5 py-2 rounded-lg border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group">
+        {content}
+      </Button>
+    )
+  }
+
+  return (
+    <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70">
+      {content}
+    </div>
   )
 }
+
+

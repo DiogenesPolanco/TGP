@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { formatDuration } from '@/utils/technologyUtils'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { Button } from '@/components/ui/Button'
 import {
   Pencil, Server, Box, Database, Users, Shield,
   FileWarning, BookOpen, Calendar,
@@ -121,13 +122,13 @@ export function TechnologyDetailPage() {
       onBack={() => navigate('/catalog/obsolescence')}
       backLabel="Obsolescencia"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/catalog/obsolescence/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       {/* Tabs */}
@@ -135,7 +136,7 @@ export function TechnologyDetailPage() {
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
@@ -146,7 +147,7 @@ export function TechnologyDetailPage() {
             >
               <Icon size={16} />
               {tab.label}
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -626,7 +627,7 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
   name: string; subtitle: string; badge: string; badgeColor: string; onClick: () => void
 }) {
   return (
-    <button
+    <Button
       onClick={onClick}
       className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 hover:border-primary/30 hover:shadow-sm transition-all group text-left"
     >
@@ -644,7 +645,7 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
         <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
       </div>
       <ArrowRight size={14} className="text-neutral-40 group-hover:text-primary transition-colors shrink-0" />
-    </button>
+    </Button>
   )
 }
 
@@ -681,10 +682,10 @@ function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
         <p className="text-xs text-neutral-50 mb-3">Sin registros</p>
       )}
       {count > 0 && (
-        <button onClick={onLink} className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1">
+        <Button onClick={onLink} className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1">
           {linkLabel}
           <ExternalLink size={12} />
-        </button>
+        </Button>
       )}
     </div>
   )

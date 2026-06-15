@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import type { User } from '@/types/domain'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface FormData {
   displayName: string
@@ -99,14 +100,12 @@ export function UserFormPage() {
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
-          <button type="submit" disabled={isSubmitting}
-            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
+          <Button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
             {isEdit ? 'Guardar Cambios' : 'Crear Usuario'}
-          </button>
-          <button type="button" onClick={() => navigate('/admin/users')}
-            className="px-6 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          </Button>
+          <Button type="button" onClick={() => navigate('/admin/users')}>
             Cancelar
-          </button>
+          </Button>
         </div>
       </form>
     </DetailLayout>

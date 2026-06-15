@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowLeft, X, Shield, AlertTriangle, Users, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/Button';
 
 export function ComparePage() {
   const navigate = useNavigate()
@@ -28,10 +29,10 @@ export function ComparePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="p-2">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
-        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Comparar Aplicaciones</h1>
+        </Button>
+        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">Comparar Aplicaciones</h1>
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
@@ -40,7 +41,7 @@ export function ComparePage() {
         </h2>
         <div className="flex flex-wrap gap-2">
           {allApps.map((app) => (
-            <button
+            <Button
               key={app.id}
               onClick={() => toggleApp(app.id)}
               className={cn(
@@ -52,7 +53,7 @@ export function ComparePage() {
             >
               {app.name}
               {selectedIds.includes(app.id) && <X size={14} />}
-            </button>
+            </Button>
           ))}
           {allApps.length === 0 && (
             <p className="text-sm text-neutral-50 py-2">No hay aplicaciones registradas</p>

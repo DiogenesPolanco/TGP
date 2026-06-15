@@ -15,7 +15,7 @@ export function PredictionsWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
         <div className="animate-pulse space-y-3">
           <div className="h-4 w-32 bg-neutral-20 dark:bg-neutral-75 rounded" />
           <div className="h-16 bg-neutral-20 dark:bg-neutral-75 rounded" />
@@ -27,7 +27,7 @@ export function PredictionsWidget() {
   if (predictions.length === 0) return null
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-5">
         <Brain size={22} className="text-purple-500" />
         <h3 className="text-base font-bold text-neutral-90 dark:text-white">Análisis Predictivo</h3>

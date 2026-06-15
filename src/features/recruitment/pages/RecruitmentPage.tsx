@@ -14,6 +14,7 @@ import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Candidate } from '@/types/domain'
 import { Plus, Search, Users, UserCheck, Calendar, Star, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
@@ -121,20 +122,20 @@ export function RecruitmentPage() {
       headerClassName: 'text-right',
       render: (c) => (
         <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`/teams/recruitment/${c.id}/edit`) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => handleDelete(e, c.id)}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -146,12 +147,12 @@ export function RecruitmentPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Reclutamiento</h2>
         <div className="flex items-center gap-2">
           {statusFilter && (
-            <button onClick={() => setStatusFilter(null)}
+            <Button onClick={() => setStatusFilter(null)}
               className="px-3 py-2 text-sm text-neutral-50 hover:text-neutral-90 transition-colors">
               Limpiar filtro
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={async () => {
               if (!isTermsAccepted()) {
                 setShowTerms(true)
@@ -163,14 +164,14 @@ export function RecruitmentPage() {
           >
             <Share2 size={16} />
             Compartir
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('/teams/recruitment/new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Candidato
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -181,11 +182,11 @@ export function RecruitmentPage() {
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+          <Button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )})()}
 
@@ -271,7 +272,7 @@ function StatCard({
   active?: boolean; onClick?: () => void
 }) {
   return (
-    <button
+    <Button
       onClick={onClick}
       className={`text-left bg-white dark:bg-neutral-80 rounded-xl border p-4 shadow-sm transition-all ${
         active
@@ -282,6 +283,6 @@ function StatCard({
       <div className={`${color} mb-2`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </button>
+    </Button>
   )
 }

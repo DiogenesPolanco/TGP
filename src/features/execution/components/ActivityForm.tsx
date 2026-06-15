@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Activity, Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface ActivityFormProps {
   planId: string
@@ -129,9 +130,9 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {activity ? 'Editar Actividad' : 'Nueva Actividad'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             <X size={20} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -285,18 +286,18 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
                 placeholder="Agregar tarea y presionar Enter"
                 className="flex-1 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
-              <button onClick={addTask} className="p-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors">
+              <Button onClick={addTask} className="p-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors">
                 <Plus size={16} />
-              </button>
+              </Button>
             </div>
             {tasks.length > 0 && (
               <div className="space-y-1">
                 {tasks.map((t) => (
                   <div key={t.id} className="flex items-center justify-between px-3 py-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
                     <span className="text-sm text-neutral-90 dark:text-white">{t.title}</span>
-                    <button onClick={() => removeTask(t.id)} className="p-0.5 text-neutral-50 hover:text-danger transition-colors">
+                    <Button onClick={() => removeTask(t.id)} className="p-0.5 text-neutral-50 hover:text-danger transition-colors">
                       <Trash2 size={14} />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -305,17 +306,17 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
         )}
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={!title.trim() || saving}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <Save size={16} />
             {saving ? 'Guardando…' : activity ? 'Actualizar' : 'Crear Actividad'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

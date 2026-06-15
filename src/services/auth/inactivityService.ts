@@ -1,4 +1,4 @@
-const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000
+const DEFAULT_INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000
 const WARNING_DURATION_MS = 60 * 1000
 
 type InactivityHandler = (phase: 'warning' | 'expired') => void
@@ -8,6 +8,7 @@ let warningTimer: ReturnType<typeof setInterval> | null = null
 let remainingRef = WARNING_DURATION_MS
 let handler: InactivityHandler | null = null
 let started = false
+let currentTimeoutMs = DEFAULT_INACTIVITY_TIMEOUT_MS
 
 const EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'] as const
 
@@ -41,11 +42,12 @@ function resetMainTimer() {
         h('expired')
       }
     }, 1000)
-  }, INACTIVITY_TIMEOUT_MS)
+  }, currentTimeoutMs)
 }
 
-export function startInactivityWatch(h: InactivityHandler) {
+export function startInactivityWatch(h: InactivityHandler, timeoutMs?: number) {
   if (started) return
+  currentTimeoutMs = timeoutMs ?? DEFAULT_INACTIVITY_TIMEOUT_MS
   handler = h
   started = true
   for (const ev of EVENTS) {
@@ -72,4 +74,4 @@ export function dismissInactivityWarning() {
   resetMainTimer()
 }
 
-export { INACTIVITY_TIMEOUT_MS, WARNING_DURATION_MS }
+export { WARNING_DURATION_MS }

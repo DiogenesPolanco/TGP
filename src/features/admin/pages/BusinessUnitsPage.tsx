@@ -9,6 +9,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { Plus, Pencil, Trash2, Save, X, Upload, Search, Filter } from 'lucide-react'
 import type { BusinessUnit, BusinessUnitStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function BusinessUnitsPage() {
   const navigate = useNavigate()
@@ -103,20 +104,20 @@ export function BusinessUnitsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => { resetForm(); setShowForm(true) }}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nueva Unidad
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -132,7 +133,7 @@ export function BusinessUnitsPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || statusFilter !== 'all'
@@ -145,7 +146,7 @@ export function BusinessUnitsPage() {
             {statusFilter !== 'all' && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
-          </button>
+          </Button>
         </div>
 
         {showFilters && (
@@ -159,13 +160,13 @@ export function BusinessUnitsPage() {
               ]} className="min-w-[120px]" />
             </div>
             {statusFilter !== 'all' && (
-              <button
+              <Button
                 onClick={() => setStatusFilter('all')}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
                 Limpiar filtros
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -200,20 +201,20 @@ export function BusinessUnitsPage() {
                 { value: 'inactive', label: 'Inactivo' },
               ]} />
             </div>
-            <button
+            <Button
               onClick={handleSave}
               className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
             >
               <Save size={16} />
               {editingId ? 'Actualizar' : 'Crear'}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={resetForm}
               className="flex items-center gap-2 px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               <X size={16} />
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -326,20 +327,20 @@ function BusinessUnitRow({
       </td>
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); onEdit(bu.id) }}
             className="p-2 rounded-lg text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); onDelete(bu.id, bu.name) }}
             className="p-2 rounded-lg text-danger/60 hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       </td>
     </tr>

@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowRight, ChevronDown, ChevronRight, Link2, Plus, Trash2 } from 'lucide-react'
 import type { DependencyRelation } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface DependencyListProps {
   planId: string
@@ -92,7 +93,7 @@ export function DependencyList({ planId }: DependencyListProps) {
 
   return (
     <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl overflow-hidden">
-      <button
+      <Button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
       >
@@ -106,16 +107,16 @@ export function DependencyList({ planId }: DependencyListProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); setShowForm(!showForm) }}
             className="p-1 rounded-md hover:bg-neutral-30 dark:hover:bg-neutral-60 transition-colors"
             title="Agregar dependencia"
           >
             <Plus size={16} className="text-neutral-50" />
-          </button>
+          </Button>
           {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
         </div>
-      </button>
+      </Button>
 
       {!collapsed && (
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -170,19 +171,19 @@ export function DependencyList({ planId }: DependencyListProps) {
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <button
+                <Button
                   onClick={() => setShowForm(false)}
                   className="px-3 py-1.5 text-xs font-medium text-neutral-70 hover:bg-neutral-20 rounded-lg transition-colors"
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleAdd}
                   disabled={!targetId}
                   className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
                 >
                   Agregar
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -201,9 +202,9 @@ export function DependencyList({ planId }: DependencyListProps) {
                 <span className="text-sm text-neutral-80 dark:text-white truncate">{getTargetName(dep.targetType, dep.targetId)}</span>
                 {dep.description && <span className="text-xs text-neutral-50 hidden sm:inline truncate">- {dep.description}</span>}
               </div>
-              <button onClick={() => handleRemove(dep.id)} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0 ml-2">
+              <Button onClick={() => handleRemove(dep.id)} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0 ml-2">
                 <Trash2 size={14} className="text-neutral-50" />
-              </button>
+              </Button>
             </div>
           ))}
 

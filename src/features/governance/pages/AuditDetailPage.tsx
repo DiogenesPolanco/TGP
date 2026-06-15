@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil, Server, Search, Shield, AlertTriangle, Clock, CheckCircle, XCircle, HelpCircle, FileWarning } from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
+import { Button } from '@/components/ui/Button'
 
 const severityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info' }
 const statusLabel: Record<string, string> = { open: 'Abierto', in_progress: 'En Progreso', overdue: 'Vencido', resolved: 'Resuelto', closed: 'Cerrado' }
@@ -71,13 +72,13 @@ export function AuditDetailPage() {
       onBack={() => navigate('/governance/audit')}
       backLabel="Auditoría"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/governance/audit/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       {/* Tabs */}
@@ -85,7 +86,7 @@ export function AuditDetailPage() {
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
@@ -96,7 +97,7 @@ export function AuditDetailPage() {
             >
               <Icon size={16} />
               {tab.label}
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -213,7 +214,7 @@ export function AuditDetailPage() {
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
         {icon && <span className="text-neutral-50">{icon}</span>}
         {title}

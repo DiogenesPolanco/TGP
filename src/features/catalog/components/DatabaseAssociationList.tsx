@@ -6,6 +6,7 @@ import { associateToMicroservice, dissociateFromMicroservice } from '@/hooks/use
 import { Search, Plus, Unlink, Database, ExternalLink, Pencil } from 'lucide-react'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import type { AppDatabase } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const dbTypeLabel: Record<string, string> = {
   relational: 'Relacional',
@@ -124,20 +125,20 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
       headerClassName: 'text-right',
       render: (item: AppDatabase) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`/catalog/applications/${applicationId}/databases/${item.id}/edit?microserviceId=${microserviceId}`) }}
             className="p-1.5 rounded-md text-neutral-50 hover:text-primary hover:bg-primary/10 transition-all"
             title="Editar"
           >
             <Pencil size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDissociate(item.id) }}
             className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-all"
             title="Desasociar"
           >
             <Unlink size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -157,32 +158,32 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
       )}
 
       <div className="flex items-center gap-3">
-        <button
+        <Button
           onClick={() => navigate(`/catalog/applications/${applicationId}/databases/new?microserviceId=${microserviceId}`)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Plus size={14} />
           Nueva Base de Datos
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={() => navigate(`/catalog/applications/${applicationId}`)}
           className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors font-medium"
         >
           <ExternalLink size={14} />
           Ver en aplicación
-        </button>
+        </Button>
       </div>
 
       <div className="relative">
         {!showSearch ? (
-          <button
+          <Button
             onClick={() => setShowSearch(true)}
             className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors font-medium"
           >
             <Plus size={14} />
             Asociar existente
-          </button>
+          </Button>
         ) : (
           <div>
             <div className="relative">
@@ -206,7 +207,7 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
                   </p>
                 ) : (
                   availableDatabases.map((db_) => (
-                    <button
+                    <Button
                       key={db_.id}
                       type="button"
                       onClick={() => handleAssociate(db_.id)}
@@ -218,18 +219,18 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
                         <span className="text-neutral-90 dark:text-white truncate">{db_.name}</span>
                       </div>
                       <span className="text-xs text-neutral-50 shrink-0 font-mono">{db_.engine} {db_.version}</span>
-                    </button>
+                    </Button>
                   ))
                 )}
               </div>
             )}
 
-            <button
+            <Button
               onClick={() => { setShowSearch(false); setSearchText('') }}
               className="mt-1 text-xs text-neutral-50 hover:text-neutral-70 transition-colors"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         )}
       </div>

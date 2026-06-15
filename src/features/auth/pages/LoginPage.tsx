@@ -16,6 +16,7 @@ import {
 import { db } from '@/services/db/database'
 import { useUserStore } from '@/stores/userStore'
 import type { User } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
   const [mode, setMode] = useState<'setup' | 'login'>(
@@ -257,7 +258,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                   <p className="text-sm text-neutral-60 dark:text-neutral-40">Cuentas activas encontradas en el sistema</p>
                   <div className="space-y-2 max-h-[320px] overflow-y-auto">
                     {userList.map((u) => (
-                      <button key={u.id} onClick={() => {
+                      <Button key={u.id} onClick={() => {
                         useUserStore.getState().login(u)
                         createSession(u.otpRequestIntervalHours ?? 1)
                         onAuth()
@@ -276,7 +277,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                           <span className="text-xs text-neutral-40 dark:text-neutral-50">{u.otpRequestIntervalHours ?? 1}h OTP</span>
                           <ChevronRight size={16} className="text-neutral-30 group-hover:text-primary transition-colors" />
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   <p className="text-xs text-neutral-50 dark:text-neutral-40 pt-2 border-t border-neutral-10 dark:border-neutral-80">
@@ -371,9 +372,9 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                           <code className="flex-1 text-[10px] font-mono bg-white dark:bg-neutral-80 px-2 py-1.5 rounded-lg border border-neutral-20 dark:border-neutral-70 select-all truncate min-w-0 leading-relaxed">
                             {secret.base32}
                           </code>
-                          <button onClick={handleCopy} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0" title="Copiar">
+                          <Button onClick={handleCopy} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0" title="Copiar">
                             {copied ? <Check size={18} className="text-success" /> : <Copy size={18} className="text-neutral-50" />}
-                          </button>
+                          </Button>
                         </div>
                       </div>
 
@@ -404,14 +405,14 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
                     {error && <p className="text-base text-danger text-center">{error}</p>}
 
-                    <button
+                    <Button
                       type="submit"
                       disabled={otp.length !== 6 || verifying}
                       className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25"
                     >
                       {verifying ? 'Verificando…' : 'Verificar y despegar'}
                       {!verifying && <ArrowRight size={20} />}
-                    </button>
+                    </Button>
                   </form>
                 </div>
               </div>
@@ -507,14 +508,14 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                       </div>
                     )}
 
-                    <button
+                    <Button
                       type="submit"
                       disabled={otp.length !== 6 || verifying}
                       className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-all disabled:opacity-50 shadow-lg shadow-primary/25"
                     >
                       {verifying ? 'Verificando…' : 'Ingresar'}
                       {!verifying && <ArrowRight size={20} />}
-                    </button>
+                    </Button>
                   </form>
                 </div>
               </div>

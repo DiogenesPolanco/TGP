@@ -14,6 +14,7 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { Select } from '@/components/ui/Select'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
+import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   planned: { label: 'Planificado', color: 'text-info' },
@@ -217,31 +218,31 @@ export function ExecutiveTimelinePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={handleShare}
             className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
             title="Compartir Timeline"
           >
             <Share2 size={16} />
             Compartir
-          </button>
+          </Button>
           {shareUrl && (
-            <button
+            <Button
               onClick={handleCopy}
               className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
               title="Copiar enlace"
             >
               {copied ? <Check size={16} className="text-success" /> : <Copy size={16} />}
               {copied ? 'Copiado' : 'Copiar'}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={() => navigate('/execution/plans/new')}
             className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
           >
             <Target size={16} />
             Nuevo Plan
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -326,24 +327,24 @@ export function ExecutiveTimelinePage() {
               <span className="text-xs text-neutral-50">
                 {timelineStart.toLocaleDateString('es-ES')} — {timelineEnd.toLocaleDateString('es-ES')}
               </span>
-              <button
+              <Button
                 onClick={() => setWeekOffset((o) => o - 12)}
                 className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50"
               >
                 <ChevronLeft size={16} />
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => { setWeekOffset(0) }}
                 className="px-2 py-0.5 text-xs font-medium rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
               >
                 Hoy
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setWeekOffset((o) => o + 12)}
                 className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-70 text-neutral-50"
               >
                 <ChevronRight size={16} />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -609,7 +610,7 @@ function StatBox({ icon, label, value, color, bg, active, onClick }: {
     )
   }
   return (
-    <button
+    <Button
       onClick={onClick}
       className={`${bg} rounded-xl border p-4 text-left cursor-pointer transition-all hover:shadow-md ${
         active
@@ -620,6 +621,6 @@ function StatBox({ icon, label, value, color, bg, active, onClick }: {
       <div className={`${color} mb-1`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
-    </button>
+    </Button>
   )
 }

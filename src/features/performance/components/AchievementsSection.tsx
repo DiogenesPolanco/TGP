@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -108,12 +109,9 @@ export function AchievementsSection({ memberId }: Props) {
             </p>
           )}
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
-        >
+        <Button onClick={() => setShowForm(true)}>
           <Plus size={16} /> Nuevo Logro
-        </button>
+        </Button>
       </div>
 
       {/* Summary */}
@@ -188,12 +186,12 @@ export function AchievementsSection({ memberId }: Props) {
             </label>
           </div>
           <div className="flex gap-2">
-            <button onClick={addAchievement} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
+            <Button onClick={addAchievement} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
               Guardar Logro
-            </button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            </Button>
+            <Button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -264,8 +262,8 @@ export function AchievementsSection({ memberId }: Props) {
                   </label>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
-                  <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</button>
+                  <Button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</Button>
+                  <Button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</Button>
                 </div>
               </div>
             ) : (
@@ -296,20 +294,12 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 ml-3 shrink-0">
-                  <button
-                    onClick={() => startEdit(a)}
-                    className="p-1.5 opacity-0 group-hover/ach:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                    title="Editar logro"
-                  >
+                  <Button onClick={() => startEdit(a)}>
                     <Edit3 size={14} />
-                  </button>
-                  <button
-                    onClick={() => removeAchievement(a.id)}
-                    className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                    title="Eliminar logro"
-                  >
+                  </Button>
+                  <Button onClick={() => removeAchievement(a.id)}>
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )

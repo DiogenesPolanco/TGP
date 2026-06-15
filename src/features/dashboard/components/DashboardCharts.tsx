@@ -15,6 +15,7 @@ import { ChartTooltipSimple } from '@/components/charts/ChartTooltip'
 import { ChartGradients } from '@/components/charts/ChartGradients'
 import { AlertTriangle, CheckCircle2, Info, AlertOctagon, ChevronDown, ChevronUp } from 'lucide-react'
 import type { DashboardMetrics } from '../hooks/useDashboardMetrics'
+import { Button } from '@/components/ui/Button'
 
 const BU_COLORS = ['#0052CC', '#36B37E', '#FF8B00', '#6554C0', '#00B8D9', '#C85A48', '#57D9A3', '#FFAB00']
 
@@ -102,7 +103,7 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
 
 function ChartContainer({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
       <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">{title}</h3>
       {children}
     </div>
@@ -132,7 +133,7 @@ function AlertsList({ alerts }: { alerts: { type: string; message: string }[] })
         <AlertItem key={i} type={alert.type} message={alert.message} />
       ))}
       {hiddenCount > 0 && (
-        <button
+        <Button
           onClick={() => setExpanded(!expanded)}
           className="flex items-center justify-center gap-1.5 w-full py-2 text-xs font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75"
         >
@@ -141,7 +142,7 @@ function AlertsList({ alerts }: { alerts: { type: string; message: string }[] })
           ) : (
             <>Ver {hiddenCount} alerta{hiddenCount > 1 ? 's' : ''} más <ChevronDown size={14} /></>
           )}
-        </button>
+        </Button>
       )}
     </div>
   )

@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil } from 'lucide-react'
 import type { CommitmentStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<CommitmentStatus, { label: string; color: string }> = {
   active: { label: 'Activo', color: 'bg-info/10 text-info' },
@@ -47,13 +48,13 @@ export function CommitmentDetailPage() {
       onBack={() => navigate('/execution/commitments')}
       backLabel="Compromisos"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/execution/commitments/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

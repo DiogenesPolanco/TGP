@@ -4,6 +4,7 @@ import type { MemberProfile, MemberStatus } from '@/types/domain'
 import { MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import { Save, AtSign, Phone, Home, MapPin, Briefcase, Calendar, Umbrella, Clock } from 'lucide-react'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -179,14 +180,14 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       </div>
 
       <div className="mt-6 flex items-center gap-3">
-        <button
+        <Button
           onClick={handleSave}
           disabled={saving}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
         >
           <Save size={16} />
           {saving ? 'Guardando...' : 'Guardar Perfil'}
-        </button>
+        </Button>
         {saved && (
           <span className="text-sm text-green-600 dark:text-green-400">
             Perfil guardado exitosamente

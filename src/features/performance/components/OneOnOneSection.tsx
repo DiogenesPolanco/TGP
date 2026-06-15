@@ -5,6 +5,7 @@ import { Plus, MessageSquare, Trash2, Target, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -140,12 +141,12 @@ export function OneOnOneSection({ memberId }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Reuniones Uno a Uno</h2>
-        <button
+        <Button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={16} /> Nuevo Meeting
-        </button>
+        </Button>
       </div>
 
       {/* New Meeting Form */}
@@ -203,12 +204,12 @@ export function OneOnOneSection({ memberId }: Props) {
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={addMeeting} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
+            <Button onClick={addMeeting} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
               Guardar Meeting
-            </button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            </Button>
+            <Button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -336,8 +337,8 @@ function MeetingCard({
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
-          <button onClick={() => setEditing(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</button>
+          <Button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</Button>
+          <Button onClick={() => setEditing(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</Button>
         </div>
       </div>
     )
@@ -345,7 +346,7 @@ function MeetingCard({
 
   return (
     <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
-      <button
+      <Button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-4 text-left"
       >
@@ -368,22 +369,22 @@ function MeetingCard({
               {meeting.oportunidades.length} ops
             </span>
           )}
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); startEdit() }}
             className="p-1.5 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
             title="Editar meeting"
           >
             <Edit3 size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); onDelete(meeting.id) }}
             className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             title="Eliminar meeting"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
-      </button>
+      </Button>
 
       {expanded && (
         <div className="px-4 pb-4 space-y-4 border-t border-neutral-20 dark:border-neutral-70 pt-3">
@@ -431,8 +432,8 @@ function MeetingCard({
                         <option value="ascenso">Ascenso</option>
                         <option value="mentoria">Mentoría</option>
                       </select>
-                      <button onClick={saveEditOp} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg">OK</button>
-                      <button onClick={() => setEditingOpId(null)} className="px-2 py-1 text-xs text-neutral-60">X</button>
+                      <Button onClick={saveEditOp} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg">OK</Button>
+                      <Button onClick={() => setEditingOpId(null)} className="px-2 py-1 text-xs text-neutral-60">X</Button>
                     </div>
                   ) : (
                     <div key={op.id} className="flex items-center justify-between p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/op">
@@ -451,12 +452,12 @@ function MeetingCard({
                           <option value="completada">Completada</option>
                           <option value="cancelada">Cancelada</option>
                         </select>
-                        <button onClick={() => startEditOp(op)} className="p-1 opacity-0 group-hover/op:opacity-100 text-neutral-50 hover:text-primary rounded" title="Editar oportunidad">
+                        <Button onClick={() => startEditOp(op)} className="p-1 opacity-0 group-hover/op:opacity-100 text-neutral-50 hover:text-primary rounded" title="Editar oportunidad">
                           <Edit3 size={11} />
-                        </button>
-                        <button onClick={() => onDeleteOportunidad(meeting.id, op.id)} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="Eliminar oportunidad">
+                        </Button>
+                        <Button onClick={() => onDeleteOportunidad(meeting.id, op.id)} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="Eliminar oportunidad">
                           <Trash2 size={11} />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )
@@ -488,7 +489,7 @@ function MeetingCard({
                 <option value="ascenso">Ascenso</option>
                 <option value="mentoria">Mentoría</option>
               </select>
-              <button
+              <Button
                 onClick={() => {
                   if (newOpDesc.trim()) {
                     onAddOportunidad(meeting.id, newOpDesc.trim(), newOpTipo)
@@ -498,7 +499,7 @@ function MeetingCard({
                 className="px-2 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark"
               >
                 <Plus size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

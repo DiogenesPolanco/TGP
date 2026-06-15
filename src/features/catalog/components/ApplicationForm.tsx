@@ -9,6 +9,7 @@ import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Application } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 interface ApplicationFormProps {
   application: Application | null
@@ -74,9 +75,9 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {application ? 'Editar Aplicación' : 'Nueva Aplicación'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -168,19 +169,13 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-            >
+            <Button type="button"
+              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
               Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
-            >
+            </Button>
+            <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
               {application ? 'Actualizar' : 'Crear'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -1,16 +1,15 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { TechSearch } from '@/components/ui/TechSearch'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import {
-  Plus, X, Trash2, Server,
+  Plus, Trash2, Server,
   AlertTriangle, Shield, Activity, FileWarning,
   ExternalLink,
 } from 'lucide-react'
-import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
+import { Button } from '@/components/ui/Button'
 
 interface MicroservicesTabProps {
   applicationId: string
@@ -52,8 +51,6 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
     for (const j of auditJunctions) { if (!map[j.microserviceId]) map[j.microserviceId] = { vulns: 0, incidents: 0, risks: 0, audit: 0 }; map[j.microserviceId].audit++ }
     return map
   }, [vulnJunctions, incidentJunctions, riskJunctions, auditJunctions])
-
-  const [showForm, setShowForm] = useState(false)
 
   const handleDelete = async (msId: string) => {
     if (!(await confirm('¿Eliminar este microservicio?'))) return
@@ -157,20 +154,12 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
       headerClassName: 'text-right',
       render: (ms) => (
         <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/catalog/microservices/${ms.id}`) }}
-            className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
-            title="Gestionar"
-          >
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/catalog/microservices/${ms.id}`) }}>
             <ExternalLink size={14} />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}
-            className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
-            title="Eliminar"
-          >
+          </Button>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}>
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -182,13 +171,10 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
         <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
           Microservicios <span className="text-neutral-50 text-base font-normal">({microservices.length})</span>
         </h4>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-        >
+        <Button variant="ghost" onClick={() => navigate(`/catalog/microservices/new?appId=${applicationId}`)}>
           <Plus size={16} />
           Nuevo Microservicio
-        </button>
+        </Button>
       </div>
 
       <SortableTable
@@ -199,136 +185,6 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
         onRowClick={(ms) => navigate(`/catalog/microservices/${ms.id}`)}
       />
 
-      {showForm && (
-        <MicroserviceFormModal
-          applicationId={applicationId}
-          editingId={null}
-          onClose={() => setShowForm(false)}
-        />
-      )}
-    </div>
-  )
-}
-
-
-
-/* ─── Microservice Form Modal ─── */
-
-function MicroserviceFormModal({
-  applicationId,
-  editingId,
-  onClose,
-}: {
-  applicationId: string
-  editingId: string | null
-  onClose: () => void
-}) {
-  const existing = useLiveQuery(
-    () => db.microservices.get(editingId ?? ''),
-    [editingId],
-  )
-
-  const [name, setName] = useState(existing?.name ?? '')
-  const [description, setDescription] = useState(existing?.description ?? '')
-  const [selectedTechIds, setSelectedTechIds] = useState<string[]>(existing?.technologies ?? [])
-  const [saving, setSaving] = useState(false)
-
-  if (existing && !name) {
-    setName(existing.name)
-    setDescription(existing.description)
-    setSelectedTechIds(existing.technologies)
-  }
-
-  const handleSave = async () => {
-    if (!name.trim()) return
-    setSaving(true)
-    try {
-      const data = {
-        applicationId,
-        name: name.trim(),
-        description: description.trim(),
-        technologies: selectedTechIds,
-        updatedAt: new Date(),
-      }
-
-      if (editingId) {
-        await db.microservices.update(editingId, data)
-      } else {
-        await db.microservices.add({
-          id: crypto.randomUUID(),
-          ...data,
-          createdAt: new Date(),
-        })
-      }
-      onClose()
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
-            {editingId ? 'Editar Microservicio' : 'Nuevo Microservicio'}
-          </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
-            <X size={20} className="text-neutral-50" />
-          </button>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
-            Nombre <span className="text-danger">*</span>
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="ej. auth-service, api-gateway"
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
-            Descripción
-          </label>
-          <RichTextEditor
-            value={description}
-            onChange={(html) => setDescription(html)}
-            placeholder="Propósito del microservicio..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
-            Stack Tecnológico
-          </label>
-          <TechSearch
-            selectedIds={selectedTechIds}
-            onChange={setSelectedTechIds}
-            enableDepsSearch={true}
-          />
-        </div>
-
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!name.trim() || saving}
-            className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
-          >
-            {saving ? 'Guardando…' : editingId ? 'Actualizar' : 'Crear Microservicio'}
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

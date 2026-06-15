@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { Select } from '@/components/ui/Select'
 import type { RiskStatus, RiskCategory } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function RiskFormPage() {
   const { id } = useParams()
@@ -58,7 +59,7 @@ export function RiskFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/governance/risks')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></button>
+        <Button onClick={() => navigate('/governance/risks')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{risk ? 'Editar Riesgo' : 'Nuevo Riesgo'}</h1>
       </div>
 
@@ -98,8 +99,8 @@ export function RiskFormPage() {
           ...applications.map((app) => ({ value: app.id, label: app.name })),
         ]} /></div>
         <div className="flex justify-end gap-3 pt-4">
-          <button type="button" onClick={() => navigate('/governance/risks')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
-          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{risk ? 'Actualizar' : 'Crear'}</button>
+          <Button type="button" onClick={() => navigate('/governance/risks')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{risk ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>
     </div>

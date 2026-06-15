@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { TeamSprintsSection } from '@/features/teams/components/TeamSprintsSection'
 import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2, BarChart3 } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 type Tab = 'dora' | 'sprints'
 
@@ -20,7 +21,7 @@ export function TeamDetailPage() {
 
   if (!team) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
         <p className="text-neutral-60 dark:text-neutral-40">Equipo no encontrado</p>
       </div>
     )
@@ -59,21 +60,21 @@ export function TeamDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button
+        <Button
           onClick={() => navigate('/teams')}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{team.name}</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">{team.name}</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40">{bu?.name} • {team.sourceSystem} • {team.members.length} miembros</p>
         </div>
       </div>
 
       <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -84,7 +85,7 @@ export function TeamDetailPage() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -127,7 +128,7 @@ export function TeamDetailPage() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
             <div className="space-y-2">
               {team.members.map((member) => (
@@ -145,13 +146,13 @@ export function TeamDetailPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
-                    <button
+                    <Button
                       onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id) }}
                       className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
                       title="Eliminar miembro"
                     >
                       <Trash2 size={14} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -178,7 +179,7 @@ function DoraCard({ icon, label, value, benchmark, color }: {
   color: string
 }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div className={`${color}`}>{icon}</div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${color.replace('text-', 'bg-')}/10 ${color}`}>

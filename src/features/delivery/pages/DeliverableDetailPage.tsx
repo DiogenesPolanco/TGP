@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 
 import type { DeliverableStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusLabel: Record<DeliverableStatus, string> = { pending: 'Pendiente', in_progress: 'En Progreso', completed: 'Completado', cancelled: 'Cancelado' }
 const statusColor: Record<DeliverableStatus, string> = { pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60', in_progress: 'bg-info/10 text-info', completed: 'bg-success/10 text-success', cancelled: 'bg-danger/10 text-danger' }
@@ -32,12 +33,12 @@ export function DeliverableDetailPage() {
       actions={
         <div className="flex items-center gap-2">
           {app && (
-            <button
+            <Button
               onClick={() => navigate(`/catalog/applications/${app.id}`)}
               className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               Ver Aplicación
-            </button>
+            </Button>
           )}
         </div>
       }

@@ -7,6 +7,7 @@ import {
 } from '@/services/jobs/automatedChecksService'
 import type { SchedulerConfig, SchedulerState } from '@/services/jobs/automatedChecksService'
 import { Clock, Play, CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 function formatTime(epoch: number): string {
   return new Date(epoch).toLocaleString('es-ES', {
@@ -102,7 +103,7 @@ export function JobSchedulerConfig() {
           <label className="text-sm font-medium text-neutral-90 dark:text-white">
             Habilitar programador
           </label>
-          <button
+          <Button
             onClick={() => handleToggle(!config.enabled)}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               config.enabled ? 'bg-primary' : 'bg-neutral-30 dark:bg-neutral-60'
@@ -113,7 +114,7 @@ export function JobSchedulerConfig() {
                 config.enabled ? 'translate-x-6' : 'translate-x-1'
               }`}
             />
-          </button>
+          </Button>
         </div>
 
         <div>
@@ -173,7 +174,7 @@ export function JobSchedulerConfig() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             onClick={handleRunNow}
             disabled={state.isRunning}
             className={`${btnClass} bg-primary text-white hover:bg-primary-dark disabled:opacity-50`}
@@ -184,14 +185,14 @@ export function JobSchedulerConfig() {
               <Play size={14} />
             )}
             {state.isRunning ? 'Ejecutando...' : 'Ejecutar Ahora'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={refresh}
             className={`${btnClass} border border-neutral-30 dark:border-neutral-60 text-neutral-70 dark:text-neutral-30 hover:bg-neutral-20 dark:hover:bg-neutral-60`}
           >
             <RefreshCw size={14} />
             Actualizar
-          </button>
+          </Button>
         </div>
       </div>
 

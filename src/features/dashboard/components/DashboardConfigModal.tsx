@@ -1,5 +1,6 @@
 import { DASHBOARD_WIDGETS, useDashboardConfigStore } from '@/stores/dashboardConfigStore'
 import { X, Eye, EyeOff } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   onClose: () => void
@@ -17,12 +18,12 @@ export function DashboardConfigModal({ onClose }: Props) {
             <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
               Personalizar Dashboard
             </h2>
-            <button
+            <Button
               onClick={onClose}
               className="p-1.5 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               <X size={20} className="text-neutral-50" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-1">
@@ -71,18 +72,18 @@ export function DashboardConfigModal({ onClose }: Props) {
           </div>
 
           <div className="flex items-center justify-between p-4 border-t border-neutral-20 dark:border-neutral-70 bg-neutral-5 dark:bg-neutral-85 rounded-b-2xl">
-            <button
+            <Button
               onClick={enableAll}
               className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
             >
               Mostrar todo
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={disableAll}
               className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
             >
               Ocultar todo
-            </button>
+            </Button>
           </div>
         </div>
       </div>

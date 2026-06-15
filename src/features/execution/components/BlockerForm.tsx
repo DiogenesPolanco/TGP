@@ -6,6 +6,7 @@ import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface BlockerFormProps {
   blocker: Blocker | null
@@ -67,9 +68,9 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {blocker ? 'Editar Bloqueo' : 'Reportar Bloqueo'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             <X size={20} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
 
         <div>
@@ -143,17 +144,17 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={!title.trim() || saving}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <Save size={16} />
             {saving ? 'Guardando...' : blocker ? 'Actualizar' : 'Reportar Bloqueo'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ import { db } from '@/services/db/database'
 import { formatDuration } from '@/utils/technologyUtils'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import {
   Plus,
   Search,
@@ -295,20 +297,18 @@ export function ObsolescencePage() {
       headerClassName: 'text-right',
       render: (tech) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); navigate(`${tech.id}/edit`) }}
-            className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-primary transition-colors"
-            title="Editar"
+            variant="ghost" size="sm" className="p-1.5" title="Editar"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(tech.id) }}
-            className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-danger transition-colors"
-            title="Eliminar"
+            variant="ghost" size="sm" className="p-1.5 hover:text-danger" title="Eliminar"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -318,38 +318,39 @@ export function ObsolescencePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Obsolescencia</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Obsolescencia</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40">
             Gestión del ciclo de vida de tecnologías
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            variant="secondary" size="sm"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('map')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            variant="secondary" size="sm"
           >
             <Network size={16} />
             Mapa de Obsolescencias
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('new')}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+            variant="primary" size="md"
+            className="bg-primary text-white hover:bg-primary/90"
           >
             <Plus size={18} />
             Nueva Tecnología
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
               <Layers size={18} />
@@ -357,9 +358,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Total Tecnologías</p>
-        </button>
+        </Button>
 
-        <button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('active')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-success/10 text-success">
               <CheckCircle size={18} />
@@ -367,9 +368,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-success">{stats.active}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Activas</p>
-        </button>
+        </Button>
 
-        <button onClick={() => setStatusFilter('extended')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('extended')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-warning/10 text-warning">
               <Clock size={18} />
@@ -380,9 +381,9 @@ export function ObsolescencePage() {
           {stats.nearEol > 0 && (
             <p className="text-xs text-severity-high mt-1">{stats.nearEol} próx. a EOL</p>
           )}
-        </button>
+        </Button>
 
-        <button onClick={() => setStatusFilter('eol')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('eol')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <XCircle size={18} />
@@ -390,9 +391,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-danger">{stats.eol}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">EOL</p>
-        </button>
+        </Button>
 
-        <button onClick={() => { setStatusFilter('all'); setSearch('') }} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => { setStatusFilter('all'); setSearch('') }} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <AlertTriangle size={18} />
@@ -400,9 +401,9 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-danger">{stats.criticalAppsWithEol}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Apps Críticas Afectadas</p>
-        </button>
+        </Button>
 
-        <button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-info/10 text-info">
               <Shield size={18} />
@@ -410,19 +411,19 @@ export function ObsolescencePage() {
           </div>
           <p className="text-2xl font-bold text-info">{stats.total - stats.eol - stats.extended}</p>
           <p className="text-xs text-neutral-60 dark:text-neutral-40">Sin EOL / Seguras</p>
-        </button>
+        </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
-            <input
+            <Input
               type="text"
               placeholder="Buscar por nombre o vendor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="pl-9 bg-transparent"
             />
           </div>
 
@@ -440,12 +441,12 @@ export function ObsolescencePage() {
           ]} className="min-w-[180px]" />
 
           {(search || statusFilter !== 'all' || categoryFilter !== 'all') && (
-            <button
+            <Button
               onClick={() => { setSearch(''); setStatusFilter('all'); setCategoryFilter('all') }}
-              className="text-sm text-primary hover:text-primary-dark transition-colors"
+              variant="ghost" size="sm"
             >
               Limpiar filtros
-            </button>
+            </Button>
           )}
         </div>
       </div>

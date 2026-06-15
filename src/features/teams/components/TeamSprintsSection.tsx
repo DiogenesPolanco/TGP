@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { isJiraConfigured } from '@/services/jira/jiraConfigService'
 import { getBoards, getSprints, getSprintIssues, calcSprintMetrics, syncJiraSprints } from '@/services/jira/jiraService'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   teamId: string
@@ -324,22 +325,22 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints del Equipo</h2>
         <div className="flex items-center gap-2">
           {jiraConfigured && !showForm && editingId === null && (
-            <button
+            <Button
               onClick={handleSyncFromJira}
               disabled={syncing}
               className="flex items-center gap-1.5 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-50"
             >
               <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
               {syncing ? 'Sincronizando...' : 'Sync Jira'}
-            </button>
+            </Button>
           )}
           {!showForm && editingId === null && (
-            <button
+            <Button
               onClick={() => { setShowForm(true); resetForm() }}
               className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
             >
               <Plus size={16} /> Agregar Sprint
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -447,24 +448,24 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
           )}
 
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={editingId ? saveEdit : addSprint}
               className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark"
             >
               {editingId ? 'Guardar Cambios' : 'Guardar Sprint'}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleValidate}
               className="px-3 py-2 text-sm text-neutral-60 hover:text-primary border border-neutral-30 dark:border-neutral-60 rounded-lg hover:border-primary/30"
             >
               Validar vs Miembros
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={editingId ? cancelEdit : () => { setShowForm(false); resetForm() }}
               className="px-3 py-2 text-sm text-neutral-60 hover:text-neutral-90"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -590,20 +591,20 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <button
+                          <Button
                             onClick={() => startEdit(s)}
                             className="p-1.5 rounded-lg text-neutral-40 hover:text-primary hover:bg-primary/10 transition-colors"
                             title="Editar sprint"
                           >
                             <Edit3 size={14} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => removeSprint(s.id)}
                             className="p-1.5 rounded-lg text-neutral-40 hover:text-danger hover:bg-danger/10 transition-colors"
                             title="Eliminar sprint"
                           >
                             <Trash2 size={14} />
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>

@@ -7,6 +7,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Plan } from '@/types/domain'
 import type { ProjectStatus, ProjectHealth } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface PlanFormProps {
   plan: Plan | null
@@ -73,9 +74,9 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {plan ? 'Editar Plan' : 'Nuevo Plan'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             <X size={20} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -185,17 +186,17 @@ export function PlanForm({ plan, onClose, onSave }: PlanFormProps) {
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={!title.trim() || !startDate || !endDate || saving}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <Save size={16} />
             {saving ? 'Guardando…' : plan ? 'Actualizar' : 'Crear Plan'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getPredictions, type Prediction } from '@/services/predictive/predictiveService'
 import { TrendingUp, TrendingDown, Minus, Brain, RefreshCw, AlertCircle, BarChart3 } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export function PredictionsPage() {
   const [predictions, setPredictions] = useState<Prediction[]>([])
@@ -20,14 +21,14 @@ export function PredictionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Análisis Predictivo</h1>
-        <button
+        <Button
           onClick={load}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           Recalcular
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6">

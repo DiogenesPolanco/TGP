@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const statusLabel: Record<string, string> = { on_track: 'En Camino', at_risk: 'En Riesgo', behind: 'Atrasado', achieved: 'Logrado', not_started: 'No Iniciado' }
 const statusColor: Record<string, string> = { on_track: 'bg-success/10 text-success', at_risk: 'bg-warning/10 text-warning', behind: 'bg-danger/10 text-danger', achieved: 'bg-info/10 text-info', not_started: 'bg-neutral-10 text-neutral-60' }
@@ -26,13 +27,13 @@ export function ObjectiveDetailPage() {
       onBack={() => navigate('/strategy/objectives')}
       backLabel="OKRs / KPIs"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/strategy/objectives/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

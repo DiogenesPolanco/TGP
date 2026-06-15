@@ -12,6 +12,7 @@ import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
+import { Button } from '@/components/ui/Button'
 
 export function DashboardPage() {
   const metrics = useDashboardMetrics()
@@ -56,20 +57,20 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-end gap-2">
-        <button
+        <Button
           onClick={handleShare}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Share2 size={16} />
           Compartir
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setShowConfig(true)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Settings size={16} />
           Personalizar
-        </button>
+        </Button>
       </div>
 
       {shareUrl && (
@@ -79,13 +80,13 @@ export function DashboardPage() {
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
             {cleanUrl}
           </a>
-          <button
+          <Button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? 'Copiado' : 'Copiar'}
-          </button>
+          </Button>
         </div>
       )}
 

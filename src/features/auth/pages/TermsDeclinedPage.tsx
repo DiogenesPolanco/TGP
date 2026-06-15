@@ -1,4 +1,5 @@
 import { FileSpreadsheet, ArrowLeft, RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export function TermsDeclinedPage({ onBack }: { onBack: () => void }) {
   return (
@@ -13,7 +14,7 @@ export function TermsDeclinedPage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+            <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
               ¡Nos vemos en Excel!
             </h2>
             <p className="text-base text-neutral-60 dark:text-neutral-40 leading-relaxed">
@@ -32,18 +33,14 @@ export function TermsDeclinedPage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="flex items-center justify-center gap-3">
-            <button onClick={onBack}
-              className="flex items-center gap-2 px-5 py-3 border border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 rounded-xl font-medium text-sm hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
-            >
+            <Button onClick={onBack} variant="secondary" className="rounded-xl">
               <ArrowLeft size={18} />
               Volver
-            </button>
-            <button onClick={() => window.location.reload()}
-              className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
-            >
+            </Button>
+            <Button onClick={() => window.location.reload()} variant="primary" className="rounded-xl shadow-lg shadow-primary/25 bg-primary text-white hover:bg-primary/90">
               <RefreshCw size={18} />
               Reintentar
-            </button>
+            </Button>
           </div>
         </div>
       </div>

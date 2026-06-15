@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil, Server, Search, Shield, AlertTriangle, Calendar, Clock, Activity, CheckCircle, XCircle, HelpCircle } from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
+import { Button } from '@/components/ui/Button'
 
 const severityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info' }
 const incidentStatusLabel: Record<string, string> = { detected: 'Detectado', acknowledged: 'Reconocido', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' }
@@ -68,13 +69,13 @@ export function IncidentDetailPage() {
       onBack={() => navigate('/security/incidents')}
       backLabel="Incidentes"
       actions={
-        <button
+        <Button
           onClick={() => navigate(`/security/incidents/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
         >
           <Pencil size={16} />
           Editar
-        </button>
+        </Button>
       }
     >
       {/* Tabs */}
@@ -82,7 +83,7 @@ export function IncidentDetailPage() {
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
@@ -93,7 +94,7 @@ export function IncidentDetailPage() {
             >
               <Icon size={16} />
               {tab.label}
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -208,7 +209,7 @@ export function IncidentDetailPage() {
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
         {icon && <span className="text-neutral-50">{icon}</span>}
         {title}

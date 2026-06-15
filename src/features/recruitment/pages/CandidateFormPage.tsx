@@ -12,6 +12,7 @@ import { TechSearch } from '@/components/ui/TechSearch'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { EvalCategory } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function CandidateFormPage() {
   const navigate = useNavigate()
@@ -135,9 +136,9 @@ export function CandidateFormPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{isEdit ? 'Editar Candidato' : 'Nuevo Candidato'}</h2>
       </div>
 
@@ -261,13 +262,12 @@ export function CandidateFormPage() {
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-3">
-          <button type="button" onClick={() => navigate('/teams/recruitment')} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors">
+          <Button type="button" onClick={() => navigate('/teams/recruitment')} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors">
             Cancelar
-          </button>
-          <button type="submit" disabled={saving || !name.trim() || !position}
-            className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
+          </Button>
+          <Button type="submit" disabled={saving || !name.trim() || !position} className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
             {saving ? 'Guardando...' : isEdit ? 'Actualizar Candidato' : 'Registrar Candidato'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

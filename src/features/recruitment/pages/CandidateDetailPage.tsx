@@ -8,6 +8,7 @@ import { getCandidateTechnologies, getCandidateEvaluations, deleteCandidate, sel
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
@@ -64,19 +65,19 @@ export function CandidateDetailPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
             <ArrowLeft size={20} className="text-neutral-60" />
-          </button>
+          </Button>
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{candidate.name}</h2>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate(`/teams/recruitment/${candidate.id}/edit`)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors">
+          <Button onClick={() => navigate(`/teams/recruitment/${candidate.id}/edit`)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors">
             <Pencil size={18} />
-          </button>
-          <button onClick={handleDelete} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors">
+          </Button>
+          <Button onClick={handleDelete} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors">
             <Trash2 size={18} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -167,14 +168,14 @@ export function CandidateDetailPage() {
       </div>
 
       {candidate.status !== 'selected' && candidate.status !== 'rejected' && (
-        <button
+        <Button
           onClick={handleSelect}
           disabled={selecting}
           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-success text-white rounded-xl font-semibold text-sm hover:bg-success-dark transition-colors disabled:opacity-50 shadow-lg shadow-success/25"
         >
           <CheckCircle size={20} />
           {selecting ? 'Seleccionando...' : 'Seleccionar Candidato'}
-        </button>
+        </Button>
       )}
     </div>
   )

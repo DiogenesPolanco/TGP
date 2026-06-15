@@ -151,11 +151,13 @@ Esto permite modelar escenarios realistas: una vulnerabilidad de SQL Injection p
 - **Servicio de Escalamiento** — `escalationService.ts`
 
 ### Compartir y Enlaces Públicos
-- **Compartir Dashboard, Daily, Plan, Timeline, Performance, Reclutamiento y más** — cada módulo permite generar un enlace público con:
-  - Cifrado opcional AES-GCM 256 con passphrase
-  - Almacenamiento en Azure Blob Storage (cuando está configurado) o localStorage
+- **Compartir Dashboard, Daily, Plan, Timeline, Vulnerabilidades, Incidentes, Riesgos, Auditoría, OKRs, Mapas y más** — cada módulo permite generar un enlace público con:
+  - **Cifrado automático siempre activo** — AES-GCM 256 con clave auto-generada, incluso sin passphrase
+  - **Cifrado adicional opcional** — doble cifrado con passphrase seleccionada por el usuario (AES-GCM 256)
+  - **Duración configurable** — selector de expiración: 1h, 24h, 48h (default), 7d
+  - Almacenamiento en Azure Blob Storage (configuración dedicada de sharing) o localStorage como fallback
   - Vista de solo lectura para el receptor
-  - Caducidad automática a las 48h
+  - **Notificación toast** al generar enlace exitosamente
   - Botones de descarga PDF e Imagen en las vistas públicas
   - Páginas públicas standalone sin necesidad de autenticación:
     - `/public/dashboard/:hash` — Dashboard Ejecutivo
@@ -166,6 +168,19 @@ Esto permite modelar escenarios realistas: una vulnerabilidad de SQL Injection p
     - `/public/member/:hash` — Detalle de miembro
     - `/public/members/:hash` — Vista general de miembros
     - `/public/recruitment/:hash` — Reclutamiento
+    - `/public/vulnerabilities/:hash` — Vulnerabilidades
+    - `/public/incidents/:hash` — Incidentes
+    - `/public/risks/:hash` — Riesgos
+    - `/public/audit/:hash` — Hallazgos de Auditoría
+    - `/public/objectives/:hash` — OKRs / KPIs
+    - `/public/obsolescence/:hash` — Mapa de Obsolescencia Tecnológica
+    - `/public/dependencies/:hash` — Mapa de Dependencias
+- **Arquitectura de sharing**:
+  - `azureShareService.ts` — Servicio separado con su propia `AzureShareConfig` (SAS URL + contenedor dedicado para sharing, independiente del backup). Auto-cifra todo dato en reposo con AES-GCM 256. Formato de manifest v2 con soporte backward-compatible para v1.
+  - `publicShareService.ts` — Ruteo de tipos (`Record<ShareType, string>`), hashing de 16 chars (8 bytes random), sistema unificado `loadPublicEntities()`, registro de accesos (`logShareAccess`), limpieza programada.
+  - `usePublicShare` hook — Hook compartido que implementa el patrón de carga 3-tier (manifest → Azure directo → IndexedDB local) + logging de accesos, usado por todas las páginas públicas.
+  - `PassphraseModal` — Modal con selector de duración (1h/24h/48h/7d) y callback `(passphrase, hours)`.
+  - `AzureShareConfig` — Componente de administración para configurar SAS URL de sharing y probar conexión.
 
 ### Administración (`/admin`)
 - **Importación de datos desde Excel** (`/admin/import`)
@@ -180,6 +195,10 @@ Esto permite modelar escenarios realistas: una vulnerabilidad de SQL Injection p
   - Prueba de conexión
   - Subida manual de backup
   - Listado y restauración de backups desde la nube
+- **Configuración de Sharing en Azure** (`/admin`) — Configuración independiente para compartir enlaces públicos
+  - SAS URL dedicada para sharing (permisos mínimos recomendados: `rc` en contenedor separado)
+  - Si no se configura, usa como fallback la configuración de backup
+  - Todos los datos se cifran con AES-GCM 256 antes de subir a Azure
 - **Programador Automático** (`/admin`) — Ejecución programada de verificaciones del sistema
   - Configuración de hora de ejecución diaria
   - Ejecución manual inmediata ("Ejecutar Ahora")
@@ -314,6 +333,13 @@ El sistema incluye un programador de tareas automáticas que ejecuta verificacio
 | `/public/member/:hash` | Miembro público |
 | `/public/members/:hash` | Miembros público |
 | `/public/recruitment/:hash` | Reclutamiento público |
+| `/public/vulnerabilities/:hash` | Vulnerabilidades público |
+| `/public/incidents/:hash` | Incidentes público |
+| `/public/risks/:hash` | Riesgos público |
+| `/public/audit/:hash` | Auditoría público |
+| `/public/objectives/:hash` | OKRs público |
+| `/public/obsolescence/:hash` | Mapa de Obsolescencia público |
+| `/public/dependencies/:hash` | Mapa de Dependencias público |
 
 ## Desarrollo
 
@@ -413,26 +439,29 @@ TGP permite generar enlaces públicos para compartir información con personas d
 
 ### Medidas de Protección Incorporadas
 
-- **Cifrado opcional**: Al compartir, puedes agregar una contraseña que cifra los datos con AES-GCM 256 antes de almacenarlos. Quien reciba el enlace necesitará la misma contraseña para visualizar el contenido.
-- **Caducidad automática**: Todos los enlaces compartidos expiran a las 48 horas. Después de ese período, el enlace deja de funcionar y los datos no son accesibles.
-- **Limpieza programada**: El programador automático elimina de Azure Blob Storage los archivos de enlaces compartidos con más de 48h.
+- **Cifrado automático siempre activo**: Todo dato compartido se cifra en reposo con AES-GCM 256 (clave auto-generada por enlace). No es posible compartir datos sin cifrado.
+- **Cifrado adicional con passphrase**: Opcionalmente, puedes agregar una contraseña que aplica una segunda capa de cifrado AES-GCM 256. Quien reciba el enlace necesitará la misma contraseña para visualizar el contenido.
+- **Duración configurable**: Al compartir, puedes seleccionar el tiempo de expiración: 1 hora, 24 horas, 48 horas (default) o 7 días.
+- **Caducidad automática**: Todos los enlaces compartidos expiran según la duración seleccionada. Después de ese período, el enlace deja de funcionar y los datos no son accesibles.
+- **Limpieza programada**: El programador automático elimina de Azure Blob Storage los archivos de enlaces compartidos expirados.
 - **Solo lectura**: Las vistas públicas son exclusivamente de solo lectura. No es posible editar, crear o eliminar datos desde un enlace público.
 - **Autenticación requerida**: Para generar un enlace público, el usuario debe haber iniciado sesión en TGP. Las vistas públicas no requieren autenticación (son accesibles por diseño).
 
 ### Almacenamiento y Transmisión
 
-- **localStorage**: Cuando no hay Azure configurado, los enlaces se almacenan en localStorage del navegador del usuario que los creó. Esto significa que solo ese navegador puede generar y validar el enlace.
-- **Azure Blob Storage**: Si está configurado, los datos compartidos se almacenan en Azure Blob Storage y son accesibles desde cualquier lugar mediante el enlace generado. Los archivos se limpian automáticamente después de 48h.
-- **Transmisión**: Los datos viajan cifrados en tránsito (HTTPS). Si se usó cifrado con passphrase, los datos están protegidos adicionalmente con AES-GCM 256.
+- **localStorage**: Cuando no hay Azure configurado, los enlaces se almacenan en localStorage del navegador del usuario que los creó. Esto significa que solo ese navegador puede generar y validar el enlace. Los datos se almacenan siempre cifrados (AES-GCM 256 con clave auto-generada).
+- **Azure Blob Storage (configuración dedicada de sharing)**: Si está configurado, los datos compartidos se almacenan en Azure Blob Storage usando una SAS URL independiente de la de backup (permisos mínimos recomendados: `rc`). Los archivos se limpian automáticamente según la duración configurada. Como fallback, si no hay configuración de sharing, se usa la SAS URL de backup.
+- **Transmisión**: Los datos viajan cifrados en tránsito (HTTPS). En reposo, siempre están cifrados con AES-GCM 256 (clave auto-generada). Si se usó passphrase adicional, los datos tienen doble cifrado.
 
 ### Buenas Prácticas
 
-1. **Usa contraseña** para datos que contengan información institucional sensible, incluso si no es clasificada.
+1. **Usa contraseña adicional** para datos que contengan información institucional sensible, incluso si no es clasificada — el cifrado automático protege contra acceso al almacenamiento, pero la passphrase añade una capa de seguridad extrema.
 2. **Comparte el mínimo necesario** — selecciona solo la vista que contiene la información requerida por el receptor.
 3. **Comunica la contraseña por un canal diferente** al del enlace (ej. enlace por email, contraseña por mensaje interno).
-4. **Revoca enlaces** desde la sección de administración si sospechas que un enlace fue expuesto antes de su vencimiento.
-5. **Notifica al equipo de seguridad** si se comparten datos clasificados por error.
-6. **No compartas pantallas** que contengan información sensible si el sistema de captura incluye datos que no deben ser divulgados (los botones PDF/Imagen capturan todo el contenido visible de la página).
+4. **Selecciona la duración adecuada** — usa 1h para datos muy sensibles, 7d solo cuando el receptor necesite acceso prolongado.
+5. **Revoca enlaces** desde la sección de administración si sospechas que un enlace fue expuesto antes de su vencimiento.
+6. **Notifica al equipo de seguridad** si se comparten datos clasificados por error.
+7. **No compartas pantallas** que contengan información sensible si el sistema de captura incluye datos que no deben ser divulgados (los botones PDF/Imagen capturan todo el contenido visible de la página).
 
 ### Exención de Responsabilidad
 

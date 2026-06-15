@@ -11,6 +11,7 @@ import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 export function ApplicationFormPage() {
   const { id } = useParams()
@@ -94,9 +95,9 @@ export function ApplicationFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/catalog/applications')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/catalog/applications')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
           {application ? 'Editar Aplicación' : 'Nueva Aplicación'}
         </h1>
@@ -192,19 +193,19 @@ export function ApplicationFormPage() {
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <button
+          <Button
             type="button"
             onClick={() => navigate('/catalog/applications')}
             className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
           >
             {application ? 'Actualizar' : 'Crear'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

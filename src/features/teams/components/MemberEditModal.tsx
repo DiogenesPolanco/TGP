@@ -8,6 +8,7 @@ import { SkillsSection } from '@/features/performance/components/SkillsSection'
 import { SprintsSection } from '@/features/performance/components/SprintsSection'
 import { OneOnOneSection } from '@/features/performance/components/OneOnOneSection'
 import { AchievementsSection } from '@/features/performance/components/AchievementsSection'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -89,18 +90,18 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
               <p className="text-xs text-neutral-50">Gestionar información del miembro</p>
             </div>
           </div>
-          <button
+          <Button
             onClick={handleClose}
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <X size={20} className="text-neutral-60" />
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
         <div className="flex border-b border-neutral-20 dark:border-neutral-70 px-4 gap-1 shrink-0">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -111,7 +112,7 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
             >
               {tab.icon}
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
 

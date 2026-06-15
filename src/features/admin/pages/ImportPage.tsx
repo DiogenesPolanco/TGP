@@ -4,6 +4,7 @@ import { parseExcel, importRows, getImportableEntities, ImportFileError } from '
 import type { ParsedRow, ImportResult } from '@/services/import/importService'
 import { useAppStore } from '@/stores/appStore'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -171,13 +172,13 @@ export function ImportPage() {
 
           {/* Action buttons */}
           {file && !parsedRows && (
-            <button
+            <Button
               onClick={handlePreview}
               className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
             >
               <Upload size={16} />
               Previsualizar datos
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -203,21 +204,21 @@ export function ImportPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={handleReset}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 <Trash2 size={14} />
                 Limpiar
-              </button>
+              </Button>
               {result && (
-                <button
+                <Button
                   onClick={handleReset}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                 >
                   <Upload size={14} />
                   Nueva importación
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -282,7 +283,7 @@ export function ImportPage() {
           {/* Import button */}
           {!result && validRows.length > 0 && (
             <div className="mt-4 flex justify-end">
-              <button
+              <Button
                 onClick={handleImport}
                 disabled={importing}
                 className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
@@ -293,7 +294,7 @@ export function ImportPage() {
                   <Download size={16} />
                 )}
                 {importing ? 'Importando...' : `Importar ${validRows.length} registros`}
-              </button>
+              </Button>
             </div>
           )}
 
@@ -318,13 +319,13 @@ export function ImportPage() {
 
               {result.errors.length > 0 && (
                 <div>
-                  <button
+                  <Button
                     onClick={() => setShowDetails(!showDetails)}
                     className="flex items-center gap-1 text-xs text-danger hover:text-danger-dark mb-2"
                   >
                     {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                     Ver detalles de errores
-                  </button>
+                  </Button>
                   {showDetails && (
                     <div className="max-h-40 overflow-y-auto space-y-1">
                       {result.errors.map((e, i) => (
@@ -350,14 +351,14 @@ export function ImportPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {entityTypes.map((et) => (
-              <button
+              <Button
                 key={et.id}
                 onClick={() => downloadTemplate(et.id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 <Download size={14} />
                 {et.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -3,6 +3,7 @@ import { db } from '@/services/db/database'
 import type { Skill } from '@/types/domain'
 import { Plus, X, Search, Edit3 } from 'lucide-react'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -151,7 +152,7 @@ export function SkillsSection({ memberId }: Props) {
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
               {suggestions.map((name) => (
-                <button
+                <Button
                   key={name}
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -159,7 +160,7 @@ export function SkillsSection({ memberId }: Props) {
                   className="w-full text-left px-3 py-2 text-sm text-neutral-90 dark:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                 >
                   {name}
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -183,12 +184,12 @@ export function SkillsSection({ memberId }: Props) {
           ]}
           placeholder="Nivel"
         />
-        <button
+        <Button
           onClick={() => addSkill()}
           className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Plus size={16} /> Agregar
-        </button>
+        </Button>
       </div>
 
       {Object.keys(grouped).length === 0 ? (
@@ -226,8 +227,8 @@ export function SkillsSection({ memberId }: Props) {
                       <option value="advanced">Avanzado</option>
                       <option value="expert">Experto</option>
                     </select>
-                    <button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</button>
-                    <button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90">X</button>
+                    <Button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</Button>
+                    <Button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90">X</Button>
                   </div>
                 ) : (
                   <span
@@ -236,12 +237,12 @@ export function SkillsSection({ memberId }: Props) {
                   >
                     {s.name}
                     <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
-                    <button onClick={() => startEdit(s)} className="opacity-0 group-hover/skill:opacity-100 hover:opacity-70 transition-opacity ml-0.5">
+                    <Button onClick={() => startEdit(s)} className="opacity-0 group-hover/skill:opacity-100 hover:opacity-70 transition-opacity ml-0.5">
                       <Edit3 size={10} />
-                    </button>
-                    <button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
+                    </Button>
+                    <Button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
                       <X size={12} />
-                    </button>
+                    </Button>
                   </span>
                 )
               )}

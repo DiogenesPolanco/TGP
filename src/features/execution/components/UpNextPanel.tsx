@@ -29,7 +29,7 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
   if (upcoming.length === 0) return null
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2 px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
         <Calendar size={15} className="text-primary" />
         <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Qué Sigue</h3>

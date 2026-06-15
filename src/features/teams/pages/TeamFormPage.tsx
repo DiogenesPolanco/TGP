@@ -10,6 +10,7 @@ import { PersonSelect } from '@/components/ui/PersonSelect'
 import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { DoraLevel, MemberRole } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface MemberInput {
   id: string
@@ -133,7 +134,7 @@ export function TeamFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/teams')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></button>
+        <Button onClick={() => navigate('/teams')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{team ? 'Editar Equipo' : 'Nuevo Equipo'}</h1>
       </div>
 
@@ -172,7 +173,7 @@ export function TeamFormPage() {
         <div className="mt-6 pt-6 border-t border-neutral-20 dark:border-neutral-70">
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Miembros</label>
-            <button type="button" onClick={addMember} className="flex items-center gap-1 text-sm text-primary hover:underline"><Plus size={14} /> Agregar</button>
+            <Button type="button" onClick={addMember} className="flex items-center gap-1 text-sm text-primary hover:underline"><Plus size={14} /> Agregar</Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -198,7 +199,7 @@ export function TeamFormPage() {
                     </td>
                     <td className="px-3 py-2.5"><select value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value as MemberRole)} className="w-full min-w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm">{MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}</select></td>
                     <td className="px-3 py-2.5"><div className="flex items-center justify-end gap-1"><input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-right" /><span className="text-xs text-neutral-50">%</span></div></td>
-                    <td className="px-3 py-2.5"><button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></button></td>
+                    <td className="px-3 py-2.5"><Button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></Button></td>
                   </tr>
                 ))}
               </tbody>
@@ -207,8 +208,8 @@ export function TeamFormPage() {
         </div>
 
         <div className="flex justify-end gap-3 mt-6 pt-4">
-          <button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
-          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{team ? 'Actualizar' : 'Crear'}</button>
+          <Button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{team ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>
     </div>

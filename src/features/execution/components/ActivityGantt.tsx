@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle, Pencil, Trash2, Plus } from 'lucide-react'
 import type { Activity } from '@/types/domain'
 import type { DeliverableStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface ActivityGanttProps {
   planId: string
@@ -133,13 +134,13 @@ export function ActivityGantt({
           </span>
         </div>
         {!readOnly && (
-          <button
+          <Button
             onClick={onNewActivity}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
           >
             <Plus size={16} />
             Nueva Actividad
-          </button>
+          </Button>
         )}
       </div>
 
@@ -342,9 +343,9 @@ function ActivityGanttRow({
       {/* Label column */}
       <div className={`w-56 shrink-0 px-4 py-3 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2 ${isSub ? 'pl-10' : ''}`}>
         {hasChildren ? (
-          <button onClick={onToggle} className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button onClick={onToggle} className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             {isExpanded ? <ChevronUp size={14} className="text-neutral-50" /> : <ChevronDown size={14} className="text-neutral-50" />}
-          </button>
+          </Button>
         ) : (
           <div className="w-5" />
         )}
@@ -365,12 +366,12 @@ function ActivityGanttRow({
         </div>
         {!readOnly && (
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary">
+            <Button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary">
               <Pencil size={12} />
-            </button>
-            <button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger">
+            </Button>
+            <Button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger">
               <Trash2 size={12} />
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -436,7 +437,7 @@ function GanttTaskRow({
     <div className="flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group">
       {/* Label */}
       <div className="w-56 shrink-0 px-4 py-2 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2 pl-14">
-        <button
+        <Button
           onClick={onToggle}
           className="flex items-center gap-2 min-w-0 flex-1 text-left"
         >
@@ -450,7 +451,7 @@ function GanttTaskRow({
           <span title={task.title} className={`text-xs truncate ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-neutral-70 dark:text-neutral-30'}`}>
             {task.title}
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Gantt area (empty for tasks - they don't have date ranges) */}

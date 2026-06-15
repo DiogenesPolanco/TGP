@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Check, X, FileText, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 const TERMS_KEY = 'tgp-terms-accepted'
 
@@ -110,9 +111,10 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                       <p><strong>9. Contacto.</strong> Para consultas, reportes o sugerencias, puedes abrir un issue en el repositorio oficial del proyecto.</p>
                     </>
                   )}
-                  <button onClick={() => setShowFull(!showFull)} className="text-primary hover:underline text-xs font-medium">
+                  <Button variant="ghost" size="sm" className="p-0 text-primary hover:underline hover:bg-transparent"
+                    onClick={() => setShowFull(!showFull)}>
                     {showFull ? 'Mostrar menos' : 'Leer términos completos'} <ExternalLink size={12} className="inline" />
-                  </button>
+                  </Button>
                 </div>
 
                 <label className="flex items-start gap-3 cursor-pointer">
@@ -124,16 +126,14 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                 </label>
 
                 <div className="flex items-center gap-3 pt-2">
-                  <button onClick={onDecline}
-                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 border border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 rounded-xl font-medium text-sm hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
+                  <Button onClick={onDecline} variant="secondary" className="flex-1 rounded-xl">
                     <X size={18} />
                     No acepto
-                  </button>
-                  <button onClick={onAccept} disabled={!accepted}
-                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25">
+                  </Button>
+                  <Button onClick={onAccept} disabled={!accepted} variant="primary" className="flex-1 rounded-xl shadow-lg shadow-primary/25 bg-primary text-white hover:bg-primary/90">
                     <Check size={18} />
                     Aceptar y continuar
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getCalendarEvents, type CalendarEvent } from './calendarService'
+import { Button } from '@/components/ui/Button';
 
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
@@ -112,7 +113,7 @@ export function CalendarPage() {
     const isSelected = selectedDate?.getDate() === d && selectedDate?.getMonth() === currentMonth
     const isPast = new Date(currentYear, currentMonth, d, 23, 59, 59).getTime() < now
     days.push(
-      <button
+      <Button
         key={d}
         onClick={() => setSelectedDate(new Date(currentYear, currentMonth, d))}
         className={cn(
@@ -135,7 +136,7 @@ export function CalendarPage() {
             ))}
           </div>
         )}
-      </button>
+      </Button>
     )
   }
 
@@ -153,7 +154,7 @@ export function CalendarPage() {
     <div className="space-y-6">
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Calendario Ejecutivo</h1>
+        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">Calendario Ejecutivo</h1>
       </div>
 
       {/* ── Summary Cards ── */}
@@ -193,15 +194,15 @@ export function CalendarPage() {
         {/* ── Month Calendar ── */}
         <div className="lg:col-span-2 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
-            <button onClick={() => setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <Button onClick={() => setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1)} variant="ghost" size="sm" className="p-2">
               <ChevronLeft size={20} className="text-neutral-60" />
-            </button>
+            </Button>
             <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
               {MONTHS[currentMonth]} {currentYear}
             </h2>
-            <button onClick={() => setCurrentMonth((m) => m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <Button onClick={() => setCurrentMonth((m) => m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1)} variant="ghost" size="sm" className="p-2">
               <ChevronRight size={20} className="text-neutral-60" />
-            </button>
+            </Button>
           </div>
 
           {currentMonthSprints.length > 0 && (
@@ -348,7 +349,7 @@ function SummaryCard({
   }
   const s = styles[color]
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
       <div className="flex items-center justify-between mb-2">
         <div className={cn('p-2 rounded-lg', s.bg, s.text)}>{icon}</div>
         <div className={cn('h-1 w-12 rounded-full', s.dot)} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Technology } from '@/types/domain'
 import { X, Search, Server } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -77,12 +78,12 @@ export function MicroservicesSection({ memberId }: Props) {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-neutral-50">{techs.length} tecnologías</span>
-                <button
+                <Button
                   onClick={() => toggleMicroservice(ms.id)}
                   className="p-1 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <X size={14} />
-                </button>
+                </Button>
               </div>
             </div>
           )
@@ -117,7 +118,7 @@ export function MicroservicesSection({ memberId }: Props) {
               availableMS.map((ms) => {
                 const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
                 return (
-                  <button
+                  <Button
                     key={ms.id}
                     type="button"
                     onClick={() => toggleMicroservice(ms.id)}
@@ -131,7 +132,7 @@ export function MicroservicesSection({ memberId }: Props) {
                     {ms.description && (
                       <span className="text-xs text-neutral-50 truncate ml-2 max-w-[200px]">{ms.description}</span>
                     )}
-                  </button>
+                  </Button>
                 )
               })
             )}

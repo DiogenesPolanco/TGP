@@ -9,6 +9,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const STATUS_OPTIONS = [
   { value: 'not_started', label: 'No iniciado' },
@@ -151,9 +152,9 @@ export function ObjectiveFormPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/strategy/objectives')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/strategy/objectives')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
@@ -257,14 +258,14 @@ export function ObjectiveFormPage() {
                   <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">{formData.keyResults.length}</span>
                 )}
               </h3>
-              <button
+              <Button
                 type="button"
                 onClick={addKeyResult}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-medium hover:bg-primary-dark transition-colors"
               >
                 <Plus size={14} />
                 Agregar KR
-              </button>
+              </Button>
             </div>
 
             {formData.keyResults.length === 0 ? (
@@ -272,14 +273,14 @@ export function ObjectiveFormPage() {
                 <Crosshair size={28} className="mx-auto text-neutral-40 mb-2" />
                 <p className="text-sm font-medium text-neutral-60 dark:text-neutral-40">Sin Key Results</p>
                 <p className="text-xs text-neutral-50 mt-1">Agrega resultados clave medibles para este objetivo</p>
-                <button
+                <Button
                   type="button"
                   onClick={addKeyResult}
                   className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
                 >
                   <Plus size={16} />
                   Agregar Key Result
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -314,14 +315,14 @@ export function ObjectiveFormPage() {
                               <option key={opt.value} value={opt.value}>{opt.label}</option>
                             ))}
                           </select>
-                          <button
+                          <Button
                             type="button"
                             onClick={() => removeKeyResult(index)}
                             className="p-1.5 rounded-lg text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
                             title="Eliminar KR"
                           >
                             <Trash2 size={14} />
-                          </button>
+                          </Button>
                         </div>
                       </div>
 
@@ -454,19 +455,19 @@ export function ObjectiveFormPage() {
 
             {/* Actions */}
             <div className="space-y-2 pt-2">
-              <button
+              <Button
                 type="submit"
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
               >
                 {objective ? 'Actualizar Objetivo' : 'Crear Objetivo'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => navigate('/strategy/objectives')}
                 className="w-full px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </div>
         </div>

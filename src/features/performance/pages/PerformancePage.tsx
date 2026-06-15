@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { getTeamPerformanceIndicators } from '@/services/performance/performanceService'
 import type { Team } from '@/types/domain'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { Button } from '@/components/ui/Button'
 import {
   TrendingUp,
   TrendingDown,
@@ -53,14 +54,14 @@ export function PerformancePage() {
     <div className="max-w-full">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button
+        <Button
           onClick={() => navigate('/teams/members')}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <div>
-          <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
             Rendimiento — {team.name}
           </h1>
           <p className="text-neutral-60 dark:text-neutral-40 text-sm">
@@ -72,7 +73,7 @@ export function PerformancePage() {
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {/* Best Performer */}
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
               <TrendingUp size={18} className="text-green-600 dark:text-green-400" />
@@ -96,7 +97,7 @@ export function PerformancePage() {
         </div>
 
         {/* Worst Performer */}
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
               <TrendingDown size={18} className="text-red-600 dark:text-red-400" />
@@ -120,7 +121,7 @@ export function PerformancePage() {
         </div>
 
         {/* Top SP */}
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
               <Zap size={18} className="text-blue-600 dark:text-blue-400" />
@@ -144,7 +145,7 @@ export function PerformancePage() {
         </div>
 
         {/* Bottom SP */}
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
               <BarChart3 size={18} className="text-amber-600 dark:text-amber-400" />
@@ -169,13 +170,13 @@ export function PerformancePage() {
       </div>
 
       {/* Member List */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
         <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
           <h2 className="font-semibold text-neutral-90 dark:text-white">Miembros del Equipo</h2>
         </div>
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
           {team.members && team.members.length > 0 ? team.members.map((member) => (
-            <button
+            <Button
               key={member.id}
               onClick={() => navigate(`/teams/${teamId}/performance/${member.id}`)}
               className="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-left"
@@ -190,7 +191,7 @@ export function PerformancePage() {
                 </div>
               </div>
               <ChevronRight size={18} className="text-neutral-30" />
-            </button>
+            </Button>
           )) : (
             <div className="px-5 py-8 text-center text-neutral-40">
               <Award size={32} className="mx-auto mb-2 opacity-50" />

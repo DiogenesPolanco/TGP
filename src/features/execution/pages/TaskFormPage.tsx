@@ -10,6 +10,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { criticalityOptions, taskStatusOptions } from '@/constants/options'
 import type { Task, Criticality } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 interface TaskFormData {
   title: string
@@ -166,14 +167,12 @@ export function TaskFormPage() {
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
-          <button type="submit" disabled={isSubmitting}
-            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
+          <Button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
             {isEdit ? 'Guardar Cambios' : 'Crear Tarea'}
-          </button>
-          <button type="button" onClick={() => navigate('/execution/tasks')}
-            className="px-6 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          </Button>
+          <Button type="button" onClick={() => navigate('/execution/tasks')}>
             Cancelar
-          </button>
+          </Button>
         </div>
       </form>
     </DetailLayout>

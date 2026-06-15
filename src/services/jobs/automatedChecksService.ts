@@ -336,8 +336,9 @@ async function runBackup(): Promise<DashboardAlert[]> {
 
 async function cleanExpiredShares(): Promise<DashboardAlert[]> {
   const alerts: DashboardAlert[] = []
-  const { getAzureConfig } = await import('@/services/backup/azureBackupService')
-  const config = getAzureConfig()
+  const { getShareAzureConfig, getAzureBackupConfig } = await import('@/services/share/azureShareService')
+  // Prefer dedicated share config, fall back to backup config
+  const config = getShareAzureConfig() ?? getAzureBackupConfig()
   if (!config?.sasUrl || !config.containerName) return alerts
 
   const { ContainerClient } = await import('@azure/storage-blob')
@@ -350,7 +351,7 @@ async function cleanExpiredShares(): Promise<DashboardAlert[]> {
   const client = new ContainerClient(containerUrl)
 
   const now = Date.now()
-  const maxAge = 48 * 60 * 60 * 1000 // 48 hours
+  const maxAge = 48 * 60 * 60 * 1000
   let deleted = 0
 
   try {

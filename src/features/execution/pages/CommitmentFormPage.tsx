@@ -9,6 +9,7 @@ import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { CommitmentStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 const statusOptions: { value: CommitmentStatus; label: string }[] = [
   { value: 'active', label: 'Activo' },
@@ -94,9 +95,9 @@ export function CommitmentFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/execution/commitments')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/execution/commitments')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
-        </button>
+        </Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
           {commitment ? 'Editar Compromiso' : 'Nuevo Compromiso'}
         </h1>
@@ -169,8 +170,8 @@ export function CommitmentFormPage() {
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <button type="button" onClick={() => navigate('/execution/commitments')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
-          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{commitment ? 'Actualizar' : 'Crear'}</button>
+          <Button type="button" onClick={() => navigate('/execution/commitments')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{commitment ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>
     </div>

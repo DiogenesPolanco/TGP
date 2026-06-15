@@ -9,11 +9,12 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
 import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
-import { AzureBackupConfig } from '@/features/admin/components/AzureBackupConfig'
+import { AzureCloudConfig } from '@/features/admin/components/AzureCloudConfig'
 import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConfig'
 import { JiraConfigPanel } from '@/components/jira/JiraConfigPanel'
 
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/Button'
 
 export function AdminPage() {
   const navigate = useNavigate()
@@ -165,7 +166,7 @@ export function AdminPage() {
           <JobSchedulerConfig />
         </div>
         <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
-          <AzureBackupConfig />
+          <AzureCloudConfig />
         </div>
       </div>
 
@@ -189,8 +190,8 @@ export function AdminPage() {
               placeholder="000000" />
             {totpError && <p className="text-sm text-danger">{totpError}</p>}
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</button>
-              <button onClick={handleConfirmExport} disabled={totpCode.length !== 6} className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">Verificar y Exportar</button>
+              <Button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+              <Button onClick={handleConfirmExport} disabled={totpCode.length !== 6} className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">Verificar y Exportar</Button>
             </div>
           </div>
         </div>
@@ -209,7 +210,7 @@ function ActionCard({ icon, label, desc, color, onClick, disabled }: {
     info: 'border-info/20 hover:bg-info/5 hover:border-info/30 text-info',
   }
   return (
-    <button onClick={onClick} disabled={disabled}
+    <Button onClick={onClick} disabled={disabled}
       className={cn(
         'flex flex-col items-center gap-2 p-5 rounded-2xl border bg-white dark:bg-neutral-80 transition-all duration-200 disabled:opacity-50',
         colors[color] ?? colors.primary,
@@ -218,6 +219,6 @@ function ActionCard({ icon, label, desc, color, onClick, disabled }: {
       <div className="p-2.5 rounded-xl bg-current/10">{icon}</div>
       <p className="text-sm font-semibold text-center leading-tight">{label}</p>
       <p className="text-[11px] text-center opacity-60 leading-tight">{desc}</p>
-    </button>
+    </Button>
   )
 }

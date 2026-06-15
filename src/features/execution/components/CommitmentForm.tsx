@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Commitment } from '@/types/domain'
 import type { CommitmentStatus } from '@/constants/enums'
+import { Button } from '@/components/ui/Button'
 
 interface CommitmentFormProps {
   commitment: Commitment | null
@@ -86,9 +87,9 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {commitment ? 'Editar Compromiso' : 'Nuevo Compromiso'}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             <X size={20} className="text-neutral-50" />
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -202,17 +203,17 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={!title.trim() || !commitmentDate || saving}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <Save size={16} />
             {saving ? 'Guardando...' : commitment ? 'Actualizar' : 'Crear Compromiso'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

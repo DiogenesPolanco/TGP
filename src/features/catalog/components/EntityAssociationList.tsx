@@ -6,6 +6,7 @@ import { Search, Plus, Unlink } from 'lucide-react'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import type { Vulnerability, Risk, Incident, AuditFinding } from '@/types/domain'
 import type { Table } from 'dexie'
+import { Button } from '@/components/ui/Button'
 
 type EntityRecord = Vulnerability | Risk | Incident | AuditFinding
 
@@ -152,13 +153,13 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
       className: 'text-right',
       headerClassName: 'text-right',
       render: (item: EntityRecord) => (
-        <button
+        <Button
           onClick={(e) => { e.stopPropagation(); handleDissociate(item.id) }}
           className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-all"
           title="Desasociar"
         >
           <Unlink size={14} />
-        </button>
+        </Button>
       ),
     })
     return cols
@@ -179,13 +180,13 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
 
       <div className="relative">
         {!showSearch ? (
-          <button
+          <Button
             onClick={() => setShowSearch(true)}
             className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors font-medium"
           >
             <Plus size={14} />
             Asociar {ENTITY_LABELS[entityType]}
-          </button>
+          </Button>
         ) : (
           <div>
             <div className="relative">
@@ -212,7 +213,7 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
                     const cells = config.renderCells(entity)
                     const sev = getSeverity(entity)
                     return (
-                      <button
+                      <Button
                         key={entity.id}
                         type="button"
                         onClick={() => handleAssociate(entity.id)}
@@ -227,19 +228,19 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
                             {cells[1]}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     )
                   })
                 )}
               </div>
             )}
 
-            <button
+            <Button
               onClick={() => { setShowSearch(false); setSearchText('') }}
               className="mt-1 text-xs text-neutral-50 hover:text-neutral-70 transition-colors"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         )}
       </div>

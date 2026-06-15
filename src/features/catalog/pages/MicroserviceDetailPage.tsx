@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -53,11 +53,18 @@ function EntitySection({ title, entityType, microserviceId }: { title: string; e
 
 export function MicroserviceDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { confirm } = useConfirm()
 
-  const ms = useLiveQuery(() => db.microservices.get(id ?? ''), [id])
-  const app = useLiveQuery(() => ms ? db.applications.get(ms.applicationId) : undefined, [ms?.applicationId])
+  const isNew = !id
+  const newAppId = isNew ? searchParams.get('appId') : null
+
+  const ms = useLiveQuery(() => (id ? db.microservices.get(id) : undefined), [id])
+  const app = useLiveQuery(
+    () => isNew && newAppId ? db.applications.get(newAppId) : (ms ? db.applications.get(ms.applicationId) : undefined),
+    [isNew, newAppId, ms?.applicationId],
+  )
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [techIds, setTechIds] = useState<string[]>([])
@@ -146,10 +153,10 @@ export function MicroserviceDetailPage() {
   const markDirty = () => { if (!dirty) setDirty(true) }
 
   const handleSave = async () => {
-    if (!id || !name.trim()) return
+    if (!name.trim()) return
     setSaving(true)
     try {
-      await db.microservices.update(id, {
+      const data = {
         name: name.trim(),
         description: description.trim(),
         technologies: techIds,
@@ -162,8 +169,22 @@ export function MicroserviceDetailPage() {
         lifecycleStatus,
         decommissionPlan,
         updatedAt: new Date(),
-      })
-      setDirty(false)
+      }
+
+      if (isNew) {
+        if (!newAppId) return
+        const newId = crypto.randomUUID()
+        await db.microservices.add({
+          id: newId,
+          applicationId: newAppId,
+          ...data,
+          createdAt: new Date(),
+        })
+        navigate(`/catalog/microservices/${newId}`)
+      } else {
+        await db.microservices.update(id!, data)
+        setDirty(false)
+      }
     } finally {
       setSaving(false)
     }
@@ -240,7 +261,7 @@ export function MicroserviceDetailPage() {
     markDirty()
   }
 
-  if (!ms) {
+  if (!isNew && !ms) {
     return (
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
         <p className="text-neutral-60 dark:text-neutral-40">Microservicio no encontrado</p>
@@ -269,7 +290,7 @@ export function MicroserviceDetailPage() {
     low: 'text-neutral-50',
   }
 
-  const sections = [
+  const allSections = [
     { id: 'info', label: 'Info General', icon: Server },
     { id: 'docs', label: 'Documentación', icon: BookOpen },
     { id: 'features', label: 'Funcionalidades', icon: Activity },
@@ -280,6 +301,9 @@ export function MicroserviceDetailPage() {
     { id: 'risks', label: 'Riesgos', icon: FileWarning },
     { id: 'audit', label: 'Hallazgos Auditoría', icon: BookOpen },
   ]
+  const sections = isNew
+    ? allSections.filter((s) => ['info', 'docs', 'features', 'roadmap'].includes(s.id))
+    : allSections
 
   return (
     <div className="space-y-6">
@@ -298,7 +322,9 @@ export function MicroserviceDetailPage() {
           </>
         )}
         <span className="text-neutral-40">/</span>
-        <span className="text-neutral-90 dark:text-white font-medium truncate max-w-[200px]">{ms.name}</span>
+        <span className="text-neutral-90 dark:text-white font-medium truncate max-w-[200px]">
+          {isNew ? 'Nuevo Microservicio' : ms!.name}
+        </span>
       </nav>
 
       {/* Header */}
@@ -309,10 +335,12 @@ export function MicroserviceDetailPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-neutral-90 dark:text-white flex items-center gap-3">
-              {ms.name}
-              <span className={`text-xs px-2.5 py-0.5 rounded-full border ${lifecycleColor[lifecycleStatus]}`}>
-                {lifecycleLabel[lifecycleStatus]}
-              </span>
+              {isNew ? 'Nuevo Microservicio' : ms!.name}
+              {!isNew && (
+                <span className={`text-xs px-2.5 py-0.5 rounded-full border ${lifecycleColor[lifecycleStatus]}`}>
+                  {lifecycleLabel[lifecycleStatus]}
+                </span>
+              )}
             </h1>
             {app && (
               <button
@@ -327,11 +355,11 @@ export function MicroserviceDetailPage() {
         </div>
         <button
           onClick={handleSave}
-          disabled={!dirty || saving || !name.trim()}
+          disabled={isNew ? (!name.trim() || saving) : (!dirty || saving || !name.trim())}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50"
         >
           <Save size={16} />
-          {saving ? 'Guardando…' : 'Guardar'}
+          {saving ? 'Guardando…' : isNew ? 'Crear Microservicio' : 'Guardar'}
         </button>
       </div>
 
@@ -744,7 +772,7 @@ export function MicroserviceDetailPage() {
             </div>
           )}
 
-          {activeSection === 'databases' && (
+          {activeSection === 'databases' && ms && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Bases de Datos Asociadas</h2>
               <div className="bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 rounded-xl p-5">
@@ -753,19 +781,19 @@ export function MicroserviceDetailPage() {
             </div>
           )}
 
-          {activeSection === 'vulns' && (
+          {activeSection === 'vulns' && ms && (
             <EntitySection title="Vulnerabilidades Asociadas" entityType="vulns" microserviceId={ms.id} />
           )}
 
-          {activeSection === 'incidents' && (
+          {activeSection === 'incidents' && ms && (
             <EntitySection title="Incidentes Asociados" entityType="incidents" microserviceId={ms.id} />
           )}
 
-          {activeSection === 'risks' && (
+          {activeSection === 'risks' && ms && (
             <EntitySection title="Riesgos Asociados" entityType="risks" microserviceId={ms.id} />
           )}
 
-          {activeSection === 'audit' && (
+          {activeSection === 'audit' && ms && (
             <EntitySection title="Hallazgos de Auditoría Asociados" entityType="audit" microserviceId={ms.id} />
           )}
         </div>

@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import type { VacationRecord } from '@/types/domain'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Plus, Trash2, Save, X, Umbrella, Calendar } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -141,13 +142,13 @@ export function VacationsSection({ memberId }: Props) {
       <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
           <h3 className="text-sm font-medium text-neutral-90 dark:text-white">Registro de Vacaciones</h3>
-          <button
+          <Button
             type="button"
             onClick={() => setAdding(true)}
             className="flex items-center gap-1 text-sm text-primary hover:underline"
           >
             <Plus size={14} /> Agregar
-          </button>
+          </Button>
         </div>
 
         {adding && (
@@ -172,8 +173,8 @@ export function VacationsSection({ memberId }: Props) {
               </p>
             )}
             <div className="flex gap-2">
-              <button type="button" onClick={handleAdd} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"><Save size={14} /> Guardar</button>
-              <button type="button" onClick={() => { setAdding(false); setForm(emptyForm) }} className="flex items-center gap-1 px-3 py-1.5 border border-neutral-30 dark:border-neutral-60 text-sm rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><X size={14} /> Cancelar</button>
+              <Button type="button" onClick={handleAdd} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"><Save size={14} /> Guardar</Button>
+              <Button type="button" onClick={() => { setAdding(false); setForm(emptyForm) }} className="flex items-center gap-1 px-3 py-1.5 border border-neutral-30 dark:border-neutral-60 text-sm rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><X size={14} /> Cancelar</Button>
             </div>
           </div>
         )}
@@ -207,8 +208,8 @@ export function VacationsSection({ memberId }: Props) {
                     </p>
                   )}
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => handleUpdate(record.id)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"><Save size={14} /> Guardar</button>
-                    <button type="button" onClick={() => setEditingId(null)} className="flex items-center gap-1 px-3 py-1.5 border border-neutral-30 dark:border-neutral-60 text-sm rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><X size={14} /> Cancelar</button>
+                    <Button type="button" onClick={() => handleUpdate(record.id)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"><Save size={14} /> Guardar</Button>
+                    <Button type="button" onClick={() => setEditingId(null)} className="flex items-center gap-1 px-3 py-1.5 border border-neutral-30 dark:border-neutral-60 text-sm rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><X size={14} /> Cancelar</Button>
                   </div>
                 </div>
               ) : (
@@ -226,12 +227,12 @@ export function VacationsSection({ memberId }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button type="button" onClick={() => startEdit(record)} className="p-1.5 rounded-md text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
+                    <Button type="button" onClick={() => startEdit(record)} className="p-1.5 rounded-md text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
                       <Save size={14} />
-                    </button>
-                    <button type="button" onClick={() => handleDelete(record.id)} className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar">
+                    </Button>
+                    <Button type="button" onClick={() => handleDelete(record.id)} className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar">
                       <Trash2 size={14} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

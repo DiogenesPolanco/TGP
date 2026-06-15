@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Activity, Commitment } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 interface WeeklyTimelineProps {
   activities: Activity[]
@@ -36,25 +37,25 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
     selectedWeek && week.start.getTime() === selectedWeek.start.getTime()
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary" />
           <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Roadmap Semanal</h3>
         </div>
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={() => setOffset((o) => o - 4)}
             className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors text-neutral-50 hover:text-neutral-90 dark:hover:text-white"
           >
             <ChevronLeft size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setOffset((o) => o + 4)}
             className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors text-neutral-50 hover:text-neutral-90 dark:hover:text-white"
           >
             <ChevronRight size={16} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -65,7 +66,7 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
           const selected = isSelected(week)
 
           return (
-            <button
+            <Button
               key={i}
               onClick={() => onWeekSelect(selected ? null : { start: week.start, end: week.end })}
               className={`flex-1 min-w-[90px] px-3 py-4 flex flex-col items-center gap-2 transition-all cursor-pointer ${
@@ -125,7 +126,7 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
               <span className="text-[10px] text-neutral-50">
                 {week.start.getDate()}/{week.start.getMonth() + 1}
               </span>
-            </button>
+            </Button>
           )
         })}
       </div>

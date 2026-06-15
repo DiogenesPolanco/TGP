@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
 import { cn } from '@/lib/utils'
 import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -166,33 +167,16 @@ export function SprintsSection({ memberId, teamId }: Props) {
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints</h2>
         <div className="flex items-center gap-2">
           <div className="flex bg-neutral-10 dark:bg-neutral-70 rounded-lg p-0.5">
-            <button
-              onClick={() => setViewMode('list')}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                viewMode === 'list' ? 'bg-white dark:bg-neutral-80 shadow-sm text-primary' : 'text-neutral-50 hover:text-neutral-90'
-              )}
-              title="Vista lista"
-            >
+            <Button onClick={() => setViewMode('list')}>
               <List size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('chart')}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                viewMode === 'chart' ? 'bg-white dark:bg-neutral-80 shadow-sm text-primary' : 'text-neutral-50 hover:text-neutral-90'
-              )}
-              title="Vista gráfico"
-            >
+            </Button>
+            <Button onClick={() => setViewMode('chart')}>
               <BarChart3 size={16} />
-            </button>
+            </Button>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
-          >
+          <Button onClick={() => setShowForm(true)}>
             <Plus size={16} /> Agregar Sprint
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -349,12 +333,12 @@ export function SprintsSection({ memberId, teamId }: Props) {
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={addSprint} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
+            <Button onClick={addSprint} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
               Guardar Sprint
-            </button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            </Button>
+            <Button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -417,8 +401,8 @@ export function SprintsSection({ memberId, teamId }: Props) {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</button>
-                        <button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</button>
+                        <Button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</Button>
+                        <Button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</Button>
                       </div>
                     </div>
                   ) : (
@@ -434,20 +418,12 @@ export function SprintsSection({ memberId, teamId }: Props) {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
-                        <button
-                          onClick={() => startEdit(sp)}
-                          className="p-1.5 opacity-0 group-hover/sprint:opacity-100 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                          title="Editar sprint"
-                        >
+                        <Button onClick={() => startEdit(sp)}>
                           <Edit3 size={14} />
-                        </button>
-                        <button
-                          onClick={() => removeSprint(sp.id)}
-                          className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          title="Eliminar sprint"
-                        >
+                        </Button>
+                        <Button onClick={() => removeSprint(sp.id)}>
                           <Trash2 size={14} />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )

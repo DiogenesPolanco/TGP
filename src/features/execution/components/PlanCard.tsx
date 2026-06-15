@@ -49,7 +49,7 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
 
   return (
     <div
-      className="group relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+      className="group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
       onClick={() => navigate(`/execution/plans/${plan.id}`)}
     >
       {/* Accent bar at top */}

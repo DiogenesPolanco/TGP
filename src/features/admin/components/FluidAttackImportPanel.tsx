@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { Upload, FileText, AlertTriangle, CheckCircle, XCircle, ArrowRight, ShieldAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/stores/appStore'
+import { Button } from '@/components/ui/Button'
 import {
   parseFluidAttackCSV,
   matchLocations,
@@ -96,7 +97,7 @@ export function FluidAttackImportPanel() {
             onChange={handleFile}
             className="hidden"
           />
-          <button
+          <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
             className={cn(
@@ -122,7 +123,7 @@ export function FluidAttackImportPanel() {
                 </p>
               </>
             )}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -133,19 +134,19 @@ export function FluidAttackImportPanel() {
               {parsedRows.length} filas detectadas
             </p>
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={handleReset}
                 className="px-3 py-1.5 text-xs border border-neutral-30 dark:border-neutral-60 rounded-lg text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleImport}
                 className="px-3 py-1.5 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors flex items-center gap-1.5"
               >
                 <ArrowRight size={14} />
                 Importar
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -274,12 +275,12 @@ export function FluidAttackImportPanel() {
           )}
 
           <div className="flex justify-end">
-            <button
+            <Button
               onClick={handleReset}
               className="px-4 py-2 text-xs bg-neutral-10 dark:bg-neutral-85 text-neutral-70 dark:text-neutral-30 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
             >
               Importar otro archivo
-            </button>
+            </Button>
           </div>
         </div>
       )}

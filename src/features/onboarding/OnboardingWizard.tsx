@@ -6,6 +6,7 @@ import { seedTechnologies } from '@/services/demo/seedTechnologies'
 import { useUserStore } from '@/stores/userStore'
 
 import { Check, ChevronRight, ChevronLeft, Building2, Bell, Sparkles, AppWindow, Cpu, Users, Shield, Target, LayoutDashboard, User } from 'lucide-react'
+import { Button } from '@/components/ui/Button';
 
 const STORAGE_KEY = 'tgp-onboarding-done'
 
@@ -91,9 +92,9 @@ function StepWelcome({ onNext }: StepProps) {
         </div>
       </div>
 
-      <button onClick={onNext} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+      <Button onClick={onNext} variant="primary" className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
         Entendido, comenzar <ChevronRight size={16} />
-      </button>
+      </Button>
     </div>
   )
 }
@@ -132,11 +133,11 @@ function StepBusinessUnit({ onNext, onSkip }: StepProps) {
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={() => { navigate('/admin/business-units'); onNext() }}
+        <Button onClick={() => { navigate('/admin/business-units'); onNext() }}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Ir a crear BU <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Ya tengo BUs</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Ya tengo BUs</Button>}
       </div>
     </div>
   )
@@ -173,11 +174,11 @@ function StepApplications({ onNext, onSkip }: StepProps) {
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={() => { navigate('/catalog/applications'); onNext() }}
+        <Button onClick={() => { navigate('/catalog/applications'); onNext() }}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Ir a Aplicaciones <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Ya tengo apps</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Ya tengo apps</Button>}
       </div>
     </div>
   )
@@ -206,11 +207,11 @@ function StepTechnologies({ onNext, onSkip }: StepProps) {
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={() => { navigate('/catalog/obsolescence'); onNext() }}
+        <Button onClick={() => { navigate('/catalog/obsolescence'); onNext() }}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Ir a Tecnologías <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Más tarde</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Más tarde</Button>}
       </div>
     </div>
   )
@@ -243,11 +244,11 @@ function StepTeams({ onNext, onSkip }: StepProps) {
         </div>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={() => { navigate('/teams'); onNext() }}
+        <Button onClick={() => { navigate('/teams'); onNext() }}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Ir a Equipos <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Más tarde</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Más tarde</Button>}
       </div>
     </div>
   )
@@ -276,20 +277,20 @@ function StepSecurity({ onNext, onSkip }: StepProps) {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <button onClick={() => navigate('/security/vulnerabilities')} className="text-left bg-neutral-5 dark:bg-neutral-85 rounded-lg p-3 hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
+        <Button onClick={() => navigate('/security/vulnerabilities')} className="text-left bg-neutral-5 dark:bg-neutral-85 rounded-lg p-3 hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
           <p className="text-sm font-semibold text-neutral-90 dark:text-white">Vulnerabilidades</p>
           <p className="text-xs text-neutral-50">CVSS + SLA</p>
-        </button>
-        <button onClick={() => navigate('/governance/risks')} className="text-left bg-neutral-5 dark:bg-neutral-85 rounded-lg p-3 hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
+        </Button>
+        <Button onClick={() => navigate('/governance/risks')} className="text-left bg-neutral-5 dark:bg-neutral-85 rounded-lg p-3 hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
           <p className="text-sm font-semibold text-neutral-90 dark:text-white">Riesgos</p>
           <p className="text-xs text-neutral-50">Probabilidad × Impacto</p>
-        </button>
+        </Button>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+        <Button onClick={onNext} variant="primary" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Entendido <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Saltar</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Saltar</Button>}
       </div>
     </div>
   )
@@ -325,10 +326,10 @@ function StepExecution({ onNext, onSkip }: StepProps) {
         </div>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+        <Button onClick={onNext} variant="primary" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Entendido <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Saltar</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Saltar</Button>}
       </div>
     </div>
   )
@@ -356,10 +357,10 @@ function StepDashboard({ onNext, onSkip }: StepProps) {
         </div>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+        <Button onClick={onNext} variant="primary" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Ver Dashboard <ChevronRight size={16} />
-        </button>
-        {onSkip && <button onClick={onSkip} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">Saltar</button>}
+        </Button>
+        {onSkip && <Button onClick={onSkip} variant="ghost" size="md" className="px-5">Saltar</Button>}
       </div>
     </div>
   )
@@ -408,9 +409,9 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
           <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¡Bienvenido, {displayName.split(' ')[0]}!</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40">Datos de ejemplo cargados con tu perfil.</p>
         </div>
-        <button onClick={onNext} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+        <Button onClick={onNext} variant="primary" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Finalizar <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -448,13 +449,13 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
         </p>
       </div>
       <div className="flex items-center justify-center gap-3">
-        <button onClick={handleLoad} disabled={loading}
+        <Button onClick={handleLoad} disabled={loading}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-success text-white rounded-xl font-medium text-sm hover:bg-success-dark transition-colors disabled:opacity-50">
           {loading ? 'Cargando...' : 'Cargar datos demo'}
-        </button>
-        <button onClick={onNext} className="px-4 py-2.5 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white">
+        </Button>
+        <Button onClick={onNext} variant="ghost" size="md" className="px-5">
           Lo haré manualmente
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -491,9 +492,9 @@ function StepDone({ onClose }: StepProps) {
           <li>En detalle de app, clickear microservicio → asociar vulnerabilidades/riesgos</li>
         </ol>
       </div>
-      <button onClick={handleFinish} className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
+      <Button onClick={handleFinish} variant="primary" className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
         Ir al Dashboard <ChevronRight size={16} />
-      </button>
+      </Button>
     </div>
   )
 }
@@ -541,9 +542,9 @@ export function OnboardingWizard({ onClose }: WizardProps) {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="w-full max-w-lg bg-white dark:bg-neutral-80 rounded-3xl border border-neutral-20 dark:border-neutral-70 shadow-2xl relative">
           {step > 0 && (
-            <button onClick={handleBack} className="absolute top-5 left-5 p-2 rounded-xl hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors z-10" title="Atrás">
+            <Button onClick={handleBack} variant="ghost" className="absolute top-5 left-5 p-2 rounded-xl hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors z-10" title="Atrás">
               <ChevronLeft size={20} className="text-neutral-50" />
-            </button>
+            </Button>
           )}
           <div className="pt-5 px-6">
             <div className="w-full h-1 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">

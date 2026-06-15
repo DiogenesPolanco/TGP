@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import { Plus, Search, Upload, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Pencil, Trash2 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   planned: { label: 'Planificado', color: 'bg-info/10 text-info border-info/30', icon: <Target size={16} /> },
@@ -80,31 +81,31 @@ export function PlansPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Planes de Trabajo</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Planes de Trabajo</h2>
           <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
             Gestiona sprints, trimestres e iniciativas
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => navigate('/admin/import')}
             className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('/execution/plans/new')}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
             Nuevo Plan
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -142,7 +143,7 @@ export function PlansPage() {
           return (
             <div
               key={plan.id}
-              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
               onClick={() => navigate(`/execution/plans/${plan.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -181,20 +182,20 @@ export function PlansPage() {
                   <span>{stats.completed}/{stats.total} acts</span>
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
+                  <Button
                     onClick={(e) => { e.stopPropagation(); navigate(`/execution/plans/${plan.id}/edit`) }}
                     className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
                     title="Editar"
                   >
                     <Pencil size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={(e) => { e.stopPropagation(); handleDelete(plan) }}
                     className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -212,7 +213,7 @@ export function PlansPage() {
       />
 
       {filteredPlans.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
           <Target size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
           <p className="text-sm text-neutral-50">
             {plans.length === 0 ? 'No hay planes. Crea tu primer plan de trabajo.' : 'No se encontraron planes con los filtros seleccionados.'}

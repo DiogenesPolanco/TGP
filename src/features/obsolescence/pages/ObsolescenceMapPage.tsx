@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { computeAppTechMap } from '@/utils/technologyUtils'
 import { ObsolescenceGraph } from '@/features/obsolescence/components/ObsolescenceGraph'
 import type { SupportStatus, Technology } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 import {
   Network,
   AlertTriangle,
@@ -25,7 +26,7 @@ function StatCard({ icon, value, label, iconBg, valueColor, active, onClick }: {
   valueColor?: string; active: boolean; onClick: () => void
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       className={`rounded-xl border p-3 flex items-center gap-3 transition-all text-left cursor-pointer ${
@@ -39,7 +40,7 @@ function StatCard({ icon, value, label, iconBg, valueColor, active, onClick }: {
         <p className={`text-lg font-bold ${valueColor ?? 'text-neutral-90 dark:text-white'}`}>{value}</p>
         <p className="text-xs text-neutral-50 truncate">{label}</p>
       </div>
-    </button>
+    </Button>
   )
 }
 
@@ -228,12 +229,12 @@ export function ObsolescenceMapPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button
+          <Button
             onClick={() => navigate('/catalog/obsolescence')}
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <ArrowLeft size={20} className="text-neutral-60" />
-          </button>
+          </Button>
           <div>
             <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Mapa de Obsolescencias</h1>
             <p className="text-sm text-neutral-60 dark:text-neutral-40">
@@ -399,7 +400,7 @@ export function ObsolescenceMapPage() {
               <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5 block">Estado de soporte</label>
               <div className="flex flex-wrap gap-1.5">
                 {STATUS_FILTER_OPTIONS.map((opt) => (
-                  <button
+                  <Button
                     key={opt.value}
                     onClick={() => setStatusFilter(opt.value)}
                     className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
@@ -410,7 +411,7 @@ export function ObsolescenceMapPage() {
                     style={statusFilter === opt.value ? { borderColor: opt.color, color: opt.color } : undefined}
                   >
                     {opt.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -421,7 +422,7 @@ export function ObsolescenceMapPage() {
                 {showMicroservices ? <Eye size={15} className="text-primary" /> : <EyeOff size={15} className="text-neutral-50" />}
                 <span className="text-xs text-neutral-70 dark:text-neutral-30">Microservicios</span>
               </div>
-              <button
+              <Button
                 onClick={() => setShowMicroservices(!showMicroservices)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                   showMicroservices ? 'bg-primary' : 'bg-neutral-40'
@@ -432,17 +433,17 @@ export function ObsolescenceMapPage() {
                     showMicroservices ? 'translate-x-4' : 'translate-x-0.5'
                   }`}
                 />
-              </button>
+              </Button>
             </div>
 
             {/* Clear filters */}
             {(search || statusFilter !== 'all' || !showMicroservices) && (
-              <button
+              <Button
                 onClick={() => { setSearch(''); setStatusFilter('all'); setShowMicroservices(true) }}
                 className="mt-3 w-full text-xs text-center text-primary hover:text-primary-dark py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
               >
                 Limpiar filtros
-              </button>
+              </Button>
             )}
           </div>
 

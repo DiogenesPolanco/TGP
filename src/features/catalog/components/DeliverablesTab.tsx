@@ -9,6 +9,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
+import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<DeliverableStatus, string> = {
   pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
@@ -89,20 +90,20 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
       headerClassName: 'text-right',
       render: (d) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); setEditingId(editingId === d.id ? null : d.id) }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
             title="Editar"
           >
             <Pencil size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(d.id) }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -182,14 +183,14 @@ function DeliverableForm({
 
   return (
     <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg">
-      <button
+      <Button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors rounded-lg"
       >
         {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         <Plus size={16} />
         Nuevo entregable
-      </button>
+      </Button>
 
       {open && (
         <div className="px-4 pb-4 space-y-3 border-t border-neutral-20 dark:border-neutral-70 pt-3">
@@ -223,14 +224,14 @@ function DeliverableForm({
             </div>
           </div>
           <div className="flex justify-end">
-            <button
+            <Button
               onClick={handleSave}
               disabled={!title.trim() || saving}
               className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
             >
               <Save size={14} />
               {saving ? 'Guardando...' : 'Guardar'}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -300,21 +301,21 @@ function InlineEditDeliverable({
             <option key={o.id} value={o.id}>{o.title}</option>
           ))}
         </select>
-        <button
+        <Button
           onClick={handleUpdate}
           disabled={saving}
           className="p-1.5 rounded text-success hover:bg-success/10 transition-colors disabled:opacity-50"
           title="Guardar"
         >
           <Save size={14} />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onClose}
           className="p-1.5 rounded text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
           title="Cancelar"
         >
           <X size={14} />
-        </button>
+        </Button>
       </div>
     </div>
   )
