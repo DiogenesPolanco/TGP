@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Clock, Database, Settings, Share2, Check, Copy } from 'lucide-react'
 import { useDashboardMetrics } from '../hooks/useDashboardMetrics'
 import { DashboardHero } from '../components/DashboardHero'
@@ -15,6 +16,14 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { Button } from '@/components/ui/Button'
 
 export function DashboardPage() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      navigate('/mobile/dashboard', { replace: true })
+    }
+  }, [navigate])
+
   const metrics = useDashboardMetrics()
   const { enabledWidgets } = useDashboardConfigStore()
   const e = enabledWidgets
