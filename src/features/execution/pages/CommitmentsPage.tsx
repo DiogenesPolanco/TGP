@@ -162,13 +162,14 @@ export function CommitmentsPage() {
             key: 'title',
             label: 'Compromiso',
             sortable: true,
+            className: 'max-w-xs',
             render: (c) => (
-              <>
-                <p className="text-sm font-medium text-neutral-90 dark:text-white">{c.title}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{c.title}</p>
                 {c.description && (
-                  <p className="text-xs text-neutral-50 mt-0.5 line-clamp-1">{c.description}</p>
+                  <p className="text-xs text-neutral-50 mt-0.5 truncate">{c.description}</p>
                 )}
-              </>
+              </div>
             ),
           },
           {

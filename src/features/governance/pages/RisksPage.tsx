@@ -89,11 +89,12 @@ export function RisksPage() {
       key: 'title',
       label: 'Título',
       sortable: true,
+      className: 'max-w-xs',
       render: (risk) => (
-        <>
-          <p className="text-sm font-medium text-neutral-90 dark:text-white">{risk.title}</p>
-          <p className="text-xs text-neutral-50 dark:text-neutral-50">{risk.description}</p>
-        </>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{risk.title}</p>
+          {risk.description && <p className="text-xs text-neutral-50 dark:text-neutral-50 truncate">{risk.description}</p>}
+        </div>
       ),
     },
     {

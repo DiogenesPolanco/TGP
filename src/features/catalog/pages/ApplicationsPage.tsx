@@ -111,13 +111,14 @@ export function ApplicationsPage() {
       key: 'name',
       label: 'Nombre',
       sortable: true,
+      className: 'max-w-xs',
       render: (app) => (
-        <>
-          <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline">
+        <div className="min-w-0">
+          <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline truncate block">
             {app.name}
           </Link>
-          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{app.description}</p>
-        </>
+          {app.description && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5 truncate">{app.description}</p>}
+        </div>
       ),
     },
     {

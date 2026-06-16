@@ -56,8 +56,10 @@ export function DependenciesPage() {
     { key: 'targetType', label: 'Destino', sortable: true, render: (d) => (
       <span className="text-sm text-neutral-70 dark:text-neutral-30">{getEntityTitle(d.targetType, d.targetId)}</span>
     )},
-    { key: 'description', label: 'Descripción', sortable: true, render: (d) => (
-      <span className="text-sm text-neutral-70 dark:text-neutral-30">{d.description || '—'}</span>
+    { key: 'description', label: 'Descripción', sortable: true, className: 'max-w-xs', render: (d) => (
+      <div className="min-w-0">
+        <span className="text-sm text-neutral-70 dark:text-neutral-30 truncate block">{d.description || '—'}</span>
+      </div>
     )},
     { key: 'status', label: 'Estado', sortable: true, render: (d) => (
       <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor[d.status]}`}>{statusLabel[d.status]}</span>
