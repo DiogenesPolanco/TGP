@@ -42,7 +42,7 @@ export function RichTextViewer({ content }: RichTextViewerProps) {
   if (!editor) return null
 
   return (
-    <div className="max-w-none">
+    <div>
       <EditorContent editor={editor} />
     </div>
   )

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, Info } from 'lucide-react'
 
 interface KpiCardProps {
   title: string
@@ -10,6 +10,8 @@ interface KpiCardProps {
   icon?: React.ReactNode
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info'
   onClick?: () => void
+  /** Optional tooltip content shown as an info icon in the top-right corner */
+  info?: React.ReactNode
 }
 
 const colorMap = {
@@ -45,7 +47,7 @@ const colorMap = {
   },
 }
 
-export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color = 'primary', onClick }: KpiCardProps) {
+export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color = 'primary', onClick, info }: KpiCardProps) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
   const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-danger' : 'text-neutral-50'
   const styles = colorMap[color]
@@ -62,10 +64,10 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
         onClick && 'cursor-pointer',
       )}
     >
-      {/* Gradient overlay on hover */}
+      {/* Gradient overlay on hover — pointer-events-none so it doesn't block interactions */}
       <div
         className={cn(
-          'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+          'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
           'bg-gradient-to-b',
           styles.gradient,
         )}
@@ -80,12 +82,23 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
           <div className={cn('p-2 rounded-lg transition-transform duration-300 group-hover:scale-110', styles.icon)}>
             {icon}
           </div>
-          {trend && (
-            <div className={cn('flex items-center gap-1 text-sm', trendColor)}>
-              <TrendIcon size={16} />
-              <span>{trendValue}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {info && (
+              <div className="relative group/info">
+                <Info size={14} className="text-neutral-50 cursor-help transition-colors hover:text-neutral-60" />
+                <div className="absolute right-0 top-full mt-2 w-60 p-3 rounded-lg bg-neutral-90 dark:bg-neutral-20 text-white dark:text-neutral-90 text-xs shadow-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 z-50 pointer-events-none">
+                  {info}
+                  <div className="absolute right-3 bottom-full w-2 h-2 bg-neutral-90 dark:bg-neutral-20 rotate-45 translate-y-1" />
+                </div>
+              </div>
+            )}
+            {trend && (
+              <div className={cn('flex items-center gap-1 text-sm', trendColor)}>
+                <TrendIcon size={16} />
+                <span>{trendValue}</span>
+              </div>
+            )}
+          </div>
         </div>
         <h3 className="text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-1">{title}</h3>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>

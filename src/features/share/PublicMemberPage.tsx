@@ -82,9 +82,12 @@ export function PublicMemberPage() {
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-neutral-50">
-            <Clock size={14} />
-            <span>Actualizado al momento del acceso</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-xs text-neutral-50">
+              <Clock size={14} />
+              <span>Actualizado al momento del acceso</span>
+            </div>
+            <PrintButton />
           </div>
         </div>
       </header>
@@ -137,9 +140,6 @@ export function PublicMemberPage() {
                     <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
                       <div className={cn('h-full rounded-full', pct >= 80 ? 'bg-success' : pct >= 50 ? 'bg-warning' : 'bg-danger')}
                         style={{ width: `${pct}%` }} />
-          </div>
-          <div className="flex items-center gap-2">
-            <PrintButton />
           </div>
                     <span className="text-neutral-90 dark:text-white font-medium w-16 text-right">
                       {sp.storyPointsCompleted}/{total}

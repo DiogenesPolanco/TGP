@@ -110,7 +110,7 @@ export function SortableTable<T extends { id: string }>({
                 className={`${onRowClick ? 'cursor-pointer' : ''} hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group ${rowClassName?.(item) ?? ''}`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className={`px-4 py-3 text-sm ${col.className ?? ''}`}>
+                  <td key={col.key} className={`px-4 py-3 text-sm break-words ${col.className ?? ''}`}>
                     {col.render(item)}
                   </td>
                 ))}

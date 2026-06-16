@@ -106,7 +106,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
             />
           </div>
 
-          <div className="col-span-2">
+          <div className="col-span-2 overflow-hidden">
             <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripcion</label>
             <RichTextEditor
               value={description}

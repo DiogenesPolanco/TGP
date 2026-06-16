@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { AlertTriangle, RefreshCw, Bug } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 interface Props {
@@ -64,15 +64,26 @@ export class ErrorBoundary extends Component<Props, State> {
               )}
             </div>
 
-            <div className="flex items-center justify-center gap-3">
-              <Button onClick={this.handleReset} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 rounded-lg transition-colors">
-                <RefreshCw size={16} />
-                Reintentar
-              </Button>
-              <Button onClick={this.handleReload} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors">
-                <RefreshCw size={16} />
-                Recargar
-              </Button>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center justify-center gap-3">
+                <Button onClick={this.handleReset} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+                  <RefreshCw size={16} />
+                  Reintentar
+                </Button>
+                <Button onClick={this.handleReload} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors">
+                  <RefreshCw size={16} />
+                  Recargar
+                </Button>
+              </div>
+              <a
+                href="https://github.com/DiogenesPolanco/TGP/issues/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-50 hover:text-neutral-70 dark:hover:text-neutral-30 transition-colors"
+              >
+                <Bug size={12} />
+                Reportar error en GitHub
+              </a>
             </div>
           </div>
         </div>

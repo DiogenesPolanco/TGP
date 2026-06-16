@@ -13,7 +13,7 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Candidate } from '@/types/domain'
-import { Plus, Search, Users, UserCheck, Calendar, Star, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
+import { Plus, Search, Users, UserCheck, Calendar, Star, XCircle, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -21,6 +21,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   interviewed: { label: 'Entrevistado', color: 'bg-info/10 text-info' },
   selected: { label: 'Seleccionado', color: 'bg-success/10 text-success' },
   rejected: { label: 'Rechazado', color: 'bg-danger/10 text-danger' },
+  no_show: { label: 'No Asistió', color: 'bg-neutral-30 text-neutral-60' },
 }
 
 export function RecruitmentPage() {
@@ -216,7 +217,7 @@ export function RecruitmentPage() {
         />
       )}
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         <StatCard
           icon={<Users size={20} />} label="Total"
           value={candidates.length} color="text-primary"
@@ -240,6 +241,12 @@ export function RecruitmentPage() {
           value={candidates.filter((c) => c.status === 'selected').length} color="text-success"
           active={statusFilter === 'selected'}
           onClick={() => setStatusFilter('selected')}
+        />
+        <StatCard
+          icon={<XCircle size={20} />} label="No Asistieron"
+          value={candidates.filter((c) => c.status === 'no_show').length} color="text-neutral-50"
+          active={statusFilter === 'no_show'}
+          onClick={() => setStatusFilter('no_show')}
         />
       </div>
 

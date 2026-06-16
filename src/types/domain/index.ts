@@ -539,7 +539,7 @@ export interface Candidate {
   position: string
   interviewDate: Date | null
   comments: string
-  status: 'pending' | 'interviewed' | 'selected' | 'rejected'
+  status: 'pending' | 'interviewed' | 'selected' | 'rejected' | 'no_show'
   teamId: string | null
   totalScore: number
   createdAt: Date

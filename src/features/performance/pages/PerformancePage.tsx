@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
-import { getTeamPerformanceIndicators } from '@/services/performance/performanceService'
+import { getTeamPerformanceIndicators, getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team } from '@/types/domain'
+import type { MemberKPIs } from '@/services/performance/performanceService'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { KpiCard } from '@/components/data-display/KpiCard'
 import { Button } from '@/components/ui/Button'
 import {
   TrendingUp,
@@ -21,6 +23,7 @@ export function PerformancePage() {
   const navigate = useNavigate()
   const [team, setTeam] = useState<Team | null>(null)
   const [indicators, setIndicators] = useState<Awaited<ReturnType<typeof getTeamPerformanceIndicators>> | null>(null)
+  const [memberKpis, setMemberKpis] = useState<Map<string, MemberKPIs>>(new Map())
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,6 +33,17 @@ export function PerformancePage() {
       setTeam(t)
       const ind = await getTeamPerformanceIndicators(t)
       setIndicators(ind)
+
+      // Fetch individual member KPIs
+      if (t.members && t.members.length > 0) {
+        const kpisArray = await Promise.all(
+          t.members.map((m) => getMemberKPIs(m.id))
+        )
+        const map = new Map<string, MemberKPIs>()
+        kpisArray.forEach((k) => map.set(k.memberId, k))
+        setMemberKpis(map)
+      }
+
       setLoading(false)
     })
   }, [teamId])
@@ -49,6 +63,9 @@ export function PerformancePage() {
       </div>
     )
   }
+
+  // Compute max SP for progress bar scaling
+  const maxSP = Math.max(1, ...Array.from(memberKpis.values()).map((k) => k.totalSP))
 
   return (
     <div className="max-w-full">
@@ -72,101 +89,57 @@ export function PerformancePage() {
 
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {/* Best Performer */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
-              <TrendingUp size={18} className="text-green-600 dark:text-green-400" />
-            </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-50">
-              Mejor Rendimiento
-            </span>
-          </div>
-          {indicators?.bestPerformer ? (
-            <>
-              <p className="text-lg font-bold text-neutral-90 dark:text-white truncate">
-                {indicators.bestPerformer.member.displayName}
-              </p>
-              <p className="text-sm text-neutral-50 mt-1">
-                {indicators.bestPerformer.kpis.efficiencyPct}% eficiencia · {indicators.bestPerformer.kpis.totalSP} SP
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-neutral-40">Sin datos</p>
-          )}
-        </div>
+        {indicators?.bestPerformer ? (
+          <KpiCard
+            title="Mejor Rendimiento"
+            value={indicators.bestPerformer.kpis.efficiencyPct + '%'}
+            subtitle={`${indicators.bestPerformer.member.displayName} · ${indicators.bestPerformer.kpis.totalSP} SP`}
+            trend="up"
+            trendValue={`${indicators.bestPerformer.kpis.efficiencyPct}%`}
+            icon={<TrendingUp size={20} />}
+            color="success"
+          />
+        ) : (
+          <KpiCard title="Mejor Rendimiento" value="—" icon={<TrendingUp size={20} />} color="success" />
+        )}
 
-        {/* Worst Performer */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
-              <TrendingDown size={18} className="text-red-600 dark:text-red-400" />
-            </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-50">
-              Menor Rendimiento
-            </span>
-          </div>
-          {indicators?.worstPerformer ? (
-            <>
-              <p className="text-lg font-bold text-neutral-90 dark:text-white truncate">
-                {indicators.worstPerformer.member.displayName}
-              </p>
-              <p className="text-sm text-neutral-50 mt-1">
-                {indicators.worstPerformer.kpis.efficiencyPct}% eficiencia · {indicators.worstPerformer.kpis.totalSP} SP
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-neutral-40">Sin datos</p>
-          )}
-        </div>
+        {indicators?.worstPerformer ? (
+          <KpiCard
+            title="Menor Rendimiento"
+            value={indicators.worstPerformer.kpis.efficiencyPct + '%'}
+            subtitle={`${indicators.worstPerformer.member.displayName} · ${indicators.worstPerformer.kpis.totalSP} SP`}
+            trend="down"
+            trendValue={`${indicators.worstPerformer.kpis.efficiencyPct}%`}
+            icon={<TrendingDown size={20} />}
+            color="danger"
+          />
+        ) : (
+          <KpiCard title="Menor Rendimiento" value="—" icon={<TrendingDown size={20} />} color="danger" />
+        )}
 
-        {/* Top SP */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-              <Zap size={18} className="text-blue-600 dark:text-blue-400" />
-            </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-50">
-              Más Story Points
-            </span>
-          </div>
-          {indicators?.topSP ? (
-            <>
-              <p className="text-lg font-bold text-neutral-90 dark:text-white truncate">
-                {indicators.topSP.member.displayName}
-              </p>
-              <p className="text-sm text-neutral-50 mt-1">
-                {indicators.topSP.sp} SP completados
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-neutral-40">Sin datos</p>
-          )}
-        </div>
+        {indicators?.topSP ? (
+          <KpiCard
+            title="Más Story Points"
+            value={String(indicators.topSP.sp)}
+            subtitle={indicators.topSP.member.displayName}
+            icon={<Zap size={20} />}
+            color="primary"
+          />
+        ) : (
+          <KpiCard title="Más Story Points" value="—" icon={<Zap size={20} />} color="primary" />
+        )}
 
-        {/* Bottom SP */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
-              <BarChart3 size={18} className="text-amber-600 dark:text-amber-400" />
-            </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-50">
-              Menos Story Points
-            </span>
-          </div>
-          {indicators?.bottomSP ? (
-            <>
-              <p className="text-lg font-bold text-neutral-90 dark:text-white truncate">
-                {indicators.bottomSP.member.displayName}
-              </p>
-              <p className="text-sm text-neutral-50 mt-1">
-                {indicators.bottomSP.sp} SP completados
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-neutral-40">Sin datos</p>
-          )}
-        </div>
+        {indicators?.bottomSP ? (
+          <KpiCard
+            title="Menos Story Points"
+            value={String(indicators.bottomSP.sp)}
+            subtitle={indicators.bottomSP.member.displayName}
+            icon={<BarChart3 size={20} />}
+            color="info"
+          />
+        ) : (
+          <KpiCard title="Menos Story Points" value="—" icon={<BarChart3 size={20} />} color="info" />
+        )}
       </div>
 
       {/* Member List */}
@@ -175,24 +148,72 @@ export function PerformancePage() {
           <h2 className="font-semibold text-neutral-90 dark:text-white">Miembros del Equipo</h2>
         </div>
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
-          {team.members && team.members.length > 0 ? team.members.map((member) => (
-            <Button
-              key={member.id}
-              onClick={() => navigate(`/teams/${teamId}/performance/${member.id}`)}
-              className="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
-                  {member.displayName.charAt(0).toUpperCase()}
+          {team.members && team.members.length > 0 ? team.members.map((member) => {
+            const kpis = memberKpis.get(member.id)
+            const spPct = kpis && maxSP > 0 ? (kpis.totalSP / maxSP) * 100 : 0
+            const effColor = !kpis ? 'neutral' : kpis.efficiencyPct >= 75 ? 'success' : kpis.efficiencyPct >= 50 ? 'warning' : 'danger'
+            const moodColor = !kpis ? 'neutral' : kpis.avgMood >= 7 ? 'success' : kpis.avgMood >= 4 ? 'warning' : 'danger'
+
+            return (
+              <Button
+                key={member.id}
+                onClick={() => navigate(`/teams/${teamId}/performance/${member.id}`)}
+                className="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary shrink-0">
+                    {member.displayName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-neutral-90 dark:text-white truncate">{member.displayName}</p>
+                    <p className="text-xs text-neutral-50 truncate">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                  <p className="text-xs text-neutral-50">{MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role}</p>
-                </div>
-              </div>
-              <ChevronRight size={18} className="text-neutral-30" />
-            </Button>
-          )) : (
+
+                {kpis && (
+                  <div className="flex items-center gap-4 mr-2">
+                    <div className="text-right hidden sm:block">
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-2 h-2 rounded-full ${
+                          effColor === 'success' ? 'bg-success' :
+                          effColor === 'warning' ? 'bg-warning' :
+                          effColor === 'danger' ? 'bg-danger' : 'bg-neutral-40'
+                        }`} />
+                        <span className={`text-xs font-semibold tabular-nums ${
+                          effColor === 'success' ? 'text-success' :
+                          effColor === 'warning' ? 'text-warning' :
+                          effColor === 'danger' ? 'text-danger' : 'text-neutral-50'
+                        }`}>
+                          {kpis.efficiencyPct}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="hidden sm:flex items-center gap-1">
+                      <span className={`text-xs ${
+                        moodColor === 'success' ? 'text-success' :
+                        moodColor === 'warning' ? 'text-warning' :
+                        moodColor === 'danger' ? 'text-danger' : 'text-neutral-40'
+                      }`}>
+                        {'●'.repeat(Math.max(1, Math.min(3, Math.ceil(kpis.avgMood / 3.5))))}
+                      </span>
+                    </div>
+
+                    <div className="w-20 hidden md:block">
+                      <div className="h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all duration-500"
+                          style={{ width: `${spPct}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <ChevronRight size={18} className="text-neutral-30 shrink-0" />
+              </Button>
+            )
+          }) : (
             <div className="px-5 py-8 text-center text-neutral-40">
               <Award size={32} className="mx-auto mb-2 opacity-50" />
               <p>No hay miembros en este equipo</p>

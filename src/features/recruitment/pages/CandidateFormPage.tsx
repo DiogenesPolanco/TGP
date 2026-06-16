@@ -29,7 +29,7 @@ export function CandidateFormPage() {
   const [position, setPosition] = useState('')
   const [interviewDate, setInterviewDate] = useState('')
   const [comments, setComments] = useState('')
-  const [status, setStatus] = useState<'pending' | 'interviewed' | 'selected' | 'rejected'>('pending')
+  const [status, setStatus] = useState<'pending' | 'interviewed' | 'selected' | 'rejected' | 'no_show'>('pending')
   const [teamId, setTeamId] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -178,6 +178,7 @@ export function CandidateFormPage() {
               { value: 'interviewed', label: 'Entrevistado' },
               { value: 'selected', label: 'Seleccionado' },
               { value: 'rejected', label: 'Rechazado' },
+              { value: 'no_show', label: 'No Asistió' },
             ]} />
           </div>
           <div className="space-y-1.5">

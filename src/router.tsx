@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { RouteErrorPage } from '@/components/error/RouteErrorPage'
 import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
 import { PublicPerformancePage } from '@/features/share/PublicPerformancePage'
 import { PublicMemberPage } from '@/features/share/PublicMemberPage'
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
+    errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
 

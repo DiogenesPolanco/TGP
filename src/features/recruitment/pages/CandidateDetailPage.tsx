@@ -15,6 +15,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   interviewed: { label: 'Entrevistado', color: 'bg-info/10 text-info' },
   selected: { label: 'Seleccionado', color: 'bg-success/10 text-success' },
   rejected: { label: 'Rechazado', color: 'bg-danger/10 text-danger' },
+  no_show: { label: 'No Asistió', color: 'bg-neutral-30 text-neutral-60' },
 }
 
 export function CandidateDetailPage() {
@@ -167,7 +168,7 @@ export function CandidateDetailPage() {
         )}
       </div>
 
-      {candidate.status !== 'selected' && candidate.status !== 'rejected' && (
+      {candidate.status !== 'selected' && candidate.status !== 'rejected' && candidate.status !== 'no_show' && (
         <Button
           onClick={handleSelect}
           disabled={selecting}

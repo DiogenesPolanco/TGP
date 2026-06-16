@@ -9,7 +9,7 @@ import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
-import { ArrowLeft, Loader2, Share2, Check } from 'lucide-react'
+import { ArrowLeft, Loader2, Share2, Check, Zap, TrendingUp, Smile, Activity, MessageCircle, Award } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
@@ -160,25 +160,81 @@ export function MemberPerformancePage() {
             onClose={() => { setShowPassphrase(false); setSharePending(null) }}
           />
         )}
+      </div>
 
-        {/* Mini KPIs */}
-        {kpis && (
-          <div className="flex gap-3 text-sm">
-            <div className="text-center px-3 py-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-20 dark:border-neutral-70">
-              <p className="text-lg font-bold text-primary">{kpis.totalSP}</p>
-              <p className="text-xs text-neutral-50">SP Total</p>
+      {/* KPI Bar */}
+      {kpis && (
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-8">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+              <Zap size={15} />
             </div>
-            <div className="text-center px-3 py-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-20 dark:border-neutral-70">
-              <p className="text-lg font-bold text-green-600">{kpis.efficiencyPct}%</p>
-              <p className="text-xs text-neutral-50">Eficiencia</p>
-            </div>
-            <div className="text-center px-3 py-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-20 dark:border-neutral-70">
-              <p className="text-lg font-bold text-amber-600">{kpis.avgMood}/10</p>
-              <p className="text-xs text-neutral-50">Ánimo</p>
+            <div className="min-w-0">
+              <p className="text-base font-bold text-neutral-90 dark:text-white tabular-nums leading-tight">{kpis.totalSP}</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">SP</p>
             </div>
           </div>
-        )}
-      </div>
+
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg bg-success/10 text-success shrink-0">
+              <TrendingUp size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-base font-bold tabular-nums leading-tight ${
+                kpis.efficiencyPct >= 75 ? 'text-success' :
+                kpis.efficiencyPct >= 50 ? 'text-warning' : 'text-danger'
+              }`}>{kpis.efficiencyPct}%</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">Efic.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg text-warning bg-warning/10 shrink-0">
+              <Smile size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-base font-bold tabular-nums leading-tight ${
+                kpis.avgMood >= 7 ? 'text-success' :
+                kpis.avgMood >= 4 ? 'text-warning' : 'text-danger'
+              }`}>{kpis.avgMood}/10</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">Ánimo</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg bg-info/10 text-info shrink-0">
+              <Activity size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-base font-bold tabular-nums leading-tight ${
+                kpis.attentionScore <= 20 ? 'text-success' :
+                kpis.attentionScore <= 50 ? 'text-warning' : 'text-danger'
+              }`}>{kpis.attentionScore}</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">Aten.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+              <MessageCircle size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-base font-bold text-neutral-90 dark:text-white tabular-nums leading-tight">{kpis.oneOnOneCount}</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">1:1</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+            <div className="p-1.5 rounded-lg bg-success/10 text-success shrink-0">
+              <Award size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-base font-bold text-neutral-90 dark:text-white tabular-nums leading-tight">{kpis.achievementCount}</p>
+              <p className="text-[10px] text-neutral-50 uppercase tracking-wider leading-tight">Logros</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 mb-6">

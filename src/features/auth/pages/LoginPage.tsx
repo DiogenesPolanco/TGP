@@ -15,7 +15,7 @@ import {
 } from '@/services/auth/authService'
 import { db } from '@/services/db/database'
 import { useUserStore } from '@/stores/userStore'
-import type { User } from '@/types/domain'
+import type { User, UserRole } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
@@ -130,7 +130,33 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
       const activeUsers = await db.users.where('isActive').equals(1).toArray()
       if (activeUsers.length === 0) {
-        createSession(1)
+        // Auto-crear usuario administrador por defecto
+        const allUsers = await db.users.toArray()
+        let defaultUser: User
+        if (allUsers.length === 0) {
+          const id = crypto.randomUUID()
+          defaultUser = {
+            id,
+            email: 'admin@tgp.local',
+            displayName: 'Administrador',
+            role: 'admin' as UserRole,
+            businessUnitIds: [],
+            isActive: true,
+            otpRequestIntervalHours: 24,
+            createdAt: new Date(),
+          }
+          await db.users.add(defaultUser)
+        } else if (allUsers.length === 1) {
+          defaultUser = allUsers[0] as User
+          if (!defaultUser.isActive) {
+            await db.users.update(defaultUser.id, { isActive: 1 } as any)
+            defaultUser = { ...defaultUser, isActive: true }
+          }
+        } else {
+          defaultUser = allUsers[0] as User
+        }
+        useUserStore.getState().login(defaultUser)
+        createSession(defaultUser.otpRequestIntervalHours ?? 24)
         onAuth()
         return
       }

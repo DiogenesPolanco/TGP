@@ -6,7 +6,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import type { MemberStatus } from '@/types/domain'
-import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Info, Loader2, X, Edit3, Share2, Check, Copy } from 'lucide-react'
+import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Loader2, X, Edit3, Share2, Check, Copy, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { getGlobalMembersKPIs, DEV_ROLES } from '@/services/performance/performanceService'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
@@ -14,6 +14,7 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { MemberEditModal } from '@/features/teams/components/MemberEditModal'
+import { KpiCard } from '@/components/data-display/KpiCard'
 import { Button } from '@/components/ui/Button'
 
 type TeamEntry = { id: string; name: string }
@@ -58,7 +59,55 @@ export function MembersPage() {
     return filtered
   }, [globalData, searchTerm, filterTeam, filterStatus])
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems } = usePagination(allMembers, 10)
+  const [sortKey, setSortKey] = useState<string>('name')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+
+  const sortedMembers = useMemo(() => {
+    const sorted = [...allMembers]
+    sorted.sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'name':
+          cmp = a.member.displayName.localeCompare(b.member.displayName)
+          break
+        case 'role':
+          cmp = a.member.role.localeCompare(b.member.role)
+          break
+        case 'team':
+          cmp = a.team.name.localeCompare(b.team.name)
+          break
+        case 'status':
+          cmp = a.member.status.localeCompare(b.member.status)
+          break
+        case 'sp':
+          cmp = a.kpis.totalSP - b.kpis.totalSP
+          break
+        case 'efficiency':
+          cmp = a.kpis.efficiencyPct - b.kpis.efficiencyPct
+          break
+        case 'mood':
+          cmp = a.kpis.avgMood - b.kpis.avgMood
+          break
+        case 'attention':
+          cmp = a.kpis.attentionScore - b.kpis.attentionScore
+          break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return sorted
+  }, [allMembers, sortKey, sortDir])
+
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems } = usePagination(sortedMembers, 10)
+
+  const toggleSort = useCallback((key: string) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir(key === 'name' ? 'asc' : 'desc')
+    }
+    setPage(1)
+  }, [sortKey, setPage])
 
   const teamOptions: TeamEntry[] = useMemo(
     () => teams.map((t) => ({ id: t.id, name: t.name })),
@@ -159,39 +208,35 @@ export function MembersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           icon={<TrendingUp size={22} />}
-          label="Mejor Rendimiento"
+          title="Mejor Rendimiento"
           value={filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'}
           subtitle={filteredKpis?.bestPerformer?.member.displayName}
-          memberId={filteredKpis?.bestPerformer?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.bestPerformer?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.bestPerformer?.team.id ?? '') }}
-          color="text-success"
+          color="success"
+          onClick={filteredKpis?.bestPerformer ? () => { const m = filteredKpis.bestPerformer!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
         />
         <KpiCard
           icon={<TrendingDown size={22} />}
-          label="Menor Rendimiento"
+          title="Menor Rendimiento"
           value={filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'}
           subtitle={filteredKpis?.worstPerformer?.member.displayName}
-          memberId={filteredKpis?.worstPerformer?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.worstPerformer?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.worstPerformer?.team.id ?? '') }}
-          color="text-danger"
+          color="danger"
+          onClick={filteredKpis?.worstPerformer ? () => { const m = filteredKpis.worstPerformer!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
         />
         <KpiCard
           icon={<Star size={22} />}
-          label="Más Story Points"
+          title="Más Story Points"
           value={filteredKpis?.topSP ? `${filteredKpis.topSP.kpis.totalSP}` : '—'}
           subtitle={filteredKpis?.topSP?.member.displayName}
-          memberId={filteredKpis?.topSP?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.topSP?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.topSP?.team.id ?? '') }}
-          color="text-warning"
+          color="warning"
+          onClick={filteredKpis?.topSP ? () => { const m = filteredKpis.topSP!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
         />
         <KpiCard
           icon={<AlertTriangle size={22} />}
-          label="Requiere Atención"
+          title="Requiere Atención"
           value={filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'}
           subtitle={filteredKpis?.needsAttention?.member.displayName}
-          memberId={filteredKpis?.needsAttention?.member.id}
-          onMemberClick={(id) => { setEditMemberId(id); setEditMemberName(filteredKpis?.needsAttention?.member.displayName ?? ''); setEditMemberTeamId(filteredKpis?.needsAttention?.team.id ?? '') }}
-          color="text-danger"
+          color="danger"
+          onClick={filteredKpis?.needsAttention ? () => { const m = filteredKpis.needsAttention!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
           info={filteredKpis?.needsAttention ? (() => {
             const k = filteredKpis.needsAttention!.kpis
             const eff = Math.round(((100 - k.efficiencyPct) / 100) * 35)
@@ -281,13 +326,13 @@ export function MembersPage() {
               <thead>
                 <tr className="border-b border-neutral-20 dark:border-neutral-70">
                   <th className="text-left px-4 py-3 font-medium text-neutral-50 w-10"></th>
-                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Nombre</th>
-                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Rol</th>
-                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Equipo</th>
-                  <th className="text-left px-4 py-3 font-medium text-neutral-50">Estado</th>
-                  <th className="text-right px-4 py-3 font-medium text-neutral-50 w-20">SP</th>
-                  <th className="text-right px-4 py-3 font-medium text-neutral-50 w-20">Efic.</th>
-                  <th className="w-10 px-4 py-3"></th>
+                  <SortTh label="Nombre" sortKey="name" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
+                  <SortTh label="Rol" sortKey="role" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
+                  <SortTh label="Equipo" sortKey="team" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
+                  <SortTh label="Estado" sortKey="status" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
+                  <SortTh label="SP" sortKey="sp" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
+                  <SortTh label="Eficiencia" sortKey="efficiency" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
+                  <SortTh label="Aten." sortKey="attention" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -318,9 +363,38 @@ export function MembersPage() {
                       <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</td>
                       <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{team.name}</td>
                       <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[member.status]}`}>{MEMBER_STATUS_LABELS[member.status]}</span></td>
-                      <td className="px-4 py-3 text-right font-semibold text-neutral-90 dark:text-white">{kpis.totalSP}</td>
-                      <td className="px-4 py-3 text-right font-semibold text-neutral-90 dark:text-white">{kpis.efficiencyPct}%</td>
-                      <td className="px-4 py-3 text-neutral-30"><Edit3 size={16} /></td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="font-semibold text-neutral-90 dark:text-white tabular-nums">{kpis.totalSP}</span>
+                          <div className="w-12 h-1 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden hidden sm:block">
+                            <div
+                              className="h-full bg-primary rounded-full"
+                              style={{ width: `${Math.min(100, kpis.totalSP)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <div className={`w-2 h-2 rounded-full shrink-0 ${
+                            kpis.avgMood >= 7 ? 'bg-success' :
+                            kpis.avgMood >= 4 ? 'bg-warning' : 'bg-danger'
+                          }`} title={`Ánimo: ${kpis.avgMood}/10`} />
+                          <span className={`font-semibold tabular-nums ${
+                            kpis.efficiencyPct >= 75 ? 'text-success' :
+                            kpis.efficiencyPct >= 50 ? 'text-warning' : 'text-danger'
+                          }`}>{kpis.efficiencyPct}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded tabular-nums ${
+                            kpis.attentionScore <= 20 ? 'bg-success/10 text-success' :
+                            kpis.attentionScore <= 50 ? 'bg-warning/10 text-warning' : 'bg-danger/10 text-danger'
+                          }`}>{kpis.attentionScore}</span>
+                          <Edit3 size={16} className="text-neutral-30" />
+                        </div>
+                      </td>
                     </tr>
                   )
                 })}
@@ -350,43 +424,28 @@ export function MembersPage() {
   )
 }
 
-function KpiCard({ icon, label, value, subtitle, memberId, onMemberClick, color, info }: {
-  icon: React.ReactNode; label: string; value: string; subtitle?: string; memberId?: string; onMemberClick?: (id: string) => void; color: string; info?: React.ReactNode
+function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {
+  if (!active) return <ArrowUpDown size={14} className="opacity-30 group-hover:opacity-60 transition-opacity" />
+  return dir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+}
+
+function SortTh({ label, sortKey, currentKey, dir, onToggle, align }: {
+  label: string; sortKey: string; currentKey: string; dir: 'asc' | 'desc'; onToggle: (k: string) => void; align?: 'left' | 'right'
 }) {
-  const iconClasses: Record<string, string> = {
-    'text-success': 'bg-success/10 text-success',
-    'text-danger': 'bg-danger/10 text-danger',
-    'text-warning': 'bg-warning/10 text-warning',
-  }
+  const active = currentKey === sortKey
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm relative">
-      <div className="flex items-center justify-center gap-3 mb-2">
-        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
-        <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+    <th
+      onClick={() => onToggle(sortKey)}
+      className={`group px-4 py-3 font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white cursor-pointer select-none transition-colors ${align === 'right' ? 'text-right' : 'text-left'}`}
+    >
+      <div className={`flex items-center gap-1.5 ${align === 'right' ? 'justify-end' : ''}`}>
+        <span className="text-xs uppercase tracking-wider">{label}</span>
+        <span className={`${active ? 'text-primary' : ''}`}>
+          <SortIcon active={active} dir={dir} />
+        </span>
       </div>
-        {info && (
-          <div className="relative group">
-            <Info size={13} className="text-neutral-50 cursor-help" />
-            <div className="absolute left-0 bottom-full mb-2 w-56 p-3 rounded-lg bg-neutral-90 dark:bg-neutral-20 text-white dark:text-neutral-90 text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
-              {info}
-              <div className="absolute left-3 top-full w-2 h-2 bg-neutral-90 dark:bg-neutral-20 rotate-45 -translate-y-1" />
-            </div>
-          </div>
-        )}
-      {subtitle && memberId && onMemberClick && (
-        <Button
-          type="button"
-          onClick={() => onMemberClick(memberId)}
-          className="mt-1.5 text-sm font-semibold text-primary hover:text-primary-dark hover:underline truncate w-full text-left cursor-pointer"
-          title="Editar miembro"
-        >
-          {subtitle}
-        </Button>
-      )}
-      {subtitle && !(memberId && onMemberClick) && (
-        <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
-      )}
-    </div>
+    </th>
   )
 }
+
+
