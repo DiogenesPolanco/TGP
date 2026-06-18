@@ -452,6 +452,7 @@ export interface Activity {
   actualHours: number | null
   plannedPoints: number | null
   completedPoints: number | null
+  sortOrder?: number
   startDate: Date | null
   dueDate: Date | null
   completedAt: Date | null
@@ -473,6 +474,7 @@ export interface Task {
   dueDate: Date | null
   completedAt: Date | null
   dependsOn: string[]
+  sortOrder?: number
   metadata: Record<string, unknown>
   createdAt: Date
   updatedAt: Date
