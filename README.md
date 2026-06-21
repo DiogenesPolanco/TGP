@@ -1,18 +1,18 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/TGP-Technology%20Governance%20Platform-6366f1?style=for-the-badge&labelColor=1e1b4b" />
-  <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/TGP-Technology%20Governance%20Platform-6366f1?style=for-the-badge&labelColor=eef2ff" />
-  <img alt="TGP" src="https://img.shields.io/badge/TGP-Technology%20Governance%20Platform-6366f1?style=for-the-badge&labelColor=1e1b4b" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/TGP-Plataforma%20de%20Gobierno%20Tecnol%C3%B3gico-6366f1?style=for-the-badge&labelColor=1e1b4b" />
+  <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/TGP-Plataforma%20de%20Gobierno%20Tecnol%C3%B3gico-6366f1?style=for-the-badge&labelColor=eef2ff" />
+  <img alt="TGP" src="https://img.shields.io/badge/TGP-Plataforma%20de%20Gobierno%20Tecnol%C3%B3gico-6366f1?style=for-the-badge&labelColor=1e1b4b" />
 </picture>
 
 <p align="center">
-  <strong>Client-side SPA for enterprise technology governance — applications, security, risk, OKRs, teams, and execution tracking.</strong>
+  <strong>SPA cliente-side para gobierno tecnológico empresarial — aplicaciones, seguridad, riesgos, OKRs, equipos y seguimiento de ejecución.</strong>
 </p>
 
 <p align="center">
-  <a href="#key-features">Features</a> •
-  <a href="#tech-stack">Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#architecture">Architecture</a>
+  <a href="#caracteristicas">Características</a> •
+  <a href="#stack">Stack</a> •
+  <a href="#primeros-pasos">Primeros Pasos</a> •
+  <a href="#arquitectura">Arquitectura</a>
 </p>
 
 <p align="center">
@@ -21,116 +21,116 @@
   <img src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite" alt="Vite 6" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss" alt="Tailwind CSS 4" />
   <img src="https://img.shields.io/badge/Dexie.js-4-4B32C3" alt="Dexie.js 4" />
-  <img src="https://img.shields.io/badge/License-Proprietary-ef4444" alt="License" />
+  <img src="https://img.shields.io/badge/Licencia-Propietaria-ef4444" alt="Licencia" />
 </p>
 
 ---
 
-## Key Features
+## Características
 
-### 📊 Executive Dashboard
-Real-time **Technology Health Index (THI)** — a composite score across 7 weighted dimensions (Delivery, Security, Obsolescence, Risk, and more). Interactive KPI cards with drill-down, severity distribution charts, and period filtering.
+### 📊 Dashboard Ejecutivo
+**Technology Health Index (THI)** en tiempo real — puntuación compuesta en 7 dimensiones ponderadas (Delivery, Seguridad, Obsolescencia, Riesgo, y más). Tarjetas KPI interactivas con drill-down, gráficos de distribución por severidad y filtro por período.
 
-### 📋 Application Catalog
-Full CRUD for your portfolio with advanced search, filtering by criticality/status/BU, and a detail view that consolidates **inherited** vulnerabilities, risks, incidents, and audit findings from linked microservices. Import from Excel with smart upsert.
+### 📋 Catálogo de Aplicaciones
+CRUD completo con búsqueda avanzada, filtros por criticidad/estado/BU, y vista de detalle que consolida vulnerabilidades, riesgos, incidentes y hallazgos **heredados** de microservicios vinculados. Importación desde Excel con upsert inteligente.
 
-### 🔒 Security & Governance
-Track **vulnerabilities** with CVSS scoring, SLA deadlines, and status workflow. Manage **incidents** with P1-P4 severity and response-time tracking. Built-in **risk matrix** (probability × impact) and **audit findings** with evidence attachments and action plans.
+### 🔒 Seguridad y Gobierno
+Vulnerabilidades con puntuación CVSS, SLA y flujo de estados. Incidentes con severidad P1-P4 y tracking de tiempos de respuesta. Matriz de **riesgos** (probabilidad × impacto) y **hallazgos de auditoría** con evidencia adjunta y planes de acción.
 
-### 🎯 OKRs & Strategy
-Objectives with Key Results, period tracking, progress calculation, and status monitoring (on track, at risk, behind, achieved). Align deliverables and plans to strategic objectives.
+### 🎯 OKRs y Estrategia
+Objetivos con Key Results, tracking de período, cálculo de progreso y monitoreo de estado (on track, at risk, behind, achieved). Vincula entregables y planes a objetivos estratégicos.
 
-### 🚀 Execution Tracking
-Plan management with **Gantt charts**, daily activity timeline, commitments, blockers, and dependency mapping. Escalation service for overdue items. Weekly view with upcoming milestones.
+### 🚀 Seguimiento de Ejecución
+Planes con **diagramas de Gantt**, línea de tiempo diaria, compromisos, bloqueos y mapa de dependencias. Servicio de escalamiento para items vencidos. Vista semanal con hitos próximos.
 
-### 👥 Teams & DORA Metrics
-Team management with **DORA metrics** (deployment frequency, lead time, change failure rate, MTTR). Automated benchmarking against Elite / High / Medium / Low thresholds.
+### 👥 Equipos y Métricas DORA
+Gestión de equipos con **métricas DORA** (frecuencia de deploy, lead time, change failure rate, MTTR). Benchmarking automático Elite / Alto / Medio / Bajo.
 
-### 🔗 Public Sharing
-Generate **encrypted, expiring public links** for any view — dashboard, daily, plans, vulnerabilities, risks, audit, OKRs, and more. AES-GCM 256 encryption at rest with optional passphrase. Store in Azure Blob Storage or localStorage.
+### 🔗 Enlaces Públicos
+Generación de **enlaces públicos cifrados y con expiración** para cualquier vista — dashboard, daily, planes, vulnerabilidades, riesgos, auditoría, OKRs y más. Cifrado AES-GCM 256 en reposo con passphrase opcional. Almacenamiento en Azure Blob Storage o localStorage.
 
-### ⚡ Fully Client-Side
-Zero server dependencies. All data lives in **IndexedDB** (Dexie.js). Cloud backup and sharing via Azure Blob Storage. TOTP authentication with QR setup.
-
----
-
-## Screenshots
-
-> _Coming soon — preview images of the dashboard, application catalog, and execution views._
+### ⚡ 100% Cliente-Side
+Sin dependencias de servidor. Todos los datos en **IndexedDB** (Dexie.js). Backup en la nube y enlaces públicos vía Azure Blob Storage. Autenticación TOTP con código QR.
 
 ---
 
-## Tech Stack
+## Capturas
 
-| Layer | Technology |
+> _Próximamente — imágenes del dashboard, catálogo de aplicaciones y vistas de ejecución._
+
+---
+
+## Stack
+
+| Capa | Tecnología |
 |---|---|
 | **Core** | React 19, TypeScript 5, Vite 6 + SWC |
-| **Routing** | React Router v7 |
-| **State** | Zustand 5 |
-| **Database** | Dexie.js 4 (IndexedDB) |
-| **Styling** | Tailwind CSS 4 + custom design system |
-| **Forms** | React Hook Form + Zod |
-| **Charts** | Recharts + ApexCharts |
-| **Icons** | Lucide React |
+| **Ruteo** | React Router v7 |
+| **Estado** | Zustand 5 |
+| **Base de datos** | Dexie.js 4 (IndexedDB) |
+| **Estilos** | Tailwind CSS 4 + design system propio |
+| **Formularios** | React Hook Form + Zod |
+| **Gráficos** | Recharts + ApexCharts |
+| **Iconos** | Lucide React |
 | **Auth** | TOTP (otpauth + QR code) |
-| **Cloud** | Azure Blob Storage |
-| **Import** | SheetJS (XLSX) |
+| **Nube** | Azure Blob Storage |
+| **Importación** | SheetJS (XLSX) |
 
 ---
 
-## Getting Started
+## Primeros Pasos
 
 ```bash
-# Clone
+# Clonar
 git clone https://github.com/DiogenesPolanco/TGP.git
 cd TGP
 
-# Install
+# Instalar
 npm install
 
-# Start dev server
+# Iniciar servidor de desarrollo
 npm run dev
 
-# Build for production
+# Compilar para producción
 npm run build
 ```
 
-The app runs entirely in the browser — no backend required. A demo dataset can be loaded from the UI to explore features.
+La aplicación corre completamente en el navegador — no requiere backend. Puedes cargar un dataset demo desde la interfaz para explorar las funcionalidades.
 
-> **First run**: Scan the QR code with any authenticator app (Google Authenticator, Authy, 1Password) to set up TOTP.
+> **Primer inicio**: Escanea el código QR con cualquier app de autenticación (Google Authenticator, Authy, 1Password) para configurar TOTP.
 
 ---
 
-## Architecture
+## Arquitectura
 
-The application follows a **feature-first** modular structure on top of a shared UI component library.
+La aplicación sigue una estructura **feature-first** sobre una librería de componentes UI compartidos.
 
 ```
 src/
-├── components/     # Shared UI (buttons, modals, badges, layout)
-├── features/       # Domain modules (catalog, security, governance, execution, etc.)
-├── services/       # Data layer (Dexie repos, import/export, sync, THI engine)
-├── stores/         # Zustand stores
-├── hooks/          # Shared React hooks
-├── types/          # TypeScript domain types
-└── lib/            # Utilities
+├── components/     # UI compartida (botones, modales, badges, layout)
+├── features/       # Módulos por dominio (catalog, security, governance, execution, etc.)
+├── services/       # Capa de datos (repos Dexie, import/export, sync, motor THI)
+├── stores/         # Stores Zustand
+├── hooks/          # Hooks React compartidos
+├── types/          # Tipos TypeScript de dominio
+└── lib/            # Utilidades
 ```
 
-Key architectural decisions:
+Decisiones arquitectónicas clave:
 
-- **Single source of truth**: All domain data in IndexedDB with Dexie.js (20+ tables)
-- **Entity inheritance**: Vulnerabilities, risks, incidents, and audit findings can be linked to microservices and automatically inherited by parent applications
-- **Offline-first**: Everything works without network — cloud features (backup, sharing) are additive
-- **Encrypted sharing**: Public links are always encrypted at rest with AES-GCM 256
-
----
-
-## Project Status
-
-Active development. Built for enterprise governance needs, designed to be self-contained and easy to deploy — just serve the static build folder.
+- **Fuente única de verdad**: Todos los datos de dominio en IndexedDB con Dexie.js (20+ tablas)
+- **Herencia de entidades**: Vulnerabilidades, riesgos, incidentes y hallazgos pueden vincularse a microservicios y ser heredados automáticamente por sus aplicaciones padre
+- **Offline-first**: Todo funciona sin red — las funcionalidades en la nube (backup, sharing) son adicionales
+- **Enlaces cifrados**: Los enlaces públicos siempre se cifran en reposo con AES-GCM 256
 
 ---
 
-## License
+## Estado del Proyecto
 
-Proprietary — TGP &copy; 2026
+Desarrollo activo. Construido para necesidades de gobierno empresarial, diseñado para ser autónomo y fácil de desplegar — solo sirve la carpeta de build estático.
+
+---
+
+## Licencia
+
+Propietaria — TGP &copy; 2026
