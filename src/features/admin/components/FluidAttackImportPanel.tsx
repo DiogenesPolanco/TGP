@@ -168,14 +168,14 @@ export function FluidAttackImportPanel() {
                     <td className="px-3 py-1.5 text-neutral-50">{row.rowIndex}</td>
                     <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">{row.location || '—'}</td>
                     <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 max-w-xs truncate">
-                      {row.raw['Weakness'] || '—'}
+                      {row.raw['weakness'] || '—'}
                     </td>
-                    <td className="px-3 py-1.5 font-mono text-neutral-60">{row.raw['Vulnerability ID'] || '—'}</td>
+                    <td className="px-3 py-1.5 font-mono text-neutral-60">{row.raw['vulnerability_id'] || '—'}</td>
                     <td className="px-3 py-1.5">
-                      <SeverityBadge value={row.raw['Severity Level'] || row.raw['Severity'] || ''} />
+                      <SeverityBadge value={row.raw['severity_level'] || row.raw['severity'] || ''} />
                     </td>
                     <td className="px-3 py-1.5">
-                      <StatusBadge value={row.raw['Status'] || ''} />
+                      <StatusBadge value={row.raw['status'] || ''} />
                     </td>
                   </tr>
                 ))}
@@ -251,8 +251,8 @@ export function FluidAttackImportPanel() {
                         <tr key={m.row.rowIndex} className="border-t border-neutral-10 dark:border-neutral-85">
                           <td className="px-3 py-1.5 text-neutral-50">{m.row.rowIndex}</td>
                           <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">{m.row.location || '—'}</td>
-                          <td className="px-3 py-1.5 font-mono text-neutral-60">{m.row.raw['Vulnerability ID'] || '—'}</td>
-                          <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 truncate max-w-xs">{m.row.raw['Weakness'] || '—'}</td>
+                          <td className="px-3 py-1.5 font-mono text-neutral-60">{m.row.raw['vulnerability_id'] || '—'}</td>
+                          <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 truncate max-w-xs">{m.row.raw['weakness'] || '—'}</td>
                         </tr>
                       ))}
                   </tbody>

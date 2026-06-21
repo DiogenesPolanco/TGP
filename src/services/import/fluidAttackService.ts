@@ -143,19 +143,12 @@ export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
 
   const headers = parseLine(lines[0]).map((h) => h.trim())
 
-  const headerIdx: Record<string, number> = {}
-  for (let i = 0; i < headers.length; i++) {
-    headerIdx[headers[i].toLowerCase().replace(/[\s_-]+/g, '')] = i
-  }
-
-  function getHeader(normalizedKey: string): string | undefined {
-    const idx = headerIdx[normalizedKey.toLowerCase().replace(/[\s_-]+/g, '')]
-    return idx !== undefined ? headers[idx] : undefined
+  function norm(key: string): string {
+    return key.toLowerCase().replace(/[\s_-]+/g, '')
   }
 
   function getValue(row: Record<string, string>, normalizedKey: string): string | undefined {
-    const hdr = getHeader(normalizedKey)
-    return hdr ? row[hdr] : undefined
+    return row[norm(normalizedKey)]
   }
 
   const rows: FluidAttackRow[] = []
@@ -164,7 +157,7 @@ export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
     const fields = parseLine(lines[i])
     const row: Record<string, string> = {}
     for (let j = 0; j < headers.length && j < fields.length; j++) {
-      row[headers[j]] = fields[j]
+      row[norm(headers[j])] = fields[j]
     }
 
     const location = getValue(row, 'location') ?? ''
@@ -285,21 +278,21 @@ export async function importFluidAttackVulnerabilities(
     if (!match.applicationId) continue
 
     const r = match.row.raw
-    const vulnId = r['Vulnerability ID'] ?? ''
-    const weakness = r['Weakness'] ?? ''
-    const description = r['Description'] ?? ''
-    const severityRaw = r['Severity Level'] ?? r['Severity'] ?? ''
-    const statusRaw = r['Status'] ?? ''
-    const reportDate = r['Report Date'] ?? ''
-    const closingDate = r['Closing Date'] ?? ''
-    const cvssVector = r['CVSSv4.0 Vector String'] ?? ''
-    const cve = r['CVE'] ?? ''
-    const recommendation = r['Recommendation'] ?? ''
-    const pkg = r['Package'] ?? ''
-    const vulnVersion = r['Vulnerable Version'] ?? ''
-    const cweIds = r['CWE IDs'] ?? ''
-    const technique = r['Technique'] ?? ''
-    const rootNickname = r['Root Nickname'] ?? ''
+    const vulnId = r['vulnerability_id'] ?? ''
+    const weakness = r['weakness'] ?? ''
+    const description = r['description'] ?? ''
+    const severityRaw = r['severity_level'] ?? r['severity'] ?? ''
+    const statusRaw = r['status'] ?? ''
+    const reportDate = r['report_date'] ?? ''
+    const closingDate = r['closing_date'] ?? ''
+    const cvssVector = r['cvssv4_0_vector_string'] ?? ''
+    const cve = r['cve'] ?? ''
+    const recommendation = r['recommendation'] ?? ''
+    const pkg = r['package'] ?? ''
+    const vulnVersion = r['vulnerable_version'] ?? ''
+    const cweIds = r['cwe_ids'] ?? ''
+    const technique = r['technique'] ?? ''
+    const rootNickname = r['root_nickname'] ?? ''
 
     try {
       const severity = mapSeverity(severityRaw)
