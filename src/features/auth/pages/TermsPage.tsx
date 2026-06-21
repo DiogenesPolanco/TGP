@@ -3,13 +3,18 @@ import { Check, X, FileText, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const TERMS_KEY = 'tgp-terms-accepted'
+const TERMS_VERSION = 2
 
 export function isTermsAccepted(): boolean {
-  return localStorage.getItem(TERMS_KEY) === 'true'
+  return localStorage.getItem(TERMS_KEY) === String(TERMS_VERSION)
 }
 
 export function acceptTerms() {
-  localStorage.setItem(TERMS_KEY, 'true')
+  localStorage.setItem(TERMS_KEY, String(TERMS_VERSION))
+}
+
+export function getCurrentTermsVersion(): number {
+  return TERMS_VERSION
 }
 
 interface Props {
@@ -69,7 +74,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                 </ul>
               </div>
               <div className="relative mt-6 pt-4 border-t border-white/15">
-                <p className="text-sm opacity-60 leading-relaxed">Versión 1.0 · Junio 2026</p>
+                <p className="text-sm opacity-60 leading-relaxed">Versión 2.0 · Junio 2026</p>
               </div>
             </div>
 
@@ -103,12 +108,23 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                   
                   <p><strong>6. Ausencia de garantía.</strong> TGP es una solución de código abierto, sin soporte oficial ni garantía de funcionamiento en todos los entornos. El equipo de desarrollo no asume responsabilidad por daños directos o indirectos derivados del uso de la herramienta.</p>
                   
-                  <p><strong>7. Privacidad.</strong> No recolectamos, transmitimos ni procesamos datos personales en infraestructura propia. Cualquier dato que compartas a través de las funcionalidades de enlace público viaja cifrado o bajo tu configuración de Azure. La seguridad de esos datos es tu responsabilidad.</p>
+                  <p><strong>7. Privacidad y flujo de datos.</strong> No recolectamos, transmitimos ni procesamos datos personales en infraestructura propia. Todo el uso queda bajo tu control de la siguiente manera:</p>
+                  <ul className="pl-4 space-y-1 text-xs text-muted list-disc ml-1">
+                    <li><strong>Almacenamiento local (IndexedDB):</strong> Todos los datos de la aplicación se almacenan exclusivamente en tu navegador. No se envían a servidores externos a menos que tú configures explícitamente un servicio de backup o sharing.</li>
+                    <li><strong>Backup en Azure:</strong> Si configuras la funcionalidad de backup, toda la base de datos se exporta y almacena en Azure Blob Storage bajo tu propia SAS URL y container. Tú controlas cuándo y cómo se realiza el backup.</li>
+                    <li><strong>Sharing (enlaces públicos):</strong> Si compartes datos mediante enlaces públicos, la información viaja cifrada (AES-GCM 256) a Azure Blob Storage o se almacena localmente. La duración y visibilidad del enlace son configurables.</li>
+                    <li><strong>Importación de datos:</strong> Los archivos Excel que importes se procesan íntegramente en tu navegador. No se transmiten ni almacenan en servidores externos.</li>
+                  </ul>
+                  <p className="text-xs text-muted">Eres responsable de revisar y gestionar estas configuraciones según las políticas de tu institución.</p>
+                  
+                  <p><strong>8. Inteligencia Artificial.</strong> Este sistema fue desarrollado con asistencia de inteligencia artificial generativa. La IA se utilizó como herramienta de apoyo en la generación y revisión de código durante el desarrollo. TGP no incorpora modelos de IA en su ejecución cliente-side — no se recolectan datos para entrenamiento, no hay inferencia en la nube, y todo procesamiento ocurre localmente en tu navegador. El contenido que ingreses, las decisiones que tomes basado en la información del sistema, y el uso que le des a la herramienta son responsabilidad exclusiva tuya.</p>
+                  
+                  <p><strong>9. Copyright y contenido del usuario.</strong> Eres el único responsable del contenido que ingresas, importas o compartes en TGP. TGP no reclama propiedad intelectual sobre los datos, textos, métricas o configuraciones que registres en el sistema. Declaras y garantizas que cuentas con los derechos necesarios sobre la información que ingresas, incluyendo pero no limitado a datos institucionales, métricas de equipos, OKRs, hallazgos de auditoría y cualquier otro contenido. TGP no será responsable por infracciones de derechos de autor, propiedad intelectual o confidencialidad derivadas del contenido ingresado por los usuarios.</p>
                   
                   {showFull && (
                     <>
-                      <p><strong>8. Modificaciones.</strong> Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado de la herramienta después de los cambios constituye la aceptación de los nuevos términos.</p>
-                      <p><strong>9. Contacto.</strong> Para consultas, reportes o sugerencias, puedes abrir un issue en el repositorio oficial del proyecto.</p>
+                      <p><strong>10. Modificaciones.</strong> Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado de la herramienta después de los cambios constituye la aceptación de los nuevos términos.</p>
+                      <p><strong>11. Contacto.</strong> Para consultas, reportes o sugerencias, puedes abrir un issue en el repositorio oficial del proyecto.</p>
                     </>
                   )}
                   <Button variant="ghost" size="sm" className="p-0 text-primary hover:underline hover:bg-transparent"

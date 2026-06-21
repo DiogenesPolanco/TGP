@@ -71,6 +71,15 @@ export function AppShell() {
             <Outlet />
           </PageTransition>
         </main>
+        <footer className="shrink-0 border-t border-boundary px-6 py-2 flex items-center justify-between text-[11px] text-neutral-40">
+          <span>TGP — Technology Governance Platform</span>
+          <button
+            onClick={() => navigate('/terms')}
+            className="hover:text-primary transition-colors underline underline-offset-2"
+          >
+            Términos y condiciones
+          </button>
+        </footer>
       </div>
       <NotificationToast />
       <ConfirmDialog />
