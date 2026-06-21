@@ -6,6 +6,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   server: {
+    watch: {
+      ignored: ['**/.playwright-mcp/**'],
+      usePolling: true,
+      interval: 1000,
+    },
     proxy: {
       '/jira-proxy': {
         target: 'https://diogenespolanco.atlassian.net',
