@@ -179,17 +179,17 @@ export function DatabaseFormPage() {
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
             {existing ? 'Editar Base de Datos' : 'Nueva Base de Datos'}
           </h1>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40">
+          <p className="text-sm text-muted">
             {application.name}
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-5">
         {/* Name + Type */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Nombre <span className="text-danger">*</span>
             </label>
             <input
@@ -203,7 +203,7 @@ export function DatabaseFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Tipo <span className="text-danger">*</span>
             </label>
             <Select required value={dbType} onChange={(v) => { setDbType(v as DatabaseType); setEngine('') }} options={DB_TYPES.map((t) => ({ value: t, label: dbTypeLabel[t] }))} />
@@ -212,7 +212,7 @@ export function DatabaseFormPage() {
 
         {/* Environment */}
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+          <label className="block text-sm font-medium text-secondary mb-2">
             Ambiente <span className="text-danger">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
@@ -224,7 +224,7 @@ export function DatabaseFormPage() {
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   environment === env
                     ? 'bg-primary text-white shadow-sm'
-                    : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white border border-neutral-30 dark:border-neutral-60'
+                    : 'bg-neutral-10 dark:bg-neutral-70 text-muted hover:text-neutral-90 dark:hover:text-white border border-neutral-30 dark:border-neutral-60'
                 }`}
               >
                 {environmentLabel[env]}
@@ -236,7 +236,7 @@ export function DatabaseFormPage() {
         {/* Engine + Version */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Motor <span className="text-danger">*</span>
             </label>
             <input
@@ -256,7 +256,7 @@ export function DatabaseFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Versión
             </label>
             <input
@@ -272,7 +272,7 @@ export function DatabaseFormPage() {
         {/* Host + Port */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Host / Endpoint
             </label>
             <input
@@ -285,7 +285,7 @@ export function DatabaseFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+            <label className="block text-sm font-medium text-secondary mb-1">
               Puerto
             </label>
             <input
@@ -307,7 +307,7 @@ export function DatabaseFormPage() {
               onChange={(e) => setIsManaged(e.target.checked)}
               className="w-4 h-4 rounded border-neutral-30 text-primary focus:ring-primary/20"
             />
-            <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">
+            <span className="text-sm font-medium text-secondary">
               Servicio administrado (Managed) — RDS, Cloud SQL, Atlas, etc.
             </span>
           </label>
@@ -315,7 +315,7 @@ export function DatabaseFormPage() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">
+          <label className="block text-sm font-medium text-secondary mb-1">
             Descripción
           </label>
           <RichTextEditor
@@ -327,7 +327,7 @@ export function DatabaseFormPage() {
 
         {/* Technologies */}
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+          <label className="block text-sm font-medium text-secondary mb-2">
             Tecnologías relacionadas <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
           </label>
           <TechSearch
@@ -339,7 +339,7 @@ export function DatabaseFormPage() {
 
         {/* Microservices */}
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+          <label className="block text-sm font-medium text-secondary mb-2">
             Microservicios relacionados <span className="text-neutral-50 font-normal">({selectedMsIds.length} seleccionados — opcional)</span>
           </label>
 
@@ -384,7 +384,7 @@ export function DatabaseFormPage() {
               </div>
 
               {showMsDropdown && (
-                <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                   {availableMs.length === 0 ? (
                     <p className="px-4 py-3 text-sm text-neutral-50">
                       {msSearch ? 'Sin resultados' : 'Todos los microservicios ya están asociados'}
@@ -416,11 +416,11 @@ export function DatabaseFormPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="flex justify-end gap-3 pt-4 border-t border-boundary">
           <Button
             type="button"
             onClick={() => navigate(`/catalog/applications/${appId}`)}
-            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
           </Button>

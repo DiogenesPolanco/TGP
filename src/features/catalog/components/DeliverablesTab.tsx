@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, X, Save, ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, parseLocalDate } from '@/lib/utils'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
@@ -12,7 +12,7 @@ import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<DeliverableStatus, string> = {
-  pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  pending: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   in_progress: 'bg-info/10 text-info border-info/30',
   completed: 'bg-success/10 text-success border-success/30',
   cancelled: 'bg-danger/10 text-danger border-danger/30',
@@ -49,7 +49,7 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
         <div>
           <p className="text-sm font-medium text-neutral-90 dark:text-white">{d.title}</p>
           {d.description && (
-            <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5 line-clamp-1">{d.description}</p>
+            <p className="text-xs text-muted mt-0.5 line-clamp-1">{d.description}</p>
           )}
         </div>
       ),
@@ -69,7 +69,7 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
       label: 'Fecha Límite',
       sortable: true,
       render: (d) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {d.dueDate ? new Date(d.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
         </span>
       ),
@@ -80,7 +80,7 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
       sortable: true,
       render: (d) => {
         const obj = allObjectives.find((o) => o.id === d.objectiveId)
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{obj?.title || '—'}</span>
+        return <span className="text-sm text-secondary">{obj?.title || '—'}</span>
       },
     },
     {
@@ -165,7 +165,7 @@ function DeliverableForm({
         applicationId,
         title: title.trim(),
         description: description.trim(),
-        dueDate: dueDate ? new Date(dueDate) : null,
+        dueDate: dueDate ? parseLocalDate(dueDate) : null,
         status: 'pending',
         objectiveId: objectiveId || null,
         createdAt: new Date(),
@@ -182,10 +182,10 @@ function DeliverableForm({
   }
 
   return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg">
+    <div className="border border-boundary rounded-lg">
       <Button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors rounded-lg"
+        className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors rounded-lg"
       >
         {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         <Plus size={16} />
@@ -193,7 +193,7 @@ function DeliverableForm({
       </Button>
 
       {open && (
-        <div className="px-4 pb-4 space-y-3 border-t border-neutral-20 dark:border-neutral-70 pt-3">
+        <div className="px-4 pb-4 space-y-3 border-t border-boundary pt-3">
           <input
             type="text"
             placeholder="Título del entregable"
@@ -260,7 +260,7 @@ function InlineEditDeliverable({
     try {
       await db.deliverables.update(deliverable.id, {
         status,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        dueDate: dueDate ? parseLocalDate(dueDate) : null,
         objectiveId: objectiveId || null,
         updatedAt: new Date(),
       })
@@ -271,7 +271,7 @@ function InlineEditDeliverable({
   }
 
   return (
-    <div className="mt-3 p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+    <div className="mt-3 p-4 bg-card rounded-xl border border-boundary shadow-sm">
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-neutral-90 dark:text-white min-w-0 flex-1 truncate">
           Editando: {deliverable.title}

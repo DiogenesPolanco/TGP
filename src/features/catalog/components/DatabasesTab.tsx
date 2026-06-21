@@ -14,7 +14,7 @@ const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
   extended: 'bg-warning/10 text-warning border-warning/30',
   eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
 }
 
 const statusLabel: Record<SupportStatus, string> = {
@@ -130,7 +130,7 @@ function DatabaseCard({
   const eolCount = techs.filter((t) => t.supportStatus === 'eol').length
 
   return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70/50 group">
+    <div className="border border-boundary rounded-lg bg-neutral-10 dark:bg-neutral-70/50 group">
       <div className="flex items-center justify-between p-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
@@ -154,7 +154,7 @@ function DatabaseCard({
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${environmentColor[db_.environment]}`}>
                 {environmentLabel[db_.environment]}
               </span>
-              <span className="text-xs text-neutral-60 dark:text-neutral-40">
+              <span className="text-xs text-muted">
                 {dbTypeLabel[db_.dbType]}
               </span>
               {db_.isManaged && (
@@ -198,14 +198,14 @@ function DatabaseCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-neutral-20 dark:border-neutral-70 p-3 space-y-3">
+        <div className="border-t border-boundary p-3 space-y-3">
           {db_.description && (
-            <p className="text-xs text-neutral-60 dark:text-neutral-40">{db_.description}</p>
+            <p className="text-xs text-muted">{db_.description}</p>
           )}
 
           {relatedMs.length > 0 && (
             <div>
-              <p className="text-[11px] font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider mb-1.5">
+              <p className="text-[11px] font-semibold text-secondary uppercase tracking-wider mb-1.5">
                 Microservicios relacionados
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -224,7 +224,7 @@ function DatabaseCard({
 
           {techs.length > 0 && (
             <div>
-              <p className="text-[11px] font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider mb-1.5">
+              <p className="text-[11px] font-semibold text-secondary uppercase tracking-wider mb-1.5">
                 Tecnologías relacionadas
               </p>
               <div className="space-y-1">

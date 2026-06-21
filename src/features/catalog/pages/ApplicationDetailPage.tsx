@@ -42,7 +42,7 @@ const criticalityColor: Record<string, string> = {
 const statusColor: Record<string, string> = {
   active: 'bg-success/10 text-success border-success/30',
   deprecated: 'bg-warning/10 text-warning border-warning/30',
-  retired: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  retired: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   planned: 'bg-info/10 text-info border-info/30',
 }
 
@@ -143,8 +143,8 @@ export function ApplicationDetailPage() {
 
   if (!application) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        <p className="text-neutral-60 dark:text-neutral-40">Aplicación no encontrada</p>
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
+        <p className="text-muted">Aplicación no encontrada</p>
       </div>
     )
   }
@@ -189,7 +189,7 @@ export function ApplicationDetailPage() {
             {application.name}
           </h1>
           {application.description && (
-            <p className="text-base text-neutral-60 dark:text-neutral-40 leading-relaxed max-w-2xl">
+            <p className="text-base text-muted leading-relaxed max-w-2xl">
               {application.description}
             </p>
           )}
@@ -197,7 +197,7 @@ export function ApplicationDetailPage() {
             <span className={`px-3 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`}>
               {criticalityLabel[application.criticality]}
             </span>
-            <span className="px-3 py-0.5 rounded-full text-xs font-medium bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
+            <span className="px-3 py-0.5 rounded-full text-xs font-medium bg-neutral-10 dark:bg-neutral-70 text-muted">
               {appStatusLabel[application.status]}
             </span>
             <span className="text-sm text-neutral-50">
@@ -228,7 +228,7 @@ export function ApplicationDetailPage() {
                 className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm transition-all ${
                   activeTab === tab.id
                     ? 'bg-accent/10 text-accent font-medium shadow-sm'
-                    : 'text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                    : 'text-muted hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70'
                 }`}
               >
                 <Icon size={18} className="shrink-0" />
@@ -254,7 +254,7 @@ export function ApplicationDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-8"
+              className="bg-card rounded-xl border border-boundary shadow-sm p-8"
             >
               {activeTab === 'summary' && (
                 <div className="space-y-8">
@@ -277,7 +277,7 @@ export function ApplicationDetailPage() {
                       ]).map(([label, value, className]) => (
                         <div
                           key={label}
-                          className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-neutral-20 dark:border-neutral-70 p-4"
+                          className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-4"
                         >
                           <dt className="text-[11px] font-medium text-neutral-50 uppercase tracking-wider mb-1.5">
                             {label}
@@ -297,7 +297,7 @@ export function ApplicationDetailPage() {
                       <MetricCard icon={Shield} label="Vulnerabilidades" value={activeVulnCount} color="text-danger" bg="bg-danger/5 border-danger/20" />
                       <MetricCard icon={AlertTriangle} label="Riesgos" value={allRisks.length} color="text-warning" bg="bg-warning/5 border-warning/20" />
                       <MetricCard icon={Activity} label="Incidentes" value={allIncidents.length} color="text-info" bg="bg-info/5 border-info/20" />
-                      <MetricCard icon={FileWarning} label="Hallazgos" value={allFindings.length} color="text-neutral-60" bg="bg-neutral-10 dark:bg-neutral-70/40 border-neutral-20 dark:border-neutral-70" />
+                      <MetricCard icon={FileWarning} label="Hallazgos" value={allFindings.length} color="text-neutral-60" bg="bg-neutral-10 dark:bg-neutral-70/40 border-boundary" />
                     </div>
                   </div>
 
@@ -486,7 +486,7 @@ function TechStackManager({
     active: 'bg-success/10 text-success border-success/30',
     extended: 'bg-warning/10 text-warning border-warning/30',
     eol: 'bg-danger/10 text-danger border-danger/30',
-    unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+    unknown: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   }
 
   const techColumns: Column<(typeof allTechnologies)[number]>[] = useMemo(() => [
@@ -505,13 +505,13 @@ function TechStackManager({
       key: 'vendor',
       label: 'Vendor',
       sortable: true,
-      render: (t) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{t.vendor || '—'}</span>,
+      render: (t) => <span className="text-sm text-secondary">{t.vendor || '—'}</span>,
     },
     {
       key: 'category',
       label: 'Categoría',
       sortable: true,
-      render: (t) => <span className="text-sm text-neutral-70 dark:text-neutral-30 capitalize">{t.category}</span>,
+      render: (t) => <span className="text-sm text-secondary capitalize">{t.category}</span>,
     },
     {
       key: 'supportStatus',
@@ -528,7 +528,7 @@ function TechStackManager({
       label: 'Fecha EOL',
       sortable: true,
       render: (t) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {t.eolDate ? new Date(t.eolDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : '—'}
         </span>
       ),
@@ -634,7 +634,7 @@ function EntityList<T extends EntityForList>({
             </span>
           )
         }
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{cell}</span>
+        return <span className="text-sm text-secondary">{cell}</span>
       },
     }))
     cols.push({
@@ -684,7 +684,7 @@ function EntityList<T extends EntityForList>({
         </div>
 
         {showDropdown && (
-          <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
             {availableItems.length === 0 ? (
               <p className="px-4 py-3 text-sm text-neutral-50">
                 {search ? 'Sin resultados' : 'No hay más elementos disponibles'}
@@ -897,7 +897,7 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
         </div>
 
         {showDropdown && (
-          <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
             {availableVulns.length === 0 ? (
               <p className="px-4 py-3 text-sm text-neutral-50">
                 {search ? 'Sin resultados' : 'No hay más vulnerabilidades disponibles'}
@@ -953,7 +953,7 @@ function MetricCard({
         <Icon size={20} />
       </div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{label}</p>
+      <p className="text-xs text-muted mt-0.5">{label}</p>
     </div>
   )
 }
@@ -972,12 +972,12 @@ function QuickLinkCard({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1.5 p-4 rounded-xl border border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70/50 hover:border-accent/30 hover:bg-accent/5 transition-all group text-center"
+      className="flex flex-col items-center gap-1.5 p-4 rounded-xl border border-boundary bg-neutral-10 dark:bg-neutral-70/50 hover:border-accent/30 hover:bg-accent/5 transition-all group text-center"
     >
-      <div className="p-2 rounded-lg bg-white dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 group-hover:text-accent transition-colors shadow-sm">
+      <div className="p-2 rounded-lg bg-white dark:bg-neutral-70 text-muted group-hover:text-accent transition-colors shadow-sm">
         <Icon size={20} />
       </div>
-      <span className="text-xs text-neutral-60 dark:text-neutral-40">{label}</span>
+      <span className="text-xs text-muted">{label}</span>
           <span className="text-xl font-bold text-neutral-90 dark:text-white leading-none">{value}</span>
     </button>
   )

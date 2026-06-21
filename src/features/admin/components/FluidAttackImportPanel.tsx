@@ -75,7 +75,7 @@ export function FluidAttackImportPanel() {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5 space-y-4">
+    <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5 space-y-4">
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-xl bg-danger/10 text-danger">
           <ShieldAlert size={20} />
@@ -102,7 +102,7 @@ export function FluidAttackImportPanel() {
             disabled={isProcessing}
             className={cn(
               'w-full border-2 border-dashed rounded-xl p-8 flex flex-col items-center gap-2 transition-colors',
-              'border-neutral-30 dark:border-neutral-70',
+              'border-boundary',
               'hover:border-danger/40 dark:hover:border-danger/40',
               'cursor-pointer disabled:opacity-50',
             )}
@@ -115,7 +115,7 @@ export function FluidAttackImportPanel() {
             ) : (
               <>
                 <Upload size={28} className="text-neutral-40" />
-                <p className="text-sm font-medium text-neutral-60 dark:text-neutral-40">
+                <p className="text-sm font-medium text-muted">
                   Seleccionar archivo CSV
                 </p>
                 <p className="text-xs text-neutral-50 dark:text-neutral-50">
@@ -130,13 +130,13 @@ export function FluidAttackImportPanel() {
       {phase === 'preview' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-neutral-60 dark:text-neutral-40">
+            <p className="text-sm text-muted">
               {parsedRows.length} filas detectadas
             </p>
             <div className="flex gap-2">
               <Button
                 onClick={handleReset}
-                className="px-3 py-1.5 text-xs border border-neutral-30 dark:border-neutral-60 rounded-lg text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                className="px-3 py-1.5 text-xs border border-neutral-30 dark:border-neutral-60 rounded-lg text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 Cancelar
               </Button>
@@ -150,16 +150,16 @@ export function FluidAttackImportPanel() {
             </div>
           </div>
 
-          <div className="max-h-60 overflow-y-auto border border-neutral-20 dark:border-neutral-70 rounded-xl">
+          <div className="max-h-60 overflow-y-auto border border-boundary rounded-xl">
             <table className="w-full text-xs">
               <thead className="sticky top-0 bg-neutral-10 dark:bg-neutral-85">
                 <tr>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">#</th>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Location</th>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Weakness</th>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Vuln ID</th>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Severidad</th>
-                  <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Status</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">#</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">Location</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">Weakness</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">Vuln ID</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">Severidad</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -230,18 +230,18 @@ export function FluidAttackImportPanel() {
 
           {result.unmatchedRows > 0 && (
             <div>
-              <p className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 mb-2 flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-muted mb-2 flex items-center gap-1.5">
                 <AlertTriangle size={14} className="text-warning" />
                 Filas sin match ({result.unmatchedRows})
               </p>
-              <div className="max-h-40 overflow-y-auto border border-neutral-20 dark:border-neutral-70 rounded-xl">
+              <div className="max-h-40 overflow-y-auto border border-boundary rounded-xl">
                 <table className="w-full text-xs">
                   <thead className="sticky top-0 bg-neutral-10 dark:bg-neutral-85">
                     <tr>
-                      <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">#</th>
-                      <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Location</th>
-                      <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Vuln ID</th>
-                      <th className="text-left px-3 py-2 font-semibold text-neutral-60 dark:text-neutral-40">Weakness</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted">#</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted">Location</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted">Vuln ID</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted">Weakness</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -277,7 +277,7 @@ export function FluidAttackImportPanel() {
           <div className="flex justify-end">
             <Button
               onClick={handleReset}
-              className="px-4 py-2 text-xs bg-neutral-10 dark:bg-neutral-85 text-neutral-70 dark:text-neutral-30 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
+              className="px-4 py-2 text-xs bg-neutral-10 dark:bg-neutral-85 text-secondary rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
             >
               Importar otro archivo
             </Button>
@@ -332,7 +332,7 @@ function StatBox({ icon, label, value, color }: { icon: React.ReactNode; label: 
     danger: 'text-danger',
     warning: 'text-warning',
     info: 'text-info',
-    neutral: 'text-neutral-60 dark:text-neutral-40',
+    neutral: 'text-muted',
   }
   return (
     <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl border border-neutral-10 dark:border-neutral-75 p-3">

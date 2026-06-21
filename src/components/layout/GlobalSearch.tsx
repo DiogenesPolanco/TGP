@@ -532,9 +532,9 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl mx-4 bg-white dark:bg-neutral-80 rounded-2xl shadow-2xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
+      <div className="relative w-full max-w-2xl mx-4 bg-card rounded-2xl shadow-2xl border border-boundary overflow-hidden">
         {/* Input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-boundary">
           <Search size={20} className="text-neutral-50 shrink-0" />
           <input
             ref={inputRef}
@@ -599,7 +599,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
         {query.trim() && groups.length === 0 && !loading && (
           <div className="px-5 py-12 text-center text-neutral-50">
             <Search size={32} className="mx-auto mb-3 opacity-40" />
-            <p className="text-sm">Sin resultados para <span className="font-medium text-neutral-70 dark:text-neutral-30">"{query}"</span></p>
+            <p className="text-sm">Sin resultados para <span className="font-medium text-secondary">"{query}"</span></p>
             <p className="text-xs mt-1">Prueba con otro término o selecciona una categoría específica</p>
           </div>
         )}
@@ -685,7 +685,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                   <div className="w-8 h-8 rounded-full bg-white dark:bg-neutral-65 flex items-center justify-center text-neutral-60 group-hover:text-primary transition-colors">
                     <cat.icon size={16} />
                   </div>
-                  <span className="text-xs font-medium text-neutral-70 dark:text-neutral-30 group-hover:text-neutral-90 dark:group-hover:text-white transition-colors leading-tight">
+                  <span className="text-xs font-medium text-secondary group-hover:text-neutral-90 dark:group-hover:text-white transition-colors leading-tight">
                     {cat.label}
                   </span>
                 </Button>

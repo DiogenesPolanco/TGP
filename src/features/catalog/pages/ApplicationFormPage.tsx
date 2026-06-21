@@ -12,6 +12,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 export function ApplicationFormPage() {
   const { id } = useParams()
@@ -74,7 +75,7 @@ export function ApplicationFormPage() {
     e.preventDefault()
     const data = {
       ...formData,
-      supportEndDate: formData.supportEndDate ? new Date(formData.supportEndDate) : null,
+      supportEndDate: formData.supportEndDate ? parseLocalDate(formData.supportEndDate) : null,
       ownerId: formData.ownerId || `user-${crypto.randomUUID()}`,
       technologies: selectedTechIds,
       metadata: application?.metadata ?? {},
@@ -103,9 +104,9 @@ export function ApplicationFormPage() {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
           <input
             type="text"
             required
@@ -116,7 +117,7 @@ export function ApplicationFormPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
           <RichTextEditor
             value={formData.description}
             onChange={(html) => setFormData({ ...formData, description: html })}
@@ -171,7 +172,7 @@ export function ApplicationFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha fin soporte</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Fecha fin soporte</label>
             <DatePicker
               value={formData.supportEndDate}
               onChange={(v) => setFormData({ ...formData, supportEndDate: v })}
@@ -181,7 +182,7 @@ export function ApplicationFormPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+          <label className="block text-sm font-medium text-secondary mb-2">
             Tecnologías
           </label>
           <TechSearch
@@ -196,7 +197,7 @@ export function ApplicationFormPage() {
           <Button
             type="button"
             onClick={() => navigate('/catalog/applications')}
-            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
           </Button>

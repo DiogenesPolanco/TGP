@@ -1,6 +1,6 @@
 export function InvalidLinkPage() {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]" style={{
         background: 'radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)'
       }} />
@@ -44,7 +44,7 @@ export function InvalidLinkPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">Pide un nuevo enlace</h3>
-                <p className="text-base text-neutral-60 dark:text-neutral-40 leading-relaxed">
+                <p className="text-base text-muted leading-relaxed">
                   A quien te compartió este enlace le tomará segundos generar otro.
                 </p>
               </div>

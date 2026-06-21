@@ -191,14 +191,14 @@ export function AzureCloudConfig() {
       </div>
 
       {!info.configured && (
-        <p className="text-sm text-neutral-60 dark:text-neutral-40">
+        <p className="text-sm text-muted">
           Configura una SAS URL de Azure Blob Storage para mantener copias de seguridad automáticas en la nube
           y compartir enlaces públicos con cifrado. Puedes generar una SAS URL desde Azure Portal: Storage Account → Contenedor → Shared access signature.
         </p>
       )}
 
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30">
+        <div className="flex items-center gap-2 text-sm font-medium text-secondary">
           <Cloud size={16} />
           <span>Backup de Base de Datos</span>
         </div>
@@ -252,11 +252,11 @@ export function AzureCloudConfig() {
         )}
       </div>
 
-      <div className="border-t border-neutral-20 dark:border-neutral-70" />
+      <div className="border-t border-boundary" />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30">
+          <div className="flex items-center gap-2 text-sm font-medium text-secondary">
             <Share2 size={16} className="text-secondary" />
             <span>Compartir Enlaces Públicos</span>
           </div>
@@ -369,12 +369,12 @@ export function AzureCloudConfig() {
         )}
       </div>
 
-      {info.configured && <div className="border-t border-neutral-20 dark:border-neutral-70" />}
+      {info.configured && <div className="border-t border-boundary" />}
 
       {info.configured && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30">
+            <div className="flex items-center gap-2 text-sm font-medium text-secondary">
               <Download size={16} />
               <span>Backups</span>
             </div>

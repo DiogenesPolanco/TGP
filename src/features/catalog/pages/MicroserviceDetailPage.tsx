@@ -30,7 +30,7 @@ const lifecycleColor: Record<MicroserviceLifecycleStatus, string> = {
   evolving: 'bg-info/10 text-info border-info/30',
   deprecated: 'bg-warning/10 text-warning border-warning/30',
   decommissioned: 'bg-danger/10 text-danger border-danger/30',
-  planned: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  planned: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
 }
 
 const serviceLevelLabel: Record<string, string> = {
@@ -44,7 +44,7 @@ function EntitySection({ title, entityType, microserviceId }: { title: string; e
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-neutral-90 dark:text-white">{title}</h2>
-      <div className="bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 rounded-xl p-5">
+      <div className="bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-xl p-5">
         <EntityAssociationList entityType={entityType} microserviceId={microserviceId} />
       </div>
     </div>
@@ -263,8 +263,8 @@ export function MicroserviceDetailPage() {
 
   if (!isNew && !ms) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        <p className="text-neutral-60 dark:text-neutral-40">Microservicio no encontrado</p>
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
+        <p className="text-muted">Microservicio no encontrado</p>
       </div>
     )
   }
@@ -376,7 +376,7 @@ export function MicroserviceDetailPage() {
                 className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm transition-all ${
                   activeSection === s.id
                     ? 'bg-accent/10 text-accent font-medium shadow-sm'
-                    : 'text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                    : 'text-muted hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70'
                 }`}
               >
                 <Icon size={18} className="shrink-0" />
@@ -396,14 +396,14 @@ export function MicroserviceDetailPage() {
         </nav>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-8">
+        <div className="flex-1 min-w-0 bg-card rounded-xl border border-boundary shadow-sm p-8">
           {activeSection === 'info' && (
             <div className="space-y-5">
               <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Información General</h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Nombre</label>
+                  <label className="block text-sm font-medium text-secondary mb-1.5">Nombre</label>
                   <input
                     type="text"
                     value={name}
@@ -427,7 +427,7 @@ export function MicroserviceDetailPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Repositorio</label>
+                  <label className="block text-sm font-medium text-secondary mb-1.5">Repositorio</label>
                   <div className="relative">
                     <GitBranch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
                     <input
@@ -440,7 +440,7 @@ export function MicroserviceDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Nivel de Servicio</label>
+                  <label className="block text-sm font-medium text-secondary mb-1.5">Nivel de Servicio</label>
                   <select
                     value={serviceLevel}
                     onChange={(e) => { setServiceLevel(e.target.value as ServiceLevel); markDirty() }}
@@ -454,12 +454,12 @@ export function MicroserviceDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Stack Tecnológico</label>
+                <label className="block text-sm font-medium text-secondary mb-1.5">Stack Tecnológico</label>
                 <TechSearch selectedIds={techIds} onChange={(ids) => { setTechIds(ids); markDirty() }} enableDepsSearch />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
+                <label className="block text-sm font-medium text-secondary mb-1.5">Descripción</label>
                 <RichTextEditor
                   value={description}
                   onChange={(html) => { setDescription(html); markDirty() }}
@@ -468,7 +468,7 @@ export function MicroserviceDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">Estado del Ciclo de Vida</label>
+                <label className="block text-sm font-medium text-secondary mb-2">Estado del Ciclo de Vida</label>
                 <div className="flex flex-wrap gap-2">
                   {(Object.entries(lifecycleLabel) as [MicroserviceLifecycleStatus, string][]).map(([key, label]) => (
                     <button
@@ -477,7 +477,7 @@ export function MicroserviceDetailPage() {
                       className={`px-4 py-2 rounded-lg border text-sm transition-all ${
                         lifecycleStatus === key
                           ? `${lifecycleColor[key]} border-current font-medium`
-                          : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:border-neutral-50'
+                          : 'border-neutral-30 dark:border-neutral-60 text-muted hover:border-neutral-50'
                       }`}
                     >
                       {label}
@@ -490,7 +490,7 @@ export function MicroserviceDetailPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle size={16} className="text-warning" />
-                    <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">
+                    <label className="text-sm font-medium text-secondary">
                       Plan de Decomiso
                     </label>
                   </div>
@@ -538,7 +538,7 @@ export function MicroserviceDetailPage() {
               </div>
 
               {newFeatureOpen && (
-                <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl p-4 space-y-3 bg-white dark:bg-neutral-80 shadow-sm">
+                <div className="border border-boundary rounded-xl p-4 space-y-3 bg-card shadow-sm">
                   <div>
                     <label className="block text-xs font-medium text-neutral-50 mb-1">Nombre</label>
                     <input
@@ -589,7 +589,7 @@ export function MicroserviceDetailPage() {
 
               <div className="space-y-2">
                 {features.map((f) => (
-                  <div key={f.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm">
+                  <div key={f.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-neutral-90 dark:text-white">{f.name}</span>
@@ -603,7 +603,7 @@ export function MicroserviceDetailPage() {
                         </span>
                         <span className="text-xs text-neutral-50 capitalize">{f.category}</span>
                       </div>
-                      {f.description && <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{f.description}</p>}
+                      {f.description && <p className="text-xs text-muted mt-0.5">{f.description}</p>}
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <button
@@ -641,7 +641,7 @@ export function MicroserviceDetailPage() {
               </div>
 
               {newRoadmapOpen && (
-                <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl p-4 space-y-3 bg-white dark:bg-neutral-80 shadow-sm">
+                <div className="border border-boundary rounded-xl p-4 space-y-3 bg-card shadow-sm">
                   <div>
                     <label className="block text-xs font-medium text-neutral-50 mb-1">Título</label>
                     <input
@@ -720,7 +720,7 @@ export function MicroserviceDetailPage() {
                 {roadmap.map((item) => {
                   const isOverdue = item.targetDate && new Date(item.targetDate) < new Date() && item.status !== 'completed' && item.status !== 'cancelled'
                   return (
-                    <div key={item.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm">
+                    <div key={item.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-medium text-neutral-90 dark:text-white">{item.title}</span>
@@ -741,7 +741,7 @@ export function MicroserviceDetailPage() {
                           <span className="text-xs text-neutral-50 capitalize bg-neutral-10 dark:bg-neutral-70 px-1.5 py-0.5 rounded">{item.type}</span>
                           {isOverdue && <span className="text-xs text-danger font-medium">Vencido</span>}
                         </div>
-                        {item.description && <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{item.description}</p>}
+                        {item.description && <p className="text-xs text-muted mt-0.5">{item.description}</p>}
                         {item.targetDate && (
                           <p className="text-xs text-neutral-50 mt-0.5">
                             <Calendar size={12} className="inline mr-0.5" />
@@ -775,7 +775,7 @@ export function MicroserviceDetailPage() {
           {activeSection === 'databases' && ms && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Bases de Datos Asociadas</h2>
-              <div className="bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 rounded-xl p-5">
+              <div className="bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-xl p-5">
                 <DatabaseAssociationList microserviceId={ms.id} applicationId={ms.applicationId} />
               </div>
             </div>

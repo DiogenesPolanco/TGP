@@ -107,13 +107,13 @@ export function ImportPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Importar Datos</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Sube un archivo Excel (.xlsx) para importar datos masivamente
           </p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
         <div className="space-y-5">
           {/* Entity type selector */}
           <div>
@@ -126,7 +126,7 @@ export function ImportPage() {
           {/* File upload */}
           {selectedType && (
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+              <label className="block text-sm font-medium text-secondary mb-2">
                 Archivo Excel
               </label>
               <div className="flex items-center gap-3">
@@ -185,7 +185,7 @@ export function ImportPage() {
 
       {/* Preview */}
       {parsedRows && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
@@ -204,21 +204,23 @@ export function ImportPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button
+              <button
+                type="button"
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-90 dark:text-white border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 <Trash2 size={14} />
                 Limpiar
-              </Button>
+              </button>
               {result && (
-                <Button
+                <button
+                  type="button"
                   onClick={handleReset}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                 >
                   <Upload size={14} />
                   Nueva importación
-                </Button>
+                </button>
               )}
             </div>
           </div>
@@ -242,10 +244,10 @@ export function ImportPage() {
 
           {/* Table preview */}
           {previewRows.length > 0 && (
-            <div className="overflow-x-auto border border-neutral-20 dark:border-neutral-70 rounded-lg">
+            <div className="overflow-x-auto border border-boundary rounded-lg">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-neutral-10 dark:bg-neutral-70 border-b border-neutral-20 dark:border-neutral-70">
+                  <tr className="bg-neutral-10 dark:bg-neutral-70 border-b border-boundary">
                     <th className="px-3 py-2 text-left text-xs font-semibold text-neutral-60">#</th>
                     {selectedConfig?.columns.map((col) => (
                       <th key={col.key} className="px-3 py-2 text-left text-xs font-semibold text-neutral-60">{col.label}</th>
@@ -259,7 +261,7 @@ export function ImportPage() {
                       {selectedConfig?.columns.map((col) => {
                         const val = row.data[col.label]
                         return (
-                          <td key={col.key} className="px-3 py-2 text-xs text-neutral-70 dark:text-neutral-30 max-w-[200px] truncate">
+                          <td key={col.key} className="px-3 py-2 text-xs text-secondary max-w-[200px] truncate">
                             {col.type === 'date' && val ? (
                               <span className="text-neutral-50">{String(val)}</span>
                             ) : (
@@ -273,7 +275,7 @@ export function ImportPage() {
                 </tbody>
               </table>
               {parsedRows.length > 10 && (
-                <p className="px-3 py-2 text-xs text-neutral-50 border-t border-neutral-20 dark:border-neutral-70">
+                <p className="px-3 py-2 text-xs text-neutral-50 border-t border-boundary">
                   Mostrando 10 de {parsedRows.length} filas
                 </p>
               )}
@@ -300,7 +302,7 @@ export function ImportPage() {
 
           {/* Import result */}
           {result && (
-            <div className="mt-4 p-4 rounded-lg border text-sm">
+            <div className="mt-4 p-4 rounded-lg border border-neutral-30 dark:border-neutral-60 text-sm">
               <div className="flex items-center gap-3 mb-3">
                 {result.errorRows === 0 ? (
                   <CheckCircle size={24} className="text-success" />
@@ -319,13 +321,14 @@ export function ImportPage() {
 
               {result.errors.length > 0 && (
                 <div>
-                  <Button
+                  <button
+                    type="button"
                     onClick={() => setShowDetails(!showDetails)}
                     className="flex items-center gap-1 text-xs text-danger hover:text-danger-dark mb-2"
                   >
                     {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                     Ver detalles de errores
-                  </Button>
+                  </button>
                   {showDetails && (
                     <div className="max-h-40 overflow-y-auto space-y-1">
                       {result.errors.map((e, i) => (
@@ -344,21 +347,22 @@ export function ImportPage() {
 
       {/* Template download */}
       {selectedConfig && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-2">¿No tienes un archivo?</h3>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mb-3">
+          <p className="text-sm text-muted mb-3">
             Puedes descargar una plantilla con las columnas necesarias para cada tipo de dato.
           </p>
           <div className="flex flex-wrap gap-2">
             {entityTypes.map((et) => (
-              <Button
+              <button
+                type="button"
                 key={et.id}
                 onClick={() => downloadTemplate(et.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-90 dark:text-white border border-neutral-30 dark:border-neutral-60 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 <Download size={14} />
                 {et.label}
-              </Button>
+              </button>
             ))}
           </div>
         </div>

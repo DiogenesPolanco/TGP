@@ -27,7 +27,7 @@ export function ChartTooltip({ active, payload, label, formatter }: ChartTooltip
   return (
     <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[160px]">
       {label && (
-        <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+        <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-boundary">
           {label}
         </p>
       )}
@@ -39,7 +39,7 @@ export function ChartTooltip({ active, payload, label, formatter }: ChartTooltip
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: entry.color ?? entry.fill }}
               />
-              <span className="text-neutral-60 dark:text-neutral-40 text-xs">{entry.name ?? entry.dataKey}</span>
+              <span className="text-muted text-xs">{entry.name ?? entry.dataKey}</span>
             </div>
             <span className="font-semibold text-neutral-90 dark:text-white">
               {formatter ? formatter(entry.value as number) : entry.value}
@@ -55,7 +55,7 @@ export function ChartTooltipSimple({ active, payload, label }: ChartTooltipProps
   if (!active || !payload?.length) return null
   return (
     <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[160px]">
-      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-boundary">
         {label}
       </p>
       <div className="space-y-1.5">
@@ -63,7 +63,7 @@ export function ChartTooltipSimple({ active, payload, label }: ChartTooltipProps
           if (entry.name === 'color' || entry.dataKey === 'color') return null
           return (
             <div key={idx} className="flex items-center justify-between gap-4">
-              <span className="text-neutral-60 dark:text-neutral-40 text-xs capitalize">
+              <span className="text-muted text-xs capitalize">
                 {entry.name ?? entry.dataKey}
               </span>
               <span className="font-semibold text-neutral-90 dark:text-white">

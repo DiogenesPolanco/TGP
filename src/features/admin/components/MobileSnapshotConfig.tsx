@@ -80,7 +80,7 @@ export function MobileSnapshotConfig() {
       <div className="space-y-4">
         {/* Passphrase */}
         <div>
-          <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5 flex items-center gap-1.5">
+          <label className="text-xs font-medium text-muted mb-1.5 flex items-center gap-1.5">
             <KeyRound size={12} />
             Contraseña de cifrado
           </label>
@@ -137,7 +137,7 @@ export function MobileSnapshotConfig() {
         {/* Share URL result */}
         {shareUrl && (
           <div className="bg-neutral-90 dark:bg-neutral-85 rounded-xl border border-primary/20 p-4 space-y-3">
-            <p className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">
               Enlace para el móvil
             </p>
             <div className="flex items-center gap-2">

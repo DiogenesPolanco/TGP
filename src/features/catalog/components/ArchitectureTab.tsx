@@ -23,10 +23,10 @@ const appStatusLabel: Record<string, string> = {
 }
 
 const statusColors: Record<SupportStatus, string> = {
-  active: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
-  extended: 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',
-  eol: 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30',
-  unknown: 'bg-neutral-500/20 text-neutral-600 dark:text-neutral-400 border-neutral-500/30',
+  active: 'bg-success/10 text-success border-success/30',
+  extended: 'bg-warning/10 text-warning border-warning/30',
+  eol: 'bg-danger/10 text-danger border-danger/30',
+  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -145,7 +145,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* C4 Diagram */}
-      <div className="relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+      <div className="relative bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
         {/* Zoom/pan container */}
         <div className="overflow-auto p-8">
           {/* Level 1: System Boundary */}
@@ -159,7 +159,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
               </div>
 
               {/* Metadata badge */}
-              <div className="absolute -top-3.5 right-6 px-3 py-1 bg-white dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 text-xs rounded-full border border-neutral-20 dark:border-neutral-60 shadow-sm">
+              <div className="absolute -top-3.5 right-6 px-3 py-1 bg-white dark:bg-neutral-70 text-muted text-xs rounded-full border border-neutral-20 dark:border-neutral-60 shadow-sm">
                 {application.architecture} · {criticalityLabel[application.criticality]}
               </div>
 
@@ -171,7 +171,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       key={tech.id}
                       className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${
                         statusColors[tech.supportStatus]
-                      } ${tech.supportStatus === 'eol' ? 'ring-1 ring-red-500/30' : ''}`}
+                      } ${tech.supportStatus === 'eol' ? 'ring-1 ring-danger/30' : ''}`}
                     >
                       {categoryIcons[tech.category] || <Box size={14} />}
                       {tech.name}
@@ -199,7 +199,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       <div
                         key={ms.id}
                         className={`
-                          relative rounded-xl border-2 bg-white dark:bg-neutral-80 shadow-sm
+                          relative rounded-xl border-2 bg-card shadow-sm
                           transition-all duration-200 cursor-default
                           ${isHovered
                             ? 'border-blue-400 shadow-lg shadow-blue-500/10 scale-[1.02]'
@@ -236,7 +236,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                                 <span className="text-neutral-50 shrink-0">
                                   {categoryIcons[tech.category] || <Box size={12} />}
                                 </span>
-                                <span className="text-xs text-neutral-70 dark:text-neutral-30 truncate flex-1">
+                                <span className="text-xs text-secondary truncate flex-1">
                                   {tech.name}
                                 </span>
                                 <span className="text-[10px] text-neutral-50 shrink-0">{tech.version}</span>
@@ -319,7 +319,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       {/* External system body */}
                       <div className="p-3 space-y-1.5">
                         {depInfo?.description && (
-                          <p className="text-xs text-neutral-60 dark:text-neutral-40 line-clamp-2">
+                          <p className="text-xs text-muted line-clamp-2">
                             {depInfo.description}
                           </p>
                         )}
@@ -348,7 +348,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
           {microservices.length === 0 && depApps.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-neutral-50">
               <Globe size={48} className="mb-4 opacity-30" />
-              <p className="text-sm font-medium text-neutral-60 dark:text-neutral-40">
+              <p className="text-sm font-medium text-muted">
                 No hay datos para generar el diagrama de arquitectura
               </p>
               <p className="text-xs mt-1">
@@ -360,8 +360,8 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* Dependency Management */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
-        <div className="px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm">
+        <div className="px-6 py-4 border-b border-boundary flex items-center justify-between">
           <div>
             <h4 className="text-lg font-bold text-neutral-90 dark:text-white">
               Dependencias de Aplicación
@@ -379,10 +379,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
 
         {/* Add dependency form */}
         {showDepForm && (
-          <div className="p-6 border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10/50 dark:bg-neutral-70/30">
+          <div className="p-6 border-b border-boundary bg-neutral-10/50 dark:bg-neutral-70/30">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Aplicación destino *</label>
+                <label className="block text-xs font-medium text-secondary mb-1.5">Aplicación destino *</label>
                 <div className="relative">
                   <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
                   <input
@@ -390,11 +390,11 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                     placeholder="Buscar aplicación..."
                     value={depSearch}
                     onChange={(e) => setDepSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 {depSearch && availableApps.length > 0 && (
-                  <div className="mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                  <div className="mt-1 bg-card border border-boundary rounded-lg shadow-lg max-h-40 overflow-y-auto">
                     {availableApps.map((app) => (
                       <Button
                         key={app.id}
@@ -413,12 +413,12 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Tipo</label>
+                <label className="block text-xs font-medium text-secondary mb-1.5">Tipo</label>
                 <Select value={depType} onChange={(v) => setDepType(v as DependencyType)} options={dependencyTypes.map((t) => ({ value: t.value, label: t.label }))} />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Criticidad</label>
+                <label className="block text-xs font-medium text-secondary mb-1.5">Criticidad</label>
                 <Select value={depCriticality} onChange={(v) => setDepCriticality(v as Criticality)} options={[
                   { value: 'low', label: 'Baja' },
                   { value: 'medium', label: 'Media' },
@@ -429,13 +429,13 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </div>
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
+              <label className="block text-xs font-medium text-secondary mb-1.5">Descripción</label>
               <input
                 type="text"
                 placeholder="ej. Consulta catálogo de productos vía REST"
                 value={depDescription}
                 onChange={(e) => setDepDescription(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -480,7 +480,7 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                           )}
                         </div>
                         {depRel?.description && (
-                          <p className="text-xs text-neutral-60 dark:text-neutral-40 truncate mt-0.5">{depRel.description}</p>
+                          <p className="text-xs text-muted truncate mt-0.5">{depRel.description}</p>
                         )}
                       </div>
                     </div>
@@ -506,8 +506,8 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       </div>
 
       {/* Legend */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
-        <h5 className="text-xs font-semibold text-neutral-70 dark:text-neutral-30 uppercase tracking-wider mb-3">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
+        <h5 className="text-xs font-semibold text-secondary uppercase tracking-wider mb-3">
           Leyenda — Niveles C4
         </h5>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">

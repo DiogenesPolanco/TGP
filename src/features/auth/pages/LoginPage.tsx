@@ -201,7 +201,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
       {/* Gradient mesh background */}
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
@@ -234,7 +234,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
                 Demasiados intentos
               </h2>
-              <p className="text-sm text-neutral-60 dark:text-neutral-40">
+              <p className="text-sm text-muted">
                 Cuenta bloqueada temporalmente por seguridad
               </p>
               <div className="flex items-center justify-center gap-2 text-danger font-medium">
@@ -281,7 +281,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
                 <div className="max-w-lg mx-auto w-full space-y-4">
                   <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Selecciona tu usuario</h3>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40">Cuentas activas encontradas en el sistema</p>
+                  <p className="text-sm text-muted">Cuentas activas encontradas en el sistema</p>
                   <div className="space-y-2 max-h-[320px] overflow-y-auto">
                     {userList.map((u) => (
                       <Button key={u.id} onClick={() => {
@@ -289,7 +289,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                         createSession(u.otpRequestIntervalHours ?? 1)
                         onAuth()
                       }}
-                        className="w-full flex items-center justify-between p-4 rounded-xl border border-neutral-20 dark:border-neutral-70 hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group text-left">
+                        className="w-full flex items-center justify-between p-4 rounded-xl border border-boundary hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group text-left">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
                             {u.displayName.charAt(0).toUpperCase()}
@@ -381,21 +381,21 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                 <div className="max-w-lg mx-auto w-full space-y-6">
                   <div>
                     <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Configura tu acceso</h3>
-                    <p className="text-base text-neutral-60 dark:text-neutral-40 mt-1">
+                    <p className="text-base text-muted mt-1">
                       Escanea el código QR con tu app de autenticación
                     </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-start gap-6">
-                    <div className="bg-neutral-5 dark:bg-neutral-85 rounded-2xl p-4 border border-neutral-20 dark:border-neutral-70">
+                    <div className="bg-neutral-5 dark:bg-neutral-85 rounded-2xl p-4 border border-boundary">
                       <QRCodeSVG value={secret.uri} size={170} level="M" />
                     </div>
 
                     <div className="flex-1 space-y-4 w-full">
-                      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-neutral-20 dark:border-neutral-70 overflow-hidden">
+                      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-boundary overflow-hidden">
                         <p className="text-xs font-medium text-neutral-50 mb-1.5">Código secreto (ingreso manual)</p>
                         <div className="flex items-center gap-2 w-full">
-                          <code className="flex-1 text-[10px] font-mono bg-white dark:bg-neutral-80 px-2 py-1.5 rounded-lg border border-neutral-20 dark:border-neutral-70 select-all truncate min-w-0 leading-relaxed">
+                          <code className="flex-1 text-[10px] font-mono bg-card px-2 py-1.5 rounded-lg border border-boundary select-all truncate min-w-0 leading-relaxed">
                             {secret.base32}
                           </code>
                           <Button onClick={handleCopy} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0" title="Copiar">
@@ -413,7 +413,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-base font-medium text-neutral-70 dark:text-neutral-30 mb-2">
+                      <label className="block text-base font-medium text-secondary mb-2">
                         Verifica el código de 6 dígitos
                       </label>
                       <input
@@ -502,7 +502,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
                 <div className="max-w-sm mx-auto w-full space-y-6">
                   <div>
                     <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Autenticación OTP</h3>
-                    <p className="text-base text-neutral-60 dark:text-neutral-40 mt-1">
+                    <p className="text-base text-muted mt-1">
                       Ingresa el código de 6 dígitos de tu app
                     </p>
                   </div>

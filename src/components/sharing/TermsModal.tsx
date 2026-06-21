@@ -14,9 +14,9 @@ export function TermsModal({ onAccept, onClose }: Props) {
     <>
       <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl max-h-[85vh] bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl flex flex-col overflow-hidden">
+        <div className="w-full max-w-2xl max-h-[85vh] bg-card rounded-2xl border border-boundary shadow-2xl flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 shrink-0">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-boundary shrink-0">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <FileSignature size={18} className="text-primary" />
             </div>
@@ -32,7 +32,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-            <p className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               TGP permite generar enlaces públicos para compartir información con personas dentro y fuera de la
               institución. El uso de esta funcionalidad implica la aceptación de los términos aquí descritos.
             </p>
@@ -43,7 +43,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
                 <AlertTriangle size={16} className="text-danger" />
                 Responsabilidad del Usuario
               </h3>
-              <ul className="space-y-1.5 text-xs text-neutral-60 dark:text-neutral-40 ml-5 list-disc">
+              <ul className="space-y-1.5 text-xs text-muted ml-5 list-disc">
                 <li>El usuario es responsable de evaluar qué información comparte. TGP no filtra ni modifica los datos antes de generar un enlace.</li>
                 <li>No compartas información clasificada, sujeta a regulación (GDPR, LGPD) o que represente un riesgo si es divulgada.</li>
                 <li>Evita compartir datos personales identificables (nombres, correos, IDs internas) sin autorización.</li>
@@ -67,7 +67,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
                 ].map(({ icon: Icon, text, color }, i) => (
                   <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-neutral-10 dark:bg-neutral-75">
                     <Icon size={14} className={`${color} mt-0.5 shrink-0`} />
-                    <span className="text-xs text-neutral-70 dark:text-neutral-30">{text}</span>
+                    <span className="text-xs text-secondary">{text}</span>
                   </div>
                 ))}
               </div>
@@ -79,7 +79,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
                 <CheckCircle size={16} className="text-primary" />
                 Buenas Prácticas
               </h3>
-              <ul className="space-y-1.5 text-xs text-neutral-60 dark:text-neutral-40 ml-5 list-disc">
+              <ul className="space-y-1.5 text-xs text-muted ml-5 list-disc">
                 <li>Usa contraseña para datos institucionales sensibles.</li>
                 <li>Comparte solo la vista necesaria para el receptor.</li>
                 <li>Comunica la contraseña por un canal diferente al del enlace.</li>
@@ -93,7 +93,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
                 <AlertTriangle size={14} />
                 Exención de Responsabilidad
               </h3>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40 leading-relaxed">
+              <p className="text-xs text-muted leading-relaxed">
                 El usuario asume toda responsabilidad por la información que comparte, el cumplimiento de políticas
                 institucionales de protección de datos, y las consecuencias de compartir información sensible o
                 clasificada. TGP no será responsable por daños derivados del uso indebido de esta funcionalidad.
@@ -102,7 +102,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
           </div>
 
           {/* Footer: checkbox + button */}
-          <div className="border-t border-neutral-20 dark:border-neutral-70 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+          <div className="border-t border-boundary px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
             <label className="flex items-start gap-2.5 cursor-pointer flex-1">
               <input
                 type="checkbox"
@@ -110,7 +110,7 @@ export function TermsModal({ onAccept, onClose }: Props) {
                 onChange={(e) => setAccepted(e.target.checked)}
                 className="mt-0.5 w-4 h-4 rounded border-neutral-30 text-primary focus:ring-primary/30 shrink-0"
               />
-              <span className="text-xs text-neutral-60 dark:text-neutral-40 leading-relaxed">
+              <span className="text-xs text-muted leading-relaxed">
                 He leído y acepto los términos y condiciones de uso de la funcionalidad de compartir datos
               </span>
             </label>

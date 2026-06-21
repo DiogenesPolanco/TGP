@@ -192,8 +192,8 @@ export function CalendarPage() {
       {/* ── Main grid: Calendar + Sidebar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Month Calendar ── */}
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="lg:col-span-2 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-boundary">
             <Button onClick={() => setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1)} variant="ghost" size="sm" className="p-2">
               <ChevronLeft size={20} className="text-neutral-60" />
             </Button>
@@ -217,7 +217,7 @@ export function CalendarPage() {
                       className="absolute h-full rounded-md transition-all bg-primary/15"
                       style={{ left, width }}
                     />
-                    <div className="absolute inset-0 flex items-center px-2.5 text-[11px] font-medium text-neutral-60 dark:text-neutral-40">
+                    <div className="absolute inset-0 flex items-center px-2.5 text-[11px] font-medium text-muted">
                       <span>{sprint.sprintName}</span>
                       <span className="ml-auto text-primary font-semibold">{completion}%</span>
                     </div>
@@ -236,9 +236,9 @@ export function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 px-5 py-3 border-t border-neutral-20 dark:border-neutral-70 bg-neutral-5 dark:bg-neutral-85 flex-wrap">
+          <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary bg-neutral-5 dark:bg-neutral-85 flex-wrap">
             {Object.entries(TYPE_LABELS).map(([type, label]) => (
-              <div key={type} className="flex items-center gap-1.5 text-[11px] font-medium text-neutral-60 dark:text-neutral-40">
+              <div key={type} className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
                 <span className={cn('w-2 h-2 rounded-full', TYPE_DOTS[type])} />
                 {label}
               </div>
@@ -249,7 +249,7 @@ export function CalendarPage() {
         {/* ── Right panel ── */}
         <div className="space-y-4">
           {/* Selected day events */}
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+          <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
             <div className="flex items-center gap-2 mb-4">
               <CalendarIcon size={18} className="text-primary" />
               <h3 className="font-semibold text-neutral-90 dark:text-white">
@@ -307,7 +307,7 @@ export function CalendarPage() {
           </div>
 
           {/* Upcoming events */}
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+          <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
             <h3 className="font-semibold text-neutral-90 dark:text-white mb-4">Próximos eventos</h3>
             {upcomingEvents.length > 0 ? (
               <div className="space-y-2">
@@ -349,13 +349,13 @@ function SummaryCard({
   }
   const s = styles[color]
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-2xl border border-boundary p-4">
       <div className="flex items-center justify-between mb-2">
         <div className={cn('p-2 rounded-lg', s.bg, s.text)}>{icon}</div>
         <div className={cn('h-1 w-12 rounded-full', s.dot)} />
       </div>
       <p className="text-xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 font-medium mt-0.5">{title}</p>
+      <p className="text-xs text-muted font-medium mt-0.5">{title}</p>
       <p className="text-[11px] text-neutral-50 mt-0.5">{subtitle}</p>
     </div>
   )

@@ -35,7 +35,7 @@ const lifecycleColor: Record<string, string> = {
   evolving: 'bg-info/10 text-info',
   deprecated: 'bg-warning/10 text-warning',
   decommissioned: 'bg-danger/10 text-danger',
-  planned: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40',
+  planned: 'bg-neutral-10 dark:bg-neutral-70 text-muted',
 }
 
 const lifecycleDotColor: Record<string, string> = {
@@ -253,7 +253,7 @@ export function MicroservicesPage() {
             {appName ? (
               <Link
                 to={`/catalog/applications/${ms.applicationId}`}
-                className="text-sm text-neutral-70 dark:text-neutral-30 hover:text-primary transition-colors"
+                className="text-sm text-secondary hover:text-primary transition-colors"
               >
                 {appName}
               </Link>
@@ -269,7 +269,7 @@ export function MicroservicesPage() {
       label: 'Tech Lead',
       sortable: true,
       render: (ms) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {ms.technicalLead || '—'}
         </span>
       ),
@@ -293,7 +293,7 @@ export function MicroservicesPage() {
         const icon = lifecycleIcon[status] || null
         return (
           <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${lifecycleColor[status] || 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40'}`}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${lifecycleColor[status] || 'bg-neutral-10 dark:bg-neutral-70 text-muted'}`}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
             {icon && <span className="shrink-0">{icon}</span>}
@@ -306,7 +306,7 @@ export function MicroservicesPage() {
       key: 'technologies',
       label: 'Tecnologías',
       render: (ms) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {ms.technologies?.length ?? 0} techs
         </span>
       ),
@@ -329,7 +329,7 @@ export function MicroservicesPage() {
             {active.map((i) => (
               <span
                 key={i.label}
-                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-neutral-10 dark:bg-neutral-70 text-neutral-70 dark:text-neutral-30 border border-neutral-20 dark:border-neutral-60"
+                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-neutral-10 dark:bg-neutral-70 text-secondary border border-neutral-20 dark:border-neutral-60"
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${i.color}`} />
                 {i.label} {i.count}
@@ -352,7 +352,7 @@ export function MicroservicesPage() {
             to={`/catalog/microservices/${ms.id}`}
             className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
           >
-            <Eye size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <Eye size={16} className="text-muted" />
           </Link>
           <Button
             onClick={(e) => {
@@ -361,7 +361,7 @@ export function MicroservicesPage() {
             }}
             className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
           >
-            <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <Pencil size={16} className="text-muted" />
           </Button>
           <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}
@@ -391,7 +391,7 @@ export function MicroservicesPage() {
           </Button>
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -404,14 +404,14 @@ export function MicroservicesPage() {
               }
               await doShare()
             }}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Share2 size={16} />
             Compartir
           </Button>
           <Button
             onClick={handleExport}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Download size={16} />
             Exportar
@@ -421,7 +421,7 @@ export function MicroservicesPage() {
 
       {/* Share URL banner */}
       {shareUrl && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <span className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary font-mono min-w-0 truncate">
             {shareUrl.split('#')[0]}
@@ -514,7 +514,7 @@ export function MicroservicesPage() {
       </div>
 
       {/* Search bar */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -531,7 +531,7 @@ export function MicroservicesPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterLifecycle || filterApp
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -543,7 +543,7 @@ export function MicroservicesPage() {
         </div>
 
         {showFilters && (
-          <div className="space-y-3 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="space-y-3 pt-3 border-t border-boundary">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <label className="text-xs text-neutral-60">Estado</label>
@@ -587,7 +587,7 @@ export function MicroservicesPage() {
       {!rawMicroservices ? (
         <SkeletonTable rows={8} />
       ) : filteredItems.length === 0 ? (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <EmptyState
             icon={<Server size={22} className="text-neutral-50" />}
             title={
@@ -639,12 +639,12 @@ function StatCard({
         className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
           active
             ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
-            : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+            : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
         <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        <p className="text-xs text-muted">{label}</p>
     </Comp>
   )
 }

@@ -81,7 +81,7 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
           <div className="min-w-0">
             <p className="text-sm font-medium text-neutral-90 dark:text-white">{ms.name}</p>
             {ms.description && (
-              <p className="text-xs text-neutral-60 dark:text-neutral-40 line-clamp-1">{ms.description}</p>
+              <p className="text-xs text-muted line-clamp-1">{ms.description}</p>
             )}
           </div>
         </div>
@@ -95,7 +95,7 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
         const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
         return (
           <div className="flex items-center gap-1.5">
-            <span className="text-sm text-neutral-70 dark:text-neutral-30">{techs.length}</span>
+            <span className="text-sm text-secondary">{techs.length}</span>
           </div>
         )
       },

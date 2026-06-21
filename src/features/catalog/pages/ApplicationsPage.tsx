@@ -125,13 +125,13 @@ export function ApplicationsPage() {
       key: 'ownerName',
       label: 'Owner',
       sortable: true,
-      render: (app) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{app.ownerName}</span>,
+      render: (app) => <span className="text-sm text-secondary">{app.ownerName}</span>,
     },
     {
       key: 'businessUnitId',
       label: 'BU',
       render: (app) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {businessUnits.find((bu) => bu.id === app.businessUnitId)?.name || '-'}
         </span>
       ),
@@ -160,7 +160,7 @@ export function ApplicationsPage() {
       key: 'architecture',
       label: 'Arquitectura',
       sortable: true,
-      render: (app) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{app.architecture}</span>,
+      render: (app) => <span className="text-sm text-secondary">{app.architecture}</span>,
     },
     {
       key: 'actions',
@@ -170,13 +170,13 @@ export function ApplicationsPage() {
       render: (app) => (
         <div className="flex items-center justify-end gap-2">
           <Link to={`/catalog/applications/${app.id}`} className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
-            <Eye size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <Eye size={16} className="text-muted" />
           </Link>
           <Link
             to={`/catalog/applications/${app.id}/edit`}
             className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
           >
-            <Pencil size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <Pencil size={16} className="text-muted" />
           </Link>
           <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
@@ -196,14 +196,14 @@ export function ApplicationsPage() {
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
           </Button>
           <Button
             onClick={() => navigate('/compare')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <GitCompare size={16} />
             Comparar
@@ -218,7 +218,7 @@ export function ApplicationsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -235,7 +235,7 @@ export function ApplicationsPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterCriticality || filterStatus || filterBU
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -246,7 +246,7 @@ export function ApplicationsPage() {
           </Button>
           <Button
             onClick={handleExport}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Download size={16} />
             Exportar
@@ -254,7 +254,7 @@ export function ApplicationsPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Criticidad</label>
               <Select value={filterCriticality} onChange={(v) => setFilterCriticality(v)} options={[
@@ -298,7 +298,7 @@ export function ApplicationsPage() {
       {!rawApplications ? (
         <SkeletonTable rows={8} />
       ) : filteredApps.length === 0 ? (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <EmptyState
             icon={<AppWindow size={22} className="text-neutral-50" />}
             title={searchTerm || filterCriticality || filterStatus || filterBU

@@ -116,11 +116,11 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-full bg-white dark:bg-neutral-80 border-r border-neutral-20 dark:border-neutral-70 transition-all duration-300 z-50 flex flex-col',
+        'fixed left-0 top-0 h-full bg-card border-r border-boundary transition-all duration-300 z-50 flex flex-col',
         sidebarOpen ? 'w-60' : 'w-16'
       )}
     >
-      <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-boundary">
         {sidebarOpen && (
           <div className="flex items-center gap-2">
             <img src="/favicon.svg" alt="TGP" className="w-8 h-8" />
@@ -143,7 +143,7 @@ export function Sidebar() {
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
                       ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                      : 'text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white'
+                      : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white'
                   )
                 }
               >
@@ -154,7 +154,7 @@ export function Sidebar() {
               <div>
                 <Button onClick={() => sidebarOpen && toggleItem(item.label)}
                   className={cn(
-                    'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
+                    'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
                     item.children?.some((c) =>
                       location.pathname === c.path || location.pathname.startsWith(c.path + '/')
                     ) &&
@@ -184,7 +184,7 @@ export function Sidebar() {
                             'block px-3 py-2 rounded-lg text-sm transition-colors',
                             isActive
                               ? 'text-primary font-medium'
-                              : 'text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                              : 'text-muted hover:text-neutral-90 dark:hover:text-white'
                           )
                         }
                       >
@@ -200,7 +200,7 @@ export function Sidebar() {
       </nav>
 
       {/* Enlace a Términos */}
-      <div className="border-t border-neutral-20 dark:border-neutral-70 px-2 py-3">
+      <div className="border-t border-boundary px-2 py-3">
         <NavLink
           to="/terms"
           className={({ isActive }) =>

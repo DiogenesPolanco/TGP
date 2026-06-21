@@ -122,7 +122,7 @@ export function ThiGauge({ value, size = 240, showLabel = true }: ThiGaugeProps)
             {Math.round(animatedValue)}
           </span>
           {showLabel && (
-            <span className="text-sm font-medium text-neutral-60 dark:text-neutral-40 mt-1">
+            <span className="text-sm font-medium text-muted mt-1">
               {getLabel(value)}
             </span>
           )}

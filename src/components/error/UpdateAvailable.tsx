@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button'
 
 export function UpdateAvailable({ onReload }: { onReload: () => void }) {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
         style={{
@@ -72,7 +72,7 @@ export function UpdateAvailable({ onReload }: { onReload: () => void }) {
 
                 <div className="space-y-2">
                   <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Instalar actualización</h3>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+                  <p className="text-sm text-muted leading-relaxed">
                     Aplica los cambios más recientes para mantener todo funcionando correctamente.
                   </p>
                 </div>

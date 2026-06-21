@@ -97,7 +97,7 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
       label: 'Engine',
       sortable: true,
       render: (item: AppDatabase) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30 font-mono">{item.engine} {item.version}</span>
+        <span className="text-sm text-secondary font-mono">{item.engine} {item.version}</span>
       ),
     },
     {
@@ -105,7 +105,7 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
       label: 'Tipo',
       sortable: true,
       render: (item: AppDatabase) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">{dbTypeLabel[item.dbType] ?? item.dbType}</span>
+        <span className="text-sm text-secondary">{dbTypeLabel[item.dbType] ?? item.dbType}</span>
       ),
     },
     {
@@ -200,7 +200,7 @@ export function DatabaseAssociationList({ microserviceId, applicationId }: Props
             </div>
 
             {showSearch && (
-              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+              <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                 {availableDatabases.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-neutral-50">
                     {searchText ? 'Sin resultados' : 'No hay más bases de datos disponibles'}

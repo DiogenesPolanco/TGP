@@ -145,7 +145,7 @@ export function AdminPage() {
       )}
 
       {showStats && !loadingStats && (
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Base de Datos</h3>
             <span className="text-xs text-neutral-50">{dbStats.reduce((s, t) => s + t.count, 0).toLocaleString()} registros</span>
@@ -153,7 +153,7 @@ export function AdminPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-1.5">
             {dbStats.filter((s) => s.count > 0).sort((a, b) => b.count - a.count).map((s) => (
               <div key={s.name} className="flex items-center justify-between py-1.5 border-b border-neutral-10 dark:border-neutral-85">
-                <span className="text-xs text-neutral-60 dark:text-neutral-40 truncate mr-2">{s.name.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="text-xs text-muted truncate mr-2">{s.name.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <span className="text-xs font-bold text-neutral-90 dark:text-white tabular-nums shrink-0">{s.count.toLocaleString()}</span>
               </div>
             ))}
@@ -163,31 +163,31 @@ export function AdminPage() {
 
       {/* Configuraciones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
           <JobSchedulerConfig />
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
           <AzureCloudConfig />
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
         <MobileSnapshotConfig />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-5">
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
         <JiraConfigPanel />
       </div>
 
       {/* TOTP dialog */}
       {showTotpDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-card rounded-2xl border border-boundary shadow-xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center gap-3">
               <Shield size={24} className="text-primary" />
               <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">Verificar identidad</h3>
             </div>
-            <p className="text-sm text-neutral-60 dark:text-neutral-40">Ingresa el código de 6 dígitos de tu autenticador.</p>
+            <p className="text-sm text-muted">Ingresa el código de 6 dígitos de tu autenticador.</p>
             <input type="text" inputMode="numeric" autoFocus maxLength={6} value={totpCode}
               onChange={(e) => { setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setTotpError('') }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmExport() }}
@@ -195,7 +195,7 @@ export function AdminPage() {
               placeholder="000000" />
             {totpError && <p className="text-sm text-danger">{totpError}</p>}
             <div className="flex justify-end gap-3">
-              <Button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+              <Button onClick={() => setShowTotpDialog(false)} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
               <Button onClick={handleConfirmExport} disabled={totpCode.length !== 6} className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">Verificar y Exportar</Button>
             </div>
           </div>
@@ -217,7 +217,7 @@ function ActionCard({ icon, label, desc, color, onClick, disabled }: {
   return (
     <Button onClick={onClick} disabled={disabled}
       className={cn(
-        'flex flex-col items-center gap-2 p-5 rounded-2xl border bg-white dark:bg-neutral-80 transition-all duration-200 disabled:opacity-50',
+        'flex flex-col items-center gap-2 p-5 rounded-2xl border bg-card transition-all duration-200 disabled:opacity-50',
         colors[color] ?? colors.primary,
         onClick && !disabled && 'cursor-pointer hover:-translate-y-0.5 hover:shadow-md'
       )}>

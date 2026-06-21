@@ -22,7 +22,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
   const [showFull, setShowFull] = useState(false)
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]" style={{
         background: 'radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)'
       }} />
@@ -85,12 +85,12 @@ export function TermsPage({ onAccept, onDecline }: Props) {
               <div className="max-w-lg mx-auto w-full space-y-5">
                 <div>
                   <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Términos de Uso</h3>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+                  <p className="text-sm text-muted mt-1">
                     Leé atentamente antes de continuar
                   </p>
                 </div>
 
-                <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-neutral-20 dark:border-neutral-70 max-h-[320px] overflow-y-auto text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed space-y-3">
+                <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-boundary max-h-[320px] overflow-y-auto text-sm text-secondary leading-relaxed space-y-3">
                   <p><strong>1. Naturaleza del servicio.</strong> TGP es una herramienta de gobierno tecnológico gratuita, sin garantías explícitas ni implícitas. Se proporciona "tal cual" y bajo tu propio riesgo.</p>
                   
                   <p><strong>2. Almacenamiento de datos.</strong> Toda la información se almacena localmente en el navegador del usuario mediante IndexedDB. No contamos con servidores propios ni almacenamos datos en infraestructura controlada por nosotros. Eres el único responsable de respaldar y proteger tu información.</p>
@@ -120,7 +120,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}
                     className="mt-0.5 w-4 h-4 rounded border-neutral-30 text-primary focus:ring-primary/25 accent-primary" />
-                  <span className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">
+                  <span className="text-sm text-secondary leading-relaxed">
                     He leído y acepto los <span className="text-primary font-medium">términos y condiciones</span> de TGP
                   </span>
                 </label>

@@ -95,7 +95,7 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className={`pointer-events-auto w-full max-w-md bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-8 transition-all duration-300 ${
+          className={`pointer-events-auto w-full max-w-md bg-card rounded-2xl border border-boundary shadow-2xl p-8 transition-all duration-300 ${
             warningVisible
               ? 'translate-y-0 opacity-100 scale-100'
               : 'translate-y-4 opacity-0 scale-95'
@@ -119,7 +119,7 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
               Sesión por expirar
             </h2>
 
-            <p className="text-sm text-neutral-60 dark:text-neutral-40">
+            <p className="text-sm text-muted">
               Tu sesión se cerrará automáticamente por inactividad. Mueve el mouse o presiona una tecla para continuar.
             </p>
 
@@ -150,7 +150,7 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
             <div className="flex items-center gap-3 pt-2">
               <Button
                 onClick={handleExpired}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-neutral-30 dark:border-neutral-60 text-neutral-70 dark:text-neutral-30 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-sm font-medium"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-neutral-30 dark:border-neutral-60 text-secondary rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-sm font-medium"
               >
                 <LogOut size={16} />
                 Cerrar sesión

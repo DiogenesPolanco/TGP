@@ -32,7 +32,7 @@ export function UsersPage() {
 
   const columns: Column<User>[] = [
     { key: 'displayName', label: 'Nombre', sortable: true, render: (u) => <span className="text-sm font-medium text-neutral-90 dark:text-white">{u.displayName}</span> },
-    { key: 'email', label: 'Email', sortable: true, render: (u) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{u.email}</span> },
+    { key: 'email', label: 'Email', sortable: true, render: (u) => <span className="text-sm text-secondary">{u.email}</span> },
     { key: 'role', label: 'Rol', sortable: true, render: (u) => {
       const colors: Record<string, string> = { admin: 'bg-danger/10 text-danger', executive: 'bg-warning/10 text-warning', manager: 'bg-info/10 text-info', operator: 'bg-success/10 text-success' }
       return <span className={`text-xs px-2 py-0.5 rounded-full ${colors[u.role] || 'bg-neutral-10 text-neutral-60'}`}>{roleLabel[u.role] ?? u.role}</span>
@@ -57,7 +57,7 @@ export function UsersPage() {
         <div className="flex items-center gap-3">
           <div>
             <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Usuarios</h2>
-            <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">Gestión de usuarios del sistema</p>
+            <p className="text-xs text-muted mt-0.5">Gestión de usuarios del sistema</p>
           </div>
           <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
             {filtered.length}
@@ -68,7 +68,7 @@ export function UsersPage() {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
           <input type="text" placeholder="Buscar por nombre o email..." value={search} onChange={(e) => setSearch(e.target.value)}

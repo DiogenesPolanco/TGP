@@ -144,7 +144,7 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
             </span>
           )
         }
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{cell}</span>
+        return <span className="text-sm text-secondary">{cell}</span>
       },
     }))
     cols.push({
@@ -203,7 +203,7 @@ export function EntityAssociationList({ entityType, microserviceId }: Props) {
             </div>
 
             {showSearch && (
-              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+              <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                 {availableEntities.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-neutral-50">
                     {searchText ? 'Sin resultados' : 'No hay más elementos disponibles'}

@@ -88,7 +88,7 @@ export function Header() {
   }
 
   return (
-    <header className="h-16 bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between px-6">
+    <header className="h-16 bg-card border-b border-boundary flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
           {getPageTitle()}
@@ -101,19 +101,19 @@ export function Header() {
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           title="Buscar (⌘K)"
         >
-          <Search size={18} className="text-neutral-60 dark:text-neutral-40" />
+          <Search size={18} className="text-muted" />
         </Button>
 
         <div className="relative">
           <Button
             onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Calendar size={16} />
             <span>{periodOptions.find((p) => p.value === selectedPeriod)?.label}</span>
           </Button>
           {showPeriodDropdown && (
-            <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 mt-2 w-40 bg-card border border-boundary rounded-lg shadow-lg z-50">
               {periodOptions.map((option) => (
                 <Button
                   key={option.value}
@@ -125,7 +125,7 @@ export function Header() {
                     'w-full text-left px-4 py-2 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors',
                     selectedPeriod === option.value
                       ? 'text-primary font-medium'
-                      : 'text-neutral-70 dark:text-neutral-30'
+                      : 'text-secondary'
                   )}
                 >
                   {option.label}
@@ -140,7 +140,7 @@ export function Header() {
             onClick={() => setShowAlerts(!showAlerts)}
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors relative"
           >
-            <Bell size={18} className="text-neutral-60 dark:text-neutral-40" />
+            <Bell size={18} className="text-muted" />
             {alerts.length > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-danger text-white text-[10px] font-bold rounded-full px-1">
                 {alerts.length > 99 ? '99+' : alerts.length}
@@ -149,8 +149,8 @@ export function Header() {
           </Button>
 
           {showAlerts && (
-            <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
-              <div className="p-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
+            <div className="absolute right-0 mt-2 w-96 bg-card border border-boundary rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+              <div className="p-3 border-b border-boundary flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-neutral-90 dark:text-white">
                   Alertas ({alerts.length})
                 </h4>
@@ -215,7 +215,7 @@ export function Header() {
           )}
         </Button>
 
-        <div className="flex items-center gap-2 pl-3 border-l border-neutral-20 dark:border-neutral-70">
+        <div className="flex items-center gap-2 pl-3 border-l border-boundary">
           {currentUser ? (
             <Button onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
@@ -224,7 +224,7 @@ export function Header() {
                   {currentUser.displayName.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30 hidden lg:block group-hover:text-primary transition-colors">
+              <span className="text-sm font-medium text-secondary hidden lg:block group-hover:text-primary transition-colors">
                 {currentUser.displayName}
               </span>
             </Button>

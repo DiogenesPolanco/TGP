@@ -18,7 +18,7 @@ export function RouteErrorPage() {
     message.includes('loading chunk')
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
         style={{
@@ -37,7 +37,7 @@ export function RouteErrorPage() {
         }}
       />
 
-      <div className="w-full max-w-md bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-8 text-center space-y-6 relative">
+      <div className="w-full max-w-md bg-card rounded-2xl border border-boundary shadow-2xl p-8 text-center space-y-6 relative">
         <div className="w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center mx-auto">
           <AlertTriangle size={32} className="text-danger" />
         </div>
@@ -46,7 +46,7 @@ export function RouteErrorPage() {
           <h1 className="text-xl font-bold text-neutral-90 dark:text-white">
             {isChunkError ? 'Actualización disponible' : 'Algo salió mal'}
           </h1>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+          <p className="text-sm text-muted leading-relaxed">
             {isChunkError
               ? 'La aplicación se actualizó recientemente. Recarga para obtener la última versión.'
               : 'Ocurrió un error inesperado al cargar esta sección. Puedes recargar o reportar el problema.'}
@@ -57,7 +57,7 @@ export function RouteErrorPage() {
               <summary className="text-xs text-neutral-50 cursor-pointer hover:text-neutral-70 dark:hover:text-neutral-30">
                 Detalles técnicos
               </summary>
-              <pre className="mt-2 p-3 bg-neutral-5 dark:bg-neutral-85 rounded-lg text-xs text-neutral-60 dark:text-neutral-40 overflow-auto max-h-32">
+              <pre className="mt-2 p-3 bg-neutral-5 dark:bg-neutral-85 rounded-lg text-xs text-muted overflow-auto max-h-32">
                 {message}
               </pre>
             </details>

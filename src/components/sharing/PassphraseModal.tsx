@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Eye, EyeOff, ArrowRight, Shield, Check, Clock } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 
 interface Props {
   title?: string
@@ -80,27 +79,35 @@ export function PassphraseModal({
               <div className="max-w-xs mx-auto w-full space-y-5">
                 <div>
                   <h3 className="text-lg font-bold text-neutral-90 dark:text-white">{title}</h3>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Configura el enlace compartido</p>
+                  <p className="text-sm text-muted mt-1">Configura el enlace compartido</p>
                 </div>
 
                 {/* Duration selector */}
                 <div>
-                  <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-2 flex items-center gap-1.5">
+                  <label className="text-xs font-medium text-muted mb-2 flex items-center gap-1.5">
                     <Clock size={13} />
                     Duración del enlace
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
                     {DURATION_OPTIONS.map((opt) => (
-                      <Button onClick={() => handleHoursChange(opt.hours)}>
+                      <button
+                        type="button"
+                        onClick={() => handleHoursChange(opt.hours)}
+                        className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                          opt.hours === hours
+                            ? 'bg-primary text-white border-primary'
+                            : 'text-neutral-90 dark:text-white border-neutral-30 dark:border-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                        }`}
+                      >
                         {opt.label}
-                      </Button>
+                      </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Passphrase input */}
                 <div>
-                  <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-2">Contraseña opcional</label>
+                  <label className="text-xs font-medium text-muted mb-2">Contraseña opcional</label>
                   <div className="relative">
                     <input
                       type={show ? 'text' : 'password'}
@@ -118,13 +125,13 @@ export function PassphraseModal({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Button onClick={() => onSkip?.(hours)} className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0">
+                  <button type="button" onClick={() => onSkip?.(hours)} className="flex items-center gap-1.5 px-4 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary-dark transition-colors shrink-0">
                     {buttonLabel} {pass ? <ArrowRight size={18} /> : null}
-                  </Button>
+                  </button>
                   {onSkip && (
-                    <Button onClick={() => onSkip(hours)} className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0">
+                    <button type="button" onClick={() => onSkip(hours)} className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0">
                       Sin clave
-                    </Button>
+                    </button>
                   )}
                 </div>
               </div>

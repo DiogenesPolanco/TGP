@@ -56,7 +56,7 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
     <div
       onClick={onClick}
       className={cn(
-        'group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5',
+        'group relative bg-card rounded-2xl border border-boundary p-5',
         'shadow-sm hover:shadow-lg transition-all duration-300',
         'hover:-translate-y-0.5',
         styles.shadow,
@@ -100,7 +100,7 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
             )}
           </div>
         </div>
-        <h3 className="text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-1">{title}</h3>
+        <h3 className="text-sm font-medium text-muted mb-1">{title}</h3>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
         {subtitle && (
           <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-1">{subtitle}</p>

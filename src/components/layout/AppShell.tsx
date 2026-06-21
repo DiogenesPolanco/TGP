@@ -57,7 +57,7 @@ export function AppShell() {
   if (stale) return <UpdateAvailable onReload={reload} />
 
   return (
-    <div className={cn('flex h-screen bg-neutral-10 dark:bg-neutral-90', isTabHidden && 'blur-xl transition-all duration-300')}>
+    <div className={cn('flex h-screen bg-canvas', isTabHidden && 'blur-xl transition-all duration-300')}>
       <Sidebar />
       <div
         className={cn(

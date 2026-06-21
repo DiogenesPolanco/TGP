@@ -93,7 +93,7 @@ export function JobSchedulerConfig() {
         )}
       </div>
 
-      <p className="text-sm text-neutral-60 dark:text-neutral-40">
+      <p className="text-sm text-muted">
         El programador ejecuta verificaciones automáticas del sistema (obsolescencia, vencimientos,
         bloqueos, backups, limpieza de shares) y genera alertas en el dashboard.
       </p>
@@ -125,7 +125,7 @@ export function JobSchedulerConfig() {
             type="time"
             value={time}
             onChange={(e) => handleTimeChange(e.target.value)}
-            className="w-40 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-40 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -188,7 +188,7 @@ export function JobSchedulerConfig() {
           </Button>
           <Button
             onClick={refresh}
-            className={`${btnClass} border border-neutral-30 dark:border-neutral-60 text-neutral-70 dark:text-neutral-30 hover:bg-neutral-20 dark:hover:bg-neutral-60`}
+            className={`${btnClass} border border-neutral-30 dark:border-neutral-60 text-secondary hover:bg-neutral-20 dark:hover:bg-neutral-60`}
           >
             <RefreshCw size={14} />
             Actualizar

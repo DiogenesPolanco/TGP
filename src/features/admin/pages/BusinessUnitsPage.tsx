@@ -99,14 +99,14 @@ export function BusinessUnitsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Unidades de Negocio</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Gestiona las unidades de negocio para organizar aplicaciones y equipos
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -121,7 +121,7 @@ export function BusinessUnitsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -138,7 +138,7 @@ export function BusinessUnitsPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || statusFilter !== 'all'
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -150,7 +150,7 @@ export function BusinessUnitsPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
               <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
@@ -173,13 +173,13 @@ export function BusinessUnitsPage() {
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">
             {editingId ? 'Editar Unidad de Negocio' : 'Nueva Unidad de Negocio'}
           </h3>
           <div className="flex items-end gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-1">
+              <label className="block text-sm font-medium text-muted mb-1">
                 Nombre
               </label>
               <input
@@ -193,7 +193,7 @@ export function BusinessUnitsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-60 dark:text-neutral-40 mb-1">
+              <label className="block text-sm font-medium text-muted mb-1">
                 Estado
               </label>
               <Select value={formStatus} onChange={(v) => setFormStatus(v as BusinessUnitStatus)} options={[
@@ -210,7 +210,7 @@ export function BusinessUnitsPage() {
             </Button>
             <Button
               onClick={resetForm}
-              className="flex items-center gap-2 px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               <X size={16} />
               Cancelar
@@ -219,7 +219,7 @@ export function BusinessUnitsPage() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
         {businessUnits.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-neutral-50 dark:text-neutral-40 text-sm">
@@ -230,23 +230,23 @@ export function BusinessUnitsPage() {
           <>
             <table className="w-full">
               <thead>
-                <tr className="border-b border-neutral-20 dark:border-neutral-70">
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                <tr className="border-b border-boundary">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Estado
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Aplicaciones
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Equipos
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Creado
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -315,13 +315,13 @@ function BusinessUnitRow({
         </span>
       </td>
       <td className="px-6 py-4">
-        <span className="text-sm text-neutral-60 dark:text-neutral-40">{appCount}</span>
+        <span className="text-sm text-muted">{appCount}</span>
       </td>
       <td className="px-6 py-4">
-        <span className="text-sm text-neutral-60 dark:text-neutral-40">{teamCount}</span>
+        <span className="text-sm text-muted">{teamCount}</span>
       </td>
       <td className="px-6 py-4">
-        <span className="text-sm text-neutral-60 dark:text-neutral-40">
+        <span className="text-sm text-muted">
           {new Date(bu.createdAt).toLocaleDateString()}
         </span>
       </td>
