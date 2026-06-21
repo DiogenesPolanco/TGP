@@ -21,8 +21,8 @@ export function TeamDetailPage() {
 
   if (!team) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-        <p className="text-neutral-60 dark:text-neutral-40">Equipo no encontrado</p>
+      <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
+        <p className="text-muted">Equipo no encontrado</p>
       </div>
     )
   }
@@ -68,15 +68,16 @@ export function TeamDetailPage() {
         </Button>
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">{team.name}</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40">{bu?.name} • {team.sourceSystem} • {team.members.length} miembros</p>
+          <p className="text-sm text-muted">{bu?.name} • {team.sourceSystem} • {team.members.length} miembros</p>
         </div>
       </div>
 
-      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="flex gap-1 border-b border-boundary">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
+            variant="ghost"
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-primary text-primary'
@@ -128,7 +129,7 @@ export function TeamDetailPage() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
             <div className="space-y-2">
               {team.members.map((member) => (
@@ -141,11 +142,11 @@ export function TeamDetailPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                      <p className="text-xs text-neutral-60 dark:text-neutral-40">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
+                      <p className="text-xs text-muted">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-neutral-60 dark:text-neutral-40">{member.allocationPct}%</span>
+                    <span className="text-sm text-muted">{member.allocationPct}%</span>
                     <Button
                       onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id) }}
                       className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
@@ -179,7 +180,7 @@ function DoraCard({ icon, label, value, benchmark, color }: {
   color: string
 }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div className={`${color}`}>{icon}</div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${color.replace('text-', 'bg-')}/10 ${color}`}>
@@ -187,7 +188,7 @@ function DoraCard({ icon, label, value, benchmark, color }: {
         </span>
       </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1">{label}</p>
+      <p className="text-xs text-muted mt-1">{label}</p>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface Props {
   memberId: string
@@ -45,7 +46,7 @@ export function OneOnOneSection({ memberId }: Props) {
     const meeting: OneOnOne = {
       id: crypto.randomUUID(),
       memberId,
-      date: new Date(newMeeting.date),
+      date: parseLocalDate(newMeeting.date),
       tipo: newMeeting.tipo,
       feedbackDelLider: newMeeting.feedbackDelLider,
       feedbackDelMiembro: newMeeting.feedbackDelMiembro,
@@ -151,14 +152,14 @@ export function OneOnOneSection({ memberId }: Props) {
 
       {/* New Meeting Form */}
       {showForm && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+        <div className="bg-card rounded-xl border border-boundary p-4">
           <div className="grid gap-4 sm:grid-cols-3 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Fecha</label>
               <DatePicker
                 value={newMeeting.date}
                 onChange={(v) => setNewMeeting({ ...newMeeting, date: v })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -166,7 +167,7 @@ export function OneOnOneSection({ memberId }: Props) {
               <select
                 value={newMeeting.tipo}
                 onChange={(e) => setNewMeeting({ ...newMeeting, tipo: e.target.value as OneOnOne['tipo'] })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
               >
                 <option value="semanal">Semanal</option>
                 <option value="quincenal">Quincenal</option>
@@ -181,7 +182,7 @@ export function OneOnOneSection({ memberId }: Props) {
                 max={10}
                 value={newMeeting.estadoAnimo}
                 onChange={(e) => setNewMeeting({ ...newMeeting, estadoAnimo: Number(e.target.value) })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -282,7 +283,7 @@ function MeetingCard({
 
   const saveEdit = () => {
     onEdit(meeting.id, {
-      date: new Date(editData.date),
+      date: parseLocalDate(editData.date),
       tipo: editData.tipo,
       estadoAnimo: editData.estadoAnimo,
       feedbackDelLider: editData.feedbackDelLider,
@@ -302,11 +303,11 @@ function MeetingCard({
     setEditingOpId(null)
   }
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white'
+  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white'
 
   if (editing) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+      <div className="bg-card rounded-xl border border-boundary p-4">
         <h4 className="text-sm font-semibold text-neutral-90 dark:text-white mb-3">Editar Meeting</h4>
         <div className="grid gap-3 sm:grid-cols-3 mb-3">
           <div>
@@ -345,10 +346,10 @@ function MeetingCard({
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
-      <Button
+    <div className="bg-card rounded-xl border border-boundary">
+      <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 text-left"
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className={`w-2 h-2 rounded-full ${
@@ -369,25 +370,25 @@ function MeetingCard({
               {meeting.oportunidades.length} ops
             </span>
           )}
-          <Button
+          <button
             onClick={(e) => { e.stopPropagation(); startEdit() }}
             className="p-1.5 text-neutral-50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
             title="Editar meeting"
           >
             <Edit3 size={14} />
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={(e) => { e.stopPropagation(); onDelete(meeting.id) }}
             className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             title="Eliminar meeting"
           >
             <Trash2 size={14} />
-          </Button>
+          </button>
         </div>
-      </Button>
+      </button>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-4 border-t border-neutral-20 dark:border-neutral-70 pt-3">
+        <div className="px-4 pb-4 space-y-4 border-t border-boundary pt-3">
           {/* Feedback */}
           <div className="grid sm:grid-cols-2 gap-3">
             <div className="p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
@@ -404,7 +405,7 @@ function MeetingCard({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Target size={14} className="text-neutral-50" />
-              <h4 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30">Oportunidades</h4>
+              <h4 className="text-sm font-semibold text-secondary">Oportunidades</h4>
             </div>
             {meeting.oportunidades.length === 0 ? (
               <p className="text-xs text-neutral-40 mb-2">Sin oportunidades registradas</p>
@@ -412,7 +413,7 @@ function MeetingCard({
               <div className="space-y-1.5 mb-2">
                 {meeting.oportunidades.map((op) =>
                   editingOpId === op.id ? (
-                    <div key={op.id} className="flex items-center gap-2 p-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
+                    <div key={op.id} className="flex items-center gap-2 p-2 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60">
                       <input
                         type="text"
                         value={editOpData.descripcion}
@@ -470,7 +471,7 @@ function MeetingCard({
                 value={newOpDesc}
                 onChange={(e) => setNewOpDesc(e.target.value)}
                 placeholder="Nueva oportunidad..."
-                className="flex-1 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-xs"
+                className="flex-1 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-xs"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newOpDesc.trim()) {
                     onAddOportunidad(meeting.id, newOpDesc.trim(), newOpTipo)
@@ -481,7 +482,7 @@ function MeetingCard({
               <select
                 value={newOpTipo}
                 onChange={(e) => setNewOpTipo(e.target.value as Oportunidad['tipo'])}
-                className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-2 py-1.5 text-xs"
+                className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-2 py-1.5 text-xs"
               >
                 <option value="mejora">Mejora</option>
                 <option value="crecimiento">Crecimiento</option>

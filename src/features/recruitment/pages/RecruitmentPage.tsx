@@ -79,7 +79,7 @@ export function RecruitmentPage() {
       label: 'Posición',
       sortable: true,
       render: (c) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? c.position}
         </span>
       ),
@@ -102,7 +102,7 @@ export function RecruitmentPage() {
           <div className="w-16 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
             <div className="h-full bg-primary rounded-full" style={{ width: `${c.totalScore}%` }} />
           </div>
-          <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">{c.totalScore}%</span>
+          <span className="text-sm font-medium text-secondary">{c.totalScore}%</span>
         </div>
       ),
     },
@@ -161,7 +161,7 @@ export function RecruitmentPage() {
               }
               await doShare()
             }}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Share2 size={16} />
             Compartir
@@ -177,7 +177,7 @@ export function RecruitmentPage() {
       </div>
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -257,7 +257,7 @@ export function RecruitmentPage() {
           placeholder="Buscar candidatos por nombre o posición..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
@@ -281,15 +281,15 @@ function StatCard({
   return (
     <Button
       onClick={onClick}
-      className={`text-left bg-white dark:bg-neutral-80 rounded-xl border p-4 shadow-sm transition-all ${
+      className={`text-left bg-card rounded-xl border p-4 shadow-sm transition-all ${
         active
           ? 'border-primary ring-2 ring-primary/20'
-          : 'border-neutral-20 dark:border-neutral-70 hover:shadow-md'
+          : 'border-boundary hover:shadow-md'
       }`}
     >
       <div className={`${color} mb-2`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Button>
   )
 }

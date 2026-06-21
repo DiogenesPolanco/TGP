@@ -21,7 +21,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
   const [teamSprints, setTeamSprints] = useState<TeamSprint[]>([])
   const [loadingTeamSprints, setLoadingTeamSprints] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [viewMode, setViewMode] = useState<ViewMode>('chart')
   const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
   const [quarterFilter, setQuarterFilter] = useState<string | 'all'>('all')
 
@@ -159,22 +159,22 @@ export function SprintsSection({ memberId, teamId }: Props) {
       })
   }, [teamSprints, sprints])
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
+  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-xl border border-boundary p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints</h2>
         <div className="flex items-center gap-2">
           <div className="flex bg-neutral-10 dark:bg-neutral-70 rounded-lg p-0.5">
-            <Button onClick={() => setViewMode('list')}>
+            <button onClick={() => setViewMode('list')} className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
               <List size={16} />
-            </Button>
-            <Button onClick={() => setViewMode('chart')}>
+            </button>
+            <button onClick={() => setViewMode('chart')} className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
               <BarChart3 size={16} />
-            </Button>
+            </button>
           </div>
-          <Button onClick={() => setShowForm(true)}>
+          <Button onClick={() => setShowForm(true)} variant="ghost" className="flex items-center gap-1">
             <Plus size={16} /> Agregar Sprint
           </Button>
         </div>
@@ -257,7 +257,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
       )}
 
       {showForm && (
-        <div className="mb-6 p-4 border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70">
+        <div className="mb-6 p-4 border border-boundary rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-5 mb-3">
             <div className="sm:col-span-2">
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Sprint del Equipo</label>
@@ -336,7 +336,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
             <Button onClick={addSprint} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
               Guardar Sprint
             </Button>
-            <Button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            <Button onClick={() => setShowForm(false)} variant="ghost" className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
               Cancelar
             </Button>
           </div>
@@ -353,7 +353,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
               <div className="space-y-2">
                 {records.map((sp) =>
                   editingId === sp.id ? (
-                    <div key={sp.id} className="p-3 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60">
+                    <div key={sp.id} className="p-3 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60">
                       <div className="grid gap-2 sm:grid-cols-5 mb-2">
                         <div className="sm:col-span-2">
                           <select
@@ -418,12 +418,12 @@ export function SprintsSection({ memberId, teamId }: Props) {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
-                        <Button onClick={() => startEdit(sp)}>
+                        <button onClick={() => startEdit(sp)} className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
                           <Edit3 size={14} />
-                        </Button>
-                        <Button onClick={() => removeSprint(sp.id)}>
+                        </button>
+                        <button onClick={() => removeSprint(sp.id)} className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400">
                           <Trash2 size={14} />
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   )

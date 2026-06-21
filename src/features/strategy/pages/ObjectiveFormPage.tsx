@@ -10,6 +10,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 const STATUS_OPTIONS = [
   { value: 'not_started', label: 'No iniciado' },
@@ -99,8 +100,8 @@ export function ObjectiveFormPage() {
       ...formData,
       teamId: formData.teamId || null,
       businessUnitId: formData.businessUnitId || null,
-      periodStart: new Date(formData.periodStart),
-      periodEnd: new Date(formData.periodEnd),
+      periodStart: parseLocalDate(formData.periodStart),
+      periodEnd: parseLocalDate(formData.periodEnd),
       progress: liveProgress,
       metadata: objective?.metadata ?? {},
       createdAt: objective?.createdAt ?? new Date(),
@@ -159,7 +160,7 @@ export function ObjectiveFormPage() {
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
           </h1>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-0.5">
+          <p className="text-sm text-muted mt-0.5">
             {objective ? 'Modifica los datos del objetivo y sus resultados clave' : 'Define un nuevo objetivo y sus resultados clave'}
           </p>
         </div>
@@ -176,14 +177,14 @@ export function ObjectiveFormPage() {
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Card: Información General */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2 mb-4">
               <Target size={16} className="text-primary" />
               Información General
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5">Título del Objetivo *</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">Título del Objetivo *</label>
                 <input
                   type="text"
                   required
@@ -194,7 +195,7 @@ export function ObjectiveFormPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5">Descripción</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">Descripción</label>
                 <RichTextEditor
                   value={formData.description}
                   onChange={(html) => setFormData({ ...formData, description: html })}
@@ -205,7 +206,7 @@ export function ObjectiveFormPage() {
           </div>
 
           {/* Card: Asignación y Período */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2 mb-4">
               <Crosshair size={16} className="text-primary" />
               Asignación y Período
@@ -228,7 +229,7 @@ export function ObjectiveFormPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })} options={STATUS_OPTIONS} />
               <div>
-                <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5">Inicio *</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">Inicio *</label>
                 <DatePicker
                   required
                   value={formData.periodStart}
@@ -237,7 +238,7 @@ export function ObjectiveFormPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5">Fin *</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">Fin *</label>
                 <DatePicker
                   required
                   value={formData.periodEnd}
@@ -249,7 +250,7 @@ export function ObjectiveFormPage() {
           </div>
 
           {/* Card: Key Results */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+          <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
                 <Crosshair size={16} className="text-primary" />
@@ -271,7 +272,7 @@ export function ObjectiveFormPage() {
             {formData.keyResults.length === 0 ? (
               <div className="border-2 border-dashed border-neutral-30 dark:border-neutral-60 rounded-xl p-8 text-center hover:border-primary/40 transition-colors">
                 <Crosshair size={28} className="mx-auto text-neutral-40 mb-2" />
-                <p className="text-sm font-medium text-neutral-60 dark:text-neutral-40">Sin Key Results</p>
+                <p className="text-sm font-medium text-muted">Sin Key Results</p>
                 <p className="text-xs text-neutral-50 mt-1">Agrega resultados clave medibles para este objetivo</p>
                 <Button
                   type="button"
@@ -293,7 +294,7 @@ export function ObjectiveFormPage() {
                     <div
                       key={kr.id}
                       data-kr-card
-                      className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 hover:border-primary/20 transition-colors"
+                      className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-boundary p-4 hover:border-primary/20 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex-1">
@@ -302,7 +303,7 @@ export function ObjectiveFormPage() {
                             placeholder="Nombre del Key Result"
                             value={kr.title}
                             onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
-                            className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -334,7 +335,7 @@ export function ObjectiveFormPage() {
                             placeholder="Ej: %"
                             value={kr.measure}
                             onChange={(e) => updateKeyResult(index, 'measure', e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div>
@@ -344,7 +345,7 @@ export function ObjectiveFormPage() {
                             placeholder="0"
                             value={kr.baseline}
                             onChange={(e) => updateKeyResult(index, 'baseline', parseFloat(e.target.value) || 0)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div>
@@ -354,7 +355,7 @@ export function ObjectiveFormPage() {
                             placeholder="0"
                             value={kr.current}
                             onChange={(e) => updateKeyResult(index, 'current', parseFloat(e.target.value) || 0)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div>
@@ -364,7 +365,7 @@ export function ObjectiveFormPage() {
                             placeholder="100"
                             value={kr.target}
                             onChange={(e) => updateKeyResult(index, 'target', parseFloat(e.target.value) || 0)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                       </div>
@@ -392,14 +393,14 @@ export function ObjectiveFormPage() {
 
         {/* Sidebar: Live Preview */}
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm sticky top-6 space-y-4">
+          <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm sticky top-6 space-y-4">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
               <Target size={16} className="text-primary" />
               Vista Previa
             </h3>
 
             {/* Live preview card */}
-            <div className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
+            <div className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-boundary overflow-hidden">
               <div className={`h-1 w-full ${formData.status === 'achieved' || formData.status === 'on_track' ? 'bg-success' : formData.status === 'at_risk' ? 'bg-warning' : formData.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`} />
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -424,7 +425,7 @@ export function ObjectiveFormPage() {
                   <div className={`h-full rounded-full transition-all duration-500 ${progressColor}`} style={{ width: `${liveProgress}%` }} />
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+                <div className="mt-3 pt-3 border-t border-boundary">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-50">Key Results</span>
                     <span className="font-semibold text-neutral-90 dark:text-white">{formData.keyResults.length}</span>
@@ -441,11 +442,11 @@ export function ObjectiveFormPage() {
 
             {/* Quick tips */}
             <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg p-3 space-y-1.5">
-              <p className="text-xs font-semibold text-neutral-70 dark:text-neutral-30 flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-secondary flex items-center gap-1.5">
                 <HelpCircle size={12} />
                 Tips
               </p>
-              <ul className="text-[11px] text-neutral-60 dark:text-neutral-40 space-y-1 list-disc list-inside">
+              <ul className="text-[11px] text-muted space-y-1 list-disc list-inside">
                 <li>Usa métricas específicas y medibles</li>
                 <li>Define metas alcanzables pero desafiantes</li>
                 <li>Los KRs deben estar vinculados al objetivo</li>
@@ -464,7 +465,7 @@ export function ObjectiveFormPage() {
               <Button
                 type="button"
                 onClick={() => navigate('/strategy/objectives')}
-                className="w-full px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                className="w-full px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
               >
                 Cancelar
               </Button>

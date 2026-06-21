@@ -23,7 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  not_started: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  not_started: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   on_track: 'bg-success/10 text-success border-success/20',
   at_risk: 'bg-warning/10 text-warning border-warning/20',
   behind: 'bg-danger/10 text-danger border-danger/20',
@@ -100,12 +100,12 @@ export function ObjectivesPage() {
         className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
           active
             ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
-            : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+            : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
         <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        <p className="text-xs text-muted">{label}</p>
       </Comp>
     )
   }
@@ -116,7 +116,7 @@ export function ObjectivesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">OKRs / KPIs</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-0.5">Objetivos y resultados clave del portafolio</p>
+          <p className="text-sm text-muted mt-0.5">Objetivos y resultados clave del portafolio</p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={() => navigate('/admin/import')}>
@@ -141,7 +141,7 @@ export function ObjectivesPage() {
       </div>
 
       {/* Search + Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -161,7 +161,7 @@ export function ObjectivesPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
               <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
@@ -195,7 +195,7 @@ export function ObjectivesPage() {
           return (
             <div
               key={objective.id}
-              className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
+              className="bg-card rounded-xl border border-boundary shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
               onClick={() => navigate(`${objective.id}/edit`)}
             >
               {/* Colored top accent */}
@@ -221,7 +221,7 @@ export function ObjectivesPage() {
                 {/* Title + Description */}
                 <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-1">{objective.title}</h3>
                 {objective.description && (
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 line-clamp-2 mb-3">{objective.description.replace(/<[^>]*>/g, '').slice(0, 150)}</p>
+                  <p className="text-sm text-muted line-clamp-2 mb-3">{objective.description.replace(/<[^>]*>/g, '').slice(0, 150)}</p>
                 )}
 
                 {/* Progress bar */}
@@ -245,7 +245,7 @@ export function ObjectivesPage() {
 
                 {/* Key Results */}
                 {objective.keyResults.length > 0 && (
-                  <div className="border-t border-neutral-20 dark:border-neutral-70 pt-4">
+                  <div className="border-t border-boundary pt-4">
                     <div className="flex items-center gap-1.5 mb-3">
                       <Crosshair size={14} className="text-neutral-50" />
                       <h4 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider">Key Results ({objective.keyResults.length})</h4>
@@ -257,7 +257,7 @@ export function ObjectivesPage() {
                           : 0
                         const krBarColor = kr.status === 'achieved' ? 'bg-success' : kr.status === 'on_track' ? 'bg-success' : kr.status === 'at_risk' ? 'bg-warning' : kr.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'
                         return (
-                          <div key={kr.id} className="bg-neutral-10 dark:bg-neutral-70/50 rounded-lg border border-neutral-20 dark:border-neutral-70 p-3">
+                          <div key={kr.id} className="bg-neutral-10 dark:bg-neutral-70/50 rounded-lg border border-boundary p-3">
                             <div className="flex items-center justify-between mb-1.5">
                               <span className="text-sm font-medium text-neutral-90 dark:text-white truncate min-w-0 flex-1">{kr.title}</span>
                               <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border shrink-0 ml-2 ${KR_STATUS_STYLE[kr.status]}`}>
@@ -281,7 +281,7 @@ export function ObjectivesPage() {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-1 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+                <div className="flex items-center justify-end gap-1 mt-4 pt-3 border-t border-boundary">
                   <Button onClick={(e) => { e.stopPropagation(); navigate(`${objective.id}/edit`) }}>
                     <Pencil size={15} />
                   </Button>
@@ -305,9 +305,9 @@ export function ObjectivesPage() {
       />
 
       {filteredObjectives.length === 0 && (
-        <div className="text-center py-16 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+        <div className="text-center py-16 bg-card rounded-xl border border-boundary">
           <Target size={32} className="mx-auto text-neutral-40 mb-3" />
-          <p className="text-neutral-60 dark:text-neutral-40 font-medium">No se encontraron objetivos</p>
+          <p className="text-muted font-medium">No se encontraron objetivos</p>
           <p className="text-sm text-neutral-50 mt-1">Intenta con otros filtros o términos de búsqueda</p>
         </div>
       )}

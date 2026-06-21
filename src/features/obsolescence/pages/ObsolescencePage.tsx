@@ -98,7 +98,7 @@ export function ObsolescencePage() {
       case 'eol': return 'bg-danger/10 text-danger border-danger/30'
       case 'extended': return 'bg-warning/10 text-warning border-warning/30'
       case 'active': return 'bg-success/10 text-success border-success/30'
-      default: return 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60'
+      default: return 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60'
     }
   }
 
@@ -184,14 +184,14 @@ export function ObsolescencePage() {
       key: 'version',
       label: 'Versión',
       sortable: true,
-      render: (tech) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.version}</span>,
+      render: (tech) => <span className="text-sm text-secondary">{tech.version}</span>,
     },
     {
       key: 'category',
       label: 'Categoría',
       sortable: true,
       render: (tech) => (
-        <span className="text-xs px-2 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40">
+        <span className="text-xs px-2 py-1 rounded-full bg-neutral-10 dark:bg-neutral-70 text-muted">
           {categoryLabels[tech.category] || tech.category}
         </span>
       ),
@@ -200,7 +200,7 @@ export function ObsolescencePage() {
       key: 'vendor',
       label: 'Vendor',
       sortable: true,
-      render: (tech) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{tech.vendor}</span>,
+      render: (tech) => <span className="text-sm text-secondary">{tech.vendor}</span>,
     },
     {
       key: 'supportStatus',
@@ -319,7 +319,7 @@ export function ObsolescencePage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Obsolescencia</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40">
+          <p className="text-sm text-muted">
             Gestión del ciclo de vida de tecnologías
           </p>
         </div>
@@ -350,71 +350,71 @@ export function ObsolescencePage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
               <Layers size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Total Tecnologías</p>
+          <p className="text-xs text-muted">Total Tecnologías</p>
         </Button>
 
-        <Button variant="ghost" size="md" onClick={() => setStatusFilter('active')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('active')} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-success/10 text-success">
               <CheckCircle size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-success">{stats.active}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Activas</p>
+          <p className="text-xs text-muted">Activas</p>
         </Button>
 
-        <Button variant="ghost" size="md" onClick={() => setStatusFilter('extended')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('extended')} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-warning/10 text-warning">
               <Clock size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-warning">{stats.extended}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Soporte Extendido</p>
+          <p className="text-xs text-muted">Soporte Extendido</p>
           {stats.nearEol > 0 && (
             <p className="text-xs text-severity-high mt-1">{stats.nearEol} próx. a EOL</p>
           )}
         </Button>
 
-        <Button variant="ghost" size="md" onClick={() => setStatusFilter('eol')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('eol')} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <XCircle size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-danger">{stats.eol}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">EOL</p>
+          <p className="text-xs text-muted">EOL</p>
         </Button>
 
-        <Button variant="ghost" size="md" onClick={() => { setStatusFilter('all'); setSearch('') }} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => { setStatusFilter('all'); setSearch('') }} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-danger/10 text-danger">
               <AlertTriangle size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-danger">{stats.criticalAppsWithEol}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Apps Críticas Afectadas</p>
+          <p className="text-xs text-muted">Apps Críticas Afectadas</p>
         </Button>
 
-        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80 shadow-sm hover:shadow-md text-left">
+        <Button variant="ghost" size="md" onClick={() => setStatusFilter('all')} className="w-full justify-start p-4 rounded-2xl border border-boundary bg-card shadow-sm hover:shadow-md text-left">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 rounded-lg bg-info/10 text-info">
               <Shield size={18} />
             </div>
           </div>
           <p className="text-2xl font-bold text-info">{stats.total - stats.eol - stats.extended}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Sin EOL / Seguras</p>
+          <p className="text-xs text-muted">Sin EOL / Seguras</p>
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />

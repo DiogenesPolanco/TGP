@@ -91,12 +91,12 @@ export function MemberPerformancePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Button
+          <button
             onClick={() => navigate(`/teams/${teamId}/performance`)}
             className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <ArrowLeft size={20} className="text-neutral-60" />
-          </Button>
+          </button>
           <div>
             <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
               {member.displayName}
@@ -112,7 +112,7 @@ export function MemberPerformancePage() {
               }
               await doShare()
             }}          
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             title="Compartir perfil"
           >
             {copied ? <Check size={16} className="text-success" /> : <Share2 size={16} />}
@@ -121,7 +121,7 @@ export function MemberPerformancePage() {
         </div>
 
         {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-          <div className="mb-4 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-2 text-sm max-w-full overflow-hidden">
+          <div className="mb-4 bg-card rounded-2xl border border-boundary p-3 flex items-center gap-2 text-sm max-w-full overflow-hidden">
             <span className="text-neutral-50 shrink-0">Enlace público:</span>
             <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -165,7 +165,7 @@ export function MemberPerformancePage() {
       {/* KPI Bar */}
       {kpis && (
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-8">
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
               <Zap size={15} />
             </div>
@@ -175,7 +175,7 @@ export function MemberPerformancePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg bg-success/10 text-success shrink-0">
               <TrendingUp size={15} />
             </div>
@@ -188,7 +188,7 @@ export function MemberPerformancePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg text-warning bg-warning/10 shrink-0">
               <Smile size={15} />
             </div>
@@ -201,7 +201,7 @@ export function MemberPerformancePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg bg-info/10 text-info shrink-0">
               <Activity size={15} />
             </div>
@@ -214,7 +214,7 @@ export function MemberPerformancePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
               <MessageCircle size={15} />
             </div>
@@ -224,7 +224,7 @@ export function MemberPerformancePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-card rounded-xl border border-boundary shadow-sm">
             <div className="p-1.5 rounded-lg bg-success/10 text-success shrink-0">
               <Award size={15} />
             </div>
@@ -237,11 +237,12 @@ export function MemberPerformancePage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 mb-6">
+      <div className="flex gap-1 border-b border-boundary mb-6">
         {tabs.map((tab) => (
           <Button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
+            variant="ghost"
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? 'border-primary text-primary'

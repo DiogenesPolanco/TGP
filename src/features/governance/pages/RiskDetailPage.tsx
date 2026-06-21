@@ -81,17 +81,18 @@ export function RiskDetailPage() {
       }
     >
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 -mx-6 px-6 mb-6">
+      <div className="flex gap-1 border-b border-boundary -mx-6 px-6 mb-6">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
             <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              variant="ghost"
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                  : 'border-transparent text-muted hover:text-neutral-90 dark:hover:text-white'
               }`}
             >
               <Icon size={16} />
@@ -113,7 +114,7 @@ export function RiskDetailPage() {
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-neutral-50 dark:text-neutral-40">Nivel de Riesgo</p>
                   <p className="text-xl font-bold text-neutral-90 dark:text-white">{riskLevel}</p>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-0.5">
+                  <p className="text-sm text-muted mt-0.5">
                     Score: <span className="font-bold">{risk.riskScore}</span> · Probabilidad {risk.probability}/5 · Impacto {risk.impact}/5
                   </p>
                 </div>
@@ -126,7 +127,7 @@ export function RiskDetailPage() {
             {risk.mitigationPlan && (
               <div className="mt-4 pt-4 border-t border-current/10">
                 <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-1">Plan de Mitigación</p>
-                <p className="text-sm text-neutral-70 dark:text-neutral-30 whitespace-pre-wrap">{risk.mitigationPlan}</p>
+                <p className="text-sm text-secondary whitespace-pre-wrap">{risk.mitigationPlan}</p>
               </div>
             )}
           </div>
@@ -177,7 +178,7 @@ export function RiskDetailPage() {
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+    <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
         {icon && <span className="text-neutral-50">{icon}</span>}
         {title}

@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { EvalCategory } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 export function CandidateFormPage() {
   const navigate = useNavigate()
@@ -96,7 +97,7 @@ export function CandidateFormPage() {
       email,
       phone,
       position,
-      interviewDate: interviewDate ? new Date(interviewDate) : null,
+      interviewDate: interviewDate ? parseLocalDate(interviewDate) : null,
       comments,
       status,
       teamId: teamId || null,
@@ -142,37 +143,37 @@ export function CandidateFormPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{isEdit ? 'Editar Candidato' : 'Nuevo Candidato'}</h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Nombre *</label>
+            <label className="text-sm font-medium text-secondary">Nombre *</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Posición *</label>
+            <label className="text-sm font-medium text-secondary">Posición *</label>
             <Select value={position} onChange={(v) => setPosition(v)} required options={[
               { value: '', label: 'Seleccionar rol...' },
               ...roleOptions.map((r) => ({ value: r.value, label: r.label })),
             ]} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Email</label>
+            <label className="text-sm font-medium text-secondary">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Teléfono</label>
+            <label className="text-sm font-medium text-secondary">Teléfono</label>
             <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Fecha de Entrevista</label>
+            <label className="text-sm font-medium text-secondary">Fecha de Entrevista</label>
             <DatePicker value={interviewDate} onChange={setInterviewDate}
               className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Estado</label>
+            <label className="text-sm font-medium text-secondary">Estado</label>
             <Select value={status} onChange={(v) => setStatus(v as any)} options={[
               { value: 'pending', label: 'Pendiente' },
               { value: 'interviewed', label: 'Entrevistado' },
@@ -182,7 +183,7 @@ export function CandidateFormPage() {
             ]} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Equipo (opcional)</label>
+            <label className="text-sm font-medium text-secondary">Equipo (opcional)</label>
             <Select value={teamId} onChange={(v) => setTeamId(v)} options={[
               { value: '', label: 'Sin equipo' },
               ...teams.map((t) => ({ value: t.id, label: t.name })),
@@ -191,7 +192,7 @@ export function CandidateFormPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Comentarios de la Entrevista</label>
+          <label className="text-sm font-medium text-secondary">Comentarios de la Entrevista</label>
           <RichTextEditor
             value={comments}
             onChange={setComments}
@@ -201,7 +202,7 @@ export function CandidateFormPage() {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30">
+          <label className="block text-sm font-medium text-secondary">
             Tecnologías y Puntuación <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
           </label>
           <TechSearch
@@ -226,7 +227,7 @@ export function CandidateFormPage() {
               <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider">Puntuar conocimientos</p>
               {selectedTechs.map((tech) => (
                 <div key={tech.id} className="flex items-center gap-3">
-                  <span className="text-sm text-neutral-70 dark:text-neutral-30 w-32 truncate shrink-0">{tech.name}</span>
+                  <span className="text-sm text-secondary w-32 truncate shrink-0">{tech.name}</span>
                   <input type="range" min={0} max={100} value={techScores[tech.id] ?? 50}
                     onChange={(e) => updateScore(tech.id, parseInt(e.target.value))}
                     className="flex-1 accent-primary" />
@@ -245,14 +246,14 @@ export function CandidateFormPage() {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-neutral-70 dark:text-neutral-30">
+          <label className="block text-sm font-semibold text-secondary">
             Evaluación del Candidato
           </label>
           <p className="text-xs text-neutral-50">Puntúa cada dimensión del 0 al 100 para calcular el score final</p>
           <div className="space-y-3">
             {EVALUATION_CATEGORIES.map((cat) => (
               <div key={cat.key} className="flex items-center gap-3">
-                <span className="text-sm text-neutral-70 dark:text-neutral-30 w-44 shrink-0">{cat.label}</span>
+                <span className="text-sm text-secondary w-44 shrink-0">{cat.label}</span>
                 <input type="range" min={0} max={100} value={evalScores[cat.key]}
                   onChange={(e) => setEvalScores({ ...evalScores, [cat.key]: parseInt(e.target.value) })}
                   className="flex-1 accent-primary" />

@@ -24,7 +24,7 @@ const statusLabel: Record<string, string> = {
 const statusColor: Record<string, string> = {
   open: 'bg-danger/10 text-danger border-danger/20',
   mitigated: 'bg-info/10 text-info border-info/20',
-  accepted: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+  accepted: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   closed: 'bg-success/10 text-success border-success/20',
 }
 
@@ -102,14 +102,14 @@ export function RisksPage() {
       label: 'App',
       render: (risk) => {
         const app = applications.find((a) => a.id === risk.applicationId)
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+        return <span className="text-sm text-secondary">{app?.name || '-'}</span>
       },
     },
     {
       key: 'category',
       label: 'Categoría',
       sortable: true,
-      render: (risk) => <span className="text-sm text-neutral-70 dark:text-neutral-30">{risk.category}</span>,
+      render: (risk) => <span className="text-sm text-secondary">{risk.category}</span>,
     },
     {
       key: 'riskScore',
@@ -191,12 +191,12 @@ export function RisksPage() {
         className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
           active
             ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
-            : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+            : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
         <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        <p className="text-xs text-muted">{label}</p>
       </Comp>
     )
   }
@@ -209,7 +209,7 @@ export function RisksPage() {
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -269,7 +269,7 @@ export function RisksPage() {
       </div>
 
       {/* Heat Map + Search Bar */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm">
         <div className="flex items-start gap-8">
           {/* Heat Map - collapsible */}
           <div className="shrink-0">
@@ -305,7 +305,7 @@ export function RisksPage() {
                             <div className="flex flex-col items-center justify-center h-full">
                               <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
                               {getCellRisks(prob, impact).length > 0 && (
-                                <span className="text-[9px] text-neutral-60 dark:text-neutral-40">{getCellRisks(prob, impact).length}</span>
+                                <span className="text-[9px] text-muted">{getCellRisks(prob, impact).length}</span>
                               )}
                             </div>
                           </Button>
@@ -349,7 +349,7 @@ export function RisksPage() {
                 className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
                   showFilters || statusFilter !== 'all' || categoryFilter !== 'all'
                     ? 'border-primary text-primary bg-primary/5'
-                    : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                    : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                 }`}
               >
                 <Filter size={16} />
@@ -361,7 +361,7 @@ export function RisksPage() {
             </div>
 
             {showFilters && (
-              <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+              <div className="flex items-center gap-4 pt-3 border-t border-boundary">
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-neutral-60">Estado</label>
                   <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[

@@ -56,7 +56,7 @@ function StepWelcome({ onNext }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">Bienvenido a TGP</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Plataforma de Gobierno Tecnológico Empresarial. Unifica la gestión de aplicaciones,
           tecnologías, seguridad, equipos, OKRs y ejecución en un solo lugar.
         </p>
@@ -64,7 +64,7 @@ function StepWelcome({ onNext }: StepProps) {
 
       <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 space-y-3">
         <p className="text-xs font-semibold text-neutral-50 uppercase tracking-wider">Arquitectura de datos</p>
-        <div className="space-y-2 text-sm text-neutral-70 dark:text-neutral-30">
+        <div className="space-y-2 text-sm text-secondary">
           <div className="flex items-center gap-3">
             <span className="text-primary font-bold text-base">1</span>
             <span><strong>Unidades de Negocio</strong> — Organización base</span>
@@ -109,7 +109,7 @@ function StepBusinessUnit({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">1. Unidades de Negocio</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Las <strong>Unidades de Negocio (BU)</strong> son la base del modelo. Cada aplicación,
           equipo y objetivo pertenece a una BU. Sin BUs no puedes registrar aplicaciones.
         </p>
@@ -153,12 +153,12 @@ function StepApplications({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">2. Aplicaciones</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Cada <strong>aplicación</strong> se asigna a una BU, tiene una criticidad (baja→crítica),
           una arquitectura (monolito, microservicios, etc.) y un owner responsable.
         </p>
       </div>
-      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 space-y-2 text-sm text-neutral-70 dark:text-neutral-30">
+      <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 space-y-2 text-sm text-secondary">
         <p className="font-medium text-neutral-90 dark:text-white">Campos clave:</p>
         <ul className="space-y-1 list-disc list-inside text-xs">
           <li>Nombre, descripción y <strong>BU propietaria</strong> (requiere BU creada previamente)</li>
@@ -194,7 +194,7 @@ function StepTechnologies({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">3. Tecnologías</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Registra las <strong>tecnologías</strong> de tu portafolio: lenguajes, frameworks,
           bases de datos, OS, runtimes. El sistema sincroniza automáticamente fechas EOL
           desde endoflife.date para alertar sobre obsolescencia.
@@ -227,7 +227,7 @@ function StepTeams({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">4. Equipos y Personas</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Crea <strong>equipos</strong> con miembros, roles y asignación porcentual.
           El sistema calcula métricas DORA automáticamente para clasificar el rendimiento
           (Elite, Alto, Medio, Bajo).
@@ -264,7 +264,7 @@ function StepSecurity({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">5. Seguridad y Gobierno</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Gestiona <strong>vulnerabilidades</strong> (CVSS, SLA tracking), <strong>incidentes</strong> de seguridad
           (P1-P4 con RCA), <strong>riesgos</strong> (matriz probabilidad×impacto) y
           <strong> auditoría</strong> (hallazgos con plan de acción).
@@ -305,7 +305,7 @@ function StepExecution({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">6. Ejecución y Estrategia</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           El módulo de <strong>Ejecución</strong> integra Planes, Daily, Compromisos,
           Actividades y Bloqueos. Los <strong>OKRs</strong> permiten definir objetivos
           con Key Results medibles y vinculados a equipos.
@@ -314,15 +314,15 @@ function StepExecution({ onNext, onSkip }: StepProps) {
       <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 space-y-2 text-sm">
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-purple-500" />
-          <span className="text-neutral-70 dark:text-neutral-30"><strong>Planes</strong> con health status y fechas</span>
+          <span className="text-secondary"><strong>Planes</strong> con health status y fechas</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-purple-500" />
-          <span className="text-neutral-70 dark:text-neutral-30"><strong>Daily</strong> con actividades y bloqueos del día</span>
+          <span className="text-secondary"><strong>Daily</strong> con actividades y bloqueos del día</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-purple-500" />
-          <span className="text-neutral-70 dark:text-neutral-30"><strong>OKRs</strong> con Key Results y progreso</span>
+          <span className="text-secondary"><strong>OKRs</strong> con Key Results y progreso</span>
         </div>
       </div>
       <div className="flex items-center justify-center gap-3">
@@ -344,7 +344,7 @@ function StepDashboard({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">7. Dashboard y Visibilidad</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           El <strong>Dashboard Ejecutivo</strong> consolida todo en una vista con el
           <strong> THI (Technology Health Index)</strong>, 12 KPI cards y alertas en tiempo real.
           Puedes personalizar los widgets y compartir la vista con stakeholders.
@@ -407,7 +407,7 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
         </div>
         <div className="space-y-2">
           <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¡Bienvenido, {displayName.split(' ')[0]}!</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40">Datos de ejemplo cargados con tu perfil.</p>
+          <p className="text-sm text-muted">Datos de ejemplo cargados con tu perfil.</p>
         </div>
         <Button onClick={onNext} variant="primary" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-dark transition-colors">
           Finalizar <ChevronRight size={16} />
@@ -423,19 +423,19 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">Tu perfil</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Antes de cargar los datos demo, ingresa tu nombre y correo para personalizar tu usuario administrador.
         </p>
       </div>
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1">Nombre completo</label>
+          <label className="block text-xs font-medium text-muted mb-1">Nombre completo</label>
           <input type="text" value={displayName} onChange={(e) => { setDisplayName(e.target.value); setNameError('') }}
             placeholder="Ej: Juan Pérez"
             className="w-full px-3 py-2.5 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-neutral-40 dark:placeholder:text-neutral-50" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1">Correo electrónico</label>
+          <label className="block text-xs font-medium text-muted mb-1">Correo electrónico</label>
           <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setNameError('') }}
             placeholder="Ej: juan@empresa.com"
             className="w-full px-3 py-2.5 rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-neutral-40 dark:placeholder:text-neutral-50" />
@@ -443,7 +443,7 @@ function StepDemoData({ onNext, onSkip }: StepProps) {
         {nameError && <p className="text-xs text-danger text-center">{nameError}</p>}
       </div>
       <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-3 space-y-1">
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">
+        <p className="text-xs text-muted">
           Se cargarán automáticamente: <strong>10 apps</strong>, microservicios con vulnerabilidades, incidentes, riesgos y hallazgos,
           180+ tecnologías, equipos, OKRs y más.
         </p>
@@ -477,13 +477,13 @@ function StepDone({ onClose }: StepProps) {
       </div>
       <div className="space-y-2">
         <h2 className="text-xl font-bold text-neutral-90 dark:text-white">¡Listo!</h2>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Ya puedes comenzar. Recuerda que puedes volver a cualquier sección desde el menú lateral.
         </p>
       </div>
       <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 text-left text-sm space-y-2">
         <p className="font-medium text-neutral-90 dark:text-white">Ruta recomendada:</p>
-        <ol className="text-xs text-neutral-60 dark:text-neutral-40 space-y-1 list-decimal list-inside">
+        <ol className="text-xs text-muted space-y-1 list-decimal list-inside">
           <li>Crear Unidades de Negocio en Administración</li>
           <li>Registrar Aplicaciones en Catálogo</li>
           <li>Sincronizar Tecnologías en Obsolescencia</li>
@@ -540,7 +540,7 @@ export function OnboardingWizard({ onClose }: WizardProps) {
     <>
       <div className="fixed inset-0 z-50 bg-black/60" />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-white dark:bg-neutral-80 rounded-3xl border border-neutral-20 dark:border-neutral-70 shadow-2xl relative">
+        <div className="w-full max-w-lg bg-card rounded-3xl border border-boundary shadow-2xl relative">
           {step > 0 && (
             <Button onClick={handleBack} variant="ghost" className="absolute top-5 left-5 p-2 rounded-xl hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors z-10" title="Atrás">
               <ChevronLeft size={20} className="text-neutral-50" />

@@ -53,7 +53,7 @@ export function PublicMemberPage() {
   if (!data || !stats || !data.member) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal title="Datos protegidos" description="Contenido cifrado. Ingresa la contraseña."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
@@ -70,8 +70,8 @@ export function PublicMemberPage() {
   const { member, displayName, team, sprints, oneOnOnes } = data
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -94,14 +94,14 @@ export function PublicMemberPage() {
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Header */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
               <span className="text-2xl font-bold text-primary">{displayName.charAt(0)}</span>
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-neutral-90 dark:text-white">{displayName}</h2>
-              <p className="text-sm text-neutral-60 dark:text-neutral-40 capitalize">{member.role?.replace(/_/g, ' ')}</p>
+              <p className="text-sm text-muted capitalize">{member.role?.replace(/_/g, ' ')}</p>
               {team && <p className="text-xs text-neutral-50 mt-0.5">{team.name}</p>}
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -124,7 +124,7 @@ export function PublicMemberPage() {
         </div>
 
         {/* Sprint history */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
           <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-4 flex items-center gap-2">
             <BarChart3 size={16} className="text-primary" />
             Historial de sprints
@@ -136,7 +136,7 @@ export function PublicMemberPage() {
                 const pct = total > 0 ? Math.round((sp.storyPointsCompleted / total) * 100) : 0
                 return (
                   <div key={sp.id} className="flex items-center gap-3 text-sm">
-                    <span className="text-neutral-70 dark:text-neutral-30 font-medium w-20">{sp.sprintName}</span>
+                    <span className="text-secondary font-medium w-20">{sp.sprintName}</span>
                     <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
                       <div className={cn('h-full rounded-full', pct >= 80 ? 'bg-success' : pct >= 50 ? 'bg-warning' : 'bg-danger')}
                         style={{ width: `${pct}%` }} />
@@ -155,7 +155,7 @@ export function PublicMemberPage() {
 
         {/* 1:1s */}
         {oneOnOnes.length > 0 && (
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-4 flex items-center gap-2">
               <Brain size={16} className="text-purple-500" />
               1:1 Recientes
@@ -180,7 +180,7 @@ export function PublicMemberPage() {
           </div>
         )}
 
-        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-boundary">
           TGP — Technology Governance Platform
         </div>
       </main>
@@ -190,7 +190,7 @@ export function PublicMemberPage() {
 
 function Loader() {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
     </div>
   )

@@ -82,7 +82,7 @@ export function CandidateDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+      <div className="bg-card rounded-xl border border-boundary p-6">
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
@@ -100,7 +100,7 @@ export function CandidateDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 space-y-4">
+      <div className="bg-card rounded-xl border border-boundary p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <InfoRow icon={<Briefcase size={16} />} label="Posición" value={MEMBER_ROLE_LABELS[candidate.position as keyof typeof MEMBER_ROLE_LABELS] ?? candidate.position} />
           <InfoRow icon={<Calendar size={16} />} label="Entrevista" value={candidate.interviewDate ? new Date(candidate.interviewDate).toLocaleDateString('es') : 'Pendiente'} />
@@ -110,14 +110,14 @@ export function CandidateDetailPage() {
         </div>
 
           {candidate.comments && (
-            <div className="pt-4 border-t border-neutral-20 dark:border-neutral-70">
-              <p className="text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2">Comentarios</p>
+            <div className="pt-4 border-t border-boundary">
+              <p className="text-sm font-medium text-secondary mb-2">Comentarios</p>
               <div className="text-sm text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: candidate.comments }} />
             </div>
           )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+      <div className="bg-card rounded-xl border border-boundary p-6">
         <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Tecnologías</h3>
         {technologies.length === 0 ? (
           <p className="text-sm text-neutral-50">Sin tecnologías registradas</p>
@@ -127,7 +127,7 @@ export function CandidateDetailPage() {
               <div key={t.id} className="flex items-center gap-3">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">{t.name}</span>
+                    <span className="text-sm font-medium text-secondary">{t.name}</span>
                     <span className="text-sm font-semibold text-primary">{t.points}%</span>
                   </div>
                   <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
@@ -140,7 +140,7 @@ export function CandidateDetailPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6">
+      <div className="bg-card rounded-xl border border-boundary p-6">
         <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Evaluación</h3>
         {evaluations.length === 0 ? (
           <p className="text-sm text-neutral-50">Sin evaluación registrada</p>
@@ -152,7 +152,7 @@ export function CandidateDetailPage() {
               return (
                 <div key={cat.key}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-neutral-70 dark:text-neutral-30">{cat.label}</span>
+                    <span className="text-sm text-secondary">{cat.label}</span>
                     <span className="text-sm font-semibold" style={{ color: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444' }}>{pts}%</span>
                   </div>
                   <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">

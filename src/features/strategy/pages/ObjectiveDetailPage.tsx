@@ -61,13 +61,13 @@ export function ObjectiveDetailPage() {
         </Section>
       </div>
 
-      <div className="pt-6 border-t border-neutral-20 dark:border-neutral-70">
+      <div className="pt-6 border-t border-boundary">
         <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Key Results ({objective.keyResults.length})</h3>
         <div className="space-y-4">
           {objective.keyResults.map((kr) => {
             const pct = kr.target > kr.baseline ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100) : 0
             return (
-              <div key={kr.id} className="p-4 rounded-lg border border-neutral-20 dark:border-neutral-70">
+              <div key={kr.id} className="p-4 rounded-lg border border-boundary">
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-sm font-medium text-neutral-90 dark:text-white">{kr.title}</p>

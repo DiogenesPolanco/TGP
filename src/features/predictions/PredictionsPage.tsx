@@ -31,7 +31,7 @@ export function PredictionsPage() {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6">
+      <div className="bg-card rounded-2xl border border-boundary p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2.5 rounded-xl bg-purple-500/10">
             <Brain size={24} className="text-purple-500" />
@@ -53,7 +53,7 @@ export function PredictionsPage() {
         ) : predictions.length === 0 ? (
           <div className="text-center py-12">
             <BarChart3 size={48} className="mx-auto text-neutral-40 mb-4" />
-            <p className="text-neutral-60 dark:text-neutral-40">
+            <p className="text-muted">
               No hay suficientes datos históricos para generar predicciones.
             </p>
             <p className="text-sm text-neutral-50 mt-1">
@@ -111,7 +111,7 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
           </div>
         </div>
       </div>
-      <div className="flex items-start gap-2 text-sm text-neutral-60 dark:text-neutral-40">
+      <div className="flex items-start gap-2 text-sm text-muted">
         <AlertCircle size={14} className="mt-0.5 shrink-0" />
         <p>{prediction.detail}</p>
       </div>

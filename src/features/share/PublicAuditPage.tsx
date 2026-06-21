@@ -32,17 +32,17 @@ export function PublicAuditPage() {
       key: 'applicationId',
       label: 'Aplicación',
       sortable: true,
-      render: (v) => <span className="text-neutral-70 dark:text-neutral-30">{appMap.get(v.applicationId ?? '') ?? '—'}</span>,
+      render: (v) => <span className="text-secondary">{appMap.get(v.applicationId ?? '') ?? '—'}</span>,
     },
-    { key: 'dueDate', label: 'Vencimiento', sortable: true, render: (v) => <span className="text-neutral-60 dark:text-neutral-40">{v.dueDate ? new Date(v.dueDate).toLocaleDateString() : '—'}</span> },
+    { key: 'dueDate', label: 'Vencimiento', sortable: true, render: (v) => <span className="text-muted">{v.dueDate ? new Date(v.dueDate).toLocaleDateString() : '—'}</span> },
   ]
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Hallazgos de auditoría protegidos"
             description="Esta vista fue compartida con cifrado. Ingresa la contraseña para verla."
@@ -60,8 +60,8 @@ export function PublicAuditPage() {
   const findings = data.findings as AuditRow[]
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -76,8 +76,8 @@ export function PublicAuditPage() {
       </header>
 
       <main className="px-6 py-8 max-w-screen-2xl mx-auto">
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-boundary flex items-center gap-2">
             <ClipboardCheck size={18} className="text-info" />
             <span className="font-semibold text-neutral-90 dark:text-white">{findings.length} hallazgos compartidos</span>
           </div>
@@ -88,7 +88,7 @@ export function PublicAuditPage() {
           />
         </div>
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70 mt-6">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary mt-6">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>

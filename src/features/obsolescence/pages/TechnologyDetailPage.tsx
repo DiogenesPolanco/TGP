@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 
 const supportStatusLabel: Record<string, string> = { active: 'Activo', extended: 'Soporte Extendido', eol: 'EOL', unknown: 'Desconocido' }
-const supportStatusColor: Record<string, string> = { active: 'bg-success/10 text-success', extended: 'bg-warning/10 text-warning', eol: 'bg-danger/10 text-danger', unknown: 'bg-neutral-10 text-neutral-60' }
+const supportStatusColor: Record<string, string> = { active: 'bg-success/10 text-success border-success/30', extended: 'bg-warning/10 text-warning border-warning/30', eol: 'bg-danger/10 text-danger border-danger/30', unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60' }
 const categoryLabel: Record<string, string> = {
   framework: 'Framework', language: 'Lenguaje', database: 'Base de Datos', os: 'OS',
   runtime: 'Runtime', library: 'Librería', message_broker: 'Message Broker', cache: 'Cache',
@@ -132,17 +132,18 @@ export function TechnologyDetailPage() {
       }
     >
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 -mx-6 px-6 mb-6">
+      <div className="flex gap-1 border-b border-boundary -mx-6 px-6 mb-6">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
             <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              variant="ghost"
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                  : 'border-transparent text-muted hover:text-neutral-90 dark:hover:text-white'
               }`}
             >
               <Icon size={16} />
@@ -224,7 +225,7 @@ function renderInfoTab(tech: any, _statusColor: Record<string, string>, _statusL
             <MiniField
               label="Estado"
               value={
-                <span className={`text-xs font-medium px-2 py-0.5 rounded ${supportStatusColor[tech.supportStatus]}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}>
                   {supportStatusLabel[tech.supportStatus]}
                 </span>
               }
@@ -323,7 +324,7 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
   return (
     <div className="space-y-6">
       {/* Hero section — Quick overview */}
-      <div className="bg-gradient-to-br from-neutral-5 to-neutral-10 dark:from-neutral-85 dark:to-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+      <div className="bg-gradient-to-br from-neutral-5 to-neutral-10 dark:from-neutral-85 dark:to-neutral-80 rounded-xl border border-boundary p-5">
         <div className="flex items-start justify-between mb-5">
           <div>
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
@@ -450,7 +451,7 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
               name={db.name}
               subtitle={`${db.engine} ${db.version} · ${db.environment === 'production' ? 'Producción' : db.environment === 'staging' ? 'Staging' : 'Desarrollo'}`}
               badge={db.dbType || ''}
-              badgeColor="bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40"
+              badgeColor="bg-neutral-10 dark:bg-neutral-70 text-muted"
               onClick={() => navigate(`/catalog/applications/${db.applicationId}`)}
             />
           ))}
@@ -482,8 +483,8 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
 
       {/* Security & Governance section */}
       {(data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length > 0) && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 bg-gradient-to-r from-transparent via-neutral-5 to-transparent dark:via-neutral-85">
+        <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-boundary bg-gradient-to-r from-transparent via-neutral-5 to-transparent dark:via-neutral-85">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
               <Scale size={16} className="text-primary" />
       Seguridad y Gobierno — Entidades Vinculadas
@@ -538,7 +539,7 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
 
       {/* No data at all */}
       {data.apps.length === 0 && data.microservices.length === 0 && data.databases.length === 0 && data.people.length === 0 && totalImpact === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-card rounded-xl border border-boundary shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-neutral-10 dark:bg-neutral-70 flex items-center justify-center mb-4">
             <Search size={24} className="text-neutral-50" />
           </div>
@@ -554,7 +555,7 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+    <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
         {icon && <span className="text-neutral-50">{icon}</span>}
         {title}
@@ -580,7 +581,7 @@ function StatBadge({ icon, value, label, color }: { icon: React.ReactNode; value
     danger: 'bg-danger/10 text-danger border-danger/20',
     warning: 'bg-warning/10 text-warning border-warning/20',
     purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
-    neutral: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60',
+    neutral: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   }
   const iconMap: Record<string, string> = {
     primary: 'text-primary', info: 'text-info', danger: 'text-danger',
@@ -606,8 +607,8 @@ function EntitySection({ title, count, icon, color, empty, children }: {
     'bg-neutral-10 dark:bg-neutral-70 border-neutral-30 dark:border-neutral-60'
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-      <div className={`px-5 py-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between ${count > 0 ? '' : 'opacity-60'}`}>
+    <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+      <div className={`px-5 py-3 border-b border-boundary flex items-center justify-between ${count > 0 ? '' : 'opacity-60'}`}>
         <div className="flex items-center gap-2">
           <span className={`p-1 rounded-md ${count > 0 ? accentColor : ''}`}>{icon}</span>
           <h3 className="text-sm font-bold text-neutral-90 dark:text-white">{title}</h3>
@@ -629,7 +630,7 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
   return (
     <Button
       onClick={onClick}
-      className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg bg-neutral-5 dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70 hover:border-primary/30 hover:shadow-sm transition-all group text-left"
+      className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg bg-neutral-5 dark:bg-neutral-85 border border-boundary hover:border-primary/30 hover:shadow-sm transition-all group text-left"
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
@@ -656,7 +657,7 @@ function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
   const colorMap: Record<string, { bg: string; text: string; dot: string }> = {
     danger: { bg: 'bg-danger/5 border-danger/20', text: 'text-danger', dot: 'bg-danger' },
     warning: { bg: 'bg-warning/5 border-warning/20', text: 'text-warning', dot: 'bg-warning' },
-    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-neutral-20 dark:border-neutral-70', text: 'text-neutral-60', dot: 'bg-neutral-40' },
+    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-boundary', text: 'text-neutral-60', dot: 'bg-neutral-40' },
   }
   const style = colorMap[color] || colorMap.neutral
 
@@ -672,7 +673,7 @@ function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
       {items.length > 0 ? (
         <div className="space-y-1.5 mb-3">
           {items.map((item: any) => (
-            <div key={item.id} className="flex items-center gap-2 text-xs text-neutral-70 dark:text-neutral-30">
+            <div key={item.id} className="flex items-center gap-2 text-xs text-secondary">
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`} />
               <span className="truncate">{item.title || item.name || '—'}</span>
             </div>

@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface Props {
   memberId: string
@@ -49,7 +50,7 @@ export function AchievementsSection({ memberId }: Props) {
       id: crypto.randomUUID(),
       memberId,
       ...newAchievement,
-      date: new Date(newAchievement.date),
+      date: parseLocalDate(newAchievement.date),
       createdAt: new Date(),
     }
     await db.achievements.add(achievement)
@@ -86,7 +87,7 @@ export function AchievementsSection({ memberId }: Props) {
     if (!editingId || !editData.title.trim()) return
     const updated = achievements.map((a) =>
       a.id === editingId
-        ? { ...a, ...editData, title: editData.title.trim(), date: new Date(editData.date) }
+        ? { ...a, ...editData, title: editData.title.trim(), date: parseLocalDate(editData.date) }
         : a
     )
     const record = updated.find((a) => a.id === editingId)!
@@ -109,7 +110,7 @@ export function AchievementsSection({ memberId }: Props) {
             </p>
           )}
         </div>
-        <Button onClick={() => setShowForm(true)}>
+        <Button onClick={() => setShowForm(true)} variant="ghost" className="flex items-center gap-1.5 rounded-lg">
           <Plus size={16} /> Nuevo Logro
         </Button>
       </div>
@@ -119,7 +120,7 @@ export function AchievementsSection({ memberId }: Props) {
         {Object.entries(typeConfig).map(([key, cfg]) => {
           const count = achievements.filter((a) => a.type === key).length
           return (
-            <div key={key} className="text-center p-3 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+            <div key={key} className="text-center p-3 bg-card rounded-xl border border-boundary">
               <div className={`inline-flex p-2 rounded-lg mb-1 ${cfg.color}`}>
                 {cfg.icon}
               </div>
@@ -132,7 +133,7 @@ export function AchievementsSection({ memberId }: Props) {
 
       {/* New Achievement Form */}
       {showForm && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+        <div className="bg-card rounded-xl border border-boundary p-4">
           <div className="grid gap-4 sm:grid-cols-2 mb-4">
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Título</label>
@@ -140,7 +141,7 @@ export function AchievementsSection({ memberId }: Props) {
                 type="text"
                 value={newAchievement.title}
                 onChange={(e) => setNewAchievement({ ...newAchievement, title: e.target.value })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
                 placeholder="Título del logro"
               />
             </div>
@@ -172,7 +173,7 @@ export function AchievementsSection({ memberId }: Props) {
               <DatePicker
                 value={newAchievement.date}
                 onChange={(v) => setNewAchievement({ ...newAchievement, date: v })}
-                className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+                className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
               />
             </div>
             <label className="flex items-center gap-2 mt-5">
@@ -182,14 +183,14 @@ export function AchievementsSection({ memberId }: Props) {
                 onChange={(e) => setNewAchievement({ ...newAchievement, linkedToPromotion: e.target.checked })}
                 className="rounded border-neutral-30"
               />
-              <span className="text-sm text-neutral-70 dark:text-neutral-30">Considerar para ascenso</span>
+              <span className="text-sm text-secondary">Considerar para ascenso</span>
             </label>
           </div>
           <div className="flex gap-2">
             <Button onClick={addAchievement} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
               Guardar Logro
             </Button>
-            <Button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            <Button onClick={() => setShowForm(false)} variant="ghost" className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
               Cancelar
             </Button>
           </div>
@@ -207,7 +208,7 @@ export function AchievementsSection({ memberId }: Props) {
           {sorted.map((a) => {
             const cfg = typeConfig[a.type]
             return editingId === a.id ? (
-              <div key={a.id} className="p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70">
+              <div key={a.id} className="p-4 bg-card rounded-xl border border-boundary">
                 <div className="grid gap-3 sm:grid-cols-2 mb-3">
                   <div>
                     <label className="text-xs font-medium text-neutral-60 mb-1 block">Título</label>
@@ -258,7 +259,7 @@ export function AchievementsSection({ memberId }: Props) {
                       onChange={(e) => setEditData({ ...editData, linkedToPromotion: e.target.checked })}
                       className="rounded border-neutral-30"
                     />
-                    <span className="text-sm text-neutral-70 dark:text-neutral-30">Ascenso</span>
+                    <span className="text-sm text-secondary">Ascenso</span>
                   </label>
                 </div>
                 <div className="flex gap-2">
@@ -269,7 +270,7 @@ export function AchievementsSection({ memberId }: Props) {
             ) : (
               <div
                 key={a.id}
-                className="flex items-start justify-between p-4 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 group/ach"
+                className="flex items-start justify-between p-4 bg-card rounded-xl border border-boundary group/ach"
               >
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-lg ${cfg.color}`}>
@@ -294,12 +295,12 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 ml-3 shrink-0">
-                  <Button onClick={() => startEdit(a)}>
+                  <button onClick={() => startEdit(a)} className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
                     <Edit3 size={14} />
-                  </Button>
-                  <Button onClick={() => removeAchievement(a.id)}>
+                  </button>
+                  <button onClick={() => removeAchievement(a.id)} className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400">
                     <Trash2 size={14} />
-                  </Button>
+                  </button>
                 </div>
               </div>
             )

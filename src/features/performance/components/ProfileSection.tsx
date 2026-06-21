@@ -64,10 +64,10 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
+  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-xl border border-boundary p-4">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
           {memberDisplayName.charAt(0).toUpperCase()}
@@ -80,7 +80,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <AtSign size={14} /> Correo Electrónico
           </label>
           <input
@@ -92,7 +92,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Briefcase size={14} /> Rol
           </label>
           <Select value={form.role} onChange={(v) => setForm({ ...form, role: v })} options={[
@@ -112,13 +112,13 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           ]} />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Clock size={14} /> Estado
           </label>
           <Select value={form.status} onChange={(v) => setForm({ ...form, status: v })} options={Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v }))} />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Phone size={14} /> Teléfono Celular
           </label>
           <input
@@ -130,7 +130,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Home size={14} /> Teléfono Casa
           </label>
           <input
@@ -142,7 +142,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <MapPin size={14} /> Dirección
           </label>
           <input
@@ -154,7 +154,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Umbrella size={14} /> Vacaciones por Año
           </label>
           <input
@@ -166,7 +166,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           />
         </div>
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Calendar size={14} /> Vacaciones Usadas
           </label>
           <input

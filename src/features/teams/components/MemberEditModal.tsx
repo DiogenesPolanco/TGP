@@ -75,12 +75,12 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
 
       {/* Panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full max-w-4xl bg-white dark:bg-neutral-80 shadow-2xl border-l border-neutral-20 dark:border-neutral-70 flex flex-col transition-all duration-200 ${
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-4xl bg-card shadow-2xl border-l border-boundary flex flex-col transition-all duration-200 ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-boundary shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
               {memberName.charAt(0).toUpperCase()}
@@ -99,15 +99,16 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-neutral-20 dark:border-neutral-70 px-4 gap-1 shrink-0">
+        <div className="flex border-b border-boundary px-4 gap-1 shrink-0">
           {tabs.map((tab) => (
             <Button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              variant="ghost"
               className={`flex items-center gap-2 px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                  : 'border-transparent text-muted hover:text-neutral-90 dark:hover:text-white'
               }`}
             >
               {tab.icon}

@@ -7,6 +7,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Risk } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface RiskFormProps {
   risk: Risk | null
@@ -38,7 +39,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
       ...formData,
       applicationId: formData.applicationId || null,
       riskScore,
-      targetDate: formData.targetDate ? new Date(formData.targetDate) : null,
+      targetDate: formData.targetDate ? parseLocalDate(formData.targetDate) : null,
       metadata: risk?.metadata ?? {},
       createdAt: risk?.createdAt ?? new Date(),
       updatedAt: new Date(),
@@ -54,8 +55,8 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-xl border border-boundary shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-boundary">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {risk ? 'Editar Riesgo' : 'Nuevo Riesgo'}
           </h3>
@@ -66,7 +67,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Título *</label>
             <input
               type="text"
               required
@@ -77,7 +78,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
             <RichTextEditor
               value={formData.description}
               onChange={(html) => setFormData({ ...formData, description: html })}
@@ -112,7 +113,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Probabilidad (1-5)</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Probabilidad (1-5)</label>
               <input
                 type="number"
                 min="1"
@@ -124,7 +125,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Impacto (1-5)</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Impacto (1-5)</label>
               <input
                 type="number"
                 min="1"
@@ -136,7 +137,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Risk Score</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Risk Score</label>
               <input
                 type="text"
                 readOnly
@@ -147,7 +148,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Plan de mitigación</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Plan de mitigación</label>
             <RichTextEditor
               value={formData.mitigationPlan}
               onChange={(html) => setFormData({ ...formData, mitigationPlan: html })}
@@ -165,7 +166,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
               ]} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha objetivo</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Fecha objetivo</label>
               <DatePicker
                 value={formData.targetDate}
                 onChange={(v) => setFormData({ ...formData, targetDate: v })}
@@ -176,7 +177,7 @@ export function RiskForm({ risk, onClose, onSave }: RiskFormProps) {
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button"
-              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
               Cancelar
             </Button>
             <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">

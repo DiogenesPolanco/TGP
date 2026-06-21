@@ -98,7 +98,7 @@ export function VulnerabilitiesPage() {
       label: 'App',
       render: (vuln) => {
         const app = applications.find((a) => a.id === vuln.applicationId)
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+        return <span className="text-sm text-secondary">{app?.name || '-'}</span>
       },
     },
     {
@@ -201,7 +201,7 @@ export function VulnerabilitiesPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showImport
                 ? 'border-danger text-danger bg-danger/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Bug size={16} />
@@ -227,9 +227,9 @@ export function VulnerabilitiesPage() {
 
       {/* Severity distribution bar */}
       {activeOpen > 0 && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2.5">
-            <h3 className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Distribución por Severidad</h3>
+            <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">Distribución por Severidad</h3>
             <span className="text-[11px] text-neutral-50">{activeOpen} activas</span>
           </div>
           <div className="h-2.5 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden flex">
@@ -247,7 +247,7 @@ export function VulnerabilitiesPage() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -264,7 +264,7 @@ export function VulnerabilitiesPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || severityFilter !== 'all' || statusFilter !== 'all'
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -276,7 +276,7 @@ export function VulnerabilitiesPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Severidad</label>
               <Select value={severityFilter} onChange={(v) => setSeverityFilter(v)} options={[
@@ -332,7 +332,7 @@ export function VulnerabilitiesPage() {
 
 function SeverityDot({ color, label }: { color: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-neutral-60 dark:text-neutral-40">
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted">
       <span className={`w-2 h-2 rounded-full ${color}`} />
       {label}
     </span>
@@ -349,11 +349,11 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
   return (
     <Comp
       onClick={onClick}
-      className={`bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
+      className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Comp>
   )
 }

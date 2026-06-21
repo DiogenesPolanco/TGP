@@ -100,14 +100,14 @@ export function MobileDashboardPage() {
   // ── Loading ──
   if (phase === 'loading' && !data) {
     return (
-      <div className="min-h-dvh bg-neutral-10 dark:bg-neutral-90 text-neutral-90 dark:text-neutral-10 flex flex-col items-center justify-center gap-4 p-6 relative">
+      <div className="min-h-dvh bg-canvas text-default flex flex-col items-center justify-center gap-4 p-6 relative">
         <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors"
           aria-label="Cambiar tema">
           {theme === 'light' ? <Moon size={16} className="text-neutral-60" /> : <Sun size={16} className="text-neutral-40" />}
         </button>
         <div className="w-9 h-9 border-2 border-neutral-30 dark:border-neutral-60 border-t-primary rounded-full animate-spin" />
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 font-medium">Conectando con Azure...</p>
+        <p className="text-sm text-muted font-medium">Conectando con Azure...</p>
       </div>
     )
   }
@@ -115,7 +115,7 @@ export function MobileDashboardPage() {
   // ── Error ──
   if (phase === 'error') {
     return (
-      <div className="min-h-dvh bg-neutral-10 dark:bg-neutral-90 text-neutral-90 dark:text-neutral-10 flex flex-col items-center justify-center gap-4 p-6 relative">
+      <div className="min-h-dvh bg-canvas text-default flex flex-col items-center justify-center gap-4 p-6 relative">
         <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors"
           aria-label="Cambiar tema">
@@ -125,7 +125,7 @@ export function MobileDashboardPage() {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-danger"><path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
         </div>
         <p className="text-base font-semibold text-center">Sin conexión al Command Center</p>
-        <p className="text-sm text-neutral-60 dark:text-neutral-40 text-center max-w-xs">{errorMsg}</p>
+        <p className="text-sm text-muted text-center max-w-xs">{errorMsg}</p>
         <button onClick={handleRefresh}
           className="mt-4 px-6 py-3 bg-neutral-90 dark:bg-neutral-10 text-white dark:text-neutral-90 hover:bg-neutral-80 dark:hover:bg-neutral-20 rounded-xl text-sm font-semibold transition-colors">
           Intentar de nuevo
@@ -137,7 +137,7 @@ export function MobileDashboardPage() {
   // ── Passphrase gate ──
   if (phase === 'passphrase') {
     return (
-      <div className="min-h-dvh bg-neutral-10 dark:bg-neutral-90 text-neutral-90 dark:text-neutral-10 flex flex-col items-center justify-center p-6 relative">
+      <div className="min-h-dvh bg-canvas text-default flex flex-col items-center justify-center p-6 relative">
         <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors"
           aria-label="Cambiar tema">
@@ -145,19 +145,19 @@ export function MobileDashboardPage() {
         </button>
         <div className="w-full max-w-sm space-y-6">
           <div className="flex flex-col items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-neutral-85 border border-neutral-30 dark:border-neutral-70 flex items-center justify-center text-neutral-50 dark:text-neutral-40">
+            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-neutral-85 border border-boundary flex items-center justify-center text-neutral-50 dark:text-neutral-40">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
             </div>
             <div className="text-center">
-              <h1 className="text-lg font-bold text-neutral-90 dark:text-neutral-10">Command Center</h1>
-              <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Acceso restringido</p>
+              <h1 className="text-lg font-bold text-default">Command Center</h1>
+              <p className="text-sm text-muted mt-1">Acceso restringido</p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-neutral-30 dark:border-neutral-70 p-5 space-y-4">
-            <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+          <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-boundary p-5 space-y-4">
+            <p className="text-sm text-muted leading-relaxed">
               Este dashboard está protegido con cifrado de extremo a extremo.
               Ingresa la contraseña configurada en el escritorio.
             </p>
@@ -169,7 +169,7 @@ export function MobileDashboardPage() {
                   onChange={(e) => { setPassphrase(e.target.value); setPassError(false) }}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !submitting) handleSubmitPassphrase() }}
                   placeholder="Contraseña"
-                  className="w-full px-4 py-3.5 bg-neutral-10 dark:bg-neutral-90 border border-neutral-30 dark:border-neutral-60 rounded-xl text-neutral-90 dark:text-neutral-10 text-center text-lg tracking-widest placeholder:text-neutral-50 dark:placeholder:text-neutral-50 placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-primary/30 dark:focus:ring-white/15 transition-all"
+                  className="w-full px-4 py-3.5 bg-canvas border border-neutral-30 dark:border-neutral-60 rounded-xl text-default text-center text-lg tracking-widest placeholder:text-neutral-50 dark:placeholder:text-neutral-50 placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-primary/30 dark:focus:ring-white/15 transition-all"
                   autoFocus
                   disabled={submitting}
                 />
@@ -191,26 +191,26 @@ export function MobileDashboardPage() {
   // ── Dashboard ──
   if (!data) {
     return (
-      <div className="min-h-dvh bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+      <div className="min-h-dvh bg-canvas flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-neutral-30 dark:border-neutral-60 border-t-primary rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-dvh bg-neutral-10 dark:bg-neutral-90 text-neutral-90 dark:text-neutral-10">
+    <div className="min-h-dvh bg-canvas text-default">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-neutral-10/80 dark:bg-neutral-90/80 backdrop-blur-xl border-b border-neutral-30 dark:border-neutral-80">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-30 dark:border-neutral-70 flex items-center justify-center text-neutral-50 dark:text-neutral-40">
+            <div className="w-7 h-7 rounded-lg bg-white dark:bg-neutral-85 border border-boundary flex items-center justify-center text-neutral-50 dark:text-neutral-40">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
             </div>
             <div>
-              <h1 className="text-sm font-bold leading-tight text-neutral-90 dark:text-neutral-10">Command Center</h1>
-              <p className="text-[10px] text-neutral-60 dark:text-neutral-40 font-medium">TGP · Vista protegida</p>
+              <h1 className="text-sm font-bold leading-tight text-default">Command Center</h1>
+              <p className="text-[10px] text-muted font-medium">TGP · Vista protegida</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -224,12 +224,12 @@ export function MobileDashboardPage() {
               )}
             </button>
             <button onClick={() => setShowCacheInfo(!showCacheInfo)}
-              className="w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors text-neutral-60 dark:text-neutral-40"
+              className="w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors text-muted"
               aria-label="Info del snapshot">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
             </button>
             <button onClick={handleLock}
-              className="w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors text-neutral-60 dark:text-neutral-40"
+              className="w-8 h-8 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-85 flex items-center justify-center transition-colors text-muted"
               aria-label="Bloquear">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </button>
@@ -238,7 +238,7 @@ export function MobileDashboardPage() {
       </header>
 
       {showCacheInfo && (
-        <div className="mx-4 mt-3 p-3 bg-white dark:bg-neutral-85 rounded-xl border border-neutral-30 dark:border-neutral-70 text-xs text-neutral-60 dark:text-neutral-40 space-y-1.5">
+        <div className="mx-4 mt-3 p-3 bg-white dark:bg-neutral-85 rounded-xl border border-boundary text-xs text-muted space-y-1.5">
           <p className="flex items-center gap-2">
             <span className="text-neutral-70 dark:text-neutral-50 font-medium">Actualizado:</span>
             <span>{formatDate(data.updatedAt)}</span>
@@ -256,10 +256,10 @@ export function MobileDashboardPage() {
 
       <div className="px-4 pt-5 pb-8 space-y-5">
         {/* THI Hero */}
-        <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-neutral-30 dark:border-neutral-70 p-5">
+        <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-boundary p-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-widest">Health Index</span>
-            <span className="text-[11px] font-mono text-neutral-60 dark:text-neutral-40">{data.applications} apps · {data.teams} equipos</span>
+            <span className="text-[11px] font-semibold text-muted uppercase tracking-widest">Health Index</span>
+            <span className="text-[11px] font-mono text-muted">{data.applications} apps · {data.teams} equipos</span>
           </div>
           <div className="flex items-end gap-4">
             <div className="relative">
@@ -292,8 +292,8 @@ export function MobileDashboardPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-warning"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              <span className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Alertas activas</span>
-              <span className="text-xs font-mono text-neutral-60 dark:text-neutral-40 bg-neutral-20 dark:bg-neutral-85 px-1.5 py-0.5 rounded-md">{data.alerts.length}</span>
+              <span className="text-xs font-semibold text-muted uppercase tracking-wider">Alertas activas</span>
+              <span className="text-xs font-mono text-muted bg-neutral-20 dark:bg-neutral-85 px-1.5 py-0.5 rounded-md">{data.alerts.length}</span>
             </div>
             <div className="space-y-1.5">
               {data.alerts.slice(0, 5).map((alert, i) => (
@@ -344,7 +344,7 @@ export function MobileDashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-50"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">OKRs activos</span>
+              <span className="text-xs font-semibold text-muted uppercase tracking-wider">OKRs activos</span>
               <div className="flex items-center gap-1.5 ml-auto">
                 <span className="text-[10px] font-mono text-success">{data.objectives.onTrack} On track</span>
                 <span className="text-neutral-30 dark:text-neutral-70">·</span>
@@ -355,9 +355,9 @@ export function MobileDashboardPage() {
             <div className="space-y-2">
               {data.objectives.items.slice(0, 5).map((okr) => (
                 <div key={okr.id}
-                  className="bg-white dark:bg-neutral-85 rounded-xl border border-neutral-30 dark:border-neutral-70 p-3.5">
+                  className="bg-white dark:bg-neutral-85 rounded-xl border border-boundary p-3.5">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-medium text-neutral-90 dark:text-neutral-10 truncate flex-1 mr-2">{okr.title}</p>
+                    <p className="text-xs font-medium text-default truncate flex-1 mr-2">{okr.title}</p>
                     <span className={`text-[10px] font-mono ${okr.status === 'on_track' ? 'text-success' : okr.status === 'at_risk' ? 'text-warning' : 'text-danger'}`}>{okr.progress}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-neutral-20 dark:bg-neutral-80 rounded-full overflow-hidden">
@@ -375,8 +375,8 @@ export function MobileDashboardPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-danger"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Bloqueos críticos</span>
-              <span className="text-xs font-mono text-neutral-60 dark:text-neutral-40 bg-neutral-20 dark:bg-neutral-85 px-1.5 py-0.5 rounded-md">{data.blockers.list.length}</span>
+              <span className="text-xs font-semibold text-muted uppercase tracking-wider">Bloqueos críticos</span>
+              <span className="text-xs font-mono text-muted bg-neutral-20 dark:bg-neutral-85 px-1.5 py-0.5 rounded-md">{data.blockers.list.length}</span>
             </div>
             <div className="space-y-1.5">
               {data.blockers.list.map((b) => (
@@ -405,7 +405,7 @@ function renderDimensionBar(label: string, score: number) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-medium text-neutral-60 dark:text-neutral-40">{label}</span>
+        <span className="text-[10px] font-medium text-muted">{label}</span>
         <span className="text-[10px] font-mono text-neutral-50 dark:text-neutral-50">{score}</span>
       </div>
       <div className="w-full h-1 bg-neutral-20 dark:bg-neutral-80 rounded-full overflow-hidden">
@@ -420,14 +420,14 @@ function MetricCard({ label, value, total, color, icon }: {
   label: string; value: number; total: number; color: 'danger' | 'warning' | 'success'; icon: React.ReactNode
 }) {
   return (
-    <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-neutral-30 dark:border-neutral-70 p-4">
+    <div className="bg-white dark:bg-neutral-85 rounded-2xl border border-boundary p-4">
       <div className={`flex items-center gap-2 mb-3 p-1.5 rounded-lg w-fit ${
         color === 'danger' ? 'bg-danger/5 text-danger' : color === 'warning' ? 'bg-warning/5 text-warning' : 'bg-success/5 text-success'
       }`}>{icon}</div>
-      <p className="text-xl font-bold text-neutral-90 dark:text-neutral-10 font-mono">
+      <p className="text-xl font-bold text-default font-mono">
         {value}<span className="text-sm font-medium text-neutral-50">/{total}</span>
       </p>
-      <p className="text-[11px] text-neutral-60 dark:text-neutral-40 font-medium mt-0.5">{label}</p>
+      <p className="text-[11px] text-muted font-medium mt-0.5">{label}</p>
     </div>
   )
 }
@@ -437,12 +437,12 @@ function StatusRow({ label, value, total, color }: {
 }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
   return (
-    <div className="flex items-center gap-3 bg-white dark:bg-neutral-85 rounded-xl border border-neutral-30 dark:border-neutral-70 px-4 py-3">
+    <div className="flex items-center gap-3 bg-white dark:bg-neutral-85 rounded-xl border border-boundary px-4 py-3">
       <div className={`w-2 h-2 rounded-full shrink-0 ${color === 'danger' ? 'bg-danger' : color === 'warning' ? 'bg-warning' : 'bg-success'}`}/>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-neutral-60 dark:text-neutral-40 font-medium">{label}</span>
-          <span className="text-xs font-mono text-neutral-90 dark:text-neutral-10">{value}/{total}</span>
+          <span className="text-xs text-muted font-medium">{label}</span>
+          <span className="text-xs font-mono text-default">{value}/{total}</span>
         </div>
         {total > 0 && (
           <div className="w-full h-1 bg-neutral-20 dark:bg-neutral-80 rounded-full overflow-hidden mt-1.5">

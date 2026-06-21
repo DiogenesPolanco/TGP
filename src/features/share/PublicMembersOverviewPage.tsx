@@ -88,7 +88,7 @@ export function PublicMembersOverviewPage() {
   if (!data || !analytics) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal title="Datos protegidos" description="Contenido cifrado. Ingresa la contraseña."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
@@ -103,8 +103,8 @@ export function PublicMembersOverviewPage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -160,8 +160,8 @@ export function PublicMembersOverviewPage() {
 
         {/* Needs attention */}
         {analytics.needsAttention.length > 0 && (
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-danger/20 dark:border-danger/30 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+          <div className="bg-card rounded-2xl border border-danger/20 dark:border-danger/30 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-boundary flex items-center gap-2">
               <AlertTriangle size={16} className="text-danger" />
               <h2 className="text-sm font-bold text-danger">Requiere Atención</h2>
               <span className="text-xs text-danger/70 ml-auto">{analytics.needsAttention.length} miembro{analytics.needsAttention.length > 1 ? 's' : ''}</span>
@@ -187,7 +187,7 @@ export function PublicMembersOverviewPage() {
         )}
 
         {/* Efficiency comparison chart */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+        <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
           <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-4 flex items-center gap-2">
             <BarChart3 size={16} className="text-primary" />
             Eficiencia comparativa
@@ -202,7 +202,7 @@ export function PublicMembersOverviewPage() {
               .slice(0, 8)
               .map((item) => (
                 <div key={item.member.id} className="flex items-center gap-4">
-                  <span className="text-sm text-neutral-70 dark:text-neutral-30 font-medium w-32 truncate">{item.displayName}</span>
+                  <span className="text-sm text-secondary font-medium w-32 truncate">{item.displayName}</span>
                   <div className="flex-1 h-3 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden relative">
                     <div
                       className={cn('h-full rounded-full', item._score >= 80 ? 'bg-success' : item._score >= 50 ? 'bg-warning' : 'bg-danger')}
@@ -216,7 +216,7 @@ export function PublicMembersOverviewPage() {
           </div>
         </div>
 
-        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Eficiencia = 60% completitud + 40% SP acumulados
         </div>
       </main>
@@ -230,18 +230,18 @@ function SummaryCard({ label, value, icon, color }: { label: string; value: stri
     success: 'text-success bg-success/10', warning: 'text-warning bg-warning/10', danger: 'text-danger bg-danger/10',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
       <div className={cn('p-2 rounded-lg w-fit mb-2', colors[color] ?? colors.primary)}>{icon}</div>
       <p className="text-xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </div>
   )
 }
 
 function CategoryCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 border-l-4 border-l-primary shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+    <div className="bg-card rounded-2xl border border-boundary border-l-4 border-l-primary shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-boundary flex items-center gap-2">
         {icon}
         <h3 className="text-sm font-bold text-neutral-90 dark:text-white">{title}</h3>
       </div>
@@ -274,7 +274,7 @@ function MemberRow({ rank, name, rightLabel, rightSublabel, highlight }: {
 
 function Loader() {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
     </div>
   )

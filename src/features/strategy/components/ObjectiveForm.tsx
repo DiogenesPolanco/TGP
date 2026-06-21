@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Objective, KeyResult, ObjectiveStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface ObjectiveFormProps {
   objective: Objective | null
@@ -41,8 +42,8 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
       ...formData,
       teamId: formData.teamId || null,
       businessUnitId: formData.businessUnitId || null,
-      periodStart: new Date(formData.periodStart),
-      periodEnd: new Date(formData.periodEnd),
+      periodStart: parseLocalDate(formData.periodStart),
+      periodEnd: parseLocalDate(formData.periodEnd),
       progress: Math.min(100, progress),
       metadata: objective?.metadata ?? {},
       createdAt: objective?.createdAt ?? new Date(),
@@ -83,8 +84,8 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-xl border border-boundary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-boundary">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
           </h3>
@@ -95,7 +96,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Título *</label>
             <input
               type="text"
               required
@@ -106,7 +107,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
             <RichTextEditor
               value={formData.description}
               onChange={(html) => setFormData({ ...formData, description: html })}
@@ -147,7 +148,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
               ]} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Inicio *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Inicio *</label>
               <DatePicker
                 required
                 value={formData.periodStart}
@@ -156,7 +157,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fin *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Fin *</label>
               <DatePicker
                 required
                 value={formData.periodEnd}
@@ -168,7 +169,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Key Results</label>
+              <label className="text-sm font-medium text-secondary">Key Results</label>
               <Button
                 type="button"
                 onClick={addKeyResult}
@@ -217,7 +218,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
                       kr.status === 'on_track' ? 'bg-success/10 text-success border-success/30' :
                       kr.status === 'at_risk' ? 'bg-warning/10 text-warning border-warning/30' :
                       kr.status === 'behind' ? 'bg-danger/10 text-danger border-danger/30' :
-                      'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40 border-neutral-30 dark:border-neutral-60'
+                      'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60'
                     }`}
                   >
                     <option value="not_started">No iniciado</option>
@@ -243,7 +244,7 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
             <Button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               Cancelar
             </Button>

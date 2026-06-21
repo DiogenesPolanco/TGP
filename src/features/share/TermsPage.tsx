@@ -9,8 +9,8 @@ export function TermsPage() {
   const [accepted, setAccepted] = useState(isTermsAccepted())
 
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-1 shadow-sm">
@@ -23,7 +23,8 @@ export function TermsPage() {
           </div>
           <Button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            variant="ghost"
+            className="flex items-center gap-1.5 px-3 py-2 bg-card border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <ArrowLeft size={16} />
             Volver
@@ -33,13 +34,13 @@ export function TermsPage() {
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Introducción */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 space-y-3">
-          <p className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">
+        <div className="bg-card rounded-2xl border border-boundary p-6 space-y-3">
+          <p className="text-sm text-secondary leading-relaxed">
             TGP permite generar enlaces públicos para compartir información con personas dentro y fuera de la institución.
             El uso de esta funcionalidad implica la aceptación de los términos aquí descritos. Es responsabilidad del
             usuario conocer y gestionar los riesgos asociados a la compartición de datos institucionales.
           </p>
-          <p className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">
+          <p className="text-sm text-secondary leading-relaxed">
             Estos términos aplican a todas las funcionalidades de compartir del sistema, incluyendo pero no limitado a:
             Dashboard Ejecutivo, Seguimiento Diario, Planes, Timeline Ejecutivo, Performance de Equipos,
             Miembros y Reclutamiento.
@@ -47,8 +48,8 @@ export function TermsPage() {
         </div>
 
         {/* Responsabilidad del Usuario */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 bg-danger/5">
+        <div className="bg-card rounded-2xl border border-boundary overflow-hidden">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-boundary bg-danger/5">
             <AlertTriangle size={18} className="text-danger" />
             <h2 className="text-base font-bold text-neutral-90 dark:text-white">Responsabilidad del Usuario</h2>
           </div>
@@ -98,8 +99,8 @@ export function TermsPage() {
         </div>
 
         {/* Medidas de Protección */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 bg-success/5">
+        <div className="bg-card rounded-2xl border border-boundary overflow-hidden">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-boundary bg-success/5">
             <Lock size={18} className="text-success" />
             <h2 className="text-base font-bold text-neutral-90 dark:text-white">Medidas de Protección Incorporadas</h2>
           </div>
@@ -158,8 +159,8 @@ export function TermsPage() {
         </div>
 
         {/* Buenas Prácticas */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 overflow-hidden">
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-neutral-20 dark:border-neutral-70 bg-primary/5">
+        <div className="bg-card rounded-2xl border border-boundary overflow-hidden">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-boundary bg-primary/5">
             <CheckCircle size={18} className="text-primary" />
             <h2 className="text-base font-bold text-neutral-90 dark:text-white">Buenas Prácticas</h2>
           </div>
@@ -176,7 +177,7 @@ export function TermsPage() {
                 <CheckCircle size={14} className="text-primary mt-1 shrink-0" />
                 <div>
                   <span className="text-sm font-semibold text-neutral-90 dark:text-white">{item.label}</span>
-                  <span className="text-sm text-neutral-60 dark:text-neutral-40"> — {item.desc}</span>
+                  <span className="text-sm text-muted"> — {item.desc}</span>
                 </div>
               </div>
             ))}
@@ -184,22 +185,22 @@ export function TermsPage() {
         </div>
 
         {/* Exención de Responsabilidad */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-danger/30 overflow-hidden">
+        <div className="bg-card rounded-2xl border border-danger/30 overflow-hidden">
           <div className="flex items-center gap-2 px-6 py-4 border-b border-danger/20 bg-danger/5">
             <AlertTriangle size={18} className="text-danger" />
             <h2 className="text-base font-bold text-neutral-90 dark:text-white">Exención de Responsabilidad</h2>
           </div>
           <div className="p-6 space-y-3">
-            <p className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               TGP es una herramienta de gestión y gobierno tecnológico. El usuario asume toda responsabilidad por:
             </p>
-            <ul className="list-disc pl-5 space-y-1.5 text-sm text-neutral-70 dark:text-neutral-30">
+            <ul className="list-disc pl-5 space-y-1.5 text-sm text-secondary">
               <li>La información que decide compartir mediante enlaces públicos</li>
               <li>El cumplimiento de las políticas institucionales de protección de datos</li>
               <li>Las consecuencias de compartir información sensible, clasificada o regulada</li>
               <li>La custodia y transmisión segura de las contraseñas de cifrado a los receptores</li>
             </ul>
-            <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed mt-4 italic">
+            <p className="text-sm text-muted leading-relaxed mt-4 italic">
               El equipo de TGP no será responsable por daños directos o indirectos derivados del uso indebido de la
               funcionalidad de compartir, incluyendo pero no limitado a filtración de datos, incumplimiento normativo
               o exposición de información estratégica.
@@ -208,7 +209,7 @@ export function TermsPage() {
         </div>
 
         {/* Aceptación */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6">
+        <div className="bg-card rounded-2xl border border-boundary p-6">
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"

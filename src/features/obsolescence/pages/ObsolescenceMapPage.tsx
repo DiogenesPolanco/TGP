@@ -32,7 +32,7 @@ function StatCard({ icon, value, label, iconBg, valueColor, active, onClick }: {
       className={`rounded-xl border p-3 flex items-center gap-3 transition-all text-left cursor-pointer ${
         active
           ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10'
-          : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+          : 'bg-card border-boundary hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
       }`}
     >
       <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>{icon}</div>
@@ -237,7 +237,7 @@ export function ObsolescenceMapPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Mapa de Obsolescencias</h1>
-            <p className="text-sm text-neutral-60 dark:text-neutral-40">
+            <p className="text-sm text-muted">
               Apps y microservicios coloreados por estado de soporte de sus tecnologías
             </p>
           </div>
@@ -303,8 +303,8 @@ export function ObsolescenceMapPage() {
       {/* Main content: Graph + Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Graph — 3/4 */}
-        <div className="lg:col-span-3 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="p-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
+        <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="p-3 border-b border-boundary flex items-center justify-between">
             <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Obsolescencias</h2>
             <span className="text-xs text-neutral-50">
               {filteredNodes.length} nodos · {filteredEdges.length} conexiones
@@ -334,44 +334,44 @@ export function ObsolescenceMapPage() {
         {/* Sidebar — 1/4 */}
         <div className="space-y-4">
           {/* Legend */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-xl border border-boundary p-4">
             <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Leyenda</h3>
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-[#FF5630]" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">EOL — Fin de vida</span>
+                <span className="text-xs text-secondary">EOL — Fin de vida</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-[#FF8B00]" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Soporte Extendido</span>
+                <span className="text-xs text-secondary">Soporte Extendido</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-[#8B5CF6]" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Mixto (activo + extendido)</span>
+                <span className="text-xs text-secondary">Mixto (activo + extendido)</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-[#36B37E]" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Activo — Saludable</span>
+                <span className="text-xs text-secondary">Activo — Saludable</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-[#6B778C]" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Sin datos / Desconocido</span>
+                <span className="text-xs text-secondary">Sin datos / Desconocido</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="mt-4 pt-3 border-t border-boundary">
               <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">Nodos</h4>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-5 h-5 rounded-full border-2 border-neutral-50 flex items-center justify-center" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">App</span>
+                <span className="text-xs text-secondary">App</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-4 h-4 rounded-full border-2 border-neutral-50 flex items-center justify-center" />
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Microservicio</span>
+                <span className="text-xs text-secondary">Microservicio</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="mt-4 pt-3 border-t border-boundary">
               <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">Interacción</h4>
               <p className="text-xs text-neutral-60 leading-relaxed">
                 Click en un nodo para ir al detalle de la aplicación. Las flechas punteadas indican relación app → microservicio.
@@ -380,7 +380,7 @@ export function ObsolescenceMapPage() {
           </div>
 
           {/* Filters */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-xl border border-boundary p-4">
             <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Filtros</h3>
 
             {/* Search */}
@@ -397,7 +397,7 @@ export function ObsolescenceMapPage() {
 
             {/* Status filter */}
             <div className="mb-3">
-              <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5 block">Estado de soporte</label>
+              <label className="text-xs font-medium text-muted mb-1.5 block">Estado de soporte</label>
               <div className="flex flex-wrap gap-1.5">
                 {STATUS_FILTER_OPTIONS.map((opt) => (
                   <Button
@@ -406,7 +406,7 @@ export function ObsolescenceMapPage() {
                     className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
                       statusFilter === opt.value
                         ? 'border-current bg-current/10'
-                        : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                        : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                     }`}
                     style={statusFilter === opt.value ? { borderColor: opt.color, color: opt.color } : undefined}
                   >
@@ -417,10 +417,10 @@ export function ObsolescenceMapPage() {
             </div>
 
             {/* Microservices toggle */}
-            <div className="flex items-center justify-between pt-2 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center justify-between pt-2 border-t border-boundary">
               <div className="flex items-center gap-2">
                 {showMicroservices ? <Eye size={15} className="text-primary" /> : <EyeOff size={15} className="text-neutral-50" />}
-                <span className="text-xs text-neutral-70 dark:text-neutral-30">Microservicios</span>
+                <span className="text-xs text-secondary">Microservicios</span>
               </div>
               <Button
                 onClick={() => setShowMicroservices(!showMicroservices)}
@@ -449,7 +449,7 @@ export function ObsolescenceMapPage() {
 
           {/* Summary */}
           {statusFilter !== 'all' && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+            <div className="bg-card rounded-xl border border-boundary p-4">
               <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-2">Resultados</h3>
               <p className="text-xs text-neutral-60">
                 {filteredNodes.filter((n) => n.type === 'app').length} apps · {filteredNodes.filter((n) => n.type === 'microservice').length} microservicios

@@ -6,7 +6,6 @@ import type { Team } from '@/types/domain'
 import type { MemberKPIs } from '@/services/performance/performanceService'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { KpiCard } from '@/components/data-display/KpiCard'
-import { Button } from '@/components/ui/Button'
 import {
   TrendingUp,
   TrendingDown,
@@ -71,17 +70,17 @@ export function PerformancePage() {
     <div className="max-w-full">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Button
+        <button
           onClick={() => navigate('/teams/members')}
           className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <ArrowLeft size={20} className="text-neutral-60" />
-        </Button>
+        </button>
         <div>
           <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
             Rendimiento — {team.name}
           </h1>
-          <p className="text-neutral-60 dark:text-neutral-40 text-sm">
+          <p className="text-muted text-sm">
             {team.members?.length ?? 0} miembros
           </p>
         </div>
@@ -143,8 +142,8 @@ export function PerformancePage() {
       </div>
 
       {/* Member List */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
-        <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-2xl border border-boundary">
+        <div className="px-5 py-4 border-b border-boundary">
           <h2 className="font-semibold text-neutral-90 dark:text-white">Miembros del Equipo</h2>
         </div>
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -155,7 +154,7 @@ export function PerformancePage() {
             const moodColor = !kpis ? 'neutral' : kpis.avgMood >= 7 ? 'success' : kpis.avgMood >= 4 ? 'warning' : 'danger'
 
             return (
-              <Button
+              <button
                 key={member.id}
                 onClick={() => navigate(`/teams/${teamId}/performance/${member.id}`)}
                 className="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-left"
@@ -211,7 +210,7 @@ export function PerformancePage() {
                 )}
 
                 <ChevronRight size={18} className="text-neutral-30 shrink-0" />
-              </Button>
+              </button>
             )
           }) : (
             <div className="px-5 py-8 text-center text-neutral-40">

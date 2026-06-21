@@ -57,9 +57,9 @@ export function IncidentFormPage() {
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{incident ? 'Editar Incidente' : 'Nuevo Incidente'}</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label><input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el incidente..." /></div>
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
+        <div><label className="block text-sm font-medium text-secondary mb-1">Título *</label><input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+        <div><label className="block text-sm font-medium text-secondary mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el incidente..." /></div>
         <div className="grid grid-cols-2 gap-4">
           <div><Select label="Severidad *" required value={formData.severity} onChange={(v) => setFormData({ ...formData, severity: v as Severity })} options={[
             { value: 'critical', label: 'Crítica' },
@@ -75,13 +75,13 @@ export function IncidentFormPage() {
             { value: 'closed', label: 'Cerrado' },
           ]} /></div>
         </div>
-        <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Downtime (min)</label><input type="number" value={formData.downtimeMinutes ?? ''} onChange={(e) => setFormData({ ...formData, downtimeMinutes: e.target.value ? parseInt(e.target.value) : null })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+        <div><label className="block text-sm font-medium text-secondary mb-1">Downtime (min)</label><input type="number" value={formData.downtimeMinutes ?? ''} onChange={(e) => setFormData({ ...formData, downtimeMinutes: e.target.value ? parseInt(e.target.value) : null })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
         <div><Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
           { value: '', label: 'Sin aplicación' },
           ...applications.map((app) => ({ value: app.id, label: app.name })),
         ]} /></div>
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" onClick={() => navigate('/security/incidents')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="button" onClick={() => navigate('/security/incidents')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
           <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{incident ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>

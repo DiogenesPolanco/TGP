@@ -133,7 +133,7 @@ export function SkillsSection({ memberId }: Props) {
   }, {})
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-xl border border-boundary p-4">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Habilidades</h2>
 
       <div className="relative flex flex-wrap gap-2 mb-6 p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
@@ -146,13 +146,13 @@ export function SkillsSection({ memberId }: Props) {
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder="Buscar o escribir habilidad..."
-            className="w-full pl-8 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+            className="w-full pl-8 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
             onKeyDown={(e) => e.key === 'Enter' && addSkill()}
           />
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
               {suggestions.map((name) => (
-                <Button
+                <button
                   key={name}
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -160,7 +160,7 @@ export function SkillsSection({ memberId }: Props) {
                   className="w-full text-left px-3 py-2 text-sm text-neutral-90 dark:text-white hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                 >
                   {name}
-                </Button>
+                </button>
               ))}
             </div>
           )}
@@ -170,7 +170,7 @@ export function SkillsSection({ memberId }: Props) {
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           placeholder="Categoría"
-          className="w-[140px] rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm"
+          className="w-[140px] rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
           onKeyDown={(e) => e.key === 'Enter' && addSkill()}
         />
         <Select
@@ -201,7 +201,7 @@ export function SkillsSection({ memberId }: Props) {
             <div className="flex flex-wrap gap-2">
               {catskills.map((s) =>
                 editingId === s.id ? (
-                  <div key={s.id} className="flex items-center gap-2 p-2 bg-white dark:bg-neutral-80 rounded-lg border border-neutral-30 dark:border-neutral-60 w-full max-w-md">
+                  <div key={s.id} className="flex items-center gap-2 p-2 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60 w-full max-w-md">
                     <input
                       type="text"
                       value={editData.name}
@@ -228,7 +228,7 @@ export function SkillsSection({ memberId }: Props) {
                       <option value="expert">Experto</option>
                     </select>
                     <Button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</Button>
-                    <Button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90">X</Button>
+                    <button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">X</button>
                   </div>
                 ) : (
                   <span
@@ -237,12 +237,12 @@ export function SkillsSection({ memberId }: Props) {
                   >
                     {s.name}
                     <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
-                    <Button onClick={() => startEdit(s)} className="opacity-0 group-hover/skill:opacity-100 hover:opacity-70 transition-opacity ml-0.5">
+                    <button onClick={() => startEdit(s)} className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 opacity-0 group-hover/skill:opacity-100 transition-all ml-0.5">
                       <Edit3 size={10} />
-                    </Button>
-                    <Button onClick={() => removeSkill(s.id)} className="hover:opacity-70 ml-0.5">
+                    </button>
+                    <button onClick={() => removeSkill(s.id)} className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-0.5">
                       <X size={12} />
-                    </Button>
+                    </button>
                   </span>
                 )
               )}

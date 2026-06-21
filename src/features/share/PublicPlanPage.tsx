@@ -70,12 +70,12 @@ export function PublicPlanPage() {
     })()
   }, [hash])
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Plan protegido con contraseña"
             description="Este plan fue compartido con cifrado. Ingresa la contraseña para verlo."
@@ -105,8 +105,8 @@ export function PublicPlanPage() {
   const isOverdue = endDate < today && plan.status === 'in_progress'
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-1 shadow-sm">
@@ -131,19 +131,19 @@ export function PublicPlanPage() {
         <p className="text-sm text-neutral-60">{plan.description}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-neutral-90 dark:text-white">{activities.length}</p>
             <p className="text-xs text-neutral-60">Actividades</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-success">{actPct}%</p>
             <p className="text-xs text-neutral-60">Completado</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-info">{tasks.length}</p>
             <p className="text-xs text-neutral-60">Tareas ({doneTasks} hechas)</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className={`text-2xl font-bold ${openBlockers.length > 0 ? 'text-danger' : 'text-success'}`}>{openBlockers.length}</p>
             <p className="text-xs text-neutral-60">Bloqueos</p>
           </div>
@@ -162,7 +162,7 @@ export function PublicPlanPage() {
           readOnly
         />
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>

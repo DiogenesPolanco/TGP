@@ -5,6 +5,7 @@ import { Select } from '@/components/ui/Select'
 import { db } from '@/services/db/database'
 import type { Technology, TechCategory, SupportStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 const categoryOptions: { value: TechCategory; label: string }[] = [
   { value: 'framework', label: 'Framework' },
@@ -52,7 +53,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
       version: formData.version,
       category: formData.category,
       vendor: formData.vendor,
-      eolDate: formData.eolDate ? new Date(formData.eolDate) : null,
+      eolDate: formData.eolDate ? parseLocalDate(formData.eolDate) : null,
       supportStatus: formData.supportStatus,
       cveList: formData.cveList
         ? formData.cveList.split(',').map((c) => c.trim()).filter(Boolean)
@@ -71,8 +72,8 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-xl border border-boundary shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-boundary">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {technology ? 'Editar Tecnología' : 'Nueva Tecnología'}
           </h3>
@@ -84,7 +85,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
               <input
                 type="text"
                 required
@@ -94,7 +95,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Versión *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Versión *</label>
               <input
                 type="text"
                 required
@@ -110,7 +111,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
               <Select label="Categoría *" required value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as TechCategory })} options={categoryOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Vendor *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Vendor *</label>
               <input
                 type="text"
                 required
@@ -126,7 +127,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
               <Select label="Estado de Soporte *" required value={formData.supportStatus} onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })} options={statusOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha EOL</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Fecha EOL</label>
               <DatePicker
                 value={formData.eolDate}
                 onChange={(v) => setFormData({ ...formData, eolDate: v })}
@@ -136,7 +137,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">CVE(s) conocidos</label>
+            <label className="block text-sm font-medium text-secondary mb-1">CVE(s) conocidos</label>
             <input
               type="text"
               value={formData.cveList}
@@ -149,7 +150,7 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button"
-              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
               Cancelar
             </Button>
             <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">

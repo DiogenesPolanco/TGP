@@ -85,7 +85,7 @@ export function TeamsPage() {
               }
               await doShare()
             }}
-            className="text-neutral-60 dark:text-neutral-40"
+            className="text-muted"
           >
             <Share2 size={16} />
             Compartir
@@ -101,7 +101,7 @@ export function TeamsPage() {
       </div>
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-2xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -149,7 +149,7 @@ export function TeamsPage() {
         <StatCard icon={<TrendingUp size={20} />} label="Velocidad Promedio" value={teams.length > 0 ? Math.round(teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) / teams.length) : 0} color="text-info" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -166,7 +166,7 @@ export function TeamsPage() {
             className={`px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || buFilter !== 'all'
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -178,7 +178,7 @@ export function TeamsPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Unidad de Negocio</label>
               <Select value={buFilter} onChange={(v) => setBuFilter(v)} options={[
@@ -206,14 +206,14 @@ export function TeamsPage() {
           return (
             <div key={team.id}
               onClick={() => navigate(`/teams/${team.id}`)}
-              className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <Link to={`/teams/${team.id}`} className="text-lg font-semibold text-primary hover:underline" onClick={(e) => e.stopPropagation()}>
                     {team.name}
                   </Link>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40">{bu?.name} • {team.members.length} miembros</p>
+                  <p className="text-sm text-muted">{bu?.name} • {team.members.length} miembros</p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${dora.color}`}>
                   {dora.label}
@@ -229,7 +229,7 @@ export function TeamsPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+              <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-boundary">
                 <Button
                   onClick={(e) => { e.stopPropagation(); navigate(`${team.id}/edit`) }}
                   variant="ghost" size="sm" className="p-1.5"
@@ -260,7 +260,7 @@ export function TeamsPage() {
       />
 
       {filteredTeams.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
+        <div className="text-center py-12 bg-card rounded-2xl border border-boundary">
           <p className="text-neutral-50 dark:text-neutral-50">No se encontraron equipos</p>
         </div>
       )}
@@ -279,11 +279,11 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
   return (
     <Comp
       onClick={onClick}
-      className={`bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
+      className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Comp>
   )
 }
@@ -291,7 +291,7 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
 function MetricItem({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="bg-neutral-10 dark:bg-neutral-70 rounded-lg p-2">
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
       <p className="text-sm font-semibold text-neutral-90 dark:text-white">{value}</p>
     </div>
   )

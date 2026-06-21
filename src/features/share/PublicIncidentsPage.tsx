@@ -34,13 +34,13 @@ export function PublicIncidentsPage() {
         </span>
       ),
     },
-    { key: 'responseTime', label: 'Tiempo Respuesta', sortable: true, className: 'text-right', render: (v) => <span className="text-neutral-60 dark:text-neutral-40">{v.responseTime ? `${v.responseTime}h` : '—'}</span> },
-    { key: 'resolutionTime', label: 'Tiempo Resolución', sortable: true, className: 'text-right', render: (v) => <span className="text-neutral-60 dark:text-neutral-40">{v.resolutionTime ? `${v.resolutionTime}h` : '—'}</span> },
+    { key: 'responseTime', label: 'Tiempo Respuesta', sortable: true, className: 'text-right', render: (v) => <span className="text-muted">{v.responseTime ? `${v.responseTime}h` : '—'}</span> },
+    { key: 'resolutionTime', label: 'Tiempo Resolución', sortable: true, className: 'text-right', render: (v) => <span className="text-muted">{v.resolutionTime ? `${v.resolutionTime}h` : '—'}</span> },
     {
       key: 'applicationId',
       label: 'Aplicación',
       sortable: true,
-      render: (v) => <span className="text-neutral-70 dark:text-neutral-30">{appMap.get(v.applicationId) ?? '—'}</span>,
+      render: (v) => <span className="text-secondary">{appMap.get(v.applicationId) ?? '—'}</span>,
     },
     {
       key: 'status',
@@ -53,12 +53,12 @@ export function PublicIncidentsPage() {
     },
   ]
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Incidentes protegidos"
             description="Esta vista fue compartida con cifrado. Ingresa la contraseña para verla."
@@ -74,8 +74,8 @@ export function PublicIncidentsPage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -90,8 +90,8 @@ export function PublicIncidentsPage() {
       </header>
 
       <main className="px-6 py-8 max-w-screen-2xl mx-auto">
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-boundary flex items-center gap-2">
             <AlertTriangle size={18} className="text-warning" />
             <span className="font-semibold text-neutral-90 dark:text-white">{data.incidents.length} incidentes compartidos</span>
           </div>
@@ -102,7 +102,7 @@ export function PublicIncidentsPage() {
           />
         </div>
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70 mt-6">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary mt-6">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>

@@ -134,16 +134,16 @@ export function TeamFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/teams')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
+        <Button onClick={() => navigate('/teams')} variant="ghost" className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{team ? 'Editar Equipo' : 'Nuevo Equipo'}</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-5">
           {/* Left column */}
           <div className="space-y-5">
-            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-            <div><label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el equipo..." /></div>
+            <div><label className="block text-sm font-medium text-secondary mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+            <div><label className="block text-sm font-medium text-secondary mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el equipo..." /></div>
             <div className="grid grid-cols-2 gap-4">
               <div><Select label="Clasificación DORA" value={formData.doraClassification} onChange={(v) => setFormData({ ...formData, doraClassification: v as DoraLevel })} options={[
                 { value: 'elite', label: 'Elite' },
@@ -161,7 +161,7 @@ export function TeamFormPage() {
           {/* Right column */}
           <div className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30 block mb-2">Métricas DORA</label>
+              <label className="text-sm font-medium text-secondary block mb-2">Métricas DORA</label>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as Record<string, number>)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span></div></div>))}
               </div>
@@ -170,15 +170,15 @@ export function TeamFormPage() {
         </div>
 
         {/* Members — full width below columns */}
-        <div className="mt-6 pt-6 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="mt-6 pt-6 border-t border-boundary">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Miembros</label>
+            <label className="text-sm font-medium text-secondary">Miembros</label>
             <Button type="button" onClick={addMember} className="flex items-center gap-1 text-sm text-primary hover:underline"><Plus size={14} /> Agregar</Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-20 dark:border-neutral-70">
+                <tr className="border-b border-boundary">
                   <th className="text-left px-3 py-2 font-medium text-neutral-50 w-8"></th>
                   <th className="text-left px-3 py-2 font-medium text-neutral-50">Nombre</th>
                   <th className="text-left px-3 py-2 font-medium text-neutral-50">Rol</th>
@@ -208,7 +208,7 @@ export function TeamFormPage() {
         </div>
 
         <div className="flex justify-end gap-3 mt-6 pt-4">
-          <Button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
           <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{team ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>

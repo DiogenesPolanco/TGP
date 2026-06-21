@@ -114,8 +114,8 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-xl border border-boundary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-boundary">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {team ? 'Editar Equipo' : 'Nuevo Equipo'}
           </h3>
@@ -127,7 +127,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Nombre *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
               <input
                 type="text"
                 required
@@ -156,7 +156,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Miembros</label>
+              <label className="text-sm font-medium text-secondary">Miembros</label>
               <Button
                 type="button"
                 onClick={addMember}
@@ -203,10 +203,10 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-2 block">Métricas DORA</label>
+            <label className="text-sm font-medium text-secondary mb-2 block">Métricas DORA</label>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">Velocity</label>
+                <label className="block text-xs text-muted mb-1">Velocity</label>
                 <input
                   type="number"
                   value={formData.metrics.velocity}
@@ -215,7 +215,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">Lead Time (h)</label>
+                <label className="block text-xs text-muted mb-1">Lead Time (h)</label>
                 <input
                   type="number"
                   value={formData.metrics.leadTimeHours}
@@ -224,7 +224,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">Cycle Time (h)</label>
+                <label className="block text-xs text-muted mb-1">Cycle Time (h)</label>
                 <input
                   type="number"
                   value={formData.metrics.cycleTimeHours}
@@ -233,7 +233,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">Throughput</label>
+                <label className="block text-xs text-muted mb-1">Throughput</label>
                 <input
                   type="number"
                   value={formData.metrics.throughput}
@@ -242,7 +242,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">Deploy Freq</label>
+                <label className="block text-xs text-muted mb-1">Deploy Freq</label>
                 <input
                   type="number"
                   step="0.1"
@@ -252,7 +252,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">CFR (%)</label>
+                <label className="block text-xs text-muted mb-1">CFR (%)</label>
                 <input
                   type="number"
                   step="0.1"
@@ -262,7 +262,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-neutral-60 dark:text-neutral-40 mb-1">MTTR (h)</label>
+                <label className="block text-xs text-muted mb-1">MTTR (h)</label>
                 <input
                   type="number"
                   step="0.1"
@@ -278,7 +278,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
             <Button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               Cancelar
             </Button>

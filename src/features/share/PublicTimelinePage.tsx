@@ -125,12 +125,12 @@ export function PublicTimelinePage() {
     })()
   }, [hash])
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Timeline protegido"
             description="Este timeline fue compartido con cifrado. Ingresa la contraseña para verlo."
@@ -147,9 +147,9 @@ export function PublicTimelinePage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div id="printable-content" className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -169,22 +169,22 @@ export function PublicTimelinePage() {
       <main className="px-6 py-8 space-y-6">
         {/* Stats summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <Target size={16} className="text-primary mb-1" />
             <p className="text-2xl font-bold text-primary">{stats.total}</p>
             <p className="text-xs text-neutral-60">Total Planes</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <Clock size={16} className="text-success mb-1" />
             <p className="text-2xl font-bold text-success">{stats.active}</p>
             <p className="text-xs text-neutral-60">Activos</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <AlertTriangle size={16} className="text-warning mb-1" />
             <p className="text-2xl font-bold text-warning">{stats.atRisk}</p>
             <p className="text-xs text-neutral-60">En Riesgo</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <XCircle size={16} className="text-danger mb-1" />
             <p className="text-2xl font-bold text-danger">{stats.overdue}</p>
             <p className="text-xs text-neutral-60">Vencidos</p>
@@ -192,8 +192,8 @@ export function PublicTimelinePage() {
         </div>
 
         {/* Main content: Gantt full width (no alerts sidebar) */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
               <div className="flex items-center gap-2">
                 <Calendar size={15} className="text-primary" />
                 <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Línea de Tiempo</h3>
@@ -206,8 +206,8 @@ export function PublicTimelinePage() {
             <div className="overflow-x-auto">
               <div style={{ minWidth: `${totalWidth + 200}px` }}>
                 {/* Week headers */}
-                <div className="flex border-b border-neutral-20 dark:border-neutral-70 sticky top-0 bg-white dark:bg-neutral-80 z-10">
-                  <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-neutral-20 dark:border-neutral-70">
+                <div className="flex border-b border-boundary sticky top-0 bg-card z-10">
+                  <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-boundary">
                     Plan
                   </div>
                   <div className="flex">
@@ -218,7 +218,7 @@ export function PublicTimelinePage() {
                       return (
                         <div
                           key={i}
-                          className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-neutral-20 dark:border-neutral-70 ${
+                          className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-boundary ${
                             isCurrent ? 'bg-primary/[0.04] text-primary' : 'text-neutral-50'
                           }`}
                           style={{ width: `${weekWidth}px` }}
@@ -257,9 +257,9 @@ export function PublicTimelinePage() {
                     return (
                       <div
                         key={plan.id}
-                        className="flex items-center border-b border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors"
+                        className="flex items-center border-b border-boundary hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors"
                       >
-                        <div className="w-48 shrink-0 px-4 py-3 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+                        <div className="w-48 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full shrink-0 ${health.dot}`} />
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{plan.title}</p>
@@ -327,7 +327,7 @@ export function PublicTimelinePage() {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 px-5 py-3 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary">
               <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
               <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" /> Saludable</span>
               <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En Riesgo</span>
@@ -336,7 +336,7 @@ export function PublicTimelinePage() {
             </div>
         </div>
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>

@@ -79,17 +79,18 @@ export function IncidentDetailPage() {
       }
     >
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-neutral-20 dark:border-neutral-70 -mx-6 px-6 mb-6">
+      <div className="flex gap-1 border-b border-boundary -mx-6 px-6 mb-6">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
             <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              variant="ghost"
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                  : 'border-transparent text-muted hover:text-neutral-90 dark:hover:text-white'
               }`}
             >
               <Icon size={16} />
@@ -111,7 +112,7 @@ export function IncidentDetailPage() {
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-neutral-50 dark:text-neutral-40">Severidad</p>
                   <p className="text-xl font-bold text-neutral-90 dark:text-white">{severityLabel[incident.severity] ?? incident.severity}</p>
-                  <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-0.5">
+                  <p className="text-sm text-muted mt-0.5">
                     {incidentStatusLabel[incident.status] ?? incident.status}
                     {incident.downtimeMinutes ? ` · Downtime: ${incident.downtimeMinutes} min` : ''}
                   </p>
@@ -171,19 +172,19 @@ export function IncidentDetailPage() {
 
           <Section title="Timeline" icon={<Calendar size={18} />}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-neutral-20 dark:border-neutral-70 p-3">
+              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-3">
                 <p className="text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Detectado</p>
                 <p className="text-sm font-semibold text-neutral-90 dark:text-white">
                   {new Date(incident.detectedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
-              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-neutral-20 dark:border-neutral-70 p-3">
+              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-3">
                 <p className="text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Respondido</p>
                 <p className="text-sm font-semibold text-neutral-90 dark:text-white">
                   {incident.respondedAt ? new Date(incident.respondedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
                 </p>
               </div>
-              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-neutral-20 dark:border-neutral-70 p-3">
+              <div className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-3">
                 <p className="text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Resuelto</p>
                 <p className="text-sm font-semibold text-neutral-90 dark:text-white">
                   {incident.resolvedAt ? new Date(incident.resolvedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
@@ -194,7 +195,7 @@ export function IncidentDetailPage() {
 
           {incident.description && (
             <Section title="Descripción" icon={<Activity size={18} />}>
-              <p className="text-sm text-neutral-70 dark:text-neutral-30 leading-relaxed">{incident.description}</p>
+              <p className="text-sm text-secondary leading-relaxed">{incident.description}</p>
             </Section>
           )}
         </div>
@@ -209,7 +210,7 @@ export function IncidentDetailPage() {
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm space-y-3">
+    <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
         {icon && <span className="text-neutral-50">{icon}</span>}
         {title}

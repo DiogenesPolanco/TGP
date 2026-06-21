@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { Technology } from '@/types/domain'
 import { X, Search, Server } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 
 interface Props {
   memberId: string
@@ -53,7 +52,7 @@ export function MicroservicesSection({ memberId }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-xl border border-boundary p-4">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Microservicios</h2>
 
       <div className="space-y-2 mb-4">
@@ -73,17 +72,17 @@ export function MicroservicesSection({ memberId }: Props) {
                       <span className="text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger shrink-0">{eolCount} EOL</span>
                     )}
                   </div>
-                  <p className="text-xs text-neutral-60 dark:text-neutral-40 truncate">{ms.description || '—'}</p>
+                  <p className="text-xs text-muted truncate">{ms.description || '—'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-neutral-50">{techs.length} tecnologías</span>
-                <Button
+                <button
                   onClick={() => toggleMicroservice(ms.id)}
                   className="p-1 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <X size={14} />
-                </Button>
+                </button>
               </div>
             </div>
           )
@@ -109,7 +108,7 @@ export function MicroservicesSection({ memberId }: Props) {
         </div>
 
         {showDropdown && (
-          <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
             {availableMS.length === 0 ? (
               <p className="px-4 py-3 text-sm text-neutral-50">
                 {search ? 'Sin resultados' : 'Todos los microservicios ya están asignados'}
@@ -118,11 +117,11 @@ export function MicroservicesSection({ memberId }: Props) {
               availableMS.map((ms) => {
                 const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
                 return (
-                  <Button
+                  <button
                     key={ms.id}
                     type="button"
                     onClick={() => toggleMicroservice(ms.id)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-left"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <Server size={14} className="text-primary shrink-0" />
@@ -132,7 +131,7 @@ export function MicroservicesSection({ memberId }: Props) {
                     {ms.description && (
                       <span className="text-xs text-neutral-50 truncate ml-2 max-w-[200px]">{ms.description}</span>
                     )}
-                  </Button>
+                  </button>
                 )
               })
             )}

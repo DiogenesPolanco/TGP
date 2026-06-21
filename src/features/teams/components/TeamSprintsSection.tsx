@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import { isJiraConfigured } from '@/services/jira/jiraConfigService'
 import { getBoards, getSprints, getSprintIssues, calcSprintMetrics, syncJiraSprints } from '@/services/jira/jiraService'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface Props {
   teamId: string
@@ -228,8 +229,8 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
       sprintName: form.sprintName.trim(),
       quarter: form.quarter,
       year: form.year,
-      startDate: new Date(form.startDate),
-      endDate: new Date(form.endDate),
+      startDate: parseLocalDate(form.startDate),
+      endDate: parseLocalDate(form.endDate),
       plannedSP: form.plannedSP,
       completedSP: form.completedSP,
       notCompletedSP: form.notCompletedSP,
@@ -268,8 +269,8 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
       sprintName: form.sprintName.trim(),
       quarter: form.quarter,
       year: form.year,
-      startDate: new Date(form.startDate),
-      endDate: new Date(form.endDate),
+      startDate: parseLocalDate(form.startDate),
+      endDate: parseLocalDate(form.endDate),
       plannedSP: form.plannedSP,
       completedSP: form.completedSP,
       notCompletedSP: form.notCompletedSP,
@@ -309,7 +310,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
     }, {})
   }, [sprints])
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
+  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   if (loading) {
     return (
@@ -320,7 +321,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-xl border border-boundary p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints del Equipo</h2>
         <div className="flex items-center gap-2">
@@ -347,7 +348,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
       {/* Form */}
       {(showForm || editingId !== null) && (
-        <div className="mb-6 p-4 border border-neutral-20 dark:border-neutral-70 rounded-lg bg-neutral-10 dark:bg-neutral-70">
+        <div className="mb-6 p-4 border border-boundary rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-4 mb-3">
             <div className="sm:col-span-2">
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Nombre del Sprint</label>
@@ -496,7 +497,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                   </span>
                 </div>
                 <div className="hidden sm:flex items-center gap-4 text-[11px] text-neutral-50">
-                  <span><strong className="text-neutral-70 dark:text-neutral-30">{qPlanned}</strong> SP plan.</span>
+                  <span><strong className="text-secondary">{qPlanned}</strong> SP plan.</span>
                   <span className="text-success"><strong>{qDone}</strong> complet.</span>
                   <span className="text-danger"><strong>{qNotDone}</strong> no compl.</span>
                   <span className={qEff >= 80 ? 'text-success' : qEff >= 50 ? 'text-warning' : 'text-danger'}>
@@ -531,7 +532,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                   return (
                     <div
                       key={s.id}
-                      className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm hover:shadow-md transition-all duration-200 group/sprint"
+                      className="bg-card rounded-xl border border-boundary p-4 shadow-sm hover:shadow-md transition-all duration-200 group/sprint"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="min-w-0 flex-1">

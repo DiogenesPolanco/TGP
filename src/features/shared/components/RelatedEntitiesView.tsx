@@ -44,7 +44,7 @@ export function RelatedEntitiesView({ data, entityLabel }: Props) {
   return (
     <div className="space-y-6">
       {/* Hero section */}
-      <div className="bg-gradient-to-br from-neutral-5 to-neutral-10 dark:from-neutral-85 dark:to-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-5">
+      <div className="bg-gradient-to-br from-neutral-5 to-neutral-10 dark:from-neutral-85 dark:to-neutral-80 rounded-xl border border-boundary p-5">
         <div className="flex items-start justify-between mb-5">
           <div>
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
@@ -161,7 +161,7 @@ function StatBadge({ icon, value, label, color }: { icon: ReactNode; value: numb
     purple: 'text-purple-500 bg-purple-500/10',
   }
   return (
-    <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-85`}>
+    <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border border-boundary bg-white dark:bg-neutral-85`}>
       <div className={`p-1.5 rounded-md ${colorMap[color] || colorMap.neutral}`}>{icon}</div>
       <div>
         <p className="text-lg font-bold text-neutral-90 dark:text-white tabular-nums leading-none">{value}</p>
@@ -179,7 +179,7 @@ function EntitySection({ title, count, icon, color, empty, children }: {
     info: { bg: 'bg-info/5 border-info/20', text: 'text-info' },
     danger: { bg: 'bg-danger/5 border-danger/20', text: 'text-danger' },
     warning: { bg: 'bg-warning/5 border-warning/20', text: 'text-warning' },
-    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-neutral-20 dark:border-neutral-70', text: 'text-neutral-60' },
+    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-boundary', text: 'text-neutral-60' },
   }
   const style = colorMap[color] || colorMap.neutral
   return (
@@ -205,7 +205,7 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
 }) {
   return (
     <Button variant="ghost" size="md" onClick={onClick}
-      className="w-full justify-between px-3.5 py-2.5 rounded-lg border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group text-left">
+      className="w-full justify-between px-3.5 py-2.5 rounded-lg border border-boundary bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group text-left">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-neutral-90 dark:text-white group-hover:text-primary transition-colors truncate">{name}</span>
@@ -229,14 +229,14 @@ function SimpleCard({ title, subtitle, onClick }: { title: string; subtitle: str
   if (onClick) {
     return (
       <Button variant="ghost" size="md" onClick={onClick}
-        className="w-full justify-between px-3.5 py-2 rounded-lg border border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group">
+        className="w-full justify-between px-3.5 py-2 rounded-lg border border-boundary bg-white dark:bg-neutral-85 hover:border-primary/30 hover:shadow-sm group">
         {content}
       </Button>
     )
   }
 
   return (
-    <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-neutral-20 dark:border-neutral-70">
+    <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-white dark:bg-neutral-85 border border-boundary">
       {content}
     </div>
   )

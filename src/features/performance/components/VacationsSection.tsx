@@ -5,6 +5,7 @@ import type { VacationRecord } from '@/types/domain'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Plus, Trash2, Save, X, Umbrella, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface Props {
   memberId: string
@@ -67,8 +68,8 @@ export function VacationsSection({ memberId }: Props) {
   }
 
   const handleAdd = async () => {
-    const start = new Date(form.startDate)
-    const end = new Date(form.endDate)
+    const start = parseLocalDate(form.startDate)
+    const end = parseLocalDate(form.endDate)
     const days = calcBusinessDays(start, end)
     if (days === 0) return
     const record: VacationRecord = {
@@ -87,8 +88,8 @@ export function VacationsSection({ memberId }: Props) {
   }
 
   const handleUpdate = async (id: string) => {
-    const start = new Date(editForm.startDate)
-    const end = new Date(editForm.endDate)
+    const start = parseLocalDate(editForm.startDate)
+    const end = parseLocalDate(editForm.endDate)
     const days = calcBusinessDays(start, end)
     if (days === 0) return
     await db.vacationRecords.update(id, {
@@ -118,7 +119,7 @@ export function VacationsSection({ memberId }: Props) {
   return (
     <div className="space-y-4">
       {/* Summary card */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center">
@@ -139,37 +140,37 @@ export function VacationsSection({ memberId }: Props) {
       </div>
 
       {/* Records list */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="bg-card rounded-xl border border-boundary shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-boundary">
           <h3 className="text-sm font-medium text-neutral-90 dark:text-white">Registro de Vacaciones</h3>
-          <Button
+          <button
             type="button"
             onClick={() => setAdding(true)}
             className="flex items-center gap-1 text-sm text-primary hover:underline"
           >
             <Plus size={14} /> Agregar
-          </Button>
+          </button>
         </div>
 
         {adding && (
-          <div className="p-4 border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70 space-y-3">
+          <div className="p-4 border-b border-boundary bg-neutral-10 dark:bg-neutral-70 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-neutral-50 mb-1">Inicio</label>
-                <DatePicker value={form.startDate} onChange={(v) => setForm({ ...form, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                <DatePicker value={form.startDate} onChange={(v) => setForm({ ...form, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-neutral-50 mb-1">Fin</label>
-                <DatePicker value={form.endDate} onChange={(v) => setForm({ ...form, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                <DatePicker value={form.endDate} onChange={(v) => setForm({ ...form, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" />
               </div>
             </div>
             <div>
               <label className="block text-xs text-neutral-50 mb-1">Motivo</label>
-              <input type="text" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" placeholder="Vacaciones anuales, permiso personal, etc." />
+              <input type="text" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" placeholder="Vacaciones anuales, permiso personal, etc." />
             </div>
             {form.startDate && form.endDate && (
               <p className="text-xs text-neutral-50">
-                Días hábiles: <span className="font-semibold text-neutral-90 dark:text-white">{calcBusinessDays(new Date(form.startDate), new Date(form.endDate))}</span>
+                Días hábiles: <span className="font-semibold text-neutral-90 dark:text-white">{calcBusinessDays(parseLocalDate(form.startDate), parseLocalDate(form.endDate))}</span>
               </p>
             )}
             <div className="flex gap-2">
@@ -194,17 +195,17 @@ export function VacationsSection({ memberId }: Props) {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs text-neutral-50 mb-1">Inicio</label>
-                      <DatePicker value={editForm.startDate} onChange={(v) => setEditForm({ ...editForm, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                      <DatePicker value={editForm.startDate} onChange={(v) => setEditForm({ ...editForm, startDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs text-neutral-50 mb-1">Fin</label>
-                      <DatePicker value={editForm.endDate} onChange={(v) => setEditForm({ ...editForm, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                      <DatePicker value={editForm.endDate} onChange={(v) => setEditForm({ ...editForm, endDate: v })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" />
                     </div>
                   </div>
-                  <input type="text" value={editForm.reason} onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 px-3 py-1.5 text-sm" />
+                  <input type="text" value={editForm.reason} onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })} className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-1.5 text-sm" />
                   {editForm.startDate && editForm.endDate && (
                     <p className="text-xs text-neutral-50">
-                      Días hábiles: <span className="font-semibold">{calcBusinessDays(new Date(editForm.startDate), new Date(editForm.endDate))}</span>
+                      Días hábiles: <span className="font-semibold">{calcBusinessDays(parseLocalDate(editForm.startDate), parseLocalDate(editForm.endDate))}</span>
                     </p>
                   )}
                   <div className="flex gap-2">
@@ -227,12 +228,12 @@ export function VacationsSection({ memberId }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button type="button" onClick={() => startEdit(record)} className="p-1.5 rounded-md text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
+                    <button type="button" onClick={() => startEdit(record)} className="p-1.5 rounded-md text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
                       <Save size={14} />
-                    </Button>
-                    <Button type="button" onClick={() => handleDelete(record.id)} className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar">
+                    </button>
+                    <button type="button" onClick={() => handleDelete(record.id)} className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar">
                       <Trash2 size={14} />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               )}

@@ -159,7 +159,7 @@ export function PublicDashboardPage() {
     // Show passphrase modal if encrypted data is pending
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Datos protegidos con contraseña"
             description="Este dashboard fue compartido con cifrado de extremo a extremo. Ingresa la contraseña que el creador te proporcionó."
@@ -180,9 +180,9 @@ export function PublicDashboardPage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div id="printable-content" className="min-h-screen bg-canvas">
       {/* ── Header ── */}
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -207,9 +207,9 @@ export function PublicDashboardPage() {
         {/* ── Row 1: THI Score + Executive Summary ── */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* THI Gauge */}
-          <div className="lg:col-span-2 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="lg:col-span-2 bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">Health Index</h2>
+              <h2 className="text-sm font-semibold text-muted uppercase tracking-wider">Health Index</h2>
               <div className={cn(
                 'flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full',
                 kpis.thiTrend > 0 ? 'bg-success/10 text-success' : kpis.thiTrend < 0 ? 'bg-danger/10 text-danger' : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
@@ -224,8 +224,8 @@ export function PublicDashboardPage() {
           </div>
 
           {/* Executive Summary */}
-          <div className="lg:col-span-3 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider mb-4">Resumen Ejecutivo</h2>
+          <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary p-6 shadow-sm">
+            <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Resumen Ejecutivo</h2>
 
             {/* Top-line metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
@@ -323,7 +323,7 @@ export function PublicDashboardPage() {
 
         {/* ── Row 3: Technology & Risk Details ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Tecnologías en uso por estado</h3>
             <div className="space-y-3">
               {(() => {
@@ -352,7 +352,7 @@ export function PublicDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Distribución de riesgos</h3>
             <div className="space-y-3">
               {([
@@ -379,7 +379,7 @@ export function PublicDashboardPage() {
         </div>
 
         {/* ── Footer ── */}
-        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos en tu navegador · Sin conexión externa
         </div>
       </main>
@@ -389,7 +389,7 @@ export function PublicDashboardPage() {
 
 function Loader() {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
     </div>
   )
@@ -413,7 +413,7 @@ function MiniMetric({ label, value, subtitle, icon, color }: {
         <div className={cn('p-1.5 rounded-lg', s)}>{icon}</div>
       </div>
       <p className="text-lg font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 font-medium">{label}</p>
+      <p className="text-xs text-muted font-medium">{label}</p>
       <p className="text-[11px] text-neutral-50 mt-0.5">{subtitle}</p>
     </div>
   )
@@ -426,7 +426,7 @@ function StatCard({ title, value, subtitle, icon, color }: {
     danger: 'bg-danger', warning: 'bg-warning', success: 'bg-success', info: 'bg-info', primary: 'bg-primary',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
       <div className="flex items-start justify-between mb-3">
         <div className={cn('p-2 rounded-lg', {
           'bg-danger/10 text-danger': color === 'danger',
@@ -439,7 +439,7 @@ function StatCard({ title, value, subtitle, icon, color }: {
         </div>
       </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 font-medium mt-0.5">{title}</p>
+      <p className="text-xs text-muted font-medium mt-0.5">{title}</p>
       <p className="text-xs text-neutral-50 mt-1">{subtitle}</p>
       <div className={cn('mt-3 h-0.5 rounded w-full', dots[color])} style={{ opacity: 0.3 }} />
     </div>

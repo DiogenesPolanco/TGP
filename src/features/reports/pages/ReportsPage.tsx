@@ -102,10 +102,10 @@ export default function ReportsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-boundary">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" />
-          <h1 className="text-lg font-semibold text-neutral-90 dark:text-neutral-10">Reportes</h1>
+          <h1 className="text-lg font-semibold text-default">Reportes</h1>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -135,11 +135,12 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      <div className="flex overflow-x-auto border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-85 px-2">
+      <div className="flex overflow-x-auto border-b border-boundary bg-neutral-10 dark:bg-neutral-85 px-2">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
+            variant="ghost"
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-primary text-primary'
@@ -178,15 +179,15 @@ export default function ReportsPage() {
             )}
 
             {data.sections.map((section, si) => (
-              <div key={si} className="bg-white dark:bg-neutral-80 rounded-lg border border-neutral-20 dark:border-neutral-70">
-                  <div className="px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+              <div key={si} className="bg-card rounded-lg border border-boundary">
+                  <div className="px-5 py-3 border-b border-boundary">
                     <h3 className="text-sm font-semibold text-neutral-80 dark:text-white">{section.title}</h3>
                   <p className="text-xs text-neutral-50 dark:text-neutral-40 mt-0.5">{section.rows.length} registros</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-85">
+                      <tr className="border-b border-boundary bg-neutral-10 dark:bg-neutral-85">
                         {section.columns.map((col, ci) => (
                           <th
                             key={ci}

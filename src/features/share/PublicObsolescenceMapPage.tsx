@@ -163,12 +163,12 @@ export function PublicObsolescenceMapPage() {
     return { totalApps, totalMs, appsWithEol, appsWithExtended, appsWithMixed, appsActive, appsUnknown }
   }, [apps, microservices, allNodes])
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Mapa de obsolescencias protegido"
             description="Esta vista fue compartida con cifrado. Ingresa la contraseña para verla."
@@ -184,8 +184,8 @@ export function PublicObsolescenceMapPage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -210,8 +210,8 @@ export function PublicObsolescenceMapPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-            <div className="p-3 border-b border-neutral-20 dark:border-neutral-70 flex items-center justify-between">
+          <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+            <div className="p-3 border-b border-boundary flex items-center justify-between">
               <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Obsolescencias</h2>
               <span className="text-xs text-neutral-50">
                 {filteredNodes.length} nodos · {filteredEdges.length} conexiones
@@ -237,33 +237,33 @@ export function PublicObsolescenceMapPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+            <div className="bg-card rounded-2xl border border-boundary p-4">
               <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Leyenda</h3>
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#FF5630]" />
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">EOL — Fin de vida</span>
+                  <span className="text-xs text-secondary">EOL — Fin de vida</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#FF8B00]" />
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">Soporte Extendido</span>
+                  <span className="text-xs text-secondary">Soporte Extendido</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#8B5CF6]" />
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">Mixto</span>
+                  <span className="text-xs text-secondary">Mixto</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#36B37E]" />
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">Activo</span>
+                  <span className="text-xs text-secondary">Activo</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#6B778C]" />
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">Sin datos</span>
+                  <span className="text-xs text-secondary">Sin datos</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+            <div className="bg-card rounded-2xl border border-boundary p-4">
               <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Filtros</h3>
               <div className="relative mb-3">
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -276,7 +276,7 @@ export function PublicObsolescenceMapPage() {
                 />
               </div>
               <div className="mb-3">
-                <label className="text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1.5 block">Estado de soporte</label>
+                <label className="text-xs font-medium text-muted mb-1.5 block">Estado de soporte</label>
                 <div className="flex flex-wrap gap-1.5">
                   {STATUS_FILTER_OPTIONS.map((opt) => (
                     <Button
@@ -285,7 +285,7 @@ export function PublicObsolescenceMapPage() {
                       className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
                         statusFilter === opt.value
                           ? 'border-current bg-current/10'
-                          : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                          : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                       }`}
                       style={statusFilter === opt.value ? { borderColor: opt.color, color: opt.color } : undefined}
                     >
@@ -294,10 +294,10 @@ export function PublicObsolescenceMapPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-neutral-20 dark:border-neutral-70">
+              <div className="flex items-center justify-between pt-2 border-t border-boundary">
                 <div className="flex items-center gap-2">
                   {showMicroservices ? <Eye size={15} className="text-primary" /> : <EyeOff size={15} className="text-neutral-50" />}
-                  <span className="text-xs text-neutral-70 dark:text-neutral-30">Microservicios</span>
+                  <span className="text-xs text-secondary">Microservicios</span>
                 </div>
                 <Button
                   onClick={() => setShowMicroservices(!showMicroservices)}
@@ -318,7 +318,7 @@ export function PublicObsolescenceMapPage() {
           </div>
         </div>
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>
@@ -328,7 +328,7 @@ export function PublicObsolescenceMapPage() {
 
 function StatCard({ icon, value, label, active }: { icon: React.ReactNode; value: number; label: string; active?: boolean }) {
   return (
-    <div className={`bg-white dark:bg-neutral-80 rounded-2xl border p-3 flex items-center gap-3 ${active ? 'border-neutral-30 dark:border-neutral-60' : 'border-neutral-20 dark:border-neutral-70 opacity-80'}`}>
+    <div className={`bg-card rounded-2xl border p-3 flex items-center gap-3 ${active ? 'border-neutral-30 dark:border-neutral-60' : 'border-boundary opacity-80'}`}>
       <div className="text-primary shrink-0">{icon}</div>
       <div>
         <p className="text-lg font-bold text-neutral-90 dark:text-white">{value}</p>

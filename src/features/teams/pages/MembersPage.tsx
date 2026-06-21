@@ -159,7 +159,7 @@ export function MembersPage() {
             }
             await doShare()
           }}
-          className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <Share2 size={16} />
           Compartir
@@ -167,7 +167,7 @@ export function MembersPage() {
       </div>
 
       {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -257,7 +257,7 @@ export function MembersPage() {
         />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -274,7 +274,7 @@ export function MembersPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || filterTeam || filterStatus
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -286,7 +286,7 @@ export function MembersPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div>
               <label className="text-xs text-neutral-60 mr-2">Equipo</label>
               <Select value={filterTeam} onChange={(v) => setFilterTeam(v)} options={[
@@ -314,7 +314,7 @@ export function MembersPage() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary shadow-sm">
         {paginatedItems.length === 0 ? (
           <div className="text-center py-12">
             <Users size={40} className="mx-auto text-neutral-30 mb-3" />
@@ -324,7 +324,7 @@ export function MembersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-20 dark:border-neutral-70">
+                <tr className="border-b border-boundary">
                   <th className="text-left px-4 py-3 font-medium text-neutral-50 w-10"></th>
                   <SortTh label="Nombre" sortKey="name" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
                   <SortTh label="Rol" sortKey="role" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
@@ -360,8 +360,8 @@ export function MembersPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 font-medium text-neutral-90 dark:text-white">{member.displayName}</td>
-                      <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</td>
-                      <td className="px-4 py-3 text-neutral-70 dark:text-neutral-30">{team.name}</td>
+                      <td className="px-4 py-3 text-secondary">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</td>
+                      <td className="px-4 py-3 text-secondary">{team.name}</td>
                       <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[member.status]}`}>{MEMBER_STATUS_LABELS[member.status]}</span></td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">

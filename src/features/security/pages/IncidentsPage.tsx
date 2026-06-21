@@ -81,7 +81,7 @@ export function IncidentsPage() {
       label: 'App',
       render: (incident) => {
         const app = applications.find((a) => a.id === incident.applicationId)
-        return <span className="text-sm text-neutral-70 dark:text-neutral-30">{app?.name || '-'}</span>
+        return <span className="text-sm text-secondary">{app?.name || '-'}</span>
       },
     },
     {
@@ -117,7 +117,7 @@ export function IncidentsPage() {
       label: 'Detectado',
       sortable: true,
       render: (incident) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {new Date(incident.detectedAt).toLocaleDateString('es-ES')}
         </span>
       ),
@@ -127,7 +127,7 @@ export function IncidentsPage() {
       label: 'Downtime',
       sortable: true,
       render: (incident) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {incident.downtimeMinutes ? `${incident.downtimeMinutes} min` : '-'}
         </span>
       ),
@@ -172,7 +172,7 @@ export function IncidentsPage() {
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -194,7 +194,7 @@ export function IncidentsPage() {
         <StatCard icon={<Clock size={20} />} label="MTTR Promedio" value={`${stats.avgMttr}m`} color="text-info" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm space-y-3">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -211,7 +211,7 @@ export function IncidentsPage() {
             className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || severityFilter !== 'all' || statusFilter !== 'all'
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-neutral-30 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
             }`}
           >
             <Filter size={16} />
@@ -223,7 +223,7 @@ export function IncidentsPage() {
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-4 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Severidad</label>
               <Select value={severityFilter} onChange={(v) => setSeverityFilter(v)} options={[
@@ -279,11 +279,11 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
   return (
     <Comp
       onClick={onClick}
-      className={`bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
+      className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Comp>
   )
 }

@@ -80,7 +80,7 @@ export function PublicPerformancePage() {
   if (!data || !summary) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Datos protegidos con contraseña"
             description="Este reporte fue compartido con cifrado de extremo a extremo."
@@ -97,8 +97,8 @@ export function PublicPerformancePage() {
   }
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -128,8 +128,8 @@ export function PublicPerformancePage() {
         </div>
 
         {/* Row 2: Teams */}
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
-          <div className="px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm">
+          <div className="px-6 py-4 border-b border-boundary">
             <h2 className="text-sm font-bold text-neutral-90 dark:text-white">Equipos</h2>
           </div>
           <div className="divide-y divide-neutral-10 dark:divide-neutral-75">
@@ -165,7 +165,7 @@ export function PublicPerformancePage() {
 
         {/* Row 3: Top Members */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-4 flex items-center gap-2">
               <Award size={16} className="text-amber-500" />
               Top contribuidores
@@ -198,7 +198,7 @@ export function PublicPerformancePage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-4 flex items-center gap-2">
               <TrendingUp size={16} className="text-primary" />
               Métricas agregadas
@@ -220,7 +220,7 @@ export function PublicPerformancePage() {
           </div>
         </div>
 
-        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 dark:text-neutral-60 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos en tu navegador
         </div>
       </main>
@@ -230,7 +230,7 @@ export function PublicPerformancePage() {
 
 function Loader() {
   return (
-    <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
     </div>
   )
@@ -245,10 +245,10 @@ function StatCard({ title, value, subtitle, icon, color }: {
     danger: 'text-danger bg-danger/10', info: 'text-info bg-info/10', primary: 'text-primary bg-primary/10',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
       <div className={cn('p-2 rounded-lg w-fit mb-3', colors[color])}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40 font-medium mt-0.5">{title}</p>
+      <p className="text-xs text-muted font-medium mt-0.5">{title}</p>
       <p className="text-xs text-neutral-50 mt-1">{subtitle}</p>
     </div>
   )
@@ -259,7 +259,7 @@ function MetricBar({ label, value }: { label: string; value: number }) {
   return (
     <div>
       <div className="flex items-center justify-between text-sm mb-1">
-        <span className="text-neutral-70 dark:text-neutral-30">{label}</span>
+        <span className="text-secondary">{label}</span>
         <span className="font-semibold text-neutral-90 dark:text-white">{value}%</span>
       </div>
       <div className="h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">

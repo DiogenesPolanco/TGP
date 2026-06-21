@@ -28,7 +28,7 @@ export function TechStackSection({ memberId }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+    <div className="bg-card rounded-2xl border border-boundary p-4">
       <h2 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Tecnologías</h2>
       <TechSearch
         selectedIds={selectedIds}

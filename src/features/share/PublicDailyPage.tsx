@@ -53,12 +53,12 @@ export function PublicDailyPage() {
     })()
   }, [hash])
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="Seguimiento Diario protegido"
             description="Este seguimiento fue compartido con cifrado. Ingresa la contraseña para verlo."
@@ -105,8 +105,8 @@ export function PublicDailyPage() {
   })
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-1 shadow-sm">
@@ -129,26 +129,26 @@ export function PublicDailyPage() {
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-neutral-90 dark:text-white">{activePlans.length}</p>
             <p className="text-xs text-neutral-60">Planes Activos</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-warning">{dueToday.length}</p>
             <p className="text-xs text-neutral-60">Vence Hoy</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-danger">{overdue.length}</p>
             <p className="text-xs text-neutral-60">Vencidas</p>
           </div>
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-2xl border border-boundary p-4">
             <p className="text-2xl font-bold text-success">{completedToday.length}</p>
             <p className="text-xs text-neutral-60">Completadas Hoy</p>
           </div>
         </div>
 
         {activeBlockers.length > 0 && (
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-danger/30 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-2xl border border-danger/30 shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-danger/5 border-b border-danger/20">
               <Ban size={16} className="text-danger" />
               <h3 className="text-sm font-semibold text-danger">Bloqueos Activos ({activeBlockers.length})</h3>
@@ -171,8 +171,8 @@ export function PublicDailyPage() {
           </div>
         )}
 
-        <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
             <Calendar size={16} className="text-warning" />
             <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Vence Hoy</h3>
           </div>
@@ -198,8 +198,8 @@ export function PublicDailyPage() {
         </div>
 
         {tasksDue.length > 0 && (
-          <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+          <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
               <AlertTriangle size={16} className="text-info" />
               <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Tareas Pendientes ({tasksDue.length})</h3>
             </div>
@@ -217,7 +217,7 @@ export function PublicDailyPage() {
           </div>
         )}
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>

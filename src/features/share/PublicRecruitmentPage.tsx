@@ -91,7 +91,7 @@ export function PublicRecruitmentPage() {
 
   if (loading || valid === null) {
     return (
-      <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <p className="text-neutral-50">Cargando...</p>
       </div>
     )
@@ -141,7 +141,7 @@ export function PublicRecruitmentPage() {
   ]
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
+    <div id="printable-content" className="min-h-screen bg-canvas">
       <div className="bg-gradient-to-br from-primary via-primary-dark to-[#03245E] text-white">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex items-center gap-3 mb-4">
@@ -166,10 +166,10 @@ export function PublicRecruitmentPage() {
       <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
         <div className="grid grid-cols-4 gap-4">
           {stats.map((s) => (
-            <div key={s.label} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+            <div key={s.label} className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
               <div className={`${s.color} mb-2`}>{s.icon}</div>
               <p className="text-2xl font-bold text-neutral-90 dark:text-white">{s.value}</p>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40">{s.label}</p>
+              <p className="text-xs text-muted">{s.label}</p>
               {s.sub && <p className="text-sm font-semibold text-neutral-90 dark:text-white mt-1.5 truncate">{s.sub}</p>}
             </div>
           ))}
@@ -185,7 +185,7 @@ export function PublicRecruitmentPage() {
             const evalAvg = evals.length > 0 ? Math.round(evals.reduce((s, e) => s + e.points, 0) / evals.length) : 0
 
             return (
-              <div key={c.id} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+              <div key={c.id} className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
                 <Button onClick={() => toggleExpand(c.id)} className="w-full flex items-center gap-4 p-4 hover:bg-neutral-5 dark:hover:bg-neutral-75/50 transition-colors text-left">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -215,7 +215,7 @@ export function PublicRecruitmentPage() {
                 </Button>
 
                 {isOpen && (
-                  <div className="border-t border-neutral-20 dark:border-neutral-70 px-4 py-4 space-y-4 bg-neutral-5/50 dark:bg-neutral-85/50">
+                  <div className="border-t border-boundary px-4 py-4 space-y-4 bg-neutral-5/50 dark:bg-neutral-85/50">
                     {techs.length > 0 && (
                       <div>
                         <p className="text-xs font-semibold text-neutral-60 uppercase tracking-wider mb-2">Tecnologías</p>
@@ -224,7 +224,7 @@ export function PublicRecruitmentPage() {
                             <div key={t.id} className="flex items-center gap-2">
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-0.5">
-                                  <span className="text-xs text-neutral-70 dark:text-neutral-30">{t.name}</span>
+                                  <span className="text-xs text-secondary">{t.name}</span>
                                   <span className="text-xs font-semibold text-primary">{t.points}%</span>
                                 </div>
                                 <div className="w-full h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
@@ -247,7 +247,7 @@ export function PublicRecruitmentPage() {
                             const pts = e?.points ?? 0
                             return (
                               <div key={cat.key} className="flex items-center gap-2">
-                                <span className="text-xs text-neutral-60 dark:text-neutral-40 w-28 shrink-0">{cat.label}</span>
+                                <span className="text-xs text-muted w-28 shrink-0">{cat.label}</span>
                                 <div className="flex-1 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
                                   <div className="h-full rounded-full" style={{
                                     width: `${pts}%`,

@@ -25,12 +25,12 @@ export function PublicObjectivesPage() {
   const teamMap = new Map((data?.teams as Array<Record<string, unknown>>)?.map((t) => [t.id as string, t.name as string]) ?? [])
   const buMap = new Map((data?.businessUnits as Array<Record<string, unknown>>)?.map((b) => [b.id as string, b.name as string]) ?? [])
 
-  if (loading) return <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
       return (
-        <div className="min-h-screen bg-neutral-10 dark:bg-neutral-90 flex items-center justify-center">
+        <div className="min-h-screen bg-canvas flex items-center justify-center">
           <PassphraseModal
             title="OKRs protegidos"
             description="Esta vista fue compartida con cifrado. Ingresa la contraseña para verla."
@@ -48,8 +48,8 @@ export function PublicObjectivesPage() {
   const objectives = data.objectives as ObjRow[]
 
   return (
-    <div id="printable-content" className="min-h-screen bg-neutral-10 dark:bg-neutral-90">
-      <header className="bg-white dark:bg-neutral-80 border-b border-neutral-20 dark:border-neutral-70">
+    <div id="printable-content" className="min-h-screen bg-canvas">
+      <header className="bg-card border-b border-boundary">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
@@ -72,7 +72,7 @@ export function PublicObjectivesPage() {
           objectives.map((obj) => {
             const owner = obj.teamId ? teamMap.get(obj.teamId) : obj.businessUnitId ? buMap.get(obj.businessUnitId) : null
             return (
-              <div key={obj.id} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+              <div key={obj.id} className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -90,7 +90,7 @@ export function PublicObjectivesPage() {
 
                 <div className="mb-3">
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-neutral-60 dark:text-neutral-40">Progreso</span>
+                    <span className="text-muted">Progreso</span>
                     <span className="font-semibold text-neutral-90 dark:text-white">{Math.round(obj.progress)}%</span>
                   </div>
                   <div className="w-full h-2 bg-neutral-10 dark:bg-neutral-70 rounded-full overflow-hidden">
@@ -105,8 +105,8 @@ export function PublicObjectivesPage() {
                 </div>
 
                 {obj.keyResults && obj.keyResults.length > 0 && (
-                  <div className="space-y-2 pt-3 border-t border-neutral-20 dark:border-neutral-70">
-                    <p className="text-xs font-medium text-neutral-60 dark:text-neutral-40 flex items-center gap-1">
+                  <div className="space-y-2 pt-3 border-t border-boundary">
+                    <p className="text-xs font-medium text-muted flex items-center gap-1">
                       <TrendingUp size={12} />
                       Key Results
                     </p>
@@ -117,7 +117,7 @@ export function PublicObjectivesPage() {
                       const pct = target > baseline ? Math.round(((current - baseline) / (target - baseline)) * 100) : 0
                       return (
                         <div key={kr.id as string} className="flex items-center justify-between text-xs py-1">
-                          <span className="text-neutral-70 dark:text-neutral-30 truncate flex-1">{kr.title as string}</span>
+                          <span className="text-secondary truncate flex-1">{kr.title as string}</span>
                           <span className={`ml-3 shrink-0 font-medium ${kr.status === 'achieved' ? 'text-success' : kr.status === 'at_risk' ? 'text-warning' : kr.status === 'behind' ? 'text-danger' : 'text-neutral-60'}`}>
                             {current}/{target} ({Math.max(0, Math.min(100, pct))}%)
                           </span>
@@ -127,7 +127,7 @@ export function PublicObjectivesPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-neutral-20 dark:border-neutral-70 text-xs text-neutral-50">
+                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-boundary text-xs text-neutral-50">
                   {owner && <span>Dueño: {owner}</span>}
                   <span>{new Date(obj.periodStart).toLocaleDateString()} — {new Date(obj.periodEnd).toLocaleDateString()}</span>
                 </div>
@@ -136,7 +136,7 @@ export function PublicObjectivesPage() {
           })
         )}
 
-        <div className="text-center text-xs text-neutral-40 py-4 border-t border-neutral-20 dark:border-neutral-70 mt-6">
+        <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary mt-6">
           TGP — Technology Governance Platform · Datos compartidos
         </div>
       </main>
