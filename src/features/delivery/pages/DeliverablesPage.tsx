@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import type { DeliverableStatus, Deliverable } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusColors: Record<DeliverableStatus, string> = {
   pending: 'bg-neutral-10 dark:bg-neutral-70 text-muted',
@@ -73,7 +74,7 @@ export function DeliverablesPage() {
         <>
           <p className="text-sm font-medium text-neutral-90 dark:text-white">{del.title}</p>
           {del.description && (
-            <p className="text-xs text-neutral-50 mt-0.5 max-w-xs truncate">{del.description}</p>
+            <HtmlDescription html={del.description} lines={1} className="max-w-xs" />
           )}
         </>
       ),

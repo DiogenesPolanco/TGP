@@ -6,6 +6,7 @@ import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil, Server, Search, Shield, AlertTriangle, Clock, CheckCircle, XCircle, HelpCircle, FileWarning } from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const severityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info' }
 const statusLabel: Record<string, string> = { open: 'Abierto', in_progress: 'En Progreso', overdue: 'Vencido', resolved: 'Resuelto', closed: 'Cerrado' }
@@ -182,13 +183,13 @@ export function AuditDetailPage() {
 
           {finding.description && (
             <Section title="Descripción" icon={<FileWarning size={18} />}>
-              <p className="text-sm text-secondary leading-relaxed">{finding.description}</p>
+              <HtmlDescription html={finding.description} full />
             </Section>
           )}
 
           {finding.actionPlan && (
             <Section title="Plan de Acción" icon={<CheckCircle size={18} />}>
-              <p className="text-sm text-secondary mb-4">{finding.actionPlan.description}</p>
+              <HtmlDescription html={finding.actionPlan.description} full />
               {finding.actionPlan.items.length > 0 && (
                 <ul className="space-y-2">
                   {finding.actionPlan.items.map((item) => (

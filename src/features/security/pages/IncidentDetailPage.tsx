@@ -6,6 +6,7 @@ import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Pencil, Server, Search, Shield, AlertTriangle, Calendar, Clock, Activity, CheckCircle, XCircle, HelpCircle } from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const severityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info' }
 const incidentStatusLabel: Record<string, string> = { detected: 'Detectado', acknowledged: 'Reconocido', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' }
@@ -195,7 +196,7 @@ export function IncidentDetailPage() {
 
           {incident.description && (
             <Section title="Descripción" icon={<Activity size={18} />}>
-              <p className="text-sm text-secondary leading-relaxed">{incident.description}</p>
+              <HtmlDescription html={incident.description} full />
             </Section>
           )}
         </div>

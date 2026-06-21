@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import type { Risk } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusLabel: Record<string, string> = {
   open: 'Abierto',
@@ -93,7 +94,7 @@ export function RisksPage() {
       render: (risk) => (
         <div className="min-w-0">
           <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{risk.title}</p>
-          {risk.description && <p className="text-xs text-neutral-50 dark:text-neutral-50 truncate">{risk.description}</p>}
+          {risk.description && <HtmlDescription html={risk.description} lines={1} className="text-neutral-50 dark:text-neutral-50" />}
         </div>
       ),
     },

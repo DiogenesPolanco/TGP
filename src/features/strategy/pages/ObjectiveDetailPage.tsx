@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
@@ -23,7 +24,7 @@ export function ObjectiveDetailPage() {
   return (
     <DetailLayout
       title={objective.title}
-      subtitle={objective.description}
+      subtitle={<HtmlDescription html={objective.description} lines={2} />}
       onBack={() => navigate('/strategy/objectives')}
       backLabel="OKRs / KPIs"
       actions={

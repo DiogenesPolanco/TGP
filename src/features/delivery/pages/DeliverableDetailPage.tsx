@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 import type { DeliverableStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
@@ -27,7 +28,7 @@ export function DeliverableDetailPage() {
   return (
     <DetailLayout
       title={deliverable.title}
-      subtitle={deliverable.description}
+      subtitle={<HtmlDescription html={deliverable.description} lines={2} />}
       onBack={() => navigate('/catalog/deliverables')}
       backLabel="Entregables"
       actions={
@@ -46,7 +47,8 @@ export function DeliverableDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Section title="Información General">
           <Field label="Título" value={deliverable.title} />
-          <Field label="Descripción" value={deliverable.description} />
+          <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">Descripción</dt>
+          <dd className="text-sm text-neutral-90 dark:text-white flex-1"><HtmlDescription html={deliverable.description} full /></dd>
           <Field label="Aplicación" value={app?.name ?? 'Sin asignar'} />
           <Field label="OKR" value={objective?.title ?? 'Sin asignar'} />
         </Section>
