@@ -22,7 +22,10 @@ export function PlanDetailPage() {
 
   const plan = useLiveQuery(() => db.plans.get(id ?? ''), [id])
   const rawActivities = useLiveQuery(() => db.activities.where('planId').equals(id ?? '').toArray(), [id])
-  const activities = useMemo(() => rawActivities ?? [], [rawActivities])
+  const activities = useMemo(
+    () => (rawActivities ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+    [rawActivities],
+  )
   const rawTasks = useLiveQuery(() => db.tasks.where('planId').equals(id ?? '').toArray(), [id])
   const tasks = useMemo(() => rawTasks ?? [], [rawTasks])
   const rawTeams = useLiveQuery(() => db.teams.toArray())
@@ -110,7 +113,7 @@ export function PlanDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-neutral-50">Plan no encontrado</p>
-        <Button onClick={() => navigate('/execution/plans')} className="mt-4 text-sm text-primary hover:underline">
+        <Button onClick={() => navigate('/execution/plans')} variant="ghost" className="mt-4 text-sm text-primary hover:underline">
           Volver a planes
         </Button>
       </div>
@@ -128,7 +131,7 @@ export function PlanDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button onClick={() => navigate('/execution/plans')} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors">
+        <Button onClick={() => navigate('/execution/plans')} variant="ghost" className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors">
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <div className="flex-1">
@@ -157,13 +160,13 @@ export function PlanDetailPage() {
             </span>
           </div>
           {plan.description && (
-            <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">{plan.description}</p>
+            <p className="text-sm text-muted mt-1">{plan.description}</p>
           )}
         </div>
       </div>
 
       {shareUrl && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -181,32 +184,32 @@ export function PlanDetailPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Actividades</p>
+          <p className="text-xs text-muted">Actividades</p>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <p className="text-2xl font-bold text-success">{stats.completed}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Completadas</p>
+          <p className="text-xs text-muted">Completadas</p>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <p className="text-2xl font-bold text-info">{stats.inProgress}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">En Progreso</p>
+          <p className="text-xs text-muted">En Progreso</p>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.doneTasks}/{stats.totalTasks}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Tareas</p>
+          <p className="text-xs text-muted">Tareas</p>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+        <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{daysLeft > 0 ? `${daysLeft}d` : 'Vencido'}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Tiempo restante</p>
+          <p className="text-xs text-muted">Tiempo restante</p>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-neutral-70 dark:text-neutral-30">Progreso del Plan</span>
+          <span className="text-sm font-medium text-secondary">Progreso del Plan</span>
           <span className="text-sm text-neutral-60">{Math.min(100, progress)}%</span>
         </div>
         <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2.5">

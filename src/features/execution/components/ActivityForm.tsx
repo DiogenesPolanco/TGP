@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save, Plus, Trash2 } from 'lucide-react'
@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import type { Activity, Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 interface ActivityFormProps {
   planId: string
@@ -40,8 +41,18 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
   )
   const [saving, setSaving] = useState(false)
 
-  const [tasks, setTasks] = useState<Task[]>(activity ? [] : [])
+  const [tasks, setTasks] = useState<Task[]>([])
   const [newTaskTitle, setNewTaskTitle] = useState('')
+
+  // Load existing tasks when editing
+  const existingTasks = useLiveQuery(
+    () => (activity?.id ? db.tasks.where('activityId').equals(activity.id).toArray() : []),
+    [activity?.id],
+  )
+
+  useEffect(() => {
+    if (existingTasks) setTasks(existingTasks)
+  }, [existingTasks])
 
   const addTask = () => {
     if (!newTaskTitle.trim()) return
@@ -75,7 +86,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
     setSaving(true)
     try {
       const now = new Date()
-      const data = {
+      const data: Partial<Activity> = {
         planId,
         parentActivityId: parentActivityId || null,
         title: title.trim(),
@@ -89,8 +100,9 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
         actualHours: activity?.actualHours ?? null,
         plannedPoints: plannedPoints ? Number(plannedPoints) : null,
         completedPoints: completedPoints ? Number(completedPoints) : null,
-        startDate: startDate ? new Date(startDate) : null,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        sortOrder: activity?.sortOrder ?? (activities.length > 0 ? Math.max(...activities.map((a) => a.sortOrder ?? 0)) + 1 : 0),
+        startDate: startDate ? parseLocalDate(startDate) : null,
+        dueDate: dueDate ? parseLocalDate(dueDate) : null,
         completedAt: activity?.completedAt ?? null,
         updatedAt: now,
       }
@@ -102,11 +114,12 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
         await db.activities.add({
           id: activityId,
           ...data,
+          sortOrder: data.sortOrder ?? 0,
           actualHours: null,
           completedAt: null,
           metadata: {},
           createdAt: now,
-        })
+        } as Activity)
         // Save inline tasks
         if (tasks.length > 0) {
           await db.tasks.bulkAdd(
@@ -125,7 +138,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-xl bg-card rounded-2xl border border-boundary shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {activity ? 'Editar Actividad' : 'Nueva Actividad'}
@@ -137,7 +150,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
 
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+            <label className="block text-sm font-medium text-secondary mb-1.5">
               Título <span className="text-danger">*</span>
             </label>
             <input
@@ -150,7 +163,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Descripción</label>
             <RichTextEditor
               value={description}
               onChange={(html) => setDescription(html)}
@@ -233,7 +246,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Planif.</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Puntos Planif.</label>
             <input
               type="number"
               value={plannedPoints}
@@ -244,7 +257,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Comp.</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Puntos Comp.</label>
             <input
               type="number"
               value={completedPoints}
@@ -255,7 +268,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Inicio</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Fecha Inicio</label>
             <DatePicker
               value={startDate}
               onChange={setStartDate}
@@ -264,7 +277,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Fin</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Fecha Fin</label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
@@ -273,10 +286,8 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
         </div>
 
-        {/* Inline tasks (only for new activities) */}
-        {!activity && (
-          <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Tareas rápidas</label>
+        <div>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Tareas rápidas</label>
             <div className="flex items-center gap-2 mb-2">
               <input
                 type="text"
@@ -302,11 +313,10 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
                 ))}
               </div>
             )}
-          </div>
-        )}
+        </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
           </Button>
           <Button

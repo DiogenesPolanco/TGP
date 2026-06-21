@@ -139,7 +139,7 @@ function SmallKpiCard({ title, value, subtitle, icon, color, onClick }: SmallKpi
   return (
     <div
       onClick={onClick}
-      className="group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer overflow-hidden"
+      className="group relative bg-card rounded-2xl border border-boundary p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer overflow-hidden"
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b from-neutral-10/50 via-transparent to-transparent dark:from-white/[0.02]" />
       <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-40 ${styles.dot}`} />
@@ -150,7 +150,7 @@ function SmallKpiCard({ title, value, subtitle, icon, color, onClick }: SmallKpi
             {icon}
           </div>
         </div>
-        <h4 className="text-[11px] font-medium text-neutral-60 dark:text-neutral-40 mb-0.5 uppercase tracking-wider">
+        <h4 className="text-[11px] font-medium text-muted mb-0.5 uppercase tracking-wider">
           {title}
         </h4>
         <p className="text-xl font-bold text-neutral-90 dark:text-white tabular-nums">

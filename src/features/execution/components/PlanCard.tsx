@@ -49,7 +49,7 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
 
   return (
     <div
-      className="group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+      className="group relative bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
       onClick={() => navigate(`/execution/plans/${plan.id}`)}
     >
       {/* Accent bar at top */}
@@ -81,7 +81,7 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-medium text-neutral-50 uppercase tracking-wide">Progreso Temporal</span>
-            <span className="text-[11px] font-semibold text-neutral-60 dark:text-neutral-40">{Math.min(100, timeProgress)}%</span>
+            <span className="text-[11px] font-semibold text-muted">{Math.min(100, timeProgress)}%</span>
           </div>
           <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 overflow-hidden">
             <div
@@ -98,7 +98,7 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-medium text-neutral-50 uppercase tracking-wide">Actividades</span>
-            <span className="text-[11px] font-semibold text-neutral-60 dark:text-neutral-40">{completedActivities}/{totalActivities}</span>
+            <span className="text-[11px] font-semibold text-muted">{completedActivities}/{totalActivities}</span>
           </div>
           <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 overflow-hidden">
             <div
@@ -110,11 +110,11 @@ export function PlanCard({ plan, activities, today }: PlanCardProps) {
       </div>
 
       {/* Footer stats */}
-      <div className="flex items-center justify-between pt-3 border-t border-neutral-20 dark:border-neutral-70">
+      <div className="flex items-center justify-between pt-3 border-t border-boundary">
         <div className="flex items-center gap-3">
           {/* Days left */}
           <span className={`flex items-center gap-1 text-xs font-medium ${
-            daysLeft < 0 ? 'text-danger' : daysLeft <= 7 ? 'text-warning' : 'text-neutral-60 dark:text-neutral-40'
+            daysLeft < 0 ? 'text-danger' : daysLeft <= 7 ? 'text-warning' : 'text-muted'
           }`}>
             <Clock size={12} />
             {daysLeft > 0 ? `${daysLeft}d` : 'Vencido'}

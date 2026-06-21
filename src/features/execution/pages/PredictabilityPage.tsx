@@ -44,24 +44,24 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   const data = payload[0].payload
   return (
     <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
-      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-boundary">
         {label}
       </p>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-neutral-60 dark:text-neutral-40">Predictibilidad</span>
+          <span className="text-muted">Predictibilidad</span>
           <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad as string}%</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-neutral-60 dark:text-neutral-40">Planificados</span>
+          <span className="text-muted">Planificados</span>
           <span className="font-medium text-neutral-90 dark:text-white">{data.estimado as string} pts</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-neutral-60 dark:text-neutral-40">Completados</span>
+          <span className="text-muted">Completados</span>
           <span className="font-medium text-neutral-90 dark:text-white">{data.real as string} pts</span>
         </div>
-        <div className="flex items-center justify-between gap-4 pt-1 border-t border-neutral-20 dark:border-neutral-70">
-          <span className="text-neutral-60 dark:text-neutral-40">Planes</span>
+        <div className="flex items-center justify-between gap-4 pt-1 border-t border-boundary">
+          <span className="text-muted">Planes</span>
           <span className="font-medium text-neutral-90 dark:text-white">{data.planes as string}</span>
         </div>
       </div>
@@ -83,21 +83,21 @@ const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
     label: 'Story Points Planif.',
     sortable: true,
     className: 'text-right',
-    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.totalEstimated} pts plan.</span>,
+    render: (p) => <span className="text-muted">{p.totalEstimated} pts plan.</span>,
   },
   {
     key: 'totalActual',
     label: 'Story Points Comp.',
     sortable: true,
     className: 'text-right',
-    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.totalActual} pts comp.</span>,
+    render: (p) => <span className="text-muted">{p.totalActual} pts comp.</span>,
   },
   {
     key: 'planCount',
     label: 'Planes',
     sortable: true,
     className: 'text-right',
-    render: (p) => <span className="text-neutral-60 dark:text-neutral-40">{p.planCount}</span>,
+    render: (p) => <span className="text-muted">{p.planCount}</span>,
   },
   {
     key: 'color',
@@ -175,14 +175,14 @@ export function PredictabilityPage() {
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
             Predictibilidad de Sprints
           </h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Mide qué tan preciso es un equipo al estimar y cumplir sus compromisos. Rango ideal: 80-120%
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-neutral-50" />
@@ -200,7 +200,7 @@ export function PredictabilityPage() {
                 className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                   granularity === tab.key
                     ? 'bg-white dark:bg-neutral-60 text-primary shadow-sm font-medium'
-                    : 'text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white'
+                    : 'text-muted hover:text-neutral-90 dark:hover:text-white'
                 }`}
               >
                 {tab.label}
@@ -242,7 +242,7 @@ export function PredictabilityPage() {
       </div>
 
       {/* Chart */}
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-neutral-90 dark:text-white">
             Tendencia de Predictibilidad
@@ -250,15 +250,15 @@ export function PredictabilityPage() {
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-success/60" />
-              <span className="text-neutral-60 dark:text-neutral-40">Ideal (80-120%)</span>
+              <span className="text-muted">Ideal (80-120%)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-warning/60" />
-              <span className="text-neutral-60 dark:text-neutral-40">Aceptable (50-150%)</span>
+              <span className="text-muted">Aceptable (50-150%)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-danger/60" />
-              <span className="text-neutral-60 dark:text-neutral-40">Fuera de rango</span>
+              <span className="text-muted">Fuera de rango</span>
             </div>
           </div>
         </div>
@@ -344,8 +344,8 @@ export function PredictabilityPage() {
 
       {/* Detail table */}
       {currentPeriods.length > 0 && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-boundary">
             <h3 className="text-base font-semibold text-neutral-90 dark:text-white">
               Detalle por Período
             </h3>
@@ -371,7 +371,7 @@ function SummaryCard({
   color: 'success' | 'warning' | 'danger' | 'primary'
 }) {
   return (
-    <div className="group relative bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
+    <div className="group relative bg-card rounded-xl border border-boundary p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
       <div
         className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
       />
@@ -381,7 +381,7 @@ function SummaryCard({
           {icon}
         </div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-0.5">{title}</p>
+        <p className="text-xs text-muted mt-0.5">{title}</p>
         {subtitle && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>}
       </div>
     </div>

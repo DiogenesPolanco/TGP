@@ -54,18 +54,18 @@ export function DependenciesPage() {
       return <span className={`text-xs px-2 py-0.5 rounded-full ${colors[d.relationType]}`}>{relationLabel[d.relationType]}</span>
     }},
     { key: 'targetType', label: 'Destino', sortable: true, render: (d) => (
-      <span className="text-sm text-neutral-70 dark:text-neutral-30">{getEntityTitle(d.targetType, d.targetId)}</span>
+      <span className="text-sm text-secondary">{getEntityTitle(d.targetType, d.targetId)}</span>
     )},
     { key: 'description', label: 'Descripción', sortable: true, className: 'max-w-xs', render: (d) => (
       <div className="min-w-0">
-        <span className="text-sm text-neutral-70 dark:text-neutral-30 truncate block">{d.description || '—'}</span>
+        <span className="text-sm text-secondary truncate block">{d.description || '—'}</span>
       </div>
     )},
     { key: 'status', label: 'Estado', sortable: true, render: (d) => (
       <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor[d.status]}`}>{statusLabel[d.status]}</span>
     )},
     { key: 'expectedResolutionDate', label: 'Resolución', sortable: true, render: (d) => (
-      <span className="text-sm text-neutral-70 dark:text-neutral-30">{d.expectedResolutionDate ? new Date(d.expectedResolutionDate).toLocaleDateString('es-ES') : '—'}</span>
+      <span className="text-sm text-secondary">{d.expectedResolutionDate ? new Date(d.expectedResolutionDate).toLocaleDateString('es-ES') : '—'}</span>
     )},
     { key: 'actions', label: '', render: (d) => (
       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all" onClick={(e) => e.stopPropagation()}>
@@ -79,11 +79,11 @@ export function DependenciesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Dependencias</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Gestión de dependencias entre tareas, actividades, planes y compromisos</p>
+          <p className="text-sm text-muted mt-1">Gestión de dependencias entre tareas, actividades, planes y compromisos</p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />

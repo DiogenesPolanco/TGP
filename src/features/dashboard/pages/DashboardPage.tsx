@@ -68,14 +68,14 @@ export function DashboardPage() {
       <div className="flex items-center justify-end gap-2">
         <Button
           onClick={handleShare}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white bg-card border border-boundary rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Share2 size={16} />
           Compartir
         </Button>
         <Button
           onClick={() => setShowConfig(true)}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white bg-card border border-boundary rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Settings size={16} />
           Personalizar
@@ -83,7 +83,7 @@ export function DashboardPage() {
       </div>
 
       {shareUrl && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -115,9 +115,9 @@ export function DashboardPage() {
       {e['widget-predictions'] !== false && <PredictionsWidget />}
 
       {!metrics.loading && (
-        <div className="border-t border-neutral-30 dark:border-neutral-70 pt-4 pb-2">
+        <div className="border-t border-boundary pt-4 pb-2">
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <div className="flex items-center gap-1.5 text-xs text-neutral-70 dark:text-neutral-30 font-medium">
+            <div className="flex items-center gap-1.5 text-xs text-secondary font-medium">
               <Clock size={12} className="text-neutral-50 dark:text-neutral-40" />
               <span>
                 {metrics.lastUpdated.toLocaleTimeString('es-ES', {
@@ -133,7 +133,7 @@ export function DashboardPage() {
               <>
                 <div className="hidden sm:block w-px h-4 bg-neutral-40 dark:bg-neutral-60" />
 
-                <div className="flex items-center gap-3 text-xs text-neutral-70 dark:text-neutral-30 font-medium">
+                <div className="flex items-center gap-3 text-xs text-secondary font-medium">
                   <Database size={12} className="text-neutral-50 dark:text-neutral-40" />
                   <span className="tabular-nums">{metrics.applications.length}</span>
                   <span className="text-neutral-50 dark:text-neutral-50">aplicaciones</span>

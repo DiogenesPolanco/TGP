@@ -82,14 +82,14 @@ export function PlansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Planes de Trabajo</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Gestiona sprints, trimestres e iniciativas
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -105,7 +105,7 @@ export function PlansPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -143,7 +143,7 @@ export function PlansPage() {
           return (
             <div
               key={plan.id}
-              className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              className="bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
               onClick={() => navigate(`/execution/plans/${plan.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -163,7 +163,7 @@ export function PlansPage() {
                 {plan.title}
               </h3>
               {plan.description && (
-                <p className="text-sm text-neutral-60 dark:text-neutral-40 line-clamp-2 mb-3">{plan.description}</p>
+                <p className="text-sm text-muted line-clamp-2 mb-3">{plan.description}</p>
               )}
 
               {/* Progress bar */}
@@ -177,7 +177,7 @@ export function PlansPage() {
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-3 text-neutral-60 dark:text-neutral-40">
+                <div className="flex items-center gap-3 text-muted">
                   <span>{teamMap.get(plan.teamId ?? '')?.name ?? buMap.get(plan.businessUnitId ?? '')?.name ?? 'Sin asignar'}</span>
                   <span>{stats.completed}/{stats.total} acts</span>
                 </div>
@@ -213,7 +213,7 @@ export function PlansPage() {
       />
 
       {filteredPlans.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70">
+        <div className="text-center py-12 bg-card rounded-2xl border border-boundary">
           <Target size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
           <p className="text-sm text-neutral-50">
             {plans.length === 0 ? 'No hay planes. Crea tu primer plan de trabajo.' : 'No se encontraron planes con los filtros seleccionados.'}

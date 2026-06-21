@@ -37,10 +37,10 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
   if (loading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
-        <div className="lg:col-span-1 bg-white dark:bg-neutral-80 rounded-2xl p-6 h-80" />
+        <div className="lg:col-span-1 bg-card rounded-2xl p-6 h-80" />
         <div className="lg:col-span-2 grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-neutral-80 rounded-2xl p-5 h-32" />
+            <div key={i} className="bg-card rounded-2xl p-5 h-32" />
           ))}
         </div>
       </div>
@@ -50,7 +50,7 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {enabledWidgets['thi-gauge'] !== false && (
-      <div className="lg:col-span-1 relative overflow-hidden bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+      <div className="lg:col-span-1 relative overflow-hidden bg-card rounded-2xl border border-boundary p-6 shadow-sm">
         {/* Subtle background gradient mesh */}
         <div
           className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-[0.04] dark:opacity-[0.08]"
@@ -63,7 +63,7 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
 
         <div className="relative">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-neutral-70 dark:text-neutral-30 tracking-wide uppercase">
+            <h2 className="text-sm font-semibold text-secondary tracking-wide uppercase">
               Technology Health Index
             </h2>
             <TrendBadge trend={thiTrend} />
@@ -75,7 +75,7 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
 
           {/* Sparkline + narrative */}
           {thiHistory.length >= 2 && (
-            <div className="mt-4 pt-4 border-t border-neutral-20 dark:border-neutral-70">
+            <div className="mt-4 pt-4 border-t border-boundary">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-medium text-neutral-50 dark:text-neutral-40 uppercase tracking-wider">
                   Tendencia
@@ -92,7 +92,7 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-neutral-50">Anterior</div>
-                  <div className="text-sm font-semibold tabular-nums text-neutral-70 dark:text-neutral-30">
+                  <div className="text-sm font-semibold tabular-nums text-secondary">
                     {Math.round(thiHistory[thiHistory.length - 2]?.score ?? 0)}
                   </div>
                 </div>
@@ -216,7 +216,7 @@ function KpiHeroCard({ title, value, trend, trendLabel, color, subtitle, valueSu
   return (
     <div
       onClick={onClick}
-      className="group relative bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden cursor-pointer"
+      className="group relative bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden cursor-pointer"
     >
       {/* Gradient overlay on hover */}
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${styles.gradient}`} />
@@ -226,7 +226,7 @@ function KpiHeroCard({ title, value, trend, trendLabel, color, subtitle, valueSu
 
       <div className="relative">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
             {title}
           </h3>
           {trend && (

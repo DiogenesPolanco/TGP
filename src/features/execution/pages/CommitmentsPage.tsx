@@ -82,14 +82,14 @@ export function CommitmentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Compromisos</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Seguimiento de compromisos, promesas y deadlines cross-equipo
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
-            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             <Upload size={16} />
             Importar
@@ -106,30 +106,30 @@ export function CommitmentsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-4">
-        <Button onClick={() => setStatusFilter('all')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('all')} className="bg-card rounded-2xl border border-boundary p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.total}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Total</p>
+          <p className="text-xs text-muted">Total</p>
         </Button>
-        <Button onClick={() => setStatusFilter('active')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('active')} className="bg-card rounded-2xl border border-boundary p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-info">{stats.active}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Activos</p>
+          <p className="text-xs text-muted">Activos</p>
         </Button>
-        <Button onClick={() => setStatusFilter('at_risk')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-warning/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('at_risk')} className="bg-card rounded-2xl border border-warning/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-warning">{stats.atRisk}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">En Riesgo</p>
+          <p className="text-xs text-muted">En Riesgo</p>
         </Button>
-        <Button onClick={() => setStatusFilter('breached')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-danger/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('breached')} className="bg-card rounded-2xl border border-danger/20 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-danger">{stats.breached}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Incumplidos</p>
+          <p className="text-xs text-muted">Incumplidos</p>
         </Button>
-        <Button onClick={() => setStatusFilter('fulfilled')} className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
+        <Button onClick={() => setStatusFilter('fulfilled')} className="bg-card rounded-2xl border border-boundary p-4 shadow-sm cursor-pointer hover:shadow-md transition-all text-left">
           <p className="text-2xl font-bold text-success">{stats.fulfilled}</p>
-          <p className="text-xs text-neutral-60 dark:text-neutral-40">Cumplidos</p>
+          <p className="text-xs text-muted">Cumplidos</p>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -178,7 +178,7 @@ export function CommitmentsPage() {
             sortable: true,
             render: (c) => (
               <>
-                <p className="text-sm text-neutral-70 dark:text-neutral-30">{c.ownerId}</p>
+                <p className="text-sm text-secondary">{c.ownerId}</p>
                 <p className="text-xs text-neutral-50">a: {c.accountableId}</p>
               </>
             ),
@@ -189,7 +189,7 @@ export function CommitmentsPage() {
             sortable: true,
             render: (c) => (
               <>
-                <p className="text-sm text-neutral-70 dark:text-neutral-30">
+                <p className="text-sm text-secondary">
                   {teamMap.get(c.teamId ?? '')?.name ?? '-'}
                 </p>
                 <p className="text-xs text-neutral-50">{appMap.get(c.applicationId ?? '')?.name ?? ''}</p>
@@ -222,7 +222,7 @@ export function CommitmentsPage() {
               const daysInfo = daysInfoMap.get(c.id)!
               return (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-neutral-70 dark:text-neutral-30">
+                  <span className="text-sm text-secondary">
                     {new Date(c.commitmentDate).toLocaleDateString('es-ES')}
                   </span>
                   <span className={`text-xs font-medium ${daysInfo.urgent ? 'text-danger' : 'text-neutral-50'}`}>

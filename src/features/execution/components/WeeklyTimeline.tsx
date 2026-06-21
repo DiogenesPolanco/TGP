@@ -37,8 +37,8 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
     selectedWeek && week.start.getTime() === selectedWeek.start.getTime()
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+    <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary" />
           <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Roadmap Semanal</h3>
@@ -80,7 +80,7 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
               }`}
             >
               <span className={`text-[11px] font-semibold uppercase tracking-wider ${
-                selected ? 'text-primary' : 'text-neutral-60 dark:text-neutral-40'
+                selected ? 'text-primary' : 'text-muted'
               }`}>
                 {week.shortLabel}
               </span>

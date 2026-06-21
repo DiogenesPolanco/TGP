@@ -93,7 +93,7 @@ export function TasksPage() {
       label: 'Plan',
       sortable: true,
       render: (t) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {(t.planId && planMap.get(t.planId)?.title) || '-'}
         </span>
       ),
@@ -103,7 +103,7 @@ export function TasksPage() {
       label: 'Horas',
       sortable: true,
       render: (t) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">{t.estimatedHours ?? '-'}</span>
+        <span className="text-sm text-secondary">{t.estimatedHours ?? '-'}</span>
       ),
     },
     {
@@ -115,7 +115,7 @@ export function TasksPage() {
         const d = new Date(t.dueDate)
         const diff = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
         return (
-          <span className={`text-sm ${diff < 0 ? 'text-danger font-medium' : diff <= 3 ? 'text-warning' : 'text-neutral-70 dark:text-neutral-30'}`}>
+          <span className={`text-sm ${diff < 0 ? 'text-danger font-medium' : diff <= 3 ? 'text-warning' : 'text-secondary'}`}>
             {d.toLocaleDateString('es-ES')}
           </span>
         )
@@ -158,7 +158,7 @@ export function TasksPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Tareas</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Gestión de tareas operativas</p>
+          <p className="text-sm text-muted mt-1">Gestión de tareas operativas</p>
         </div>
         <Button
           onClick={() => navigate('/execution/tasks/new')}
@@ -176,7 +176,7 @@ export function TasksPage() {
         <StatCard icon={<CheckCircle2 size={18} />} label="Completadas" value={stats.done} color="text-success" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -218,10 +218,10 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
     'text-success': 'bg-success/10 text-success',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3">
+    <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3">
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </div>
   )
 }

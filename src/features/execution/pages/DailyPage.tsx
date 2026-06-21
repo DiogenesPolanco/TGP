@@ -188,13 +188,13 @@ export function DailyPage() {
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
             Seguimiento Diario
           </h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             {today.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Button
           onClick={handleShare}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white bg-card border border-boundary rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
         >
           <Share2 size={16} />
           Compartir
@@ -202,7 +202,7 @@ export function DailyPage() {
       </div>
 
       {shareUrl && (
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4 flex items-center gap-3 max-w-full overflow-hidden">
+        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
           <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
             className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
@@ -274,7 +274,7 @@ export function DailyPage() {
         <div className="space-y-4">
           {/* Blockers */}
           {agenda.activeBlockers.length > 0 && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-danger/30 shadow-sm overflow-hidden">
+            <div className="bg-card rounded-xl border border-danger/30 shadow-sm overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 bg-danger/5 border-b border-danger/20">
                 <Ban size={16} className="text-danger" />
                 <h3 className="text-sm font-semibold text-danger">Bloqueos Activos ({agenda.activeBlockers.length})</h3>
@@ -299,7 +299,7 @@ export function DailyPage() {
                         <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
                         <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1 ml-1">
+                      <p className="text-xs text-muted mt-1 ml-1">
                         {blocker.description?.slice(0, 120)}
                       </p>
                       <div className="flex items-center gap-2 mt-1 ml-1">
@@ -315,8 +315,8 @@ export function DailyPage() {
 
           {/* Overdue */}
           {agenda.overdue.length > 0 && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+            <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
                 <XCircle size={16} className="text-danger" />
                 <h3 className="text-sm font-semibold text-danger">Vencidas ({agenda.overdue.length})</h3>
               </div>
@@ -347,8 +347,8 @@ export function DailyPage() {
           )}
 
           {/* Due today / this week */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+          <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
               <Calendar size={16} className="text-warning" />
               <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
                 {selectedWeek ? 'Vence Esta Semana' : 'Vence Hoy'}
@@ -414,8 +414,8 @@ export function DailyPage() {
 
           {/* Tasks due */}
           {agenda.tasksDue.length > 0 && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+            <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
                 <ListTodo size={16} className="text-info" />
                 <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Tareas Pendientes ({agenda.tasksDue.length})</h3>
               </div>
@@ -511,11 +511,11 @@ function StatCard({
   return (
     <CardComp
       onClick={onClick}
-      className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3"
+      className="bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3"
     >
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </CardComp>
   )
 }

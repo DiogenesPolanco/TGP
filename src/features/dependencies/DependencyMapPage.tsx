@@ -37,21 +37,21 @@ export function DependencyMapPage() {
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-3">
+        <div className="bg-card rounded-xl border border-boundary p-3 flex items-center gap-3">
           <Network size={20} className="text-primary shrink-0" />
           <div>
             <p className="text-lg font-bold text-neutral-90 dark:text-white">{nodes.length}</p>
             <p className="text-xs text-neutral-50">Aplicaciones</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-3">
+        <div className="bg-card rounded-xl border border-boundary p-3 flex items-center gap-3">
           <ArrowRight size={20} className="text-amber-500 shrink-0" />
           <div>
             <p className="text-lg font-bold text-neutral-90 dark:text-white">{edges.length}</p>
             <p className="text-xs text-neutral-50">Dependencias</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-3 flex items-center gap-3">
+        <div className="bg-card rounded-xl border border-boundary p-3 flex items-center gap-3">
           <Layers size={20} className="text-emerald-500 shrink-0" />
           <div>
             <p className="text-lg font-bold text-neutral-90 dark:text-white">
@@ -65,8 +65,8 @@ export function DependencyMapPage() {
       {/* Two-column layout: Graph | Legend + Dependencies */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Graph — takes 3/4 */}
-        <div className="lg:col-span-3 bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-          <div className="p-3 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+          <div className="p-3 border-b border-boundary">
             <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Dependencias</h2>
           </div>
           <div className="p-3">
@@ -87,7 +87,7 @@ export function DependencyMapPage() {
         {/* Sidebar — takes 1/4 */}
         <div className="lg:col-span-1 space-y-4">
           {/* Leyenda */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+          <div className="bg-card rounded-xl border border-boundary p-4">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-3">Leyenda</h3>
             <div className="space-y-4">
               <div>
@@ -132,7 +132,7 @@ export function DependencyMapPage() {
 
           {/* Lista compacta de dependencias */}
           {edges.length > 0 && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-4">
+            <div className="bg-card rounded-xl border border-boundary p-4">
               <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-3">Dependencias</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto">
                 {deps.map((dep) => {

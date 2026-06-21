@@ -109,9 +109,9 @@ export function BlockerFormPage() {
         </h1>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="block text-sm font-medium text-secondary mb-1.5">
             Título <span className="text-danger">*</span>
           </label>
           <input
@@ -124,7 +124,7 @@ export function BlockerFormPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
+          <label className="block text-sm font-medium text-secondary mb-1.5">Descripción</label>
           <RichTextEditor
             value={description}
             onChange={(html) => setDescription(html)}
@@ -161,7 +161,7 @@ export function BlockerFormPage() {
                 ]} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+                <label className="block text-sm font-medium text-secondary mb-1.5">
                   ID del Origen <span className="text-danger">*</span>
                 </label>
                 <input
@@ -185,7 +185,7 @@ export function BlockerFormPage() {
 
           {blocker && status === 'resolved' && (
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Notas de resolución</label>
+              <label className="block text-sm font-medium text-secondary mb-1.5">Notas de resolución</label>
               <RichTextEditor
                 value={resolutionNotes}
                 onChange={(html) => setResolutionNotes(html)}
@@ -199,7 +199,7 @@ export function BlockerFormPage() {
           <Button
             type="button"
             onClick={() => navigate('/execution/daily')}
-            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
           </Button>

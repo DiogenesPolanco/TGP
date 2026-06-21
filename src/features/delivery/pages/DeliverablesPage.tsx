@@ -17,7 +17,7 @@ import type { DeliverableStatus, Deliverable } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
 const statusColors: Record<DeliverableStatus, string> = {
-  pending: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 dark:text-neutral-40',
+  pending: 'bg-neutral-10 dark:bg-neutral-70 text-muted',
   in_progress: 'bg-info/10 text-info',
   completed: 'bg-success/10 text-success',
   cancelled: 'bg-danger/10 text-danger',
@@ -107,7 +107,7 @@ export function DeliverablesPage() {
       label: 'Fecha Límite',
       sortable: true,
       render: (del) => (
-        <span className="text-sm text-neutral-70 dark:text-neutral-30">
+        <span className="text-sm text-secondary">
           {del.dueDate
             ? new Date(del.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
             : '—'}
@@ -120,7 +120,7 @@ export function DeliverablesPage() {
       render: (del) => {
         const obj = del.objectiveId ? allObjectives.find((o) => o.id === del.objectiveId) : null
         return (
-          <span className="text-sm text-neutral-70 dark:text-neutral-30 max-w-[180px] truncate block">
+          <span className="text-sm text-secondary max-w-[180px] truncate block">
             {obj?.title ?? '—'}
           </span>
         )
@@ -167,7 +167,7 @@ export function DeliverablesPage() {
         </div>
         <Button
           onClick={() => navigate('/admin/import')}
-          className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
         >
           <Upload size={16} />
           Importar
@@ -186,18 +186,18 @@ export function DeliverablesPage() {
                 'p-4 rounded-xl border text-left shadow-sm transition-all',
                 statusFilter === st
                   ? 'border-primary bg-primary/5'
-                  : 'bg-white dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 hover:shadow',
+                  : 'bg-card border-boundary hover:shadow',
               )}
             >
               <p className={cn('text-2xl font-bold', statusColors[st])}>{count}</p>
-              <p className="text-xs text-neutral-60 dark:text-neutral-40 mt-1">{statusLabel[st]}</p>
+              <p className="text-xs text-muted mt-1">{statusLabel[st]}</p>
             </Button>
           )
         })}
       </div>
 
       {/* Filters bar */}
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -224,7 +224,7 @@ export function DeliverablesPage() {
         </div>
 
         {showFilters && (
-          <div className="flex gap-3 mt-3 pt-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex gap-3 mt-3 pt-3 border-t border-boundary">
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Estado</label>
               <Select value={statusFilter} onChange={(v) => setStatusFilter(v as DeliverableStatus | 'all')} options={[

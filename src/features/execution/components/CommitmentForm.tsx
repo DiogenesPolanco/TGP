@@ -82,7 +82,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-6 space-y-5">
+      <div className="w-full max-w-xl bg-card rounded-2xl border border-boundary shadow-2xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {commitment ? 'Editar Compromiso' : 'Nuevo Compromiso'}
@@ -94,7 +94,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
 
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+            <label className="block text-sm font-medium text-secondary mb-1.5">
               Titulo <span className="text-danger">*</span>
             </label>
             <input
@@ -107,7 +107,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div className="col-span-2 overflow-hidden">
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripcion</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Descripcion</label>
             <RichTextEditor
               value={description}
               onChange={(html) => setDescription(html)}
@@ -191,7 +191,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+            <label className="block text-sm font-medium text-secondary mb-1.5">
               Fecha compromiso <span className="text-danger">*</span>
             </label>
             <DatePicker
@@ -203,7 +203,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
             Cancelar
           </Button>
           <Button

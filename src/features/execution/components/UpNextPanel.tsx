@@ -29,8 +29,8 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
   if (upcoming.length === 0) return null
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-2 px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+    <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-3 border-b border-boundary">
         <Calendar size={15} className="text-primary" />
         <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Qué Sigue</h3>
         <span className="text-[11px] text-neutral-50 ml-auto">Próximos vencimientos</span>
@@ -68,7 +68,7 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
                   ? 'bg-danger/10 border-danger/20 text-danger'
                   : isToday
                     ? 'bg-warning/10 border-warning/20 text-warning'
-                    : 'bg-neutral-10 dark:bg-neutral-70 border-neutral-20 dark:border-neutral-60 text-neutral-60 dark:text-neutral-40'
+                    : 'bg-neutral-10 dark:bg-neutral-70 border-neutral-20 dark:border-neutral-60 text-muted'
               }`}>
                 <span className="text-[10px] font-bold leading-none">{item.dueDate.getDate()}</span>
                 <span className="text-[9px] leading-none mt-0.5 opacity-75">

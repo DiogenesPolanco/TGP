@@ -35,7 +35,7 @@ export function DeliverableDetailPage() {
           {app && (
             <Button
               onClick={() => navigate(`/catalog/applications/${app.id}`)}
-              className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
             >
               Ver Aplicación
             </Button>

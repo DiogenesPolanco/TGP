@@ -3,10 +3,19 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowRight, ChevronDown, ChevronRight, Link2, Plus, Trash2 } from 'lucide-react'
 import type { DependencyRelation } from '@/constants/enums'
-import { Button } from '@/components/ui/Button'
 
 interface DependencyListProps {
   planId: string
+}
+
+type EntityType = 'plan' | 'activity' | 'task' | 'deliverable' | 'commitment'
+
+const entityTypeLabels: Record<EntityType, string> = {
+  plan: 'Plan',
+  activity: 'Actividad',
+  task: 'Tarea',
+  deliverable: 'Entregable',
+  commitment: 'Compromiso',
 }
 
 const relationLabels: Record<DependencyRelation, string> = {
@@ -24,13 +33,16 @@ const relationColors: Record<DependencyRelation, string> = {
 export function DependencyList({ planId }: DependencyListProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [showForm, setShowForm] = useState(false)
-  const [targetType, setTargetType] = useState<'plan' | 'deliverable'>('plan')
+  const [targetType, setTargetType] = useState<EntityType>('plan')
   const [targetId, setTargetId] = useState('')
   const [relationType, setRelationType] = useState<DependencyRelation>('depends_on')
   const [description, setDescription] = useState('')
 
   const plans = useLiveQuery(() => db.plans.toArray())
+  const activities = useLiveQuery(() => db.activities.where('planId').equals(planId).toArray())
+  const tasks = useLiveQuery(() => db.tasks.where('planId').equals(planId).toArray())
   const deliverables = useLiveQuery(() => db.deliverables.toArray())
+  const commitments = useLiveQuery(() => db.commitments.toArray())
   const dependencies = useLiveQuery(
     () => db.dependencies.where({ sourceType: 'plan', sourceId: planId }).toArray(),
     [planId],
@@ -39,6 +51,34 @@ export function DependencyList({ planId }: DependencyListProps) {
     () => db.dependencies.where({ targetType: 'plan', targetId: planId }).toArray(),
     [planId],
   )
+
+  const getEntityOptions = () => {
+    switch (targetType) {
+      case 'plan':
+        return plans?.filter((p) => p.id !== planId).map((p) => ({ value: p.id, label: p.title })) ?? []
+      case 'activity':
+        return activities?.map((act) => ({ value: act.id, label: act.title })) ?? []
+      case 'task':
+        return tasks?.map((t) => ({ value: t.id, label: t.title })) ?? []
+      case 'deliverable':
+        return deliverables?.map((d) => ({ value: d.id, label: d.title })) ?? []
+      case 'commitment':
+        return commitments?.map((c) => ({ value: c.id, label: c.title })) ?? []
+      default:
+        return []
+    }
+  }
+
+  const getEntityName = (type: string, id: string): string => {
+    switch (type) {
+      case 'plan': return plans?.find((p) => p.id === id)?.title ?? id
+      case 'activity': return activities?.find((a) => a.id === id)?.title ?? id
+      case 'task': return tasks?.find((t) => t.id === id)?.title ?? id
+      case 'deliverable': return deliverables?.find((d) => d.id === id)?.title ?? id
+      case 'commitment': return commitments?.find((c) => c.id === id)?.title ?? id
+      default: return id
+    }
+  }
 
   const handleAdd = async () => {
     if (!targetId) return
@@ -67,33 +107,25 @@ export function DependencyList({ planId }: DependencyListProps) {
     await db.dependencies.delete(id)
   }
 
-  const getTargetName = (type: string, id: string) => {
-    if (type === 'plan') return plans?.find((p) => p.id === id)?.title ?? id
-    return deliverables?.find((d) => d.id === id)?.title ?? id
-  }
-
-  const getSourceName = (id: string) => {
-    return plans?.find((p) => p.id === id)?.title ?? id
-  }
-
   const allDeps = [
     ...(dependencies?.map((d) => ({
       dep: d,
-      relatedName: getTargetName(d.targetType, d.targetId),
+      relatedName: getEntityName(d.targetType, d.targetId),
       label: relationLabels[d.relationType],
       isIncoming: false,
     })) ?? []),
     ...(reverseDeps?.filter((d) => d.sourceId !== planId).map((d) => ({
       dep: d,
-      relatedName: getSourceName(d.sourceId),
-      label: 'Depende de este plan',
+      relatedName: getEntityName(d.sourceType, d.sourceId),
+      label: `Depende de este plan`,
       isIncoming: true,
     })) ?? []),
   ]
 
   return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl overflow-hidden">
-      <Button
+    <div className="border border-boundary rounded-xl overflow-hidden">
+      <button
+        type="button"
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
       >
@@ -107,53 +139,53 @@ export function DependencyList({ planId }: DependencyListProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button
+          <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); setShowForm(!showForm) }}
             className="p-1 rounded-md hover:bg-neutral-30 dark:hover:bg-neutral-60 transition-colors"
             title="Agregar dependencia"
           >
             <Plus size={16} className="text-neutral-50" />
-          </Button>
-          {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {collapsed ? <ChevronRight size={16} className="text-neutral-50" /> : <ChevronDown size={16} className="text-neutral-50" />}
         </div>
-      </Button>
+      </button>
 
       {!collapsed && (
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
           {showForm && (
             <div className="p-4 space-y-3 bg-neutral-10 dark:bg-neutral-80">
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Tipo destino</label>
+                <label className="block text-xs font-medium text-secondary mb-1">Tipo destino</label>
                 <select
                   value={targetType}
-                  onChange={(e) => { setTargetType(e.target.value as 'plan' | 'deliverable'); setTargetId('') }}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                  onChange={(e) => { setTargetType(e.target.value as EntityType); setTargetId('') }}
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
                 >
-                  <option value="plan">Plan</option>
-                  <option value="deliverable">Entregable</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">
-                  {targetType === 'plan' ? 'Plan destino' : 'Entregable destino'}
-                </label>
-                <select
-                  value={targetId}
-                  onChange={(e) => setTargetId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
-                >
-                  <option value="">Seleccionar...</option>
-                  {(targetType === 'plan' ? plans : deliverables)?.filter((p) => p.id !== planId).map((p) => (
-                    <option key={p.id} value={p.id}>{(targetType === 'plan' ? (p as { title: string }).title : (p as { title: string }).title) ?? p.id}</option>
+                  {(Object.keys(entityTypeLabels) as EntityType[]).map((key) => (
+                    <option key={key} value={key}>{entityTypeLabels[key]}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Relacion</label>
+                <label className="block text-xs font-medium text-secondary mb-1">Entidad destino</label>
+                <select
+                  value={targetId}
+                  onChange={(e) => setTargetId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
+                >
+                  <option value="">Seleccionar...</option>
+                  {getEntityOptions().filter((opt) => opt.value !== planId).map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-secondary mb-1">Relación</label>
                 <select
                   value={relationType}
                   onChange={(e) => setRelationType(e.target.value as DependencyRelation)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
                 >
                   <option value="depends_on">Depende de</option>
                   <option value="blocks">Bloquea a</option>
@@ -161,29 +193,31 @@ export function DependencyList({ planId }: DependencyListProps) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripcion</label>
+                <label className="block text-xs font-medium text-secondary mb-1">Descripción</label>
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Que tipo de dependencia?"
+                  placeholder="¿Qué tipo de dependencia?"
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <Button
+                <button
+                  type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-3 py-1.5 text-xs font-medium text-neutral-70 hover:bg-neutral-20 rounded-lg transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium text-neutral-70 dark:text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 rounded-lg transition-colors"
                 >
                   Cancelar
-                </Button>
-                <Button
+                </button>
+                <button
+                  type="button"
                   onClick={handleAdd}
                   disabled={!targetId}
                   className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
                 >
                   Agregar
-                </Button>
+                </button>
               </div>
             </div>
           )}
@@ -199,12 +233,16 @@ export function DependencyList({ planId }: DependencyListProps) {
                   {relationLabels[dep.relationType]}
                 </span>
                 <ArrowRight size={12} className="text-neutral-50 shrink-0" />
-                <span className="text-sm text-neutral-80 dark:text-white truncate">{getTargetName(dep.targetType, dep.targetId)}</span>
+                <span className="text-sm text-neutral-80 dark:text-white truncate">{getEntityName(dep.targetType, dep.targetId)}</span>
                 {dep.description && <span className="text-xs text-neutral-50 hidden sm:inline truncate">- {dep.description}</span>}
               </div>
-              <Button onClick={() => handleRemove(dep.id)} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0 ml-2">
-                <Trash2 size={14} className="text-neutral-50" />
-              </Button>
+              <button
+                type="button"
+                onClick={() => handleRemove(dep.id)}
+                className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0 ml-2"
+              >
+                <Trash2 size={14} className="text-neutral-50 hover:text-danger" />
+              </button>
             </div>
           ))}
 
@@ -215,7 +253,7 @@ export function DependencyList({ planId }: DependencyListProps) {
                   Depende de este plan
                 </span>
                 <ArrowRight size={12} className="text-neutral-50 shrink-0" />
-                <span className="text-sm text-neutral-80 dark:text-white truncate">{getSourceName(dep.sourceId)}</span>
+                <span className="text-sm text-neutral-80 dark:text-white truncate">{getEntityName(dep.sourceType, dep.sourceId)}</span>
               </div>
             </div>
           ))}

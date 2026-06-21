@@ -61,8 +61,29 @@ export function ActivityGantt({
     })
   }
 
-  const rootActivities = activities.filter((a) => !a.parentActivityId)
-  const childActivities = (parentId: string) => activities.filter((a) => a.parentActivityId === parentId)
+  const activitiesByParent = useMemo(() => {
+    const map = new Map<string | null, Activity[]>()
+    for (const a of activities) {
+      const parentId = a.parentActivityId ?? null
+      const list = map.get(parentId) ?? []
+      list.push(a)
+      map.set(parentId, list)
+    }
+    // Sort each level by sortOrder
+    for (const [key, list] of map) {
+      list.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      map.set(key, list)
+    }
+    return map
+  }, [activities])
+
+  const rootActivities = useMemo(
+    () => activitiesByParent.get(null) ?? [],
+    [activitiesByParent],
+  )
+
+  const childActivities = (parentId: string) =>
+    activitiesByParent.get(parentId) ?? []
 
   const tasksByActivity = useMemo(() => {
     const map = new Map<string, typeof tasks>()
@@ -121,10 +142,65 @@ export function ActivityGantt({
   const today = new Date()
   const dayWidth = Math.max(24, Math.min(48, Math.floor(800 / totalDays)))
 
+  /** Recursively renders an activity, its sub-activities (N levels), and its tasks */
+  const renderActivityTree = (activity: Activity, depth: number = 0) => {
+    const children = childActivities(activity.id)
+    const hasChildren = children.length > 0
+    const isExpanded = expandedActivities.has(activity.id)
+    const activityTasks = tasksByActivity.get(activity.id) ?? []
+    const indent = depth * 16 // 16px per level for the nested border
+
+    return (
+      <div key={activity.id}>
+        <ActivityGanttRow
+          activity={activity}
+          timelineStart={timelineStart}
+          totalDays={totalDays}
+          dayWidth={dayWidth}
+          today={today}
+          teamMap={teamMap}
+          appMap={appMap}
+          onEdit={() => onEditActivity(activity.id)}
+          onDelete={() => onDeleteActivity(activity)}
+          hasChildren={hasChildren}
+          isExpanded={isExpanded}
+          onToggle={() => toggleExpand(activity.id)}
+          readOnly={readOnly}
+          depth={depth}
+        />
+
+        {isExpanded && (
+          <div className={`border-l-2 border-boundary`} style={{ marginLeft: `${24 + indent}px` }}>
+            {/* Recursively render children */}
+            {children.map((child) => renderActivityTree(child, depth + 1))}
+
+            {/* Tasks for this activity (shown after children) */}
+            {activityTasks.length > 0 && (
+              <div className="pb-1">
+                {activityTasks.map((task) => (
+                  <GanttTaskRow
+                    key={task.id}
+                    task={task}
+                    timelineStart={timelineStart}
+                    totalDays={totalDays}
+                    dayWidth={dayWidth}
+                    today={today}
+                    onToggle={() => onTaskToggle(task.id, task.status)}
+                    depth={depth + 1}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-boundary">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             Detalle del plan
@@ -148,14 +224,14 @@ export function ActivityGantt({
       <div className="overflow-x-auto">
         <div style={{ minWidth: `${15 + totalDays * (dayWidth / 7)}px` }}>
           {/* Month headers */}
-          <div className="flex border-b border-neutral-20 dark:border-neutral-70">
-            <div className="w-56 shrink-0 border-r border-neutral-20 dark:border-neutral-70" />
+          <div className="flex border-b border-boundary">
+            <div className="w-56 shrink-0 border-r border-boundary" />
             <div className="flex">
               {buildMonthSegments(timelineStart, totalDays).map((seg, i) => (
                 <div
                   key={i}
                   title={`${seg.label} — ${seg.days} días`}
-                  className="text-center py-2 text-[11px] font-semibold text-neutral-50 uppercase tracking-wider border-r border-neutral-20 dark:border-neutral-70"
+                  className="text-center py-2 text-[11px] font-semibold text-neutral-50 uppercase tracking-wider border-r border-boundary"
                   style={{ width: `${seg.days * (dayWidth / 7)}px` }}
                 >
                   {seg.label}
@@ -165,8 +241,8 @@ export function ActivityGantt({
           </div>
 
           {/* Week headers */}
-          <div className="flex border-b border-neutral-20 dark:border-neutral-70">
-            <div className="w-56 shrink-0 border-r border-neutral-20 dark:border-neutral-70" />
+          <div className="flex border-b border-boundary">
+            <div className="w-56 shrink-0 border-r border-boundary" />
             <div className="flex">
               {(() => {
                 let currentMonth = -1
@@ -188,7 +264,7 @@ export function ActivityGantt({
                     <div
                       key={i}
                       title={`Semana del ${weekDate.toLocaleDateString('es-ES')} al ${weekEnd.toLocaleDateString('es-ES')}`}
-                      className={`text-center py-1.5 text-[10px] font-medium border-r border-neutral-20 dark:border-neutral-70 ${
+                      className={`text-center py-1.5 text-[10px] font-medium border-r border-boundary ${
                         isThisWeek ? 'bg-primary/[0.04] text-primary' : 'text-neutral-50'
                       }`}
                       style={{ width: `${dayWidth}px` }}
@@ -201,100 +277,21 @@ export function ActivityGantt({
             </div>
           </div>
 
-          {/* Activity rows */}
+          {/* Activity rows — recursive tree rendering */}
           <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
             {rootActivities.length === 0 ? (
               <div className="p-8 text-center text-sm text-neutral-50">
                 No hay actividades. Crea la primera para empezar.
               </div>
             ) : (
-              rootActivities.map((activity) => (
-                <div key={activity.id}>
-                  {/* Parent activity row */}
-                  <ActivityGanttRow
-                    activity={activity}
-                    timelineStart={timelineStart}
-                    totalDays={totalDays}
-                    dayWidth={dayWidth}
-                    today={today}
-                    teamMap={teamMap}
-                    appMap={appMap}
-                    onEdit={() => onEditActivity(activity.id)}
-                    onDelete={() => onDeleteActivity(activity)}
-                    hasChildren={childActivities(activity.id).length > 0}
-                    isExpanded={expandedActivities.has(activity.id)}
-                    onToggle={() => toggleExpand(activity.id)}
-                    readOnly={readOnly}
-                  />
-
-                  {/* Sub-activities + tasks */}
-                  {(expandedActivities.has(activity.id)) && (
-                    <div className="ml-8 border-l-2 border-neutral-20 dark:border-neutral-70">
-                      {/* Sub-activities */}
-                      {childActivities(activity.id).map((child) => (
-                        <div key={child.id}>
-                          <ActivityGanttRow
-                            activity={child}
-                            timelineStart={timelineStart}
-                            totalDays={totalDays}
-                            dayWidth={dayWidth}
-                            today={today}
-                            teamMap={teamMap}
-                            appMap={appMap}
-                            onEdit={() => onEditActivity(child.id)}
-                            onDelete={() => onDeleteActivity(child)}
-                            hasChildren={false}
-                            isExpanded={false}
-                            onToggle={() => {}}
-                            isSub={true}
-                            readOnly={readOnly}
-                          />
-                          {/* Tasks for this child */}
-                          {(tasksByActivity.get(child.id) ?? []).length > 0 && (
-                            <div className="ml-10 pb-1">
-                              {tasksByActivity.get(child.id)!.map((task) => (
-                                <GanttTaskRow
-                                  key={task.id}
-                                  task={task}
-                                  timelineStart={timelineStart}
-                                  totalDays={totalDays}
-                                  dayWidth={dayWidth}
-                                  today={today}
-                                  onToggle={() => onTaskToggle(task.id, task.status)}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-
-                      {/* Tasks directly under parent */}
-                      {(tasksByActivity.get(activity.id) ?? []).length > 0 && (
-                        <div className="ml-10 pb-1">
-                          {tasksByActivity.get(activity.id)!.map((task) => (
-                            <GanttTaskRow
-                              key={task.id}
-                              task={task}
-                              timelineStart={timelineStart}
-                              totalDays={totalDays}
-                              dayWidth={dayWidth}
-                              today={today}
-                              onToggle={() => onTaskToggle(task.id, task.status)}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))
+              rootActivities.map((activity) => renderActivityTree(activity, 0))
             )}
           </div>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 px-6 py-3 border-t border-neutral-20 dark:border-neutral-70 bg-neutral-10/50 dark:bg-neutral-80/50">
+      <div className="flex items-center gap-4 px-6 py-3 border-t border-boundary bg-neutral-10/50 dark:bg-neutral-80/50">
         <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
         <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-pending" /> Pendiente</span>
         <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-info" /> En Progreso</span>
@@ -309,8 +306,9 @@ export function ActivityGantt({
 function ActivityGanttRow({
   activity, timelineStart, totalDays, dayWidth, today,
   teamMap, appMap, onEdit, onDelete,
-  hasChildren, isExpanded, onToggle, isSub,
+  hasChildren, isExpanded, onToggle,
   readOnly = false,
+  depth = 0,
 }: {
   activity: Activity
   timelineStart: Date
@@ -324,8 +322,8 @@ function ActivityGanttRow({
   hasChildren: boolean
   isExpanded: boolean
   onToggle: () => void
-  isSub?: boolean
   readOnly?: boolean
+  depth?: number
 }) {
   const totalPixels = totalDays * (dayWidth / 7)
   const isOverdue = activity.dueDate && new Date(activity.dueDate) < today && activity.status !== 'completed' && activity.status !== 'cancelled'
@@ -339,9 +337,9 @@ function ActivityGanttRow({
   const barWidth = Math.max(dayWidth / 7, ((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7))
 
   return (
-    <div className={`flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group ${isSub ? 'bg-neutral-10/30 dark:bg-neutral-70/10' : ''}`}>
+    <div className={`flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group ${depth > 0 ? 'bg-neutral-10/30 dark:bg-neutral-70/10' : ''}`}>
       {/* Label column */}
-      <div className={`w-56 shrink-0 px-4 py-3 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2 ${isSub ? 'pl-10' : ''}`}>
+      <div className="w-56 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2" style={{ paddingLeft: `${12 + depth * 24}px` }}>
         {hasChildren ? (
           <Button onClick={onToggle} className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
             {isExpanded ? <ChevronUp size={14} className="text-neutral-50" /> : <ChevronDown size={14} className="text-neutral-50" />}
@@ -422,7 +420,7 @@ function ActivityGanttRow({
 }
 
 function GanttTaskRow({
-  task, timelineStart, totalDays, dayWidth, today, onToggle,
+  task, timelineStart, totalDays, dayWidth, today, onToggle, depth = 1,
 }: {
   task: { id: string; title: string; status: string; priority: string; dueDate: Date | null }
   timelineStart: Date
@@ -430,13 +428,14 @@ function GanttTaskRow({
   dayWidth: number
   today: Date
   onToggle: () => void
+  depth?: number
 }) {
   const totalPixels = totalDays * (dayWidth / 7)
 
   return (
     <div className="flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group">
       {/* Label */}
-      <div className="w-56 shrink-0 px-4 py-2 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2 pl-14">
+      <div className="w-56 shrink-0 px-4 py-2 border-r border-boundary flex items-center gap-2" style={{ paddingLeft: `${28 + depth * 24}px` }}>
         <Button
           onClick={onToggle}
           className="flex items-center gap-2 min-w-0 flex-1 text-left"
@@ -448,7 +447,7 @@ function GanttTaskRow({
           }`}>
             {task.status === 'done' && <CheckCircle2 size={8} className="text-white" />}
           </div>
-          <span title={task.title} className={`text-xs truncate ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-neutral-70 dark:text-neutral-30'}`}>
+          <span title={task.title} className={`text-xs truncate ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-secondary'}`}>
             {task.title}
           </span>
         </Button>

@@ -166,7 +166,7 @@ export function TaskFormPage() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-3 pt-4 border-t border-neutral-20 dark:border-neutral-70">
+        <div className="flex items-center gap-3 pt-4 border-t border-boundary">
           <Button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
             {isEdit ? 'Guardar Cambios' : 'Crear Tarea'}
           </Button>
@@ -180,5 +180,5 @@ export function TaskFormPage() {
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block text-xs font-medium text-neutral-60 dark:text-neutral-40 mb-1">{children}</label>
+  return <label className="block text-xs font-medium text-muted mb-1">{children}</label>
 }

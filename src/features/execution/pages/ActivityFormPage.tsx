@@ -7,9 +7,10 @@ import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { PersonSelect } from '@/components/ui/PersonSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
-import type { Task } from '@/types/domain'
+import type { Activity, Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 export function ActivityFormPage() {
   const { planId, activityId } = useParams<{ planId: string; activityId?: string }>()
@@ -46,6 +47,12 @@ export function ActivityFormPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTaskTitle, setNewTaskTitle] = useState('')
 
+  // Load existing tasks from DB when editing
+  const existingTasks = useLiveQuery(
+    () => (activityId ? db.tasks.where('activityId').equals(activityId).toArray() : []),
+    [activityId],
+  )
+
   useEffect(() => {
     if (activity) {
       queueMicrotask(() => {
@@ -61,10 +68,14 @@ export function ActivityFormPage() {
         setCompletedPoints(activity.completedPoints?.toString() ?? '')
         setStartDate(activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '')
         setDueDate(activity.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '')
-        setTasks((activity as any).tasks ?? [])
       })
     }
   }, [activity])
+
+  // Sync existing DB tasks into local state
+  useEffect(() => {
+    if (existingTasks) setTasks(existingTasks)
+  }, [existingTasks])
 
   if (!planId) return <div className="p-6 text-neutral-50">Plan no especificado</div>
   if (activityId && !activity) return <div className="p-6 text-neutral-50">Cargando…</div>
@@ -102,6 +113,7 @@ export function ActivityFormPage() {
     setSaving(true)
     try {
       const now = new Date()
+      const maxSortOrder = tasks.reduce((max, t) => Math.max(max, t.sortOrder ?? 0), 0)
       const data = {
         planId,
         parentActivityId: parentActivityId || null,
@@ -116,14 +128,30 @@ export function ActivityFormPage() {
         actualHours: activity?.actualHours ?? null,
         plannedPoints: plannedPoints ? Number(plannedPoints) : null,
         completedPoints: completedPoints ? Number(completedPoints) : null,
-        startDate: startDate ? new Date(startDate) : null,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        sortOrder: activity?.sortOrder ?? (activities.length > 0 ? Math.max(...activities.map((a: Activity) => a.sortOrder ?? 0)) + 1 : 0),
+        startDate: startDate ? parseLocalDate(startDate) : null,
+        dueDate: dueDate ? parseLocalDate(dueDate) : null,
         completedAt: activity?.completedAt ?? null,
         updatedAt: now,
       }
 
       if (activity) {
         await db.activities.update(activity.id, data)
+        // Sync tasks: delete removed, add new
+        const oldTaskIds = existingTasks?.map((t) => t.id) ?? []
+        const currentTaskIds = tasks.map((t) => t.id)
+        const toDelete = oldTaskIds.filter((id) => !currentTaskIds.includes(id))
+        const toAdd = tasks.filter((t) => !oldTaskIds.includes(t.id))
+        if (toDelete.length > 0) await db.tasks.bulkDelete(toDelete)
+        if (toAdd.length > 0) {
+          await db.tasks.bulkAdd(
+            toAdd.map((t) => ({
+              ...t,
+              activityId: activity.id,
+              sortOrder: maxSortOrder + 1,
+            })),
+          )
+        }
         addNotification({ type: 'success', message: 'Actividad actualizada' })
       } else {
         const newActivityId = crypto.randomUUID()
@@ -137,9 +165,10 @@ export function ActivityFormPage() {
         })
         if (tasks.length > 0) {
           await db.tasks.bulkAdd(
-            tasks.map((t) => ({
+            tasks.map((t, i) => ({
               ...t,
               activityId: newActivityId,
+              sortOrder: i,
             })),
           )
         }
@@ -168,9 +197,9 @@ export function ActivityFormPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
+      <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+          <label className="block text-sm font-medium text-secondary mb-1.5">
             Título <span className="text-danger">*</span>
           </label>
           <input
@@ -183,7 +212,7 @@ export function ActivityFormPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Descripción</label>
+          <label className="block text-sm font-medium text-secondary mb-1.5">Descripción</label>
           <RichTextEditor
             value={description}
             onChange={(html) => setDescription(html)}
@@ -193,7 +222,7 @@ export function ActivityFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Actividad Padre</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Actividad Padre</label>
             <select
               value={parentActivityId}
               onChange={(e) => setParentActivityId(e.target.value)}
@@ -211,7 +240,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Prioridad</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Prioridad</label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as Criticality)}
@@ -225,7 +254,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Estado</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Estado</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as DeliverableStatus)}
@@ -239,7 +268,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Equipo</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Equipo</label>
             <select
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
@@ -263,7 +292,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Aplicación</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Aplicación</label>
             <select
               value={applicationId}
               onChange={(e) => setApplicationId(e.target.value)}
@@ -279,7 +308,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Planif.</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Puntos Planif.</label>
             <input
               type="number"
               value={plannedPoints}
@@ -290,7 +319,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Puntos Comp.</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Puntos Comp.</label>
             <input
               type="number"
               value={completedPoints}
@@ -301,7 +330,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Inicio</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Fecha Inicio</label>
             <DatePicker
               value={startDate}
               onChange={setStartDate}
@@ -310,7 +339,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Fecha Fin</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Fecha Fin</label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
@@ -319,10 +348,8 @@ export function ActivityFormPage() {
           </div>
         </div>
 
-        {/* Inline tasks (only for new activities) */}
-        {!activity && (
-          <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">Tareas rápidas</label>
+        <div>
+            <label className="block text-sm font-medium text-secondary mb-1.5">Tareas rápidas</label>
             <div className="flex items-center gap-2 mb-2">
               <input
                 type="text"
@@ -357,14 +384,13 @@ export function ActivityFormPage() {
                 ))}
               </div>
             )}
-          </div>
-        )}
+        </div>
 
         <div className="flex items-center justify-end gap-3 pt-4">
           <Button
             type="button"
             onClick={() => navigate(`/execution/plans/${planId}`)}
-            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
           >
             Cancelar
           </Button>

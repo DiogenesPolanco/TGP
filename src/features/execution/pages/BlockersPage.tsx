@@ -51,10 +51,10 @@ export function BlockersPage() {
     )},
     { key: 'sourceType', label: 'Origen', sortable: true, render: (b) => {
       const labels: Record<string, string> = { task: 'Tarea', activity: 'Actividad', plan: 'Plan', commitment: 'Compromiso' }
-      return <span className="text-sm text-neutral-70 dark:text-neutral-30">{labels[b.sourceType] ?? b.sourceType}</span>
+      return <span className="text-sm text-secondary">{labels[b.sourceType] ?? b.sourceType}</span>
     }},
     { key: 'assigneeId', label: 'Asignado', sortable: true, render: (b) => (
-      <span className="text-sm text-neutral-70 dark:text-neutral-30">{b.assigneeId ?? '—'}</span>
+      <span className="text-sm text-secondary">{b.assigneeId ?? '—'}</span>
     )},
     { key: 'actions', label: '', render: (b) => (
       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all" onClick={(e) => e.stopPropagation()}>
@@ -76,7 +76,7 @@ export function BlockersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Bloqueos</h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">Gestión de bloqueos y escalamientos</p>
+          <p className="text-sm text-muted mt-1">Gestión de bloqueos y escalamientos</p>
         </div>
         <Button onClick={() => navigate('/execution/blockers/new')} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
           <Plus size={18} /> Nuevo Bloqueo
@@ -90,7 +90,7 @@ export function BlockersPage() {
         <StatCard icon={<Ban size={18} />} label="Críticos" value={stats.critical} color="text-danger" />
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
@@ -126,10 +126,10 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
     'text-warning': 'bg-warning/10 text-warning',
   }
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 shadow-sm flex items-center justify-center gap-3">
+    <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3">
       <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </div>
   )
 }

@@ -15,10 +15,10 @@ export function PredictionsWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
         <div className="animate-pulse space-y-3">
-          <div className="h-4 w-32 bg-neutral-20 dark:bg-neutral-75 rounded" />
-          <div className="h-16 bg-neutral-20 dark:bg-neutral-75 rounded" />
+          <div className="h-4 w-32 bg-subtle rounded" />
+          <div className="h-16 bg-subtle rounded" />
         </div>
       </div>
     )
@@ -27,7 +27,7 @@ export function PredictionsWidget() {
   if (predictions.length === 0) return null
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-5">
         <Brain size={22} className="text-purple-500" />
         <h3 className="text-base font-bold text-neutral-90 dark:text-white">Análisis Predictivo</h3>
@@ -46,7 +46,7 @@ function PredictionMini({ prediction }: { prediction: Prediction }) {
   const trendColor = prediction.trend === 'up' ? 'text-danger' : prediction.trend === 'down' ? 'text-success' : 'text-neutral-50'
 
   return (
-    <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-5 border border-neutral-20 dark:border-neutral-70">
+    <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-5 border border-boundary">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-semibold text-neutral-80 dark:text-neutral-20">{prediction.metric}</span>
         <TrendIcon size={18} className={trendColor} />
@@ -56,7 +56,7 @@ function PredictionMini({ prediction }: { prediction: Prediction }) {
         <span className="text-sm text-neutral-50 font-medium">→</span>
         <span className="text-xl font-bold text-purple-600 dark:text-purple-400">{prediction.predicted}</span>
       </div>
-      <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">{prediction.detail}</p>
+      <p className="text-sm text-muted leading-relaxed">{prediction.detail}</p>
     </div>
   )
 }

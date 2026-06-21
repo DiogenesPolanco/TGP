@@ -73,14 +73,14 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
                   <div key={entry.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span className="text-xs text-neutral-60 dark:text-neutral-40">{entry.name}</span>
+                      <span className="text-xs text-muted">{entry.name}</span>
                     </div>
                     <span className="text-sm font-medium text-neutral-90 dark:text-white">{entry.value}</span>
                   </div>
                 ))}
-                <div className="border-t border-neutral-20 dark:border-neutral-70 pt-2 mt-2">
+                <div className="border-t border-boundary pt-2 mt-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-neutral-60 dark:text-neutral-40">Total</span>
+                    <span className="text-xs font-semibold text-muted">Total</span>
                     <span className="text-sm font-bold text-neutral-90 dark:text-white">{techStatusData.reduce((s, d) => s + d.value, 0)}</span>
                   </div>
                 </div>
@@ -103,7 +103,7 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
 
 function ChartContainer({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm">
+    <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
       <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">{title}</h3>
       {children}
     </div>
@@ -180,7 +180,7 @@ function AlertItem({ type, message }: { type: string; message: string }) {
   const Icon = config.icon
 
   return (
-    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-neutral-20 dark:border-neutral-70 border-l-4 bg-white dark:bg-neutral-80 hover:bg-neutral-5 dark:hover:bg-neutral-75 transition-colors">
+    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-boundary border-l-4 bg-card hover:bg-neutral-5 dark:hover:bg-neutral-75 transition-colors">
       <Icon size={16} className={`${config.iconColor} mt-0.5 shrink-0`} />
       <div className="min-w-0 flex-1">
         <p className="text-sm text-neutral-80 dark:text-neutral-20 leading-relaxed">{message}</p>

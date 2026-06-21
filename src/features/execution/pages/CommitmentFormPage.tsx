@@ -10,6 +10,7 @@ import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { CommitmentStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
+import { parseLocalDate } from '@/lib/utils'
 
 const statusOptions: { value: CommitmentStatus; label: string }[] = [
   { value: 'active', label: 'Activo' },
@@ -76,7 +77,7 @@ export function CommitmentFormPage() {
       objectiveId: formData.objectiveId || null,
       deliverableId: formData.deliverableId || null,
       status: formData.status,
-      commitmentDate: new Date(formData.commitmentDate),
+      commitmentDate: parseLocalDate(formData.commitmentDate),
       fulfilledAt: formData.status === 'fulfilled' ? new Date() : (commitment?.fulfilledAt ?? null),
       metadata: commitment?.metadata ?? {},
       createdAt: commitment?.createdAt ?? new Date(),
@@ -103,14 +104,14 @@ export function CommitmentFormPage() {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 p-6 shadow-sm space-y-4">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Título *</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Título *</label>
           <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="ej. Entregar plan de migración antes del Q3" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripción</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
           <RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el compromiso..." />
         </div>
 
@@ -164,13 +165,13 @@ export function CommitmentFormPage() {
             <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as CommitmentStatus })} options={statusOptions} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1">Fecha compromiso *</label>
+            <label className="block text-sm font-medium text-secondary mb-1">Fecha compromiso *</label>
             <DatePicker required value={formData.commitmentDate} onChange={(v) => setFormData({ ...formData, commitmentDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" onClick={() => navigate('/execution/commitments')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
+          <Button type="button" onClick={() => navigate('/execution/commitments')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
           <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{commitment ? 'Actualizar' : 'Crear'}</Button>
         </div>
       </form>

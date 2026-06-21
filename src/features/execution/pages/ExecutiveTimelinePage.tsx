@@ -213,14 +213,14 @@ export function ExecutiveTimelinePage() {
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
             Timeline Ejecutivo
           </h2>
-          <p className="text-sm text-neutral-60 dark:text-neutral-40 mt-1">
+          <p className="text-sm text-muted mt-1">
             Visión consolidada de todos los planes
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 bg-card border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
             title="Compartir Timeline"
           >
             <Share2 size={16} />
@@ -229,7 +229,7 @@ export function ExecutiveTimelinePage() {
           {shareUrl && (
             <Button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-2 bg-card border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
               title="Copiar enlace"
             >
               {copied ? <Check size={16} className="text-success" /> : <Copy size={16} />}
@@ -316,9 +316,9 @@ export function ExecutiveTimelinePage() {
       {/* Main content: Gantt + sidebar */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Left: Gantt chart */}
-        <div className="xl:col-span-3 bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+        <div className="xl:col-span-3 bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
           {/* Timeline navigation + header */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
             <div className="flex items-center gap-2">
               <Calendar size={15} className="text-primary" />
               <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Línea de Tiempo</h3>
@@ -352,8 +352,8 @@ export function ExecutiveTimelinePage() {
           <div className="overflow-x-auto">
             <div style={{ minWidth: `${totalWidth + 200}px` }}>
               {/* Week headers */}
-              <div className="flex border-b border-neutral-20 dark:border-neutral-70 sticky top-0 bg-white dark:bg-neutral-80 z-10">
-                <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-neutral-20 dark:border-neutral-70">
+              <div className="flex border-b border-boundary sticky top-0 bg-card z-10">
+                <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-boundary">
                   Plan
                 </div>
                 <div className="flex">
@@ -364,7 +364,7 @@ export function ExecutiveTimelinePage() {
                     return (
                       <div
                         key={i}
-                        className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-neutral-20 dark:border-neutral-70 ${
+                        className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-boundary ${
                           isCurrent ? 'bg-primary/[0.04] text-primary' : 'text-neutral-50'
                         }`}
                         style={{ width: `${weekWidth}px` }}
@@ -403,11 +403,11 @@ export function ExecutiveTimelinePage() {
                   return (
                     <div
                       key={plan.id}
-                      className="flex items-center border-b border-neutral-20 dark:border-neutral-70 hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors cursor-pointer group"
+                      className="flex items-center border-b border-boundary hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors cursor-pointer group"
                       onClick={() => navigate(`/execution/plans/${plan.id}`)}
                     >
                       {/* Plan label */}
-                      <div className="w-48 shrink-0 px-4 py-3 border-r border-neutral-20 dark:border-neutral-70 flex items-center gap-2">
+                      <div className="w-48 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full shrink-0 ${health.dot}`} />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{plan.title}</p>
@@ -481,7 +481,7 @@ export function ExecutiveTimelinePage() {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 px-5 py-3 border-t border-neutral-20 dark:border-neutral-70">
+          <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary">
             <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
             <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" /> Saludable</span>
             <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En Riesgo</span>
@@ -493,8 +493,8 @@ export function ExecutiveTimelinePage() {
         {/* Right sidebar: Milestones + Alerts */}
         <div className="space-y-4">
           {/* Milestones */}
-          <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+          <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
               <Calendar size={15} className="text-primary" />
               <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Próximos Hitos</h3>
             </div>
@@ -523,7 +523,7 @@ export function ExecutiveTimelinePage() {
                           {diffDays <= 0 ? 'VENCE HOY' : diffDays === 1 ? 'MAÑANA' : `${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-70 dark:text-neutral-30 truncate">{m.title}</p>
+                      <p className="text-xs text-secondary truncate">{m.title}</p>
                       <p className="text-[10px] text-neutral-50 mt-0.5">{m.planTitle}</p>
                     </div>
                   )
@@ -534,8 +534,8 @@ export function ExecutiveTimelinePage() {
 
           {/* Alerts */}
           {alerts.length > 0 && (
-            <div className="bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-20 dark:border-neutral-70">
+            <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
                 <AlertOctagon size={15} className="text-danger" />
                 <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Alertas</h3>
               </div>
@@ -552,7 +552,7 @@ export function ExecutiveTimelinePage() {
                       a.severity === 'critical' ? 'text-danger' : a.severity === 'warning' ? 'text-warning' : 'text-info'
                     }`} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-neutral-70 dark:text-neutral-30">{a.message}</p>
+                      <p className="text-xs text-secondary">{a.message}</p>
                     </div>
                     <ArrowRight size={12} className="shrink-0 text-neutral-40 mt-1" />
                   </div>
@@ -602,10 +602,10 @@ function StatBox({ icon, label, value, color, bg, active, onClick }: {
 }) {
   if (!onClick) {
     return (
-      <div className={`${bg} rounded-xl border border-neutral-20 dark:border-neutral-70 p-4`}>
+      <div className={`${bg} rounded-xl border border-boundary p-4`}>
         <div className={`${color} mb-1`}>{icon}</div>
         <p className={`text-2xl font-bold ${color}`}>{value}</p>
-        <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+        <p className="text-xs text-muted">{label}</p>
       </div>
     )
   }
@@ -615,12 +615,12 @@ function StatBox({ icon, label, value, color, bg, active, onClick }: {
       className={`${bg} rounded-xl border p-4 text-left cursor-pointer transition-all hover:shadow-md ${
         active
           ? 'border-neutral-60 dark:border-neutral-40 ring-2 ring-inset ring-neutral-50/30 dark:ring-neutral-30/30'
-          : 'border-neutral-20 dark:border-neutral-70 hover:border-neutral-40 dark:hover:border-neutral-50'
+          : 'border-boundary hover:border-neutral-40 dark:hover:border-neutral-50'
       }`}
     >
       <div className={`${color} mb-1`}>{icon}</div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-neutral-60 dark:text-neutral-40">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Button>
   )
 }

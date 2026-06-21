@@ -13,8 +13,8 @@ export function DashboardConfigModal({ onClose }: Props) {
     <>
       <div className="fixed inset-0 z-50 bg-black/40 transition-opacity" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-lg bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl max-h-[80vh] flex flex-col">
-          <div className="flex items-center justify-between p-5 border-b border-neutral-20 dark:border-neutral-70">
+        <div className="pointer-events-auto w-full max-w-lg bg-card rounded-2xl border border-boundary shadow-2xl max-h-[80vh] flex flex-col">
+          <div className="flex items-center justify-between p-5 border-b border-boundary">
             <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
               Personalizar Dashboard
             </h2>
@@ -27,7 +27,7 @@ export function DashboardConfigModal({ onClose }: Props) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-1">
-            <p className="text-sm text-neutral-60 dark:text-neutral-40 mb-4">
+            <p className="text-sm text-muted mb-4">
               Selecciona los widgets que quieres ver en el dashboard. Los cambios se guardan automáticamente.
             </p>
 
@@ -71,16 +71,16 @@ export function DashboardConfigModal({ onClose }: Props) {
             ))}
           </div>
 
-          <div className="flex items-center justify-between p-4 border-t border-neutral-20 dark:border-neutral-70 bg-neutral-5 dark:bg-neutral-85 rounded-b-2xl">
+          <div className="flex items-center justify-between p-4 border-t border-boundary bg-neutral-5 dark:bg-neutral-85 rounded-b-2xl">
             <Button
               onClick={enableAll}
-              className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
+              className="text-sm text-muted hover:text-neutral-90 dark:hover:text-white transition-colors"
             >
               Mostrar todo
             </Button>
             <Button
               onClick={disableAll}
-              className="text-sm text-neutral-60 dark:text-neutral-40 hover:text-neutral-90 dark:hover:text-white transition-colors"
+              className="text-sm text-muted hover:text-neutral-90 dark:hover:text-white transition-colors"
             >
               Ocultar todo
             </Button>

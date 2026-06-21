@@ -117,7 +117,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
   const openCount = blockers?.filter((b) => b.status !== 'resolved').length ?? 0
 
   return (
-    <div className="border border-neutral-20 dark:border-neutral-70 rounded-xl overflow-hidden">
+    <div className="border border-boundary rounded-xl overflow-hidden">
       <Button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
@@ -149,17 +149,17 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
           {showForm && (
             <div className="p-4 space-y-3 bg-neutral-10 dark:bg-neutral-80">
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Titulo <span className="text-danger">*</span></label>
+                <label className="block text-xs font-medium text-secondary mb-1">Titulo <span className="text-danger">*</span></label>
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   placeholder="ej. Certificado SSL vencido"
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Descripcion</label>
+                <label className="block text-xs font-medium text-secondary mb-1">Descripcion</label>
                 <RichTextEditor
                   value={editDescription}
                   onChange={(html) => setEditDescription(html)}
@@ -168,11 +168,11 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Severidad</label>
+                  <label className="block text-xs font-medium text-secondary mb-1">Severidad</label>
                   <select
                     value={editSeverity}
                     onChange={(e) => setEditSeverity(e.target.value as BlockerSeverity)}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
                   >
                     <option value="low">Baja</option>
                     <option value="medium">Media</option>
@@ -181,11 +181,11 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Estado</label>
+                  <label className="block text-xs font-medium text-secondary mb-1">Estado</label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as BlockerStatus)}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-white dark:bg-neutral-80 text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
                   >
                     <option value="open">Abierto</option>
                     <option value="escalated">Escalado</option>
@@ -202,7 +202,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               </div>
               {editStatus === 'resolved' && (
                 <div>
-                  <label className="block text-xs font-medium text-neutral-70 dark:text-neutral-30 mb-1">Notas de resolucion</label>
+                  <label className="block text-xs font-medium text-secondary mb-1">Notas de resolucion</label>
                   <RichTextEditor
                     value={editResolutionNotes}
                     onChange={(html) => setEditResolutionNotes(html)}
@@ -247,7 +247,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                     </span>
                   </div>
                   {blocker.description && (
-                    <p className="mt-0.5 text-xs text-neutral-60 dark:text-neutral-40">{blocker.description}</p>
+                    <p className="mt-0.5 text-xs text-muted">{blocker.description}</p>
                   )}
                 </div>
               </div>
