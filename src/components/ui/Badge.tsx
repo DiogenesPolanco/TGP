@@ -42,7 +42,7 @@ const colorMap = {
   },
   neutral: {
     bg: 'bg-neutral-10 dark:bg-neutral-75',
-    text: 'text-neutral-60 dark:text-neutral-40',
+    text: 'text-muted',
     border: 'border-neutral-20 dark:border-neutral-60',
     dot: 'bg-neutral-40 dark:bg-neutral-50',
   },

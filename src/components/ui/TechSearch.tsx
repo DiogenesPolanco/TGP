@@ -183,17 +183,17 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
             <span key={t.id} className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${statusColors[t.supportStatus ?? 'unknown']}`}>
               {t.supportStatus === 'eol' && <AlertTriangle size={10} />}
               {t.name}{t.version ? ` ${t.version}` : ''}
-              <Button type="button" onClick={() => removeItem(t.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
+              <button type="button" onClick={() => removeItem(t.id)} className="ml-0.5 p-0.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors shrink-0">
                 <X size={12} />
-              </Button>
+              </button>
             </span>
           ))}
           {selectedSkills.map((s) => (
             <span key={s.id} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30">
               {s.name}
-              <Button type="button" onClick={() => removeItem(s.id)} className="ml-0.5 hover:opacity-70 transition-opacity">
+              <button type="button" onClick={() => removeItem(s.id)} className="ml-0.5 p-0.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors shrink-0">
                 <X size={12} />
-              </Button>
+              </button>
             </span>
           ))}
         </div>
@@ -229,7 +229,7 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
 
       {/* Dropdown */}
       {showDropdown && (query || results.length > 0 || depsResult || depsError || depsSearching) && (
-        <div ref={dropdownRef} className="bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div ref={dropdownRef} className="bg-card border border-boundary rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {/* Local catalog results */}
           {results.length > 0 && results.map((r) => {
             const alreadySelected = selectedIds.includes(r.id) || selectedSkills.some((s) => s.id === r.id)
@@ -256,7 +256,7 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
 
           {/* deps.dev section */}
           {enableDepsSearch && (depsSearching || depsResult || depsError || (results.length === 0 && query.trim() && !depsResult)) && (
-            <div className={`${results.length > 0 ? 'border-t border-neutral-20 dark:border-neutral-70' : ''}`}>
+            <div className={`${results.length > 0 ? 'border-t border-boundary' : ''}`}>
               {depsSearching ? (
                 <div className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-50">
                   <Loader2 size={14} className="animate-spin" />

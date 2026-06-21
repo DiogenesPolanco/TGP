@@ -33,9 +33,9 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
   }
 
   return (
-    <div className="flex items-center justify-between px-6 py-3 border-t border-neutral-20 dark:border-neutral-70 bg-white dark:bg-neutral-80">
+    <div className="flex items-center justify-between px-6 py-3 border-t border-boundary bg-card">
       <div className="flex items-center gap-4">
-        <span className="text-sm text-neutral-60 dark:text-neutral-40">
+        <span className="text-sm text-muted">
           Mostrando {startItem}-{endItem} de {totalItems}
         </span>
         {onPageSizeChange && (
@@ -47,7 +47,7 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
               id="page-size-select"
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs text-neutral-60 dark:text-neutral-40 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+              className="px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
             >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <option key={size} value={size}>
@@ -66,7 +66,7 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
             className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Página anterior"
           >
-            <ChevronLeft size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <ChevronLeft size={16} className="text-muted" />
           </Button>
           {getVisiblePages().map((p, idx) =>
             typeof p === 'number' ? (
@@ -76,7 +76,7 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
                 className={`min-w-[32px] h-8 rounded-md text-sm font-medium transition-colors ${
                   p === page
                     ? 'bg-primary text-white'
-                    : 'text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                    : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                 }`}
                 aria-label={`Página ${p}`}
                 aria-current={p === page ? 'page' : undefined}
@@ -95,7 +95,7 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
             className="p-1.5 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Página siguiente"
           >
-            <ChevronRight size={16} className="text-neutral-60 dark:text-neutral-40" />
+            <ChevronRight size={16} className="text-muted" />
           </Button>
         </div>
       )}

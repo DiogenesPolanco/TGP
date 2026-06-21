@@ -29,6 +29,13 @@ PROMPT-*.md
 test-results/
 playwright-report/
 
+# Scripts auxiliares
+*.mjs
+*.csv
+*.png
+scripts/*.sh
+.sisyphus/
+
 # skillfile
 .skillfile/cache/
 .skillfile/conflict

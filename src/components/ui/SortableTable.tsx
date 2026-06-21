@@ -62,23 +62,23 @@ export function SortableTable<T extends { id: string }>({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm">
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm">
         <div className="p-12 text-center text-sm text-neutral-50">{emptyMessage}</div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-neutral-20 dark:border-neutral-70 bg-neutral-10 dark:bg-neutral-70">
+            <tr className="border-b border-boundary bg-neutral-10 dark:bg-neutral-70">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col)}
-                  className={`text-left px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-40 uppercase ${
+                  className={`text-left px-4 py-3 text-xs font-semibold text-muted uppercase ${
                     col.sortable ? 'cursor-pointer select-none hover:text-neutral-90 dark:hover:text-white transition-colors' : ''
                   } ${col.headerClassName ?? ''}`}
                 >

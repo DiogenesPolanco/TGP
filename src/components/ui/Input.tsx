@@ -13,7 +13,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         className={cn(
           'w-full rounded-lg border border-neutral-30 dark:border-neutral-60',
-          'bg-white dark:bg-neutral-80 px-3 py-2 text-sm',
+          'bg-card px-3 py-2 text-sm',
           'text-neutral-90 dark:text-white',
           'focus:outline-none focus:ring-2 focus:ring-primary',
           'placeholder:text-neutral-40 dark:placeholder:text-neutral-50',

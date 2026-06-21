@@ -167,7 +167,7 @@ export function PersonSelect({
   return (
     <div data-person-select className="relative">
       {label && (
-        <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+        <label className="block text-sm font-medium text-secondary mb-1.5">
           {label}{required && <span className="text-danger ml-0.5">*</span>}
         </label>
       )}
@@ -220,7 +220,7 @@ export function PersonSelect({
       {open && !value && (
         <div
           ref={listRef}
-          className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+          className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
         >
           {filtered.length === 0 ? (
             <p className="px-4 py-3 text-sm text-neutral-50 text-center">

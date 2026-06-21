@@ -138,7 +138,7 @@ export function Select({
   return (
     <div data-select ref={containerRef} className={`relative ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+        <label className="block text-sm font-medium text-secondary mb-1.5">
           {label}
           {required && <span className="text-danger ml-0.5">*</span>}
         </label>
@@ -190,10 +190,10 @@ export function Select({
       {open && (
         <div
           ref={listRef}
-          className="absolute left-0 right-0 mt-1 bg-white dark:bg-neutral-80 border border-neutral-20 dark:border-neutral-70 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+          className="absolute left-0 right-0 mt-1 bg-card border border-boundary rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
         >
           {isSearchable && (
-            <div className="p-2 border-b border-neutral-20 dark:border-neutral-70">
+            <div className="p-2 border-b border-boundary">
               <input
                 ref={inputRef}
                 type="text"

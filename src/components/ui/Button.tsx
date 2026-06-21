@@ -6,9 +6,9 @@ const variantMap = {
   primary:
     'text-white hover:bg-secondary/90 active:bg-primary/80 active:text-white',
   secondary:
-    'bg-neutral-10 dark:bg-neutral-75 text-neutral-70 dark:text-neutral-30 hover:bg-neutral-20 dark:hover:bg-neutral-70 border border-neutral-30 dark:border-neutral-60',
+    'bg-neutral-10 dark:bg-neutral-75 text-secondary hover:bg-neutral-20 dark:hover:bg-neutral-70 border border-neutral-30 dark:border-neutral-60',
   ghost:
-    'text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
+    'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
   danger:
     'bg-danger text-white hover:bg-danger/90 active:bg-danger/80',
   'outline-primary':

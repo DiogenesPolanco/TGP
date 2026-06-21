@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 
 interface DatePickerProps {
   value?: string
@@ -30,7 +29,9 @@ function formatDate(year: number, month: number, day: number): string {
 
 function parseDate(str: string): Date | null {
   if (!str) return null
-  const d = new Date(str + 'T00:00:00')
+  const parts = str.split('-').map(Number)
+  if (parts.length !== 3 || parts.some(isNaN)) return null
+  const d = new Date(parts[0], parts[1] - 1, parts[2])
   return isNaN(d.getTime()) ? null : d
 }
 
@@ -166,13 +167,13 @@ export function DatePicker({
       />
 
       {label && (
-        <label className="block text-sm font-medium text-neutral-70 dark:text-neutral-30 mb-1.5">
+        <label className="block text-sm font-medium text-secondary mb-1.5">
           {label}
           {required && <span className="text-danger ml-0.5">*</span>}
         </label>
       )}
 
-      <Button
+      <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
@@ -183,31 +184,31 @@ export function DatePicker({
             : 'cursor-pointer'
         }`}
       >
-          <span className={`${displayValue ? '' : 'opacity-60'}`}>
+          <span className={`text-neutral-90 dark:text-white ${displayValue ? '' : 'opacity-60'}`}>
           {displayValue || placeholder}
         </span>
-      </Button>
+      </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 w-[280px] bg-white dark:bg-neutral-80 rounded-xl border border-neutral-20 dark:border-neutral-70 shadow-lg p-3">
+        <div className="absolute top-full left-0 mt-1 z-50 w-[280px] bg-card rounded-xl border border-boundary shadow-lg p-3">
           <div className="flex items-center justify-between mb-2">
-            <Button
+            <button
               type="button"
               onClick={prevMonth}
               className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-neutral-60 hover:text-neutral-90 dark:hover:text-white"
             >
               <ChevronLeft size={16} />
-            </Button>
+            </button>
             <span className="text-sm font-semibold text-neutral-90 dark:text-white">
               {MONTHS[month]} {year}
             </span>
-            <Button
+            <button
               type="button"
               onClick={nextMonth}
               className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors text-neutral-60 hover:text-neutral-90 dark:hover:text-white"
             >
               <ChevronRight size={16} />
-            </Button>
+            </button>
           </div>
 
           <div className="grid grid-cols-7 mb-1">
@@ -229,7 +230,7 @@ export function DatePicker({
               const isToday = dateStr === todayStr
 
               return (
-                <Button
+                <button
                   key={i}
                   type="button"
                   disabled={cell.disabled}
@@ -241,24 +242,24 @@ export function DatePicker({
                         ? 'bg-primary text-white font-semibold'
                         : isToday
                           ? 'bg-primary/10 text-primary font-semibold hover:bg-primary/20'
-                          : 'text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70'
+                          : 'text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70'
                   }`}
                 >
                   {cell.day}
-                </Button>
+                </button>
               )
             })}
           </div>
 
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-20 dark:border-neutral-70">
-            <Button
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-boundary">
+            <button
               type="button"
               onClick={goToToday}
               className="text-xs font-medium text-primary hover:text-primary-dark transition-colors"
             >
               Hoy
-            </Button>
-            <Button
+            </button>
+            <button
               type="button"
               onClick={() => {
                 onChange?.('')
@@ -267,7 +268,7 @@ export function DatePicker({
               className="text-xs text-neutral-50 hover:text-neutral-70 dark:hover:text-neutral-30 transition-colors"
             >
               Limpiar
-            </Button>
+            </button>
           </div>
         </div>
       )}

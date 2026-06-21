@@ -14,7 +14,7 @@ export function DetailLayout({ title, subtitle, onBack, backLabel = 'Volver', ac
   return (
     <div className="space-y-6">
       <nav className="flex items-center gap-1 text-sm text-neutral-50">
-        <Button onClick={onBack} className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors">
+        <Button onClick={onBack} variant="ghost" className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors">
           <ChevronLeft size={16} />
           {backLabel}
         </Button>
@@ -23,12 +23,12 @@ export function DetailLayout({ title, subtitle, onBack, backLabel = 'Volver', ac
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">{title}</h1>
-          {subtitle && <div className="text-sm text-neutral-60 dark:text-neutral-40">{subtitle}</div>}
+          {subtitle && <div className="text-sm text-muted">{subtitle}</div>}
         </div>
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
       </div>
 
-      <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-sm p-6">
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-6">
         {children}
       </div>
     </div>

@@ -4,7 +4,7 @@ function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-lg bg-neutral-20 dark:bg-neutral-75',
+        'animate-pulse rounded-lg bg-subtle',
         className
       )}
     />
@@ -13,7 +13,7 @@ function SkeletonPulse({ className }: { className?: string }) {
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-5 space-y-3">
+    <div className="bg-card rounded-2xl border border-boundary p-5 space-y-3">
       <div className="flex items-center justify-between">
         <SkeletonPulse className="w-8 h-8 rounded-lg" />
         <SkeletonPulse className="w-14 h-4" />
@@ -26,9 +26,9 @@ export function SkeletonCard() {
 
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-4 space-y-3">
+    <div className="bg-card rounded-2xl border border-boundary p-4 space-y-3">
       {/* Header */}
-      <div className="flex gap-4 pb-2 border-b border-neutral-20 dark:border-neutral-70">
+      <div className="flex gap-4 pb-2 border-b border-boundary">
         {[1, 2, 3, 4].map((i) => (
           <SkeletonPulse key={i} className="h-4 flex-1" />
         ))}
@@ -47,7 +47,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
 
 export function SkeletonChart() {
   return (
-    <div className="bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 p-6">
+    <div className="bg-card rounded-2xl border border-boundary p-6">
       <SkeletonPulse className="w-32 h-4 mb-6" />
       <SkeletonPulse className="w-full h-48" />
     </div>

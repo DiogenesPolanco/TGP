@@ -9,17 +9,17 @@ const STORAGE_KEYS = {
   session: 'tgp-auth-session',
 } as const
 
-/* sessionStorage wrapper for session — cleared when tab closes */
+/* localStorage wrapper for session — persists across tabs and browser restarts */
 function writeSession(data: AuthSession): void {
-  sessionStorage.setItem(STORAGE_KEYS.session, JSON.stringify(data))
+  localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(data))
 }
 function readSession(): AuthSession | null {
-  const raw = sessionStorage.getItem(STORAGE_KEYS.session)
+  const raw = localStorage.getItem(STORAGE_KEYS.session)
   if (!raw) return null
   try { return JSON.parse(raw) as AuthSession } catch { return null }
 }
 function removeSession(): void {
-  sessionStorage.removeItem(STORAGE_KEYS.session)
+  localStorage.removeItem(STORAGE_KEYS.session)
 }
 
 /* ─── Rate limiting ─── */

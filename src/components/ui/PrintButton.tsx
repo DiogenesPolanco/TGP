@@ -127,7 +127,7 @@ export function PrintButton() {
       <div className="flex items-center gap-2 no-print">
         <Button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
+          className="flex items-center gap-2 px-3 py-2 bg-card border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm"
           title="Descargar PDF"
         >
           <Printer size={16} />
@@ -136,7 +136,7 @@ export function PrintButton() {
         <Button
           onClick={captureImage}
           disabled={capturing}
-          className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-80 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 dark:text-neutral-40 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-2 bg-card border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors shadow-sm disabled:opacity-50"
           title="Descargar Imagen"
         >
           {capturing ? <Loader2 size={16} className="animate-spin" /> : <Image size={16} />}

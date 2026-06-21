@@ -51,7 +51,7 @@ export function ConfirmDialog() {
       {/* Dialog */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className={`pointer-events-auto w-full max-w-sm bg-white dark:bg-neutral-80 rounded-2xl border border-neutral-20 dark:border-neutral-70 shadow-2xl p-6 transition-all duration-200 ${
+          className={`pointer-events-auto w-full max-w-sm bg-card rounded-2xl border border-boundary shadow-2xl p-6 transition-all duration-200 ${
             visible
               ? 'translate-y-0 opacity-100 scale-100'
               : 'translate-y-4 opacity-0 scale-95'
@@ -75,13 +75,13 @@ export function ConfirmDialog() {
               </div>
 
               {/* Message */}
-              <p className="text-sm text-neutral-60 dark:text-neutral-40 leading-relaxed">
+              <p className="text-sm text-muted leading-relaxed">
                 {message}
               </p>
 
               {/* Actions */}
               <div className="flex items-center justify-end gap-3 mt-5">
-                <Button onClick={handleCancel} className="px-4 py-2 text-sm font-medium text-neutral-70 dark:text-neutral-30 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+                <Button onClick={handleCancel} className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
                   Cancelar
                 </Button>
                 <Button onClick={handleConfirm} className="px-4 py-2 text-sm font-medium bg-danger text-white rounded-lg hover:bg-danger-dark transition-colors">
