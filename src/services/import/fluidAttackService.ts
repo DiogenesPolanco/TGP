@@ -253,6 +253,53 @@ export async function matchLocations(
       }
     }
 
+    /* ─── 3er fallback: Root Nickname ─── */
+    if (!bestMatch) {
+      const nickname = (row.raw['root_nickname'] ?? '').trim().toLowerCase()
+      if (nickname.length >= 2) {
+        const exact = msIndex.get(nickname)
+        if (exact && exact.length > 0) {
+          const ms = exact[0]
+          bestMatch = {
+            appId: ms.appId,
+            appName: appMap.get(ms.appId) ?? ms.msName,
+            msId: ms.msId,
+            msName: ms.msName,
+            matchedBy: `root_nickname exact: ${nickname} = ${ms.msName}`,
+          }
+        } else {
+          for (const [msName, entries] of msIndex) {
+            if (nickname.includes(msName) || msName.includes(nickname)) {
+              const ms = entries[0]
+              bestMatch = {
+                appId: ms.appId,
+                appName: appMap.get(ms.appId) ?? ms.msName,
+                msId: ms.msId,
+                msName: ms.msName,
+                matchedBy: `root_nickname partial: ${nickname} ~ ${ms.msName}`,
+              }
+              break
+            }
+          }
+        }
+        if (!bestMatch) {
+          for (const app of allApplications) {
+            const appNameLower = app.name.toLowerCase().trim()
+            if (nickname === appNameLower || appNameLower.includes(nickname) || nickname.includes(appNameLower)) {
+              bestMatch = {
+                appId: app.id,
+                appName: app.name,
+                msId: '',
+                msName: '',
+                matchedBy: `root_nickname app: ${nickname} ~ ${app.name}`,
+              }
+              break
+            }
+          }
+        }
+      }
+    }
+
     matches.push({
       row,
       applicationId: bestMatch?.appId ?? null,
