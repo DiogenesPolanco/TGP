@@ -144,7 +144,7 @@ export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
   const headers = parseLine(lines[0]).map((h) => h.trim())
 
   function norm(key: string): string {
-    return key.toLowerCase().replace(/[\s_-]+/g, '')
+    return key.toLowerCase().replace(/[\s_.-]+/g, '_').replace(/^_|_$/g, '')
   }
 
   function getValue(row: Record<string, string>, normalizedKey: string): string | undefined {
