@@ -56,7 +56,29 @@ Sin dependencias de servidor. Todos los datos en **IndexedDB** (Dexie.js). Backu
 
 ## Capturas
 
-> _Próximamente — imágenes del dashboard, catálogo de aplicaciones y vistas de ejecución._
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="Dashboard Ejecutivo" width="700" />
+  <br />
+  <em>Dashboard Ejecutivo — THI, KPI cards y distribución por severidad</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/applications.png" alt="Catálogo de Aplicaciones" width="700" />
+  <br />
+  <em>Catálogo de Aplicaciones — CRUD, filtros y vista de portafolio</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/vulnerabilities.png" alt="Vulnerabilidades" width="700" />
+  <br />
+  <em>Seguridad — Vulnerabilidades con CVSS, SLA y flujo de estados</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/timeline.png" alt="Timeline Ejecutivo" width="700" />
+  <br />
+  <em>Ejecución — Timeline con diagrama de Gantt y planificación</em>
+</p>
 
 ---
 
