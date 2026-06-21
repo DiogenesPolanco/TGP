@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 interface MicroservicesTabProps {
   applicationId: string
@@ -81,7 +82,7 @@ export function MicroservicesTab({ applicationId }: MicroservicesTabProps) {
           <div className="min-w-0">
             <p className="text-sm font-medium text-neutral-90 dark:text-white">{ms.name}</p>
             {ms.description && (
-              <p className="text-xs text-muted line-clamp-1">{ms.description}</p>
+              <HtmlDescription html={ms.description} lines={1} />
             )}
           </div>
         </div>

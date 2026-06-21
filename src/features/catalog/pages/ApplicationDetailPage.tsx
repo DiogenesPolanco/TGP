@@ -17,6 +17,7 @@ import { MicroservicesTab } from '../components/MicroservicesTab'
 import { DatabasesTab } from '../components/DatabasesTab'
 import { ArchitectureTab } from '../components/ArchitectureTab'
 import { useInheritedEntityIds } from '@/hooks/useMicroserviceEntities'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -189,9 +190,7 @@ export function ApplicationDetailPage() {
             {application.name}
           </h1>
           {application.description && (
-            <p className="text-base text-muted leading-relaxed max-w-2xl">
-              {application.description}
-            </p>
+            <HtmlDescription html={application.description} full className="max-w-2xl" />
           )}
           <div className="flex items-center gap-3 pt-1">
             <span className={`px-3 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`}>

@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import type { Deliverable, DeliverableStatus, Objective } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusColors: Record<DeliverableStatus, string> = {
   pending: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
@@ -49,7 +50,7 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
         <div>
           <p className="text-sm font-medium text-neutral-90 dark:text-white">{d.title}</p>
           {d.description && (
-            <p className="text-xs text-muted mt-0.5 line-clamp-1">{d.description}</p>
+            <HtmlDescription html={d.description} lines={1} />
           )}
         </div>
       ),

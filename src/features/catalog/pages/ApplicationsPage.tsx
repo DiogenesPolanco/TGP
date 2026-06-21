@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, Download, Upload, GitCompare, Trash2, Pencil, Eye, X, AppWindow } from 'lucide-react'
 import type { Application } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const criticalityLabel: Record<string, string> = {
   low: 'Baja',
@@ -117,7 +118,7 @@ export function ApplicationsPage() {
           <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline truncate block">
             {app.name}
           </Link>
-          {app.description && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5 truncate">{app.description}</p>}
+          {app.description && <HtmlDescription html={app.description} lines={1} className="text-neutral-50 dark:text-neutral-50 mt-0.5" />}
         </div>
       ),
     },

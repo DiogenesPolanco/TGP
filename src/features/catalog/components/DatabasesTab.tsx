@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import type { DatabaseType, EnvironmentType, SupportStatus, AppDatabase, Technology } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusColors: Record<SupportStatus, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -200,7 +201,7 @@ function DatabaseCard({
       {expanded && (
         <div className="border-t border-boundary p-3 space-y-3">
           {db_.description && (
-            <p className="text-xs text-muted">{db_.description}</p>
+            <HtmlDescription html={db_.description} lines={2} />
           )}
 
           {relatedMs.length > 0 && (
