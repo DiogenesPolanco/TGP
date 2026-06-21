@@ -17,6 +17,7 @@ import type { Blocker } from '@/types/domain'
 import { UpNextPanel } from '../components/UpNextPanel'
 import { WeeklyTimeline } from '../components/WeeklyTimeline'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const severityLabel: Record<string, string> = {
   critical: 'Crítica',
@@ -300,7 +301,7 @@ export function DailyPage() {
                         <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <p className="text-xs text-muted mt-1 ml-1">
-                        {blocker.description?.slice(0, 120)}
+                        <HtmlDescription html={blocker.description} lines={1} />
                       </p>
                       <div className="flex items-center gap-2 mt-1 ml-1">
                         {plan && <span className="text-xs text-primary font-medium">{plan.title}</span>}

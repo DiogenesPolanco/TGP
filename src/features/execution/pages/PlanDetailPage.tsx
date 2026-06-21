@@ -14,6 +14,7 @@ import { DependencyList } from '../components/DependencyList'
 import { ActivityGantt } from '../components/ActivityGantt'
 import type { Activity } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 export function PlanDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -160,7 +161,7 @@ export function PlanDetailPage() {
             </span>
           </div>
           {plan.description && (
-            <p className="text-sm text-muted mt-1">{plan.description}</p>
+            <HtmlDescription html={plan.description} full className="mt-1" />
           )}
         </div>
       </div>

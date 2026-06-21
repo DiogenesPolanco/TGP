@@ -6,6 +6,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button';
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Plus, Search, Upload, Pencil, Trash2 } from 'lucide-react'
 import { runEscalation } from '../services/escalationService'
 import type { CommitmentStatus } from '@/constants/enums'
@@ -167,7 +168,7 @@ export function CommitmentsPage() {
               <div className="min-w-0">
                 <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{c.title}</p>
                 {c.description && (
-                  <p className="text-xs text-neutral-50 mt-0.5 truncate">{c.description}</p>
+                  <HtmlDescription html={c.description} lines={1} />
                 )}
               </div>
             ),

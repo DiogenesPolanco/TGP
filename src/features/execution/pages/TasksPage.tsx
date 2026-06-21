@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import { Plus, Search, Pencil, Trash2, ListTodo, Clock, Play, CheckCircle2 } from 'lucide-react'
 import type { Task, Criticality } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const priorityLabel: Record<Criticality, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' }
 const priorityColor: Record<Criticality, string> = {
@@ -57,7 +58,7 @@ export function TasksPage() {
       render: (t) => (
         <div>
           <p className="text-sm font-medium text-neutral-90 dark:text-white">{t.title}</p>
-          {t.description && <p className="text-xs text-neutral-50 truncate max-w-xs">{t.description}</p>}
+          {t.description && <HtmlDescription html={t.description} lines={1} className="max-w-xs" />}
         </div>
       ),
     },

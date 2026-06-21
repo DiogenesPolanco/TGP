@@ -8,6 +8,7 @@ import { PersonSelect } from '@/components/ui/PersonSelect'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 interface BlockerPanelProps {
   sourceType: 'task' | 'activity' | 'plan' | 'commitment'
@@ -247,7 +248,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                     </span>
                   </div>
                   {blocker.description && (
-                    <p className="mt-0.5 text-xs text-muted">{blocker.description}</p>
+                    <HtmlDescription html={blocker.description} lines={2} />
                   )}
                 </div>
               </div>
@@ -263,7 +264,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                     <span className="text-danger">Escalado {new Date(blocker.escalatedAt).toLocaleDateString()}</span>
                   )}
                   {blocker.resolutionNotes && blocker.status === 'resolved' && (
-                    <span className="text-success truncate max-w-[200px]">{blocker.resolutionNotes}</span>
+                    <HtmlDescription html={blocker.resolutionNotes} lines={1} className="text-success max-w-[200px]" />
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0 ml-2">

@@ -7,6 +7,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button';
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Plus, Search, Pencil, Trash2, Ban } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
 
@@ -40,7 +41,7 @@ export function BlockersPage() {
     { key: 'title', label: 'Título', sortable: true, render: (b) => (
       <div>
         <p className="text-sm font-medium text-neutral-90 dark:text-white">{b.title}</p>
-        <p className="text-xs text-neutral-50 truncate max-w-xs">{b.description}</p>
+        <HtmlDescription html={b.description} lines={1} className="max-w-xs" />
       </div>
     )},
     { key: 'severity', label: 'Severidad', sortable: true, render: (b) => (

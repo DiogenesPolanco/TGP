@@ -10,6 +10,7 @@ import { Plus, Search, Upload, Target, AlertCircle, CheckCircle, PauseCircle, XC
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   planned: { label: 'Planificado', color: 'bg-info/10 text-info border-info/30', icon: <Target size={16} /> },
@@ -163,7 +164,7 @@ export function PlansPage() {
                 {plan.title}
               </h3>
               {plan.description && (
-                <p className="text-sm text-muted line-clamp-2 mb-3">{plan.description}</p>
+                <HtmlDescription html={plan.description} lines={2} className="mb-3" />
               )}
 
               {/* Progress bar */}
