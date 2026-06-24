@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Pencil } from 'lucide-react'
 import type { CommitmentStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
@@ -44,7 +45,7 @@ export function CommitmentDetailPage() {
   return (
     <DetailLayout
       title={commitment.title}
-      subtitle={commitment.description}
+      subtitle={<HtmlDescription html={commitment.description} lines={2} />}
       onBack={() => navigate('/execution/commitments')}
       backLabel="Compromisos"
       actions={
@@ -60,7 +61,8 @@ export function CommitmentDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Section title="Información General">
           <Field label="Título" value={commitment.title} />
-          <Field label="Descripción" value={commitment.description} />
+          <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">Descripción</dt>
+          <dd className="text-sm text-neutral-90 dark:text-white flex-1"><HtmlDescription html={commitment.description} full /></dd>
           <Field label="Owner" value={commitment.ownerId} />
           <Field label="Responsable" value={commitment.accountableId} />
           <Field label="Equipo" value={team?.name ?? 'Sin asignar'} />

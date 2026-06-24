@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Pencil } from 'lucide-react'
 import type { Criticality } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
@@ -25,7 +26,7 @@ export function TaskDetailPage() {
   return (
     <DetailLayout
       title={task.title}
-      subtitle={task.description || undefined}
+      subtitle={<HtmlDescription html={task.description} lines={2} />}
       onBack={() => navigate('/execution/tasks')}
       backLabel="Tareas"
       actions={
@@ -41,7 +42,8 @@ export function TaskDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Section title="Información General">
           <Field label="Título" value={task.title} />
-          <Field label="Descripción" value={task.description || 'Sin descripción'} />
+          <dt className="text-xs font-medium text-neutral-50 uppercase tracking-wider min-w-[100px] pt-0.5">Descripción</dt>
+          <dd className="text-sm text-neutral-90 dark:text-white flex-1"><HtmlDescription html={task.description} full /></dd>
           <Field label="Plan" value={plan?.title ?? 'Sin asignar'} />
           <Field label="Actividad" value={activity?.title ?? 'Sin asignar'} />
           <Field label="Asignado" value={task.assigneeId ?? 'Sin asignar'} />
