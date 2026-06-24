@@ -64,7 +64,7 @@ export function PersonSelect({
     }
 
     for (const u of users) {
-      if (u.isActive !== false && !seen.has(u.id)) {
+      if (u.isActive === 1 && !seen.has(u.id)) {
         seen.add(u.id)
         options.push({ id: u.id, label: u.displayName, subtitle: u.email, source: 'user' })
       }

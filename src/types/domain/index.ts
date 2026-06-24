@@ -78,7 +78,7 @@ export interface Tenant {
   name: string
   slug: string
   settings: TenantSettings
-  isActive: boolean
+  isActive: 0 | 1
   createdAt: Date
   updatedAt: Date
 }
@@ -414,7 +414,7 @@ export interface User {
   displayName: string
   role: UserRole
   businessUnitIds: string[]
-  isActive: boolean
+  isActive: 0 | 1
   otpRequestIntervalHours: number
   createdAt: Date
 }

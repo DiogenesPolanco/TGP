@@ -7,7 +7,7 @@ import {
   dismissInactivityWarning,
   WARNING_DURATION_MS,
 } from '@/services/auth/inactivityService'
-import { logout } from '@/services/auth/authService'
+import { logout, getSession } from '@/services/auth/authService'
 import { Button } from '@/components/ui/Button'
 
 interface InactivityGuardProps {
@@ -39,6 +39,17 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
 
   // Effect principal: se registra UNA SOLA VEZ al montar
   useEffect(() => {
+    // Calcular inactivity timeout respetando el tiempo restante de sesión
+    const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000
+    const session = getSession()
+    const sessionRemainingMs = session ? session.expiresAt - Date.now() : DEFAULT_TIMEOUT_MS
+    // El inactivity timeout nunca debe exceder el tiempo restante de sesión,
+    // así el usuario no es deslogueado por inactividad antes de que expire su sesión OTP
+    const safeTimeout = Math.max(
+      WARNING_DURATION_MS + 1000,
+      Math.min(sessionRemainingMs, DEFAULT_TIMEOUT_MS),
+    )
+
     startInactivityWatch((phase) => {
       if (phase === 'warning') {
         if (warningActiveRef.current) {
@@ -54,7 +65,7 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
       } else if (phase === 'expired') {
         handleExpired()
       }
-    })
+    }, safeTimeout)
 
     return () => {
       stopInactivityWatch()

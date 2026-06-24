@@ -85,7 +85,7 @@ export async function seedDemoData(force = false) {
         logoUrl: null,
       },
     },
-    isActive: true,
+    isActive: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
   }
@@ -557,7 +557,7 @@ export async function seedDemoData(force = false) {
   })
 
   const users: User[] = [
-    { id: 'user-1', email: 'admin@tgp.demo', displayName: 'Admin', role: 'admin', businessUnitIds: ['bu-digital', 'bu-core', 'bu-legacy'], isActive: true, otpRequestIntervalHours: 1, createdAt: new Date() },
+    { id: 'user-1', email: 'admin@tgp.demo', displayName: 'Admin', role: 'admin', businessUnitIds: ['bu-digital', 'bu-core', 'bu-legacy'], isActive: 1, otpRequestIntervalHours: 1, createdAt: new Date() },
   ]
 
   await db.tenants.add(tenant)

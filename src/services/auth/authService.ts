@@ -243,13 +243,13 @@ export function clearSession(): void {
   removeSession()
 }
 
-export async function confirmSetup(base32Secret: string): Promise<void> {
+export async function confirmSetup(base32Secret: string, otpIntervalHours?: number): Promise<void> {
   const encrypted = await encryptSecret(base32Secret)
   localStorage.setItem(STORAGE_KEYS.secret, encrypted.ciphertext)
   localStorage.setItem(STORAGE_KEYS.secretIv, encrypted.iv)
   localStorage.setItem(STORAGE_KEYS.secretSalt, encrypted.salt)
   resetRateLimit()
-  createSession()
+  createSession(otpIntervalHours)
 }
 
 export function logout(): void {

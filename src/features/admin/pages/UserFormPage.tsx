@@ -35,13 +35,17 @@ export function UserFormPage() {
 
   useEffect(() => {
     if (user) {
-      reset({ displayName: user.displayName, email: user.email, role: user.role, isActive: user.isActive, otpRequestIntervalHours: user.otpRequestIntervalHours ?? 1 })
+      reset({ displayName: user.displayName, email: user.email, role: user.role, isActive: user.isActive === 1, otpRequestIntervalHours: user.otpRequestIntervalHours ?? 1 })
     }
   }, [user, reset])
 
   const onSubmit = async (data: FormData) => {
+    const userData = {
+      ...data,
+      isActive: data.isActive ? 1 : 0,
+    }
     if (isEdit) {
-      await db.users.update(id!, data as any)
+      await db.users.update(id!, userData as any)
       addNotification({ type: 'success', message: 'Usuario actualizado' })
     } else {
       const existing = await db.users.where('email').equals(data.email).first()
@@ -51,8 +55,8 @@ export function UserFormPage() {
       }
       await db.users.add({
         id: crypto.randomUUID(),
-        ...data,
-        otpRequestIntervalHours: data.otpRequestIntervalHours ?? 1,
+        ...userData,
+        otpRequestIntervalHours: userData.otpRequestIntervalHours ?? 1,
         businessUnitIds: [],
         createdAt: new Date(),
       } as User)

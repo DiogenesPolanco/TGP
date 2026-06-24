@@ -121,9 +121,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
       }
 
       if (mode === 'setup' && secret) {
-        await confirmSetup(secret.base32)
+        await confirmSetup(secret.base32, 24) // 24h default para la sesión inicial
         setMode('login')
-        createSession(1)
         onAuth()
         return
       }
@@ -141,8 +140,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
             displayName: 'Administrador',
             role: 'admin' as UserRole,
             businessUnitIds: [],
-            isActive: true,
-            otpRequestIntervalHours: 24,
+          isActive: 1,
+          otpRequestIntervalHours: 24,
             createdAt: new Date(),
           }
           await db.users.add(defaultUser)
@@ -150,7 +149,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
           defaultUser = allUsers[0] as User
           if (!defaultUser.isActive) {
             await db.users.update(defaultUser.id, { isActive: 1 } as any)
-            defaultUser = { ...defaultUser, isActive: true }
+            defaultUser = { ...defaultUser, isActive: 1 }
           }
         } else {
           defaultUser = allUsers[0] as User
