@@ -46,6 +46,9 @@ Planes con **diagramas de Gantt**, línea de tiempo diaria, compromisos, bloqueo
 ### 👥 Equipos y Métricas DORA
 Gestión de equipos con **métricas DORA** (frecuencia de deploy, lead time, change failure rate, MTTR). Benchmarking automático Elite / Alto / Medio / Bajo.
 
+### 💻 Inventario de Equipamiento
+CRUD completo de equipos (laptops, monitores, teléfonos, periféricos, etc.) con asignación a miembros, historial de asignaciones, tickets de soporte (reparación/reemplazo/nuevo) y reportes. Los tickets se vinculan a Jira con ID y enlace externo. Dashboard público compartible con métricas, inventario y tickets. Vista de detalle con tabs de Información, Tickets e Historial, más diseño hero con icono de estado.
+
 ### 🔗 Enlaces Públicos
 Generación de **enlaces públicos cifrados y con expiración** para cualquier vista — dashboard, daily, planes, vulnerabilidades, riesgos, auditoría, OKRs y más. Cifrado AES-GCM 256 en reposo con passphrase opcional. Almacenamiento en Azure Blob Storage o localStorage.
 
@@ -130,7 +133,7 @@ La aplicación sigue una estructura **feature-first** sobre una librería de com
 ```
 src/
 ├── components/     # UI compartida (botones, modales, badges, layout)
-├── features/       # Módulos por dominio (catalog, security, governance, execution, etc.)
+├── features/       # Módulos por dominio (catalog, security, equipment, execution, etc.)
 ├── services/       # Capa de datos (repos Dexie, import/export, sync, motor THI)
 ├── stores/         # Stores Zustand
 ├── hooks/          # Hooks React compartidos
@@ -140,7 +143,7 @@ src/
 
 Decisiones arquitectónicas clave:
 
-- **Fuente única de verdad**: Todos los datos de dominio en IndexedDB con Dexie.js (20+ tablas)
+- **Fuente única de verdad**: Todos los datos de dominio en IndexedDB con Dexie.js (25+ tablas)
 - **Herencia de entidades**: Vulnerabilidades, riesgos, incidentes y hallazgos pueden vincularse a microservicios y ser heredados automáticamente por sus aplicaciones padre
 - **Offline-first**: Todo funciona sin red — las funcionalidades en la nube (backup, sharing) son adicionales
 - **Enlaces cifrados**: Los enlaces públicos siempre se cifran en reposo con AES-GCM 256

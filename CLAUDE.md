@@ -47,7 +47,7 @@ Every memory must answer: could a future agent with zero context read this and k
 ### Tecnologías
 - React 19 + TypeScript 5 + Vite 6 + SWC
 - Tailwind CSS 4
-- Dexie.js (IndexedDB) — 20+ tablas
+- Dexie.js (IndexedDB) — 28+ tablas
 - No backend server, todo cliente-side SPA
 - Azure Blob Storage para sharing de datos
 - RichTextEditor con TipTap para contenido HTML
