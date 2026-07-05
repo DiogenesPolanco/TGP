@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { X, FileText, Umbrella, Zap, Target, User, Award } from 'lucide-react'
+import { X, FileText, Umbrella, Zap, Target, User, Award, Monitor } from 'lucide-react'
 import { ProfileSection } from '@/features/performance/components/ProfileSection'
 import { VacationsSection } from '@/features/performance/components/VacationsSection'
 import { SkillsSection } from '@/features/performance/components/SkillsSection'
 import { SprintsSection } from '@/features/performance/components/SprintsSection'
 import { OneOnOneSection } from '@/features/performance/components/OneOnOneSection'
 import { AchievementsSection } from '@/features/performance/components/AchievementsSection'
+import { EquipmentSection } from '@/features/performance/components/EquipmentSection'
 import { Button } from '@/components/ui/Button'
 
 interface Props {
@@ -18,15 +19,16 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'profile' | 'vacations' | 'skills' | 'sprints' | 'oneonone' | 'achievements'
+type Tab = 'profile' | 'vacations' | 'skills' | 'sprints' | 'oneonone' | 'achievements' | 'equipment'
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'profile', label: 'Datos Personales', icon: <FileText size={16} /> },
   { key: 'vacations', label: 'Vacaciones', icon: <Umbrella size={16} /> },
   { key: 'skills', label: 'Habilidades', icon: <Zap size={16} /> },
   { key: 'sprints', label: 'Sprints', icon: <Target size={16} /> },
-  { key: 'oneonone', label: 'Uno a Uno', icon: <User size={16} /> },
+  { key: 'oneonone', label: '1:1', icon: <User size={16} /> },
   { key: 'achievements', label: 'Logros', icon: <Award size={16} /> },
+  { key: 'equipment', label: 'Equipamiento', icon: <Monitor size={16} /> },
 ]
 
 export function MemberEditModal({ memberId, memberName, teamId, open, onClose }: Props) {
@@ -127,6 +129,7 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
           {activeTab === 'sprints' && <SprintsSection memberId={memberId} teamId={teamId || profile?.teamId || ''} />}
           {activeTab === 'oneonone' && <OneOnOneSection memberId={memberId} />}
           {activeTab === 'achievements' && <AchievementsSection memberId={memberId} />}
+          {activeTab === 'equipment' && <EquipmentSection memberId={memberId} />}
         </div>
       </div>
     </>

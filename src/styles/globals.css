@@ -25,9 +25,11 @@
 
   /* Semantic colors */
   --color-success: #36B37E;
+  --color-success-dark: #1F8B5E;
   --color-warning: #FFAB00;
   --color-danger: #FF5630;
   --color-info: #00B8D9;
+  --color-info-dark: #008DA8;
 
   /* Severity colors */
   --color-severity-critical: #FF5630;

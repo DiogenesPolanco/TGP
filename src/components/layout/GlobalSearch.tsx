@@ -77,6 +77,8 @@ import {
   User,
   CalendarDays,
   Stamp,
+  Monitor,
+  Wrench,
 } from 'lucide-react'
 
 /* ─── Types ─── */
@@ -123,6 +125,8 @@ const CATEGORIES: CategoryMeta[] = [
   { key: 'microservices', label: 'Microservicios', icon: Box, description: 'Microservicios por aplicación' },
   { key: 'members', label: 'Miembros', icon: User, description: 'Perfiles de miembros' },
   { key: 'teamSprints', label: 'Sprints', icon: CalendarDays, description: 'Sprints de equipo' },
+  { key: 'equipment', label: 'Equipos', icon: Monitor, description: 'Equipamiento e inventario' },
+  { key: 'equipmentTickets', label: 'Tickets Equipo', icon: Wrench, description: 'Tickets de mantenimiento' },
 ]
 
 /* ─── Search helpers ─── */
@@ -364,6 +368,26 @@ const SEARCH_REGISTRY: Record<string, SearchConfig> = {
       entity: item,
     }),
   },
+  equipment: {
+    table: db.equipment,
+    fields: ['brand', 'model', 'serialNumber', 'type'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: `${item.brand} ${item.model}`,
+      subtitle: `${item.serialNumber} · ${item.type}`,
+      entity: item,
+    }),
+  },
+  equipmentTickets: {
+    table: db.equipmentTickets,
+    fields: ['description', 'jiraTicketId'],
+    buildResult: (item) => ({
+      id: item.id,
+      title: item.description.replace(/<[^>]*>/g, '').slice(0, 60),
+      subtitle: `#${item.equipmentId.slice(0, 8)} · ${statusLabel(item.status)}`,
+      entity: item,
+    }),
+  },
 }
 
 /* ─── Route mapping ─── */
@@ -387,6 +411,8 @@ const ROUTE_MAP: Record<string, (item: SearchResult) => string> = {
   microservices: (item) => `/catalog/microservices/${item.id}`,
   members: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
   teamSprints: (item) => `/teams/${item.entity.teamId}`,
+  equipment: (item) => `/equipment/${item.id}`,
+  equipmentTickets: (item) => `/equipment/${item.entity.equipmentId}`,
 }
 
 /* ─── Component ─── */

@@ -30,10 +30,13 @@ import type {
   CandidateTechnology,
   CandidateEvaluation,
   Dependency,
+  EquipmentItem,
+  EquipmentAssignmentLog,
+  EquipmentTicket,
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes
-const SEEDED_FLAG = 'tgp-seeded-v5'
+const SEEDED_FLAG = 'tgp-seeded-v8'
 let seedingInProgress = false
 
 export async function seedDemoData(force = false) {
@@ -392,6 +395,7 @@ export async function seedDemoData(force = false) {
       { id: 'tm-3', userPrincipal: 'user-3', displayName: 'Carlos López', role: 'senior_developer', allocationPct: 100, status: 'activo' },
       { id: 'tm-4', userPrincipal: 'user-4', displayName: 'Ana Martínez', role: 'developer', allocationPct: 100, status: 'activo' },
       { id: 'tm-5', userPrincipal: 'user-5', displayName: 'Pedro Sánchez', role: 'intern', allocationPct: 100, status: 'activo' },
+      { id: 'tm-cand-1', userPrincipal: 'cand-1', displayName: 'Elena Vargas', role: 'senior_developer', allocationPct: 100, status: 'incorporacion' },
     ], currentMetrics: { velocity: 45, leadTimeHours: 12, cycleTimeHours: 8, throughput: 12, deploymentFrequency: 2, changeFailureRate: 3, mttrHours: 0.5, measuredAt: new Date() }, metadata: {}, createdAt: new Date(), updatedAt: new Date() },
     { id: 'team-2', businessUnitId: 'bu-core', name: 'Core Squad', sourceSystem: 'azure_devops', externalId: 'TEAM-2', members: [
       { id: 'tm-2', userPrincipal: 'user-2', displayName: 'María García', role: 'senior_developer', allocationPct: 100, status: 'activo' },
@@ -817,6 +821,7 @@ export async function seedDemoData(force = false) {
     { id: 'tm-6', teamId: 'team-2', email: 'laura.rodriguez@tgp.demo', phoneCell: '+56922222222', phoneHome: '+56922222223', address: 'Viña del Mar, Chile', role: 'tech_lead', skills: [{ id: 'sk-15', name: 'Arquitectura', level: 'expert', category: 'Arquitectura' }, { id: 'sk-16', name: 'Python', level: 'advanced', category: 'Backend' }, { id: 'sk-17', name: 'Kubernetes', level: 'advanced', category: 'DevOps' }, { id: 'sk-18', name: 'Redis', level: 'intermediate', category: 'Cache' }], technologies: ['tech-8', 'tech-14', 'tech-15', 'tech-16', 'tech-6'], microservices: ['ms-7', 'ms-8', 'ms-9'], avgStoryPoints: 41, vacationDaysPerYear: 14, vacationUsed: 2, createdAt: ds2(-180), updatedAt: ds2(-1) },
     { id: 'tm-7', teamId: 'team-2', email: 'diego.fernandez@tgp.demo', phoneCell: '+56922222224', phoneHome: '', address: 'Valparaíso, Chile', role: 'developer', skills: [{ id: 'sk-19', name: 'Java', level: 'intermediate', category: 'Backend' }, { id: 'sk-20', name: 'React', level: 'intermediate', category: 'Frontend' }], technologies: ['tech-2', 'tech-13'], microservices: ['ms-6'], avgStoryPoints: 14, vacationDaysPerYear: 14, vacationUsed: 10, createdAt: ds2(-90), updatedAt: ds2(-1) },
     { id: 'tm-8', teamId: 'team-2', email: 'sofia.torres@tgp.demo', phoneCell: '+56922222225', phoneHome: '', address: 'Valparaíso, Chile', role: 'intern', skills: [{ id: 'sk-21', name: 'JavaScript', level: 'beginner', category: 'Frontend' }, { id: 'sk-22', name: 'HTML/CSS', level: 'beginner', category: 'Frontend' }], technologies: ['tech-13'], microservices: [], avgStoryPoints: 7, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: ds2(-45), updatedAt: ds2(-1) },
+    { id: 'tm-cand-1', teamId: 'team-1', email: 'elena.vargas@tgp.demo', phoneCell: '+56912340001', phoneHome: '', address: 'Santiago, Chile', role: 'senior_developer', status: 'incorporacion', skills: [{ id: 'sk-cand-1', name: '.NET', level: 'advanced', category: 'Backend' }, { id: 'sk-cand-2', name: 'Azure', level: 'advanced', category: 'Cloud' }, { id: 'sk-cand-3', name: 'PostgreSQL', level: 'intermediate', category: 'Base de Datos' }, { id: 'sk-cand-4', name: 'Docker', level: 'intermediate', category: 'DevOps' }, { id: 'sk-cand-5', name: 'Angular', level: 'beginner', category: 'Frontend' }], technologies: ['tech-1', 'tech-4', 'tech-7', 'tech-14', 'tech-13'], microservices: ['ms-2'], avgStoryPoints: 0, vacationDaysPerYear: 14, vacationUsed: 0, createdAt: ds2(-15), updatedAt: ds2(-3) },
   ]
 
   // ── Generate sprint records for 12 sprints per team ──
@@ -1031,9 +1036,9 @@ export async function seedDemoData(force = false) {
   let candidateIdx = 1
 
   const candidates: Candidate[] = [
-    { id: cId(1), name: 'Elena Vargas', email: 'elena.vargas@email.com', phone: '+56912340001', position: 'senior_developer', interviewDate: days(3), comments: '<p>Excelente candidata con amplia experiencia en microservicios. Demostró conocimiento profundo de patrones de diseño y arquitectura hexagonal. Comunicación clara y actitud proactiva.</p>', status: 'interviewed', teamId: 'team-1', totalScore: 0, createdAt: days(15), updatedAt: days(3) },
+    { id: cId(1), name: 'Elena Vargas', email: 'elena.vargas@email.com', phone: '+56912340001', position: 'senior_developer', interviewDate: days(3), comments: '<p>Excelente candidata con amplia experiencia en microservicios. Demostró conocimiento profundo de patrones de diseño y arquitectura hexagonal. Comunicación clara y actitud proactiva.</p>', status: 'onboarding', teamId: 'team-1', totalScore: 0, createdAt: days(15), updatedAt: days(3) },
     { id: cId(2), name: 'Roberto Méndez', email: 'roberto.mendez@email.com', phone: '+56912340002', position: 'developer', interviewDate: days(1), comments: '<p>Buen conocimiento de JavaScript y React. Sin experiencia en backend. Potencial para crecer con mentoría.</p>', status: 'interviewed', teamId: null, totalScore: 0, createdAt: days(10), updatedAt: days(1) },
-    { id: cId(3), name: 'Camila Ríos', email: 'camila.rios@email.com', phone: '+56912340003', position: 'tech_lead', interviewDate: days(7), comments: '<p>Perfil excepcional para Tech Lead. Experiencia liderando equipos de hasta 8 personas. Domina arquitecturas cloud-native y metodologías ágiles. Referencias verificadas excelentes.</p>', status: 'pending', teamId: 'team-2', totalScore: 0, createdAt: days(8), updatedAt: days(8) },
+    { id: cId(3), name: 'Camila Ríos', email: 'camila.rios@email.com', phone: '+56912340003', position: 'tech_lead', interviewDate: days(7), comments: '<p>Perfil excepcional para Tech Lead. Experiencia liderando equipos de hasta 8 personas. Domina arquitecturas cloud-native y metodologías ágiles. Referencias verificadas excelentes.</p>', status: 'pre_selected', teamId: 'team-2', totalScore: 0, createdAt: days(8), updatedAt: days(8) },
     { id: cId(4), name: 'Diego Herrera', email: 'diego.herrera@email.com', phone: '+56912340004', position: 'senior_developer', interviewDate: days(5), comments: '<p>Sólidos conocimientos en Java y Spring Boot. Experiencia en sistemas transaccionales de alta criticidad. Buen comunicador, pero mostró poca flexibilidad para aprender nuevas tecnologías.</p>', status: 'interviewed', teamId: null, totalScore: 0, createdAt: days(12), updatedAt: days(5) },
     { id: cId(5), name: 'Sofía Paredes', email: 'sofia.paredes@email.com', phone: '+56912340005', position: 'ux_designer', interviewDate: null, comments: '', status: 'pending', teamId: null, totalScore: 0, createdAt: days(6), updatedAt: days(6) },
     { id: cId(6), name: 'Andrés Muñoz', email: 'andres.munoz@email.com', phone: '+56912340006', position: 'developer', interviewDate: days(10), comments: '<p>Buenos fundamentos pero poca experiencia práctica. Demostró interés genuino en aprender. Recomendable para posición junior.</p>', status: 'pending', teamId: null, totalScore: 0, createdAt: days(5), updatedAt: days(5) },
@@ -1158,6 +1163,54 @@ export async function seedDemoData(force = false) {
     const totalScore = Math.round(techAvg * 0.5 + evalAvg * 0.5)
     await db.candidates.update(c.id, { totalScore })
   }
+
+  // ── Equipment seed data ──
+  const equipmentItems: EquipmentItem[] = [
+    // Assigned items
+    { id: 'eq-1', type: 'laptop', brand: 'Dell', model: 'Latitude 5540', serialNumber: 'LAT-001', status: 'assigned', condition: 'good', assignedTo: 'tm-1', assignmentType: 'member', purchaseDate: '2024-01-15', warrantyExpiry: '2027-01-15', lastMaintenanceDate: '2025-06-15', costCenter: 'CC-2024-001', businessUnitId: 'bu-core', notes: 'Laptop principal - Juan Pérez', createdAt: days(500), updatedAt: days(30) },
+    { id: 'eq-2', type: 'monitor', brand: 'Dell', model: 'UltraSharp U2723QE', serialNumber: 'MON-001', status: 'assigned', condition: 'excellent', assignedTo: 'tm-3', assignmentType: 'member', purchaseDate: '2024-03-01', warrantyExpiry: '2027-03-01', lastMaintenanceDate: null, costCenter: 'CC-2024-002', businessUnitId: 'bu-digital', notes: 'Monitor 4K - Carlos López', createdAt: days(465), updatedAt: days(60) },
+    { id: 'eq-3', type: 'phone', brand: 'Apple', model: 'iPhone 14', serialNumber: 'PHN-001', status: 'assigned', condition: 'good', assignedTo: 'tm-6', assignmentType: 'member', purchaseDate: '2024-02-01', warrantyExpiry: '2026-02-01', lastMaintenanceDate: null, costCenter: 'CC-2024-003', businessUnitId: 'bu-digital', notes: 'Teléfono corporativo - Laura Rodríguez', createdAt: days(480), updatedAt: days(90) },
+    { id: 'eq-4', type: 'chair', brand: 'Herman Miller', model: 'Aeron', serialNumber: 'CHR-001', status: 'assigned', condition: 'fair', assignedTo: 'tm-2', assignmentType: 'member', purchaseDate: '2023-06-15', warrantyExpiry: '2028-06-15', lastMaintenanceDate: '2024-06-15', costCenter: 'CC-2023-001', businessUnitId: 'bu-core', notes: 'Silla ergonómica - María García', createdAt: days(550), updatedAt: days(180) },
+    { id: 'eq-8', type: 'mouse', brand: 'Logitech', model: 'MX Master 3S', serialNumber: 'MOU-008', status: 'assigned', condition: 'excellent', assignedTo: 'tm-4', assignmentType: 'member', purchaseDate: '2025-02-01', warrantyExpiry: null, lastMaintenanceDate: null, costCenter: 'CC-2025-001', businessUnitId: 'bu-legacy', notes: 'Ratón inalámbrico - Ana Martínez', createdAt: days(120), updatedAt: days(5) },
+    { id: 'eq-9', type: 'keyboard', brand: 'Keychron', model: 'Q1 Pro', serialNumber: 'KBD-009', status: 'assigned', condition: 'good', assignedTo: 'tm-7', assignmentType: 'member', purchaseDate: '2024-08-01', warrantyExpiry: null, lastMaintenanceDate: null, costCenter: null, businessUnitId: 'bu-digital', notes: 'Teclado mecánico - Diego Fernández', createdAt: days(320), updatedAt: days(15) },
+    { id: 'eq-12', type: 'laptop', brand: 'Dell', model: 'XPS 16', serialNumber: 'XPS-012', status: 'assigned', condition: 'excellent', assignedTo: 'tm-cand-1', assignmentType: 'member', purchaseDate: '2026-06-15', warrantyExpiry: '2029-06-15', lastMaintenanceDate: null, costCenter: 'CC-2026-001', businessUnitId: 'bu-digital', notes: 'Laptop nueva para incorporación - Elena Vargas', createdAt: days(10), updatedAt: days(5) },
+    // Available items
+    { id: 'eq-5', type: 'laptop', brand: 'Lenovo', model: 'ThinkPad X1 Carbon Gen 11', serialNumber: 'LEN-005', status: 'available', condition: 'excellent', assignedTo: null, assignmentType: null, purchaseDate: '2025-01-10', warrantyExpiry: '2028-01-10', lastMaintenanceDate: null, costCenter: 'CC-2025-002', businessUnitId: null, notes: 'Equipo de reserva - sellado', createdAt: days(150), updatedAt: days(60) },
+    { id: 'eq-11', type: 'desk_stand', brand: 'Ergotron', model: 'LX', serialNumber: 'STN-011', status: 'available', condition: 'good', assignedTo: null, assignmentType: null, purchaseDate: '2025-03-01', warrantyExpiry: null, lastMaintenanceDate: null, costCenter: null, businessUnitId: null, notes: 'Soporte de monitor ajustable', createdAt: days(100), updatedAt: days(30) },
+    // Maintenance
+    { id: 'eq-6', type: 'laptop', brand: 'Apple', model: 'MacBook Pro 14"', serialNumber: 'MAC-006', status: 'maintenance', condition: 'poor', assignedTo: null, assignmentType: null, purchaseDate: '2023-11-01', warrantyExpiry: '2025-11-01', lastMaintenanceDate: '2025-12-01', costCenter: 'CC-2023-002', businessUnitId: 'bu-digital', notes: 'En reparación - pantalla dañada y batería hinchada', createdAt: days(600), updatedAt: days(20) },
+    // Retired
+    { id: 'eq-7', type: 'monitor', brand: 'HP', model: 'Z27k G3', serialNumber: 'MON-007', status: 'retired', condition: 'poor', assignedTo: null, assignmentType: null, purchaseDate: '2020-05-01', warrantyExpiry: '2023-05-01', lastMaintenanceDate: null, costCenter: 'CC-2020-001', businessUnitId: 'bu-legacy', notes: 'Monitor retirado - reemplazado por Dell UltraSharp', createdAt: days(1000), updatedAt: days(60) },
+    // Obsolete
+    { id: 'eq-10', type: 'headphones', brand: 'Sony', model: 'WH-1000XM4', serialNumber: 'HDP-010', status: 'obsolete', condition: 'fair', assignedTo: null, assignmentType: null, purchaseDate: '2022-01-01', warrantyExpiry: '2024-01-01', lastMaintenanceDate: null, costCenter: null, businessUnitId: null, notes: 'Audífonos obsoletos - fuera de garantía', createdAt: days(800), updatedAt: days(180) },
+  ]
+
+  const equipmentAssignments: EquipmentAssignmentLog[] = [
+    // Current assignments
+    { id: 'assn-1', equipmentId: 'eq-1', assignedTo: 'tm-1', assignedAt: days(365), returnedAt: null, conditionAtAssignment: 'good', conditionAtReturn: null, notes: 'Asignación regular' },
+    { id: 'assn-2', equipmentId: 'eq-2', assignedTo: 'tm-3', assignedAt: days(300), returnedAt: null, conditionAtAssignment: 'excellent', conditionAtReturn: null, notes: '' },
+    { id: 'assn-3', equipmentId: 'eq-3', assignedTo: 'tm-6', assignedAt: days(400), returnedAt: null, conditionAtAssignment: 'good', conditionAtReturn: null, notes: '' },
+    { id: 'assn-4', equipmentId: 'eq-4', assignedTo: 'tm-2', assignedAt: days(500), returnedAt: null, conditionAtAssignment: 'good', conditionAtReturn: null, notes: 'Silla ergonómica para puesto fijo' },
+    { id: 'assn-5', equipmentId: 'eq-8', assignedTo: 'tm-4', assignedAt: days(120), returnedAt: null, conditionAtAssignment: 'excellent', conditionAtReturn: null, notes: '' },
+    { id: 'assn-6', equipmentId: 'eq-9', assignedTo: 'tm-7', assignedAt: days(250), returnedAt: null, conditionAtAssignment: 'good', conditionAtReturn: null, notes: '' },
+    { id: 'assn-7', equipmentId: 'eq-12', assignedTo: 'tm-cand-1', assignedAt: days(10), returnedAt: null, conditionAtAssignment: 'excellent', conditionAtReturn: null, notes: 'Equipamiento nuevo para onboarding - Elena Vargas' },
+    // Historical assignments
+    { id: 'assn-8', equipmentId: 'eq-1', assignedTo: 'tm-1', assignedAt: days(730), returnedAt: days(370), conditionAtAssignment: 'fair', conditionAtReturn: 'poor', notes: 'Devolución por upgrade a Latitude 5540' },
+    { id: 'assn-9', equipmentId: 'eq-6', assignedTo: 'tm-3', assignedAt: days(400), returnedAt: days(25), conditionAtAssignment: 'good', conditionAtReturn: 'poor', notes: 'Devolución por falla de hardware - ingresó a mantenimiento' },
+    { id: 'assn-10', equipmentId: 'eq-5', assignedTo: 'tm-4', assignedAt: days(180), returnedAt: days(15), conditionAtAssignment: 'excellent', conditionAtReturn: 'excellent', notes: 'Equipo de prueba devuelto en perfecto estado' },
+  ]
+
+  const equipmentTickets: EquipmentTicket[] = [
+    { id: 'tkt-1', equipmentId: 'eq-6', requesterId: 'tm-3', assigneeId: 'tm-7', type: 'repair', status: 'in_progress', jiraTicketId: 'ITSM-2026-042', jiraTicketLink: 'https://jira.tgp.demo/browse/ITSM-2026-042', priority: 'high', description: 'MacBook Pro con pantalla dañada (líneas verticales) y batería hinchada. La batería dura menos de 1 hora.', resolution: null, startDate: days(18), endDate: null, createdAt: days(20), updatedAt: days(5) },
+    { id: 'tkt-2', equipmentId: 'eq-10', requesterId: 'tm-4', assigneeId: 'tm-8', type: 'replacement', status: 'closed', jiraTicketId: 'ITSM-2026-015', jiraTicketLink: 'https://jira.tgp.demo/browse/ITSM-2026-015', priority: 'low', description: 'Solicitud de reemplazo de audífonos Sony WH-1000XM4 por desgaste de almohadillas.', resolution: 'Reemplazo denegado - fuera de ciclo de renovación. Se autorizó compra de almohadillas nuevas.', startDate: days(175), endDate: days(150), createdAt: days(180), updatedAt: days(150) },
+    { id: 'tkt-3', equipmentId: 'eq-7', requesterId: 'tm-2', assigneeId: 'tm-3', type: 'replacement', status: 'resolved', jiraTicketId: 'ITSM-2025-188', jiraTicketLink: 'https://jira.tgp.demo/browse/ITSM-2025-188', priority: 'medium', description: 'Monitor HP Z27k presenta quemadura de pantalla permanente en la esquina inferior derecha.', resolution: 'Monitor reemplazado por Dell UltraSharp U2723QE. HP retirado del inventario.', startDate: days(350), endDate: days(300), createdAt: days(365), updatedAt: days(300) },
+    { id: 'tkt-4', equipmentId: 'eq-9', requesterId: 'tm-7', assigneeId: null, type: 'repair', status: 'open', jiraTicketId: null, jiraTicketLink: null, priority: 'low', description: 'Tecla Shift derecha del Keychron Q1 Pro no responde consistentemente. Ocurre aproximadamente 1 de cada 5 pulsaciones.', resolution: null, startDate: null, endDate: null, createdAt: days(7), updatedAt: days(7) },
+    { id: 'tkt-5', equipmentId: '', requesterId: 'tm-8', assigneeId: 'tm-2', type: 'new', status: 'open', jiraTicketId: null, jiraTicketLink: null, priority: 'medium', description: 'Solicitud de monitor 27" 4K para puesto de desarrollo. La internista Sofía Torres requiere monitor adicional para completar su estación de trabajo dual.', resolution: null, startDate: days(1), endDate: null, createdAt: days(3), updatedAt: days(3) },
+  ]
+
+  await db.equipment.bulkAdd(equipmentItems)
+  await db.equipmentAssignments.bulkAdd(equipmentAssignments)
+  await db.equipmentTickets.bulkAdd(equipmentTickets)
 
   localStorage.setItem(SEEDED_FLAG, 'true')
   seedingInProgress = false

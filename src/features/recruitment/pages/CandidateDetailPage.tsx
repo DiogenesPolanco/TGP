@@ -4,16 +4,18 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { getCandidateTechnologies, getCandidateEvaluations, deleteCandidate, selectCandidate } from '@/services/recruitment/candidateService'
+import { getCandidateTechnologies, getCandidateEvaluations, deleteCandidate, preSelectCandidate, selectCandidate, startOnboarding } from '@/services/recruitment/candidateService'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
-import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck, ThumbsUp, Rocket, Monitor, Package } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
   interviewed: { label: 'Entrevistado', color: 'bg-info/10 text-info' },
+  pre_selected: { label: 'Pre-Seleccionado', color: 'bg-primary/10 text-primary' },
   selected: { label: 'Seleccionado', color: 'bg-success/10 text-success' },
+  onboarding: { label: 'En Onboarding', color: 'bg-info/10 text-info' },
   rejected: { label: 'Rechazado', color: 'bg-danger/10 text-danger' },
   no_show: { label: 'No Asistió', color: 'bg-neutral-30 text-neutral-60' },
 }
@@ -24,6 +26,8 @@ export function CandidateDetailPage() {
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
   const [selecting, setSelecting] = useState(false)
+  const [preSelecting, setPreSelecting] = useState(false)
+  const [onboarding, setOnboarding] = useState(false)
 
   const candidate = useLiveQuery(() => db.candidates.get(id!), [id])
   const technologies = useLiveQuery(() => id ? getCandidateTechnologies(id) : [], [id]) ?? []
@@ -48,13 +52,44 @@ export function CandidateDetailPage() {
     }
     setSelecting(true)
     try {
-      await selectCandidate(candidate.id, candidate.teamId)
-      addNotification({ type: 'success', message: 'Candidato seleccionado y agregado al equipo' })
+      await selectCandidate(candidate.id)
+      addNotification({ type: 'success', message: 'Candidato seleccionado' })
       navigate('/teams/recruitment')
     } catch {
       addNotification({ type: 'error', message: 'Error al seleccionar candidato' })
     } finally {
       setSelecting(false)
+    }
+  }
+
+  const handlePreSelect = async () => {
+    if (!candidate) return
+    setPreSelecting(true)
+    try {
+      await preSelectCandidate(candidate.id)
+      addNotification({ type: 'success', message: 'Candidato pre-seleccionado' })
+    } catch {
+      addNotification({ type: 'error', message: 'Error al pre-seleccionar candidato' })
+    } finally {
+      setPreSelecting(false)
+    }
+  }
+
+  const handleStartOnboarding = async () => {
+    if (!candidate) return
+    if (!candidate.teamId) {
+      addNotification({ type: 'error', message: 'Asigna un equipo al candidato antes de iniciar onboarding' })
+      return
+    }
+    setOnboarding(true)
+    try {
+      await startOnboarding(candidate.id, candidate.teamId)
+      addNotification({ type: 'success', message: 'Onboarding iniciado — agregando al equipo' })
+      navigate('/teams/recruitment')
+    } catch {
+      addNotification({ type: 'error', message: 'Error al iniciar onboarding' })
+    } finally {
+      setOnboarding(false)
     }
   }
 
@@ -168,7 +203,18 @@ export function CandidateDetailPage() {
         )}
       </div>
 
-      {candidate.status !== 'selected' && candidate.status !== 'rejected' && candidate.status !== 'no_show' && (
+      {candidate.status === 'interviewed' && (
+        <Button
+          onClick={handlePreSelect}
+          disabled={preSelecting}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/25"
+        >
+          <ThumbsUp size={20} />
+          {preSelecting ? 'Procesando...' : 'Pre-Seleccionar'}
+        </Button>
+      )}
+
+      {candidate.status === 'pre_selected' && (
         <Button
           onClick={handleSelect}
           disabled={selecting}
@@ -177,6 +223,42 @@ export function CandidateDetailPage() {
           <CheckCircle size={20} />
           {selecting ? 'Seleccionando...' : 'Seleccionar Candidato'}
         </Button>
+      )}
+
+      {candidate.status === 'selected' && (
+        <Button
+          onClick={handleStartOnboarding}
+          disabled={onboarding}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-info text-white rounded-xl font-semibold text-sm hover:bg-info-dark transition-colors disabled:opacity-50 shadow-lg shadow-info/25"
+        >
+          <Rocket size={20} />
+          {onboarding ? 'Iniciando...' : 'Iniciar Onboarding'}
+        </Button>
+      )}
+
+      {candidate.status === 'onboarding' && (
+        <div className="space-y-3">
+          <div className="bg-info/10 border border-info/20 rounded-xl p-4 text-center">
+            <p className="text-sm font-medium text-info">Candidato en proceso de onboarding</p>
+            <p className="text-xs text-info/70 mt-1">Asignación de accesos, equipos y permisos en curso</p>
+          </div>
+
+          <div className="bg-card rounded-xl border border-boundary p-5 space-y-3">
+            <div className="flex items-center gap-2 text-neutral-90 dark:text-white">
+              <Monitor size={18} className="text-primary" />
+              <h3 className="font-semibold text-sm">Equipamiento Asignado</h3>
+            </div>
+            <p className="text-xs text-neutral-50">
+              Durante el onboarding se asignan los equipos necesarios (laptop, monitor, teléfono, accesorios).
+              Gestiona las asignaciones desde el inventario de equipamiento.
+            </p>
+            <Button onClick={() => navigate('/equipment')}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">
+              <Package size={16} />
+              Ir a Inventario de Equipos
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   )

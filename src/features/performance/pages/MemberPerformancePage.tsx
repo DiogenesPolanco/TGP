@@ -18,9 +18,10 @@ import { OneOnOneSection } from '@/features/performance/components/OneOnOneSecti
 import { AchievementsSection } from '@/features/performance/components/AchievementsSection'
 import { TechStackSection } from '@/features/performance/components/TechStackSection'
 import { MicroservicesSection } from '@/features/performance/components/MicroservicesSection'
+import { EquipmentSection } from '@/features/performance/components/EquipmentSection'
 import { Button } from '@/components/ui/Button'
 
-type Tab = 'perfil' | 'skills' | 'tecnologias' | 'microservicios' | 'sprints' | 'oneonone' | 'logros'
+type Tab = 'perfil' | 'skills' | 'tecnologias' | 'microservicios' | 'sprints' | 'oneonone' | 'logros' | 'equipamiento'
 
 export function MemberPerformancePage() {
   const { memberId, id: teamId } = useParams<{ memberId: string; id: string }>()
@@ -84,6 +85,7 @@ export function MemberPerformancePage() {
     { key: 'sprints', label: 'Sprints' },
     { key: 'oneonone', label: 'Uno a Uno' },
     { key: 'logros', label: 'Logros' },
+    { key: 'equipamiento', label: 'Equipamiento' },
   ]
 
   return (
@@ -276,6 +278,9 @@ export function MemberPerformancePage() {
         )}
         {activeTab === 'logros' && (
           <AchievementsSection memberId={member.id} />
+        )}
+        {activeTab === 'equipamiento' && (
+          <EquipmentSection memberId={member.id} />
         )}
       </div>
     </div>

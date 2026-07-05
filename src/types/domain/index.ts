@@ -541,7 +541,7 @@ export interface Candidate {
   position: string
   interviewDate: Date | null
   comments: string
-  status: 'pending' | 'interviewed' | 'selected' | 'rejected' | 'no_show'
+  status: 'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'
   teamId: string | null
   totalScore: number
   createdAt: Date
@@ -562,4 +562,62 @@ export interface CandidateEvaluation {
   candidateId: string
   category: EvalCategory
   points: number
+}
+
+/* ─── Equipamiento ─── */
+
+export type EquipmentType = 'laptop' | 'monitor' | 'phone' | 'mouse' | 'headphones' | 'chair' | 'keyboard' | 'desk_stand' | 'other'
+export type EquipmentStatus = 'available' | 'assigned' | 'maintenance' | 'retired' | 'obsolete'
+export type EquipmentCondition = 'excellent' | 'good' | 'fair' | 'poor'
+export type TicketType = 'replacement' | 'repair' | 'new'
+export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed'
+export type TicketPriority = 'low' | 'medium' | 'high' | 'critical'
+
+export interface EquipmentItem {
+  id: string
+  type: EquipmentType
+  brand: string
+  model: string
+  serialNumber: string
+  status: EquipmentStatus
+  condition: EquipmentCondition
+  assignedTo: string | null
+  assignmentType: 'member' | null
+  purchaseDate: string | null
+  warrantyExpiry: string | null
+  lastMaintenanceDate: string | null
+  costCenter: string | null
+  businessUnitId: string | null
+  notes: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface EquipmentAssignmentLog {
+  id: string
+  equipmentId: string
+  assignedTo: string
+  assignedAt: Date
+  returnedAt: Date | null
+  conditionAtAssignment: EquipmentCondition
+  conditionAtReturn: EquipmentCondition | null
+  notes: string
+}
+
+export interface EquipmentTicket {
+  id: string
+  equipmentId: string
+  requesterId: string
+  assigneeId: string | null
+  type: TicketType
+  status: TicketStatus
+  jiraTicketId: string | null
+  jiraTicketLink: string | null
+  priority: TicketPriority
+  description: string
+  resolution: string | null
+  startDate: Date | null
+  endDate: Date | null
+  createdAt: Date
+  updatedAt: Date
 }

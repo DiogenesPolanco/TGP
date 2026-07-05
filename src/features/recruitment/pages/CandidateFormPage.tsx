@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
-import { createCandidate, updateCandidate, getCandidate, getCandidateTechnologies, getCandidateEvaluations } from '@/services/recruitment/candidateService'
+import { createCandidate, updateCandidate, preSelectCandidate, getCandidate, getCandidateTechnologies, getCandidateEvaluations } from '@/services/recruitment/candidateService'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
@@ -30,9 +30,10 @@ export function CandidateFormPage() {
   const [position, setPosition] = useState('')
   const [interviewDate, setInterviewDate] = useState('')
   const [comments, setComments] = useState('')
-  const [status, setStatus] = useState<'pending' | 'interviewed' | 'selected' | 'rejected' | 'no_show'>('pending')
+  const [status, setStatus] = useState<'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'>('pending')
   const [teamId, setTeamId] = useState('')
   const [saving, setSaving] = useState(false)
+  const [preSelecting, setPreSelecting] = useState(false)
 
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
   const [techScores, setTechScores] = useState<Record<string, number>>({})
@@ -129,6 +130,20 @@ export function CandidateFormPage() {
     }
   }
 
+  const handlePreSelect = async () => {
+    if (!id) return
+    setPreSelecting(true)
+    try {
+      await preSelectCandidate(id)
+      addNotification({ type: 'success', message: 'Candidato pre-seleccionado' })
+      navigate('/teams/recruitment')
+    } catch {
+      addNotification({ type: 'error', message: 'Error al pre-seleccionar candidato' })
+    } finally {
+      setPreSelecting(false)
+    }
+  }
+
   const roleOptions = MEMBER_ROLES.map((role) => ({
     value: role,
     label: MEMBER_ROLE_LABELS[role],
@@ -177,7 +192,9 @@ export function CandidateFormPage() {
             <Select value={status} onChange={(v) => setStatus(v as any)} options={[
               { value: 'pending', label: 'Pendiente' },
               { value: 'interviewed', label: 'Entrevistado' },
+              { value: 'pre_selected', label: 'Pre-Seleccionado' },
               { value: 'selected', label: 'Seleccionado' },
+              { value: 'onboarding', label: 'En Onboarding' },
               { value: 'rejected', label: 'Rechazado' },
               { value: 'no_show', label: 'No Asistió' },
             ]} />
@@ -267,6 +284,12 @@ export function CandidateFormPage() {
           <Button type="button" onClick={() => navigate('/teams/recruitment')} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors">
             Cancelar
           </Button>
+          {isEdit && status === 'interviewed' && (
+            <Button type="button" onClick={handlePreSelect} disabled={preSelecting}
+              className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
+              {preSelecting ? 'Procesando...' : 'Pre-Seleccionar'}
+            </Button>
+          )}
           <Button type="submit" disabled={saving || !name.trim() || !position} className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
             {saving ? 'Guardando...' : isEdit ? 'Actualizar Candidato' : 'Registrar Candidato'}
           </Button>

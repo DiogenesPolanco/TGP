@@ -13,7 +13,9 @@ import { Button } from '@/components/ui/Button';
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
   interviewed: { label: 'Entrevistado', color: 'bg-info/10 text-info' },
+  pre_selected: { label: 'Pre-Seleccionado', color: 'bg-primary/10 text-primary' },
   selected: { label: 'Seleccionado', color: 'bg-success/10 text-success' },
+  onboarding: { label: 'En Onboarding', color: 'bg-info/10 text-info' },
   rejected: { label: 'Rechazado', color: 'bg-danger/10 text-danger' },
   no_show: { label: 'No Asistió', color: 'bg-neutral-30 text-neutral-60' },
 }

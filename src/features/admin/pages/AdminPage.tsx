@@ -101,7 +101,7 @@ export function AdminPage() {
   const handleSeedData = async () => {
     const stats = await Promise.all(db.tables.map((t) => t.count()))
     if (stats.some((c) => c > 0) && !(await confirm('Hay datos. ¿Sobrescribir con datos demo?'))) return
-    await seedDemoData()
+    await seedDemoData(true)
     addNotification({ type: 'success', message: 'Datos de demo cargados' })
   }
 

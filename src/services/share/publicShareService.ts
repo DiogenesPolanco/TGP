@@ -8,7 +8,7 @@ const ACCESS_LOG_KEY = 'tgp-share-access-log'
 
 export type ShareType = 'dashboard' | 'performance' | 'member' | 'members' | 'recruitment' | 'daily'
   | 'plan' | 'timeline' | 'predictability' | 'vulnerabilities' | 'incidents' | 'risks'
-  | 'audit' | 'objectives' | 'obsolescence' | 'dependencies'
+  | 'audit' | 'objectives' | 'obsolescence' | 'dependencies' | 'equipment'
 
 interface SharedLink {
   hash: string
@@ -44,6 +44,7 @@ const PUBLIC_ROUTES: Record<ShareType, string> = {
   objectives: '/public/objectives',
   obsolescence: '/public/obsolescence',
   dependencies: '/public/dependencies',
+  equipment: '/public/equipment',
 }
 
 // ─── Hash generation (fix #2: 16 chars direct, no duplication) ─────
@@ -254,6 +255,9 @@ const ENTITY_LOADERS: Record<string, () => Promise<unknown[]>> = {
   microservices: () => db.microservices.toArray(),
   applicationDependencies: () => db.applicationDependencies.toArray(),
   teamSprints: () => db.teamSprints.toArray(),
+  equipment: () => db.equipment.toArray(),
+  equipmentAssignments: () => db.equipmentAssignments.toArray(),
+  equipmentTickets: () => db.equipmentTickets.toArray(),
 }
 
 export async function loadPublicEntities(entities: string[]): Promise<Record<string, any[]>> {

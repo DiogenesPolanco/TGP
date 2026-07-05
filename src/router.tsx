@@ -17,6 +17,7 @@ import { PublicAuditPage } from '@/features/share/PublicAuditPage'
 import { PublicObjectivesPage } from '@/features/share/PublicObjectivesPage'
 import { PublicObsolescenceMapPage } from '@/features/share/PublicObsolescenceMapPage'
 import { PublicDependencyMapPage } from '@/features/share/PublicDependencyMapPage'
+import { PublicEquipmentPage } from '@/features/equipment/pages/PublicEquipmentPage'
 import { TermsPage } from '@/features/share/TermsPage'
 import { MobileDashboardPage } from '@/features/mobile/dashboard/MobileDashboardPage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
   {
     path: '/public/dependencies/:hash',
     element: <PublicDependencyMapPage />,
+  },
+  {
+    path: '/public/equipment/:hash',
+    element: <PublicEquipmentPage />,
   },
   {
     path: '/terms',
@@ -162,6 +167,15 @@ export const router = createBrowserRouter([
       { path: 'teams/recruitment/:id', lazy: () => import('@/features/recruitment/pages/CandidateDetailPage').then((m) => ({ Component: m.CandidateDetailPage })) },
       { path: 'teams/:id/performance', lazy: () => import('@/features/performance/pages/PerformancePage').then((m) => ({ Component: m.PerformancePage })) },
       { path: 'teams/:id/performance/:memberId', lazy: () => import('@/features/performance/pages/MemberPerformancePage').then((m) => ({ Component: m.MemberPerformancePage })) },
+
+      // Equipamiento
+      { path: 'equipment', lazy: () => import('@/features/equipment/pages/EquipmentListPage').then((m) => ({ Component: m.EquipmentListPage })) },
+      { path: 'equipment/new', lazy: () => import('@/features/equipment/pages/EquipmentFormPage').then((m) => ({ Component: m.EquipmentFormPage })) },
+      { path: 'equipment/:id/edit', lazy: () => import('@/features/equipment/pages/EquipmentFormPage').then((m) => ({ Component: m.EquipmentFormPage })) },
+      { path: 'equipment/:id/tickets/new', lazy: () => import('@/features/equipment/pages/EquipmentTicketFormPage').then((m) => ({ Component: m.EquipmentTicketFormPage })) },
+      { path: 'equipment/:id/tickets/:ticketId/edit', lazy: () => import('@/features/equipment/pages/EquipmentTicketFormPage').then((m) => ({ Component: m.EquipmentTicketFormPage })) },
+      { path: 'equipment/:id', lazy: () => import('@/features/equipment/pages/EquipmentDetailPage').then((m) => ({ Component: m.EquipmentDetailPage })) },
+      { path: 'equipment/reports', lazy: () => import('@/features/equipment/pages/EquipmentReportsPage').then((m) => ({ Component: m.EquipmentReportsPage })) },
 
       // Estrategia
       { path: 'strategy/objectives', lazy: () => import('@/features/strategy/pages/ObjectivesPage').then((m) => ({ Component: m.ObjectivesPage })) },

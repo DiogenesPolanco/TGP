@@ -16,6 +16,7 @@ import {
   ClipboardList,
   FileText,
   FileSignature,
+  Monitor,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
@@ -82,6 +83,14 @@ const navItems: NavItem[] = [
       { label: 'Rendimiento', path: '/teams' },
       { label: 'Miembros', path: '/teams/members' },
       { label: 'Reclutamiento', path: '/teams/recruitment' },
+    ],
+  },
+  {
+    label: 'Equipamiento',
+    icon: <Monitor size={20} />,
+    children: [
+      { label: 'Inventario', path: '/equipment' },
+      { label: 'Reportes', path: '/equipment/reports' },
     ],
   },
   { label: 'Reportes', icon: <FileText size={20} />, path: '/reports' },

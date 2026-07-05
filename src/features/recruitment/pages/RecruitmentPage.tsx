@@ -13,13 +13,15 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Candidate } from '@/types/domain'
-import { Plus, Search, Users, UserCheck, Calendar, Star, XCircle, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
+import { Plus, Search, Users, UserCheck, Calendar, Star, XCircle, Pencil, Trash2, Share2, Check, Copy, ThumbsUp, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendiente', color: 'bg-warning/10 text-warning' },
   interviewed: { label: 'Entrevistado', color: 'bg-info/10 text-info' },
+  pre_selected: { label: 'Pre-Seleccionado', color: 'bg-primary/10 text-primary' },
   selected: { label: 'Seleccionado', color: 'bg-success/10 text-success' },
+  onboarding: { label: 'En Onboarding', color: 'bg-info/10 text-info' },
   rejected: { label: 'Rechazado', color: 'bg-danger/10 text-danger' },
   no_show: { label: 'No Asistió', color: 'bg-neutral-30 text-neutral-60' },
 }
@@ -217,7 +219,7 @@ export function RecruitmentPage() {
         />
       )}
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-7 gap-4">
         <StatCard
           icon={<Users size={20} />} label="Total"
           value={candidates.length} color="text-primary"
@@ -237,10 +239,22 @@ export function RecruitmentPage() {
           onClick={() => setStatusFilter('interviewed')}
         />
         <StatCard
+          icon={<ThumbsUp size={20} />} label="Pre-Seleccionados"
+          value={candidates.filter((c) => c.status === 'pre_selected').length} color="text-primary"
+          active={statusFilter === 'pre_selected'}
+          onClick={() => setStatusFilter('pre_selected')}
+        />
+        <StatCard
           icon={<Star size={20} />} label="Seleccionados"
           value={candidates.filter((c) => c.status === 'selected').length} color="text-success"
           active={statusFilter === 'selected'}
           onClick={() => setStatusFilter('selected')}
+        />
+        <StatCard
+          icon={<Rocket size={20} />} label="En Onboarding"
+          value={candidates.filter((c) => c.status === 'onboarding').length} color="text-info"
+          active={statusFilter === 'onboarding'}
+          onClick={() => setStatusFilter('onboarding')}
         />
         <StatCard
           icon={<XCircle size={20} />} label="No Asistieron"

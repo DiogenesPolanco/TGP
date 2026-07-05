@@ -36,6 +36,9 @@ import type {
   AuditFindingMicroservice,
   RiskMicroservice,
   AppDatabaseMicroservice,
+  EquipmentItem,
+  EquipmentAssignmentLog,
+  EquipmentTicket,
 } from '@/types/domain'
 
 export class TGPDatabase extends Dexie {
@@ -76,6 +79,11 @@ export class TGPDatabase extends Dexie {
   candidates!: Table<Candidate, string>
   candidateTechnologies!: Table<CandidateTechnology, string>
   candidateEvaluations!: Table<CandidateEvaluation, string>
+
+  // Equipamiento
+  equipment!: Table<EquipmentItem, string>
+  equipmentAssignments!: Table<EquipmentAssignmentLog, string>
+  equipmentTickets!: Table<EquipmentTicket, string>
 
   // Junction M:N microservicios
   vulnerabilityMicroservices!: Table<VulnerabilityMicroservice, string>
@@ -145,6 +153,26 @@ export class TGPDatabase extends Dexie {
     })
     this.version(16).stores({
       users: 'id, email, role, isActive',
+    })
+    this.version(17).stores({
+      equipment: 'id, type, status, assignedTo, serialNumber',
+      equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
+      equipmentTickets: 'id, equipmentId, requesterId, status, type',
+    })
+    this.version(18).stores({
+      equipment: 'id, type, status, assignedTo, serialNumber, createdAt',
+      equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
+      equipmentTickets: 'id, equipmentId, requesterId, status, type',
+    })
+    this.version(19).stores({
+      equipment: 'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
+      equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
+      equipmentTickets: 'id, equipmentId, requesterId, status, type',
+    })
+    this.version(20).stores({
+      equipment: 'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
+      equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
+      equipmentTickets: 'id, equipmentId, requesterId, status, type, assigneeId',
     })
   }
 }

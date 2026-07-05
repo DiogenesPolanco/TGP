@@ -108,12 +108,23 @@ export async function deleteCandidate(id: string): Promise<void> {
   })
 }
 
-export async function selectCandidate(id: string, teamId: string): Promise<void> {
+export async function preSelectCandidate(id: string): Promise<void> {
+  await db.candidates.update(id, { status: 'pre_selected', updatedAt: new Date() })
+}
+
+export async function selectCandidate(id: string): Promise<void> {
+  const candidate = await db.candidates.get(id)
+  if (!candidate) return
+
+  await db.candidates.update(id, { status: 'selected', updatedAt: new Date() })
+}
+
+export async function startOnboarding(id: string, teamId: string): Promise<void> {
   const candidate = await db.candidates.get(id)
   if (!candidate) return
 
   await db.transaction('rw', [db.candidates, db.teams, db.memberProfiles, db.achievements, db.candidateTechnologies] as const, async () => {
-    await db.candidates.update(id, { status: 'selected', teamId, updatedAt: new Date() })
+    await db.candidates.update(id, { status: 'onboarding', teamId, updatedAt: new Date() })
 
     const team = await db.teams.get(teamId)
     if (team) {
