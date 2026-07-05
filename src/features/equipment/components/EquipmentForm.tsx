@@ -144,12 +144,12 @@ export function EquipmentForm({ initial, id }: Props) {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-secondary flex items-center gap-1.5">
                   <User size={14} />
-                  Asignar a miembro *
+                  Asignar a
                 </label>
                 <MemberSelector
                   value={assignedTo}
                   onChange={setAssignedTo}
-                  placeholder="Seleccionar miembro..."
+                  placeholder="Buscar miembro o escribir nombre..."
                 />
               </div>
             ) : (

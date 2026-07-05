@@ -250,7 +250,11 @@ export function EquipmentDetailPage() {
               ) : equipment.status !== 'retired' && equipment.status !== 'obsolete' ? (
                 <div className="space-y-3">
                   <p className="text-sm text-neutral-50">Equipo disponible para asignar</p>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-secondary flex items-center gap-1.5">
+                      <User size={14} />
+                      Asignar a
+                    </label>
                     <MemberSelector
                       value={assignTarget}
                       onChange={setAssignTarget}

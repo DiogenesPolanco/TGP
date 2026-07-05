@@ -8,7 +8,7 @@ import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { Select } from '@/components/ui/Select'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Button } from '@/components/ui/Button'
-import { ArrowLeft, ExternalLink, Calendar } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Calendar, User } from 'lucide-react'
 import { EQUIPMENT_TYPE_LABELS } from '../components/EquipmentStatusBadge'
 import type { TicketType, TicketPriority } from '@/types/domain'
 
@@ -149,11 +149,14 @@ export function EquipmentTicketFormPage() {
           )}
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-secondary">Asignado a</label>
+            <label className="text-sm font-medium text-secondary flex items-center gap-1.5">
+              <User size={14} />
+              Asignar a
+            </label>
             <MemberSelector
               value={assigneeId}
               onChange={setAssigneeId}
-              placeholder="Sin asignar"
+              placeholder="Buscar miembro o escribir nombre..."
             />
           </div>
 
