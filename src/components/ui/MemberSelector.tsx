@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
+import { useUserStore } from '@/stores/userStore'
 import { cn } from '@/lib/utils'
 import { User, Plus, Check, ChevronDown } from 'lucide-react'
 
@@ -9,16 +10,29 @@ interface MemberOption {
   displayName: string
   teamName: string
   role: string
+  source: 'member' | 'user' | 'current'
 }
 
 interface MemberSelectorProps {
   value: string
   onChange: (value: string) => void
+  label?: string
   placeholder?: string
+  required?: boolean
   className?: string
+  /** If provided, only show members of this team */
+  teamId?: string
 }
 
-export function MemberSelector({ value, onChange, placeholder = 'Buscar o escribir nombre...', className }: MemberSelectorProps) {
+export function MemberSelector({
+  value,
+  onChange,
+  label,
+  placeholder = 'Buscar o escribir nombre...',
+  required = false,
+  className,
+  teamId,
+}: MemberSelectorProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [highlightIdx, setHighlightIdx] = useState(0)
@@ -27,26 +41,71 @@ export function MemberSelector({ value, onChange, placeholder = 'Buscar o escrib
 
   const members = useLiveQuery(() => db.memberProfiles.toArray(), []) ?? []
   const teams = useLiveQuery(() => db.teams.toArray(), []) ?? []
+  const users = useLiveQuery(() => db.users.toArray(), []) ?? []
+  const currentUser = useUserStore((s) => s.currentUser)
 
   const allOptions: MemberOption[] = useMemo(() => {
     const seen = new Set<string>()
     const opts: MemberOption[] = []
-    for (const m of members) {
-      seen.add(m.id)
-      const teamName = teams.find((t) => t.id === m.teamId)?.name ?? ''
-      opts.push({ id: m.id, displayName: m.email.split('@')[0], teamName, role: m.role.replace(/_/g, ' ') })
+
+    if (currentUser && !seen.has('__me__')) {
+      seen.add('__me__')
+      opts.push({
+        id: '__me__',
+        displayName: `Yo — ${currentUser.email}`,
+        teamName: 'Usuario actual',
+        role: '',
+        source: 'current',
+      })
     }
+
+    for (const u of users) {
+      if (u.isActive === 1 && !seen.has(u.id)) {
+        seen.add(u.id)
+        opts.push({
+          id: u.id,
+          displayName: u.displayName,
+          teamName: u.email,
+          role: '',
+          source: 'user',
+        })
+      }
+    }
+
+    for (const m of members) {
+      if (teamId && m.teamId !== teamId) continue
+      if (!seen.has(m.id)) {
+        seen.add(m.id)
+        const teamName = teams.find((t) => t.id === m.teamId)?.name ?? ''
+        opts.push({
+          id: m.id,
+          displayName: m.email.split('@')[0],
+          teamName,
+          role: m.role.replace(/_/g, ' '),
+          source: 'member',
+        })
+      }
+    }
+
     for (const t of teams) {
+      if (teamId && t.id !== teamId) continue
       for (const tm of t.members) {
         if (!seen.has(tm.id)) {
           seen.add(tm.id)
-          opts.push({ id: tm.id, displayName: tm.displayName, teamName: t.name, role: tm.role.replace(/_/g, ' ') })
+          opts.push({
+            id: tm.id,
+            displayName: tm.displayName,
+            teamName: t.name,
+            role: tm.role.replace(/_/g, ' '),
+            source: 'member',
+          })
         }
       }
     }
+
     opts.sort((a, b) => a.displayName.localeCompare(b.displayName))
     return opts
-  }, [members, teams])
+  }, [members, teams, users, currentUser, teamId])
 
   const selectedMember = useMemo(
     () => allOptions.find((m) => m.id === value),
@@ -123,8 +182,30 @@ export function MemberSelector({ value, onChange, placeholder = 'Buscar o escrib
       ? value
       : search
 
+  const sourceLabel = (source: MemberOption['source']) => {
+    switch (source) {
+      case 'user': return 'Usuario'
+      case 'current': return 'Tú'
+      default: return 'Miembro'
+    }
+  }
+
+  const sourceColor = (source: MemberOption['source']) => {
+    switch (source) {
+      case 'user': return 'bg-info/10 text-info'
+      case 'current': return 'bg-primary/10 text-primary'
+      default: return 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50'
+    }
+  }
+
   return (
     <div className={cn('relative', className)}>
+      {label && (
+        <label className="block text-sm font-medium text-secondary mb-1.5">
+          {label}{required && <span className="text-danger ml-0.5">*</span>}
+        </label>
+      )}
+
       <div className="relative">
         <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50 pointer-events-none" />
         <input
@@ -134,13 +215,16 @@ export function MemberSelector({ value, onChange, placeholder = 'Buscar o escrib
           placeholder={placeholder}
           onFocus={() => { setOpen(true); if (!selectedMember) setSearch('') }}
           onBlur={() => {
-            if (search.trim() && !selectedMember && !isExternal) {
+            if (search.trim() && !selectedMember) {
               onChange(search.trim())
             }
           }}
           onChange={(e) => {
             setSearch(e.target.value)
             if (selectedMember && e.target.value !== selectedMember.displayName) {
+              onChange('')
+            }
+            if (isExternal) {
               onChange('')
             }
             if (!open) setOpen(true)
@@ -203,9 +287,12 @@ export function MemberSelector({ value, onChange, placeholder = 'Buscar o escrib
                   )}
                 </p>
                 <p className="text-xs text-neutral-50 truncate">
-                  {opt.role}{opt.teamName ? ` \u00b7 ${opt.teamName}` : ''}
+                  {opt.role}{opt.teamName ? ` · ${opt.teamName}` : ''}
                 </p>
               </div>
+              <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${sourceColor(opt.source)}`}>
+                {sourceLabel(opt.source)}
+              </span>
             </button>
           ))}
 

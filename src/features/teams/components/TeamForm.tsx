@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
@@ -169,7 +169,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
               {formData.members.map((member, index) => (
                 <div key={member.id || index} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
                   <div className="flex-1 min-w-[180px]">
-                    <PersonSelect
+                    <MemberSelector
                       value={member.id}
                       onChange={(personId) => handlePersonChange(index, personId)}
                       placeholder="Buscar persona..."

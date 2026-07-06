@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
@@ -124,7 +124,7 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           </div>
 
           <div className="col-span-2">
-            <PersonSelect
+            <MemberSelector
               label="Asignado a"
               value={assigneeId}
               onChange={setAssigneeId}

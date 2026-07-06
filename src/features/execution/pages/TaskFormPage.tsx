@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { DetailLayout } from '@/components/ui/DetailLayout'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { criticalityOptions, taskStatusOptions } from '@/constants/options'
@@ -143,7 +143,7 @@ export function TaskFormPage() {
             />
           </div>
           <div>
-            <PersonSelect
+            <MemberSelector
               label="Asignado a"
               value={watch('assigneeId')}
               onChange={(id) => setValue('assigneeId', id)}

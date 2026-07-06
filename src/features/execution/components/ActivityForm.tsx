@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save, Plus, Trash2 } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Activity, Task } from '@/types/domain'
@@ -226,7 +226,7 @@ export function ActivityForm({ planId, activity, onClose, onSave }: ActivityForm
           </div>
 
           <div>
-            <PersonSelect
+            <MemberSelector
               label="Asignado a"
               value={assigneeId}
               onChange={setAssigneeId}

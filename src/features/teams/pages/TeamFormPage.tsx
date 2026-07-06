@@ -6,7 +6,7 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { DoraLevel, MemberRole } from '@/constants/enums'
@@ -191,7 +191,7 @@ export function TeamFormPage() {
                   <tr key={index} className="border-b border-neutral-20/50 dark:border-neutral-70/50 last:border-0">
                     <td className="px-3 py-2.5 text-neutral-50"><Users size={14} /></td>
                     <td className="px-3 py-2.5 min-w-[200px]">
-                      <PersonSelect
+                      <MemberSelector
                         value={member.id}
                         onChange={(personId) => updateMember(index, 'id', personId)}
                         placeholder="Buscar persona..."

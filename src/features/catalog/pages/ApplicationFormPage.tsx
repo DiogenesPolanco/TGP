@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/userStore'
 import { ArrowLeft } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { TechSearch } from '@/components/ui/TechSearch'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Criticality, ArchitectureType, ApplicationStatus } from '@/types/domain'
@@ -125,7 +125,7 @@ export function ApplicationFormPage() {
           />
         </div>
 
-        <PersonSelect
+        <MemberSelector
           label="Owner"
           value={formData.ownerId}
           onChange={handlePersonChange}

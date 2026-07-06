@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { X, Save } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { Commitment } from '@/types/domain'
@@ -116,7 +116,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div>
-            <PersonSelect
+            <MemberSelector
               label="Quien se compromete"
               value={ownerId}
               onChange={setOwnerId}
@@ -125,7 +125,7 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           </div>
 
           <div>
-            <PersonSelect
+            <MemberSelector
               label="Responsable (stakeholder)"
               value={accountableId}
               onChange={setAccountableId}

@@ -4,7 +4,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
@@ -194,7 +194,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
                   </select>
                 </div>
                 <div>
-                  <PersonSelect
+                  <MemberSelector
                     label="Asignado"
                     value={editAssigneeId}
                     onChange={setEditAssigneeId}

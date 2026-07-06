@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import type { CommitmentStatus } from '@/constants/enums'
@@ -116,13 +116,13 @@ export function CommitmentFormPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <PersonSelect
+          <MemberSelector
             label="Quien se compromete"
             value={formData.ownerId}
             onChange={(id) => setFormData({ ...formData, ownerId: id })}
             required
           />
-          <PersonSelect
+          <MemberSelector
             label="Responsable (stakeholder)"
             value={formData.accountableId}
             onChange={(id) => setFormData({ ...formData, accountableId: id })}

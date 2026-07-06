@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { TechSearch } from '@/components/ui/TechSearch'
-import { Select } from '@/components/ui/Select'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { RichTextViewer } from '@/components/rich-text/RichTextViewer'
 import {
@@ -105,25 +105,6 @@ export function MicroserviceDetailPage() {
     () => id ? db.auditFindingMicroservices.where('microserviceId').equals(id).toArray() : [],
     [id],
   ) ?? []
-
-  const teams = useLiveQuery(() => db.teams.toArray()) ?? []
-
-  const memberOptions = useMemo(() => {
-    const options: { value: string; label: string }[] = []
-    for (const team of teams) {
-      for (const member of team.members ?? []) {
-        if (member.displayName) {
-          options.push({ value: member.displayName, label: `${member.displayName} — ${team.name}` })
-        }
-      }
-    }
-    const seen = new Set<string>()
-    return options.filter((o) => {
-      if (seen.has(o.value)) return false
-      seen.add(o.value)
-      return true
-    }).sort((a, b) => a.label.localeCompare(b.label))
-  }, [teams])
 
   const sectionCounts: Record<string, number> = {
     databases: dbJunctions.length,
@@ -412,14 +393,10 @@ export function MicroserviceDetailPage() {
                   />
                 </div>
                 <div>
-                  <Select
+                  <MemberSelector
                     label="Responsable Técnico"
                     value={technicalLead}
                     onChange={(v) => { setTechnicalLead(v); markDirty() }}
-                    options={[
-                      { value: '', label: 'Sin asignar' },
-                      ...memberOptions,
-                    ]}
                     placeholder="Seleccionar responsable"
                   />
                 </div>

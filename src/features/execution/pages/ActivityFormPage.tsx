@@ -5,7 +5,7 @@ import { db } from '@/services/db/database'
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { PersonSelect } from '@/components/ui/PersonSelect'
+import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import type { Activity, Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
@@ -284,7 +284,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <PersonSelect
+            <MemberSelector
               label="Asignado a"
               value={assigneeId}
               onChange={setAssigneeId}
