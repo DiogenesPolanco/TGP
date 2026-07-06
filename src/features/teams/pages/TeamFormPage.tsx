@@ -197,7 +197,15 @@ export function TeamFormPage() {
                         placeholder="Buscar persona..."
                       />
                     </td>
-                    <td className="px-3 py-2.5"><select value={member.role} onChange={(e) => updateMember(index, 'role', e.target.value as MemberRole)} className="w-full min-w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm">{MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}</select></td>
+                    <td className="px-3 py-2.5">
+                      <Select
+                        value={member.role}
+                        onChange={(v) => updateMember(index, 'role', v as MemberRole)}
+                        options={MEMBER_ROLES.map((r) => ({ value: r, label: MEMBER_ROLE_LABELS[r] }))}
+                        className="w-full min-w-28"
+                        placeholder="Rol"
+                      />
+                    </td>
                     <td className="px-3 py-2.5"><div className="flex items-center justify-end gap-1"><input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-right" /><span className="text-xs text-neutral-50">%</span></div></td>
                     <td className="px-3 py-2.5"><Button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></Button></td>
                   </tr>

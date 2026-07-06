@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
 
@@ -40,21 +41,15 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
         </span>
         {onPageSizeChange && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-neutral-50 dark:text-neutral-50" htmlFor="page-size-select">
+            <label className="text-xs text-neutral-50 dark:text-neutral-50">
               Filas:
             </label>
-            <select
-              id="page-size-select"
-              value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-xs text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-            >
-              {PAGE_SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
+            <Select
+              value={String(pageSize)}
+              onChange={(v) => onPageSizeChange(Number(v))}
+              options={PAGE_SIZE_OPTIONS.map((s) => ({ value: String(s), label: String(s) }))}
+              className="w-16"
+            />
           </div>
         )}
       </div>

@@ -48,6 +48,17 @@ export function MemberSelector({
     const seen = new Set<string>()
     const opts: MemberOption[] = []
 
+    // Build lookup map from teams — gives us the best displayName for each member
+    const memberInfo = new Map<string, { displayName: string; teamName: string; role: string }>()
+    for (const t of teams) {
+      if (teamId && t.id !== teamId) continue
+      for (const tm of t.members) {
+        const dn = tm.displayName || tm.userPrincipal || ''
+        memberInfo.set(tm.id, { displayName: dn, teamName: t.name, role: tm.role })
+      }
+    }
+
+    // 1. Current user
     if (currentUser && !seen.has('__me__')) {
       seen.add('__me__')
       opts.push({
@@ -59,6 +70,7 @@ export function MemberSelector({
       })
     }
 
+    // 2. System users (active)
     for (const u of users) {
       if (u.isActive === 1 && !seen.has(u.id)) {
         seen.add(u.id)
@@ -72,21 +84,26 @@ export function MemberSelector({
       }
     }
 
+    // 3. Member profiles — enriched from team info when available
     for (const m of members) {
       if (teamId && m.teamId !== teamId) continue
       if (!seen.has(m.id)) {
         seen.add(m.id)
-        const teamName = teams.find((t) => t.id === m.teamId)?.name ?? ''
+        const info = memberInfo.get(m.id)
+        const displayName = info?.displayName || m.email.split('@')[0] || m.email || ''
+        const teamName = info?.teamName ?? teams.find((t) => t.id === m.teamId)?.name ?? ''
+        const role = info?.role ?? m.role
         opts.push({
           id: m.id,
-          displayName: m.email.split('@')[0],
+          displayName,
           teamName,
-          role: m.role.replace(/_/g, ' '),
+          role: role.replace(/_/g, ' '),
           source: 'member',
         })
       }
     }
 
+    // 4. Team members not yet in list
     for (const t of teams) {
       if (teamId && t.id !== teamId) continue
       for (const tm of t.members) {
@@ -94,7 +111,7 @@ export function MemberSelector({
           seen.add(tm.id)
           opts.push({
             id: tm.id,
-            displayName: tm.displayName,
+            displayName: tm.displayName || tm.userPrincipal || '',
             teamName: t.name,
             role: tm.role.replace(/_/g, ' '),
             source: 'member',

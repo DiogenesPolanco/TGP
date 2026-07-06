@@ -5,6 +5,7 @@ import { searchTechnologies, COMMON_SKILLS } from '@/constants/commonSkills'
 import { lookupDepsPackage, type DepsPackageResult, DEPS_SYSTEMS, type DepsSystem } from '@/services/security/depsDevService'
 import { Plus, X, AlertTriangle, Search, ExternalLink, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 
 const statusColors: Record<string, string> = {
   active: 'bg-success/10 text-success border-success/30',
@@ -215,15 +216,12 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
           <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
         </div>
         {enableDepsSearch && (
-          <select
+          <Select
             value={depsSystem}
-            onChange={(e) => { setDepsSystem(e.target.value as DepsSystem); setDepsResult(null); setDepsError(null) }}
-            className="px-2 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 shrink-0"
-          >
-            {DEPS_SYSTEMS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
+            onChange={(v) => { setDepsSystem(v as DepsSystem); setDepsResult(null); setDepsError(null) }}
+            options={DEPS_SYSTEMS.map((s) => ({ value: s.value, label: s.label }))}
+            className="w-40 shrink-0"
+          />
         )}
       </div>
 
@@ -239,17 +237,34 @@ export function TechSearch({ selectedIds, onChange, placeholder = 'Buscar tecnol
                 type="button"
                 disabled={alreadySelected}
                 onClick={() => !alreadySelected && addItem(r)}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-left"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-left"
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Plus size={14} className="text-primary shrink-0" />
-                  <span className="text-neutral-90 dark:text-white truncate">{r.name}</span>
-                  {r.isSkill && <span className="text-[10px] text-neutral-50 bg-neutral-10 dark:bg-neutral-75 px-1.5 py-0.5 rounded shrink-0">skill</span>}
-                  {!r.isSkill && r.vendor && showVendor && (
-                    <span className="text-xs text-neutral-50 shrink-0">({r.vendor})</span>
-                  )}
+                <Plus size={14} className="text-primary shrink-0 mt-0.5 self-start" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-neutral-90 dark:text-white truncate font-medium">{r.name}</span>
+                    {r.version && !r.isSkill && (
+                      <span className="text-xs text-neutral-50 shrink-0">v{r.version}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {r.isSkill ? (
+                      <span className="text-[10px] text-neutral-50 bg-neutral-10 dark:bg-neutral-75 px-1.5 py-0.5 rounded">skill</span>
+                    ) : (
+                      <>
+                        {r.supportStatus && r.supportStatus !== 'unknown' && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${statusColors[r.supportStatus]}`}>
+                            {statusLabel[r.supportStatus]}
+                          </span>
+                        )}
+                        {r.vendor && showVendor && (
+                          <span className="text-xs text-neutral-50">{r.vendor}</span>
+                        )}
+                      </>
+                    )}
+                    <span className="text-[10px] capitalize text-neutral-50">{r.category}</span>
+                  </div>
                 </div>
-                <span className="text-[10px] capitalize text-neutral-50 shrink-0 ml-2">{r.category}</span>
               </Button>
             )
           })}

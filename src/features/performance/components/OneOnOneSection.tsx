@@ -5,6 +5,7 @@ import { Plus, MessageSquare, Trash2, Target, Edit3 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { parseLocalDate } from '@/lib/utils'
 
@@ -16,13 +17,6 @@ const tipoLabels: Record<string, string> = {
   semanal: 'Semanal',
   quincenal: 'Quincenal',
   mensual: 'Mensual',
-}
-
-const opStatusColors: Record<string, string> = {
-  pendiente: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300',
-  en_progreso: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300',
-  completada: 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300',
-  cancelada: 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300',
 }
 
 export function OneOnOneSection({ memberId }: Props) {
@@ -164,15 +158,15 @@ export function OneOnOneSection({ memberId }: Props) {
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
-              <select
-                value={newMeeting.tipo}
-                onChange={(e) => setNewMeeting({ ...newMeeting, tipo: e.target.value as OneOnOne['tipo'] })}
-                className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm"
-              >
-                <option value="semanal">Semanal</option>
-                <option value="quincenal">Quincenal</option>
-                <option value="mensual">Mensual</option>
-              </select>
+            <Select
+              value={newMeeting.tipo}
+              onChange={(v) => setNewMeeting({ ...newMeeting, tipo: v as OneOnOne['tipo'] })}
+              options={[
+                { value: 'semanal', label: 'Semanal' },
+                { value: 'quincenal', label: 'Quincenal' },
+                { value: 'mensual', label: 'Mensual' },
+              ]}
+            />
             </div>
             <div>
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Estado de Ánimo (1-10)</label>
@@ -316,11 +310,16 @@ function MeetingCard({
           </div>
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
-            <select value={editData.tipo} onChange={(e) => setEditData({ ...editData, tipo: e.target.value as OneOnOne['tipo'] })} className={inputClass}>
-              <option value="semanal">Semanal</option>
-              <option value="quincenal">Quincenal</option>
-              <option value="mensual">Mensual</option>
-            </select>
+            <Select
+              value={editData.tipo}
+              onChange={(v) => setEditData({ ...editData, tipo: v as OneOnOne['tipo'] })}
+              options={[
+                { value: 'semanal', label: 'Semanal' },
+                { value: 'quincenal', label: 'Quincenal' },
+                { value: 'mensual', label: 'Mensual' },
+              ]}
+              className="w-full"
+            />
           </div>
           <div>
             <label className="text-xs font-medium text-neutral-60 mb-1 block">Ánimo (1-10)</label>
@@ -422,17 +421,18 @@ function MeetingCard({
                         autoFocus
                         onKeyDown={(e) => { if (e.key === 'Enter') saveEditOp(); if (e.key === 'Escape') setEditingOpId(null) }}
                       />
-                      <select
+                      <Select
                         value={editOpData.tipo}
-                        onChange={(e) => setEditOpData({ ...editOpData, tipo: e.target.value as Oportunidad['tipo'] })}
-                        className="rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
-                      >
-                        <option value="mejora">Mejora</option>
-                        <option value="crecimiento">Crecimiento</option>
-                        <option value="capacitacion">Capacitación</option>
-                        <option value="ascenso">Ascenso</option>
-                        <option value="mentoria">Mentoría</option>
-                      </select>
+                        onChange={(v) => setEditOpData({ ...editOpData, tipo: v as Oportunidad['tipo'] })}
+                        options={[
+                          { value: 'mejora', label: 'Mejora' },
+                          { value: 'crecimiento', label: 'Crecimiento' },
+                          { value: 'capacitacion', label: 'Capacitación' },
+                          { value: 'ascenso', label: 'Ascenso' },
+                          { value: 'mentoria', label: 'Mentoría' },
+                        ]}
+                        className="w-32"
+                      />
                       <Button onClick={saveEditOp} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg">OK</Button>
                       <Button onClick={() => setEditingOpId(null)} className="px-2 py-1 text-xs text-neutral-60">X</Button>
                     </div>
@@ -443,16 +443,17 @@ function MeetingCard({
                         <p className="text-xs text-neutral-50 capitalize">{op.tipo}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <select
-                          value={op.status}
-                          onChange={(e) => onUpdateOportunidadStatus(meeting.id, op.id, e.target.value as Oportunidad['status'])}
-                          className={`text-xs px-2 py-0.5 rounded-full border-0 ${opStatusColors[op.status]}`}
-                        >
-                          <option value="pendiente">Pendiente</option>
-                          <option value="en_progreso">En Progreso</option>
-                          <option value="completada">Completada</option>
-                          <option value="cancelada">Cancelada</option>
-                        </select>
+                      <Select
+                        value={op.status}
+                        onChange={(v) => onUpdateOportunidadStatus(meeting.id, op.id, v as Oportunidad['status'])}
+                        options={[
+                          { value: 'pendiente', label: 'Pendiente' },
+                          { value: 'en_progreso', label: 'En Progreso' },
+                          { value: 'completada', label: 'Completada' },
+                          { value: 'cancelada', label: 'Cancelada' },
+                        ]}
+                        className="w-32"
+                      />
                         <Button onClick={() => startEditOp(op)} className="p-1 opacity-0 group-hover/op:opacity-100 text-neutral-50 hover:text-primary rounded" title="Editar oportunidad">
                           <Edit3 size={11} />
                         </Button>
@@ -479,17 +480,18 @@ function MeetingCard({
                   }
                 }}
               />
-              <select
+              <Select
                 value={newOpTipo}
-                onChange={(e) => setNewOpTipo(e.target.value as Oportunidad['tipo'])}
-                className="rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-2 py-1.5 text-xs"
-              >
-                <option value="mejora">Mejora</option>
-                <option value="crecimiento">Crecimiento</option>
-                <option value="capacitacion">Capacitación</option>
-                <option value="ascenso">Ascenso</option>
-                <option value="mentoria">Mentoría</option>
-              </select>
+                onChange={(v) => setNewOpTipo(v as Oportunidad['tipo'])}
+                options={[
+                  { value: 'mejora', label: 'Mejora' },
+                  { value: 'crecimiento', label: 'Crecimiento' },
+                  { value: 'capacitacion', label: 'Capacitación' },
+                  { value: 'ascenso', label: 'Ascenso' },
+                  { value: 'mentoria', label: 'Mentoría' },
+                ]}
+                className="w-32"
+              />
               <Button
                 onClick={() => {
                   if (newOpDesc.trim()) {

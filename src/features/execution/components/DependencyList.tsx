@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowRight, ChevronDown, ChevronRight, Link2, Plus, Trash2 } from 'lucide-react'
 import type { DependencyRelation } from '@/constants/enums'
+import { Select } from '@/components/ui/Select'
 
 interface DependencyListProps {
   planId: string
@@ -157,40 +158,40 @@ export function DependencyList({ planId }: DependencyListProps) {
             <div className="p-4 space-y-3 bg-neutral-10 dark:bg-neutral-80">
               <div>
                 <label className="block text-xs font-medium text-secondary mb-1">Tipo destino</label>
-                <select
+                <Select
                   value={targetType}
-                  onChange={(e) => { setTargetType(e.target.value as EntityType); setTargetId('') }}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
-                >
-                  {(Object.keys(entityTypeLabels) as EntityType[]).map((key) => (
-                    <option key={key} value={key}>{entityTypeLabels[key]}</option>
-                  ))}
-                </select>
+                  onChange={(v) => { setTargetType(v as EntityType); setTargetId('') }}
+                  options={(Object.keys(entityTypeLabels) as EntityType[]).map((key) => ({
+                    value: key,
+                    label: entityTypeLabels[key],
+                  }))}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-secondary mb-1">Entidad destino</label>
-                <select
+                <Select
                   value={targetId}
-                  onChange={(e) => setTargetId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
-                >
-                  <option value="">Seleccionar...</option>
-                  {getEntityOptions().filter((opt) => opt.value !== planId).map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                  onChange={(v) => setTargetId(v)}
+                  options={[
+                    { value: '', label: 'Seleccionar...' },
+                    ...getEntityOptions().filter((opt) => opt.value !== planId).map((opt) => ({
+                      value: opt.value,
+                      label: opt.label,
+                    })),
+                  ]}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-secondary mb-1">Relación</label>
-                <select
+                <Select
                   value={relationType}
-                  onChange={(e) => setRelationType(e.target.value as DependencyRelation)}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
-                >
-                  <option value="depends_on">Depende de</option>
-                  <option value="blocks">Bloquea a</option>
-                  <option value="related_to">Relacionado con</option>
-                </select>
+                  onChange={(v) => setRelationType(v as DependencyRelation)}
+                  options={[
+                    { value: 'depends_on', label: 'Depende de' },
+                    { value: 'blocks', label: 'Bloquea a' },
+                    { value: 'related_to', label: 'Relacionado con' },
+                  ]}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-secondary mb-1">Descripción</label>

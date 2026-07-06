@@ -368,16 +368,16 @@ export function SprintsSection({ memberId, teamId }: Props) {
                           </select>
                         </div>
                         <div>
-                          <select
+                          <Select
                             value={editData.quarter}
-                            onChange={(e) => setEditData({ ...editData, quarter: e.target.value })}
-                            className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
-                          >
-                            <option value="Q1">Q1</option>
-                            <option value="Q2">Q2</option>
-                            <option value="Q3">Q3</option>
-                            <option value="Q4">Q4</option>
-                          </select>
+                            onChange={(v) => setEditData({ ...editData, quarter: v })}
+                            options={[
+                              { value: 'Q1', label: 'Q1' },
+                              { value: 'Q2', label: 'Q2' },
+                              { value: 'Q3', label: 'Q3' },
+                              { value: 'Q4', label: 'Q4' },
+                            ]}
+                          />
                         </div>
                         <div>
                           <input

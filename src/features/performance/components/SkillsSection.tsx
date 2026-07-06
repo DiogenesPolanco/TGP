@@ -217,16 +217,17 @@ export function SkillsSection({ memberId }: Props) {
                       className="w-[100px] rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
                       placeholder="Categoría"
                     />
-                    <select
+                    <Select
                       value={editData.level}
-                      onChange={(e) => setEditData({ ...editData, level: e.target.value as Skill['level'] })}
-                      className="rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
-                    >
-                      <option value="beginner">Principiante</option>
-                      <option value="intermediate">Intermedio</option>
-                      <option value="advanced">Avanzado</option>
-                      <option value="expert">Experto</option>
-                    </select>
+                      onChange={(v) => setEditData({ ...editData, level: v as Skill['level'] })}
+                      options={[
+                        { value: 'beginner', label: 'Principiante' },
+                        { value: 'intermediate', label: 'Intermedio' },
+                        { value: 'advanced', label: 'Avanzado' },
+                        { value: 'expert', label: 'Experto' },
+                      ]}
+                      className="w-28"
+                    />
                     <Button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</Button>
                     <button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">X</button>
                   </div>

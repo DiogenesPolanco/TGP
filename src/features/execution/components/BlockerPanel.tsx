@@ -5,6 +5,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MemberSelector } from '@/components/ui/MemberSelector'
+import { Select } from '@/components/ui/Select'
 import type { Blocker } from '@/types/domain'
 import type { BlockerSeverity, BlockerStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
@@ -170,28 +171,28 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-secondary mb-1">Severidad</label>
-                  <select
+                  <Select
                     value={editSeverity}
-                    onChange={(e) => setEditSeverity(e.target.value as BlockerSeverity)}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
-                  >
-                    <option value="low">Baja</option>
-                    <option value="medium">Media</option>
-                    <option value="high">Alta</option>
-                    <option value="critical">Critica</option>
-                  </select>
+                    onChange={(v) => setEditSeverity(v as BlockerSeverity)}
+                    options={[
+                      { value: 'low', label: 'Baja' },
+                      { value: 'medium', label: 'Media' },
+                      { value: 'high', label: 'Alta' },
+                      { value: 'critical', label: 'Crítica' },
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-secondary mb-1">Estado</label>
-                  <select
+                  <Select
                     value={editStatus}
-                    onChange={(e) => setEditStatus(e.target.value as BlockerStatus)}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm"
-                  >
-                    <option value="open">Abierto</option>
-                    <option value="escalated">Escalado</option>
-                    <option value="resolved">Resuelto</option>
-                  </select>
+                    onChange={(v) => setEditStatus(v as BlockerStatus)}
+                    options={[
+                      { value: 'open', label: 'Abierto' },
+                      { value: 'escalated', label: 'Escalado' },
+                      { value: 'resolved', label: 'Resuelto' },
+                    ]}
+                  />
                 </div>
                 <div>
                   <MemberSelector

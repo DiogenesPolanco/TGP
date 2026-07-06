@@ -175,13 +175,13 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                       placeholder="Buscar persona..."
                     />
                   </div>
-                  <select
+                  <Select
                     value={member.role}
-                    onChange={(e) => updateMember(index, 'role', e.target.value)}
-                    className="w-28 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
-                  >
-                    {MEMBER_ROLES.map((r) => (<option key={r} value={r}>{MEMBER_ROLE_LABELS[r]}</option>))}
-                  </select>
+                    onChange={(v) => updateMember(index, 'role', v)}
+                    options={MEMBER_ROLES.map((r) => ({ value: r, label: MEMBER_ROLE_LABELS[r] }))}
+                    className="w-28"
+                    placeholder="Rol"
+                  />
                   <input
                     type="number"
                     placeholder="%"

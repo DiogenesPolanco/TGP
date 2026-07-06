@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MemberSelector } from '@/components/ui/MemberSelector'
+import { Select } from '@/components/ui/Select'
 import { DatePicker } from '@/components/ui/DatePicker'
 import type { Activity, Task } from '@/types/domain'
 import type { Criticality, DeliverableStatus, TaskStatus } from '@/constants/enums'
@@ -223,64 +224,56 @@ export function ActivityFormPage() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-secondary mb-1.5">Actividad Padre</label>
-            <select
+            <Select
               value={parentActivityId}
-              onChange={(e) => setParentActivityId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Ninguna (raíz)</option>
-              {activities
-                .filter((a) => a.id !== activity?.id)
-                .map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.title}
-                  </option>
-                ))}
-            </select>
+              onChange={setParentActivityId}
+              options={[
+                { value: '', label: 'Ninguna (raíz)' },
+                ...activities
+                  .filter((a) => a.id !== activity?.id)
+                  .map((a) => ({ value: a.id, label: a.title })),
+              ]}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-1.5">Prioridad</label>
-            <select
+            <Select
               value={priority}
-              onChange={(e) => setPriority(e.target.value as Criticality)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="low">Baja</option>
-              <option value="medium">Media</option>
-              <option value="high">Alta</option>
-              <option value="critical">Crítica</option>
-            </select>
+              onChange={(v) => setPriority(v as Criticality)}
+              options={[
+                { value: 'low', label: 'Baja' },
+                { value: 'medium', label: 'Media' },
+                { value: 'high', label: 'Alta' },
+                { value: 'critical', label: 'Crítica' },
+              ]}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-1.5">Estado</label>
-            <select
+            <Select
               value={status}
-              onChange={(e) => setStatus(e.target.value as DeliverableStatus)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="pending">Pendiente</option>
-              <option value="in_progress">En Progreso</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
-            </select>
+              onChange={(v) => setStatus(v as DeliverableStatus)}
+              options={[
+                { value: 'pending', label: 'Pendiente' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' },
+              ]}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-1.5">Equipo</label>
-            <select
+            <Select
               value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin equipo</option>
-              {teams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+              onChange={setTeamId}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
 
           <div>
@@ -293,18 +286,14 @@ export function ActivityFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-1.5">Aplicación</label>
-            <select
+            <Select
               value={applicationId}
-              onChange={(e) => setApplicationId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">Sin app</option>
-              {applications.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
+              onChange={setApplicationId}
+              options={[
+                { value: '', label: 'Sin app' },
+                ...applications.map((a) => ({ value: a.id, label: a.name })),
+              ]}
+            />
           </div>
 
           <div>

@@ -5,6 +5,7 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { TechSearch } from '@/components/ui/TechSearch'
 import { MemberSelector } from '@/components/ui/MemberSelector'
+import { Select } from '@/components/ui/Select'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { RichTextViewer } from '@/components/rich-text/RichTextViewer'
 import {
@@ -418,15 +419,11 @@ export function MicroserviceDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-secondary mb-1.5">Nivel de Servicio</label>
-                  <select
+                  <Select
                     value={serviceLevel}
-                    onChange={(e) => { setServiceLevel(e.target.value as ServiceLevel); markDirty() }}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    {Object.entries(serviceLevelLabel).map(([k, v]) => (
-                      <option key={k} value={k}>{v}</option>
-                    ))}
-                  </select>
+                    onChange={(v) => { setServiceLevel(v as ServiceLevel); markDirty() }}
+                    options={Object.entries(serviceLevelLabel).map(([k, v]) => ({ value: k, label: v }))}
+                  />
                 </div>
               </div>
 
@@ -537,19 +534,20 @@ export function MicroserviceDetailPage() {
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <select
+                    <Select
                       value={featureForm.category}
-                      onChange={(e) => setFeatureForm({ ...featureForm, category: e.target.value as MicroserviceFeature['category'] })}
-                      className="px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="api">API</option>
-                      <option value="integration">Integración</option>
-                      <option value="performance">Performance</option>
-                      <option value="security">Seguridad</option>
-                      <option value="observability">Observabilidad</option>
-                      <option value="business">Funcionalidad</option>
-                      <option value="other">Otro</option>
-                    </select>
+                      onChange={(v) => setFeatureForm({ ...featureForm, category: v as MicroserviceFeature['category'] })}
+                      options={[
+                        { value: 'api', label: 'API' },
+                        { value: 'integration', label: 'Integración' },
+                        { value: 'performance', label: 'Performance' },
+                        { value: 'security', label: 'Seguridad' },
+                        { value: 'observability', label: 'Observabilidad' },
+                        { value: 'business', label: 'Funcionalidad' },
+                        { value: 'other', label: 'Otro' },
+                      ]}
+                      className="flex-1"
+                    />
                     <button onClick={addFeature} className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
                       Agregar
                     </button>
@@ -642,31 +640,31 @@ export function MicroserviceDetailPage() {
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-neutral-50 mb-1">Tipo</label>
-                      <select
+                      <Select
                         value={roadmapForm.type}
-                        onChange={(e) => setRoadmapForm({ ...roadmapForm, type: e.target.value as MicroserviceRoadmapItem['type'] })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      >
-                        <option value="upgrade">Upgrade</option>
-                        <option value="migration">Migración</option>
-                        <option value="decommission">Decomiso</option>
-                        <option value="feature">Funcionalidad</option>
-                        <option value="security">Seguridad</option>
-<option value="performance">Rendimiento</option>
-                      </select>
+                        onChange={(v) => setRoadmapForm({ ...roadmapForm, type: v as MicroserviceRoadmapItem['type'] })}
+                        options={[
+                          { value: 'upgrade', label: 'Upgrade' },
+                          { value: 'migration', label: 'Migración' },
+                          { value: 'decommission', label: 'Decomiso' },
+                          { value: 'feature', label: 'Funcionalidad' },
+                          { value: 'security', label: 'Seguridad' },
+                          { value: 'performance', label: 'Rendimiento' },
+                        ]}
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-neutral-50 mb-1">Prioridad</label>
-                      <select
+                      <Select
                         value={roadmapForm.priority}
-                        onChange={(e) => setRoadmapForm({ ...roadmapForm, priority: e.target.value as MicroserviceRoadmapItem['priority'] })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      >
-                        <option value="critical">Crítica</option>
-                        <option value="high">Alta</option>
-                        <option value="medium">Media</option>
-                        <option value="low">Baja</option>
-                      </select>
+                        onChange={(v) => setRoadmapForm({ ...roadmapForm, priority: v as MicroserviceRoadmapItem['priority'] })}
+                        options={[
+                          { value: 'critical', label: 'Crítica' },
+                          { value: 'high', label: 'Alta' },
+                          { value: 'medium', label: 'Media' },
+                          { value: 'low', label: 'Baja' },
+                        ]}
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-neutral-50 mb-1">Fecha Objetivo</label>

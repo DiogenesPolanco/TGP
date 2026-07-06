@@ -307,15 +307,12 @@ export function ObjectiveFormPage() {
                           />
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <select
+                          <Select
                             value={kr.status}
-                            onChange={(e) => updateKeyResult(index, 'status', e.target.value)}
-                            className={`text-xs px-2 py-1.5 rounded-lg border font-medium cursor-pointer ${STATUS_STYLE[kr.status]}`}
-                          >
-                            {STATUS_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
+                            onChange={(v) => updateKeyResult(index, 'status', v)}
+                            options={STATUS_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
+                            className="w-36"
+                          />
                           <Button
                             type="button"
                             onClick={() => removeKeyResult(index)}

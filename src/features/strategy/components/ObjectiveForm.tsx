@@ -210,23 +210,18 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
                     onChange={(e) => updateKeyResult(index, 'current', parseFloat(e.target.value))}
                     className="w-20 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                   />
-                  <select
+                  <Select
                     value={kr.status}
-                    onChange={(e) => updateKeyResult(index, 'status', e.target.value)}
-                    className={`text-xs px-2 py-1 rounded border font-medium ${
-                      kr.status === 'achieved' ? 'bg-success/10 text-success border-success/30' :
-                      kr.status === 'on_track' ? 'bg-success/10 text-success border-success/30' :
-                      kr.status === 'at_risk' ? 'bg-warning/10 text-warning border-warning/30' :
-                      kr.status === 'behind' ? 'bg-danger/10 text-danger border-danger/30' :
-                      'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60'
-                    }`}
-                  >
-                    <option value="not_started">No iniciado</option>
-                    <option value="on_track">Encaminado</option>
-                    <option value="at_risk">En riesgo</option>
-                    <option value="behind">Atrasado</option>
-                    <option value="achieved">Logrado</option>
-                  </select>
+                    onChange={(v) => updateKeyResult(index, 'status', v)}
+                    options={[
+                      { value: 'not_started', label: 'No iniciado' },
+                      { value: 'on_track', label: 'Encaminado' },
+                      { value: 'at_risk', label: 'En riesgo' },
+                      { value: 'behind', label: 'Atrasado' },
+                      { value: 'achieved', label: 'Logrado' },
+                    ]}
+                    className="w-32"
+                  />
                   <Button
                     type="button"
                     onClick={() => removeKeyResult(index)}

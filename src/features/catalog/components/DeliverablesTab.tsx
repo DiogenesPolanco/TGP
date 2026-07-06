@@ -277,31 +277,31 @@ function InlineEditDeliverable({
         <span className="text-sm font-medium text-neutral-90 dark:text-white min-w-0 flex-1 truncate">
           Editando: {deliverable.title}
         </span>
-        <select
+        <Select
           value={status}
-          onChange={(e) => setStatus(e.target.value as DeliverableStatus)}
-          className="px-2 py-1 text-xs rounded border border-neutral-30 dark:border-neutral-60 bg-transparent"
-        >
-          <option value="pending">Pendiente</option>
-          <option value="in_progress">En Progreso</option>
-          <option value="completed">Completado</option>
-          <option value="cancelled">Cancelado</option>
-        </select>
+          onChange={(v) => setStatus(v as DeliverableStatus)}
+          options={[
+            { value: 'pending', label: 'Pendiente' },
+            { value: 'in_progress', label: 'En Progreso' },
+            { value: 'completed', label: 'Completado' },
+            { value: 'cancelled', label: 'Cancelado' },
+          ]}
+          className="w-32"
+        />
         <DatePicker
           value={dueDate}
           onChange={setDueDate}
           className="px-2 py-1 text-xs rounded border border-neutral-30 dark:border-neutral-60 bg-transparent w-32"
         />
-        <select
+        <Select
           value={objectiveId}
-          onChange={(e) => setObjectiveId(e.target.value)}
-          className="px-2 py-1 text-xs rounded border border-neutral-30 dark:border-neutral-60 bg-transparent max-w-[140px]"
-        >
-          <option value="">Sin OKR</option>
-          {allObjectives.map((o) => (
-            <option key={o.id} value={o.id}>{o.title}</option>
-          ))}
-        </select>
+          onChange={(v) => setObjectiveId(v)}
+          options={[
+            { value: '', label: 'Sin OKR' },
+            ...allObjectives.map((o) => ({ value: o.id, label: o.title })),
+          ]}
+          className="w-40"
+        />
         <Button
           onClick={handleUpdate}
           disabled={saving}
