@@ -15,16 +15,24 @@ import { UpdateAvailable } from '@/components/error/UpdateAvailable'
 import { OnboardingWizard, useFirstTimeuser, isOnboardingDone } from '@/features/onboarding/OnboardingWizard'
 import { cn } from '@/lib/utils'
 import { startAutomatedChecks } from '@/services/jobs/automatedChecksService'
-
+import { AiChatPanel } from '@/features/ai/components/AiChatPanel'
+import { useAiConfigStore } from '@/features/ai/store/aiConfigStore'
+import { useUserStore } from '@/stores/userStore'
 export function AppShell() {
   const navigate = useNavigate()
   const { sidebarOpen, toggleSidebar } = useAppStore()
   const isTabHidden = usePrivacyBlur()
   const { checking: checkingOnboarding, isFirstTime } = useFirstTimeuser()
   const [wizardDone, setWizardDone] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
   const showWizard = !checkingOnboarding && isFirstTime && !wizardDone
   useDemoData()
   useTheme()
+
+  const currentUser = useUserStore((s) => s.currentUser)
+  const getConfig = useAiConfigStore((s) => s.getConfig)
+  const aiConfig = currentUser ? getConfig(currentUser.id) : null
+  const aiConfigured = aiConfig?.enabled && (aiConfig.provider === 'ollama' || !!aiConfig?.apiKey)
 
   const onboardingComplete = isOnboardingDone() || wizardDone
 
@@ -33,6 +41,18 @@ export function AppShell() {
       startAutomatedChecks()
     }
   }, [onboardingComplete])
+
+  // Alt+A shortcut to toggle AI chat
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault()
+        setChatOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   const appShortcuts = useCallback(() => ({
     b: () => toggleSidebar(),
@@ -81,6 +101,25 @@ export function AppShell() {
           </button>
         </footer>
       </div>
+
+      {/* AI Copilot — toggle button */}
+      {aiConfigured && !chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-xl bg-neutral-90 border border-neutral-70 shadow-lg hover:shadow-xl hover:border-neutral-60 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center"
+          title="Abrir Copilot TGP (Alt+A)"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-30">
+            <polyline points="4 17 10 11 4 5" />
+            <line x1="12" y1="19" x2="20" y2="19" />
+          </svg>
+        </button>
+      )}
+
+      {aiConfigured && chatOpen && aiConfig && (
+        <AiChatPanel config={aiConfig} isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      )}
+
       <NotificationToast />
       <ConfirmDialog />
       {showWizard && <OnboardingWizard onClose={() => setWizardDone(true)} />}
