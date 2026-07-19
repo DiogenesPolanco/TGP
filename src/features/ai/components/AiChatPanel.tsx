@@ -386,10 +386,10 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
                     {msg.role === 'assistant' && msg.content && (
                       <button
                         onClick={() => copy(msg.content, msg.id)}
-                        className="absolute -right-1 top-0 p-1 rounded-md text-neutral-60 hover:text-neutral-20 hover:bg-neutral-80 opacity-40 hover:opacity-100 transition-all duration-150"
+                        className="absolute -right-1 -top-1 p-1.5 rounded-lg text-neutral-50 hover:text-neutral-10 bg-neutral-85/80 hover:bg-neutral-80 opacity-0 group-hover/message:opacity-100 transition-all duration-150"
                         title="Copiar respuesta"
                       >
-                        {copiedId === msg.id ? <Check size={12} /> : <Clipboard size={12} />}
+                        {copiedId === msg.id ? <Check size={14} /> : <Clipboard size={14} />}
                       </button>
                     )}
                   </div>

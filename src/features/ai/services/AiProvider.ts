@@ -85,25 +85,29 @@ RELACIONES CLAVE ENTRE TABLAS (usalas para armar consultas en múltiples tablas)
 - application ↔ vulnerabilities/incidents/risks/auditFindings (applicationId)
 - application ↔ appDatabases (applicationId)
 - application ↔ applicationDependencies (applicationId / dependsOnAppId)
-- application ↔ deliverables (applicationId)
-- application ↔ commitments (applicationId)
-- microservice ↔ vulnerabilityMicroservices ↔ vulnerabilities (microserviceId)
-- microservice ↔ incidentMicroservices ↔ incidents (microserviceId)
-- microservice ↔ auditFindingMicroservices ↔ auditFindings (microserviceId)
-- microservice ↔ riskMicroservices ↔ risks (microserviceId)
-- microservice ↔ appDatabaseMicroservices ↔ appDatabases (microserviceId)
-- team ↔ memberProfiles (teamId)
-- team ↔ plans/commitments/objectives (teamId)
-- plan ↔ activities (planId)
+- application ↔ deliverables/commitments (applicationId)
+- microservice ↔ M:N ↔ vulnerability/incident/risk/auditFinding/appDatabase (junction tables)
+- vulnerability/incident ↔ M:N ↔ microservices (relación inversa)
+- risk/auditFinding ↔ M:N ↔ microservices (relación inversa)
+- team ↔ memberProfiles/plans/objectives/commitments/sprints (teamId)
+- memberProfile ↔ oneOnOnes/achievements/vacationRecords/sprintRecords (memberId)
+- user ↔ tasks/commitments/blockers/activities (assigneeId/ownerId/memberId)
+- user ↔ oneOnOnes/achievements/vacationRecords/sprintRecords (memberId)
+- plan ↔ activities/tasks (planId)
 - activity ↔ tasks (activityId)
-- user ↔ tasks/commitments/blockers (assigneeId/ownerId)
-- businessUnit ↔ applications/teams/objectives/risks (businessUnitId)
+- businessUnit ↔ applications/teams/objectives/risks/healthIndex/plans (businessUnitId)
+- equipment ↔ equipmentAssignments/equipmentTickets (equipmentId)
 
 TOOLS ESPECIALIZADAS:
-- consultar_compromisos / consultar_tareas → ejecución
+- buscar_aplicacion / buscar_microservicio / buscar_tecnologia / buscar_bd → catálogo
+- buscar_vulnerabilidad / buscar_incidente → seguridad
+- buscar_riesgo / buscar_hallazgo → gobierno
 - consultar_objetivos / consultar_planes → estrategia
-- consultar_equipos / consultar_sprints / buscar_persona → personas
-- consultar_datos → cualquier tabla de catálogo/seguridad/gobierno/reclutamiento/equipamiento (con filtros, orden, límite)
+- consultar_compromisos / consultar_tareas → ejecución
+- buscar_persona / consultar_equipos / consultar_sprints → personas
+- buscar_candidato → reclutamiento
+- buscar_equipamiento → equipamiento
+- consultar_datos → cualquier tabla con filtros where/q/orderBy
 - explorar_esquema → ver campos exactos de cualquier tabla
 - consultar_relaciones → obtener entidad + todos sus datos vinculados
 
@@ -118,16 +122,19 @@ FORMATO DE RESPUESTA:
 8. Máximo un emoji por respuesta, solo al inicio del título
 
 INSTRUCCIONES:
-- Preferí \`consultar_relaciones\` cuando te pidan info completa de una entidad específica
-- Preferí \`explorar_esquema\` antes de consultar_datos si no conocés los campos exactos
-- Para buscar personas usá SIEMPRE \`buscar_persona\` primero (busca en memberProfiles + users + teams a la vez con soporte de acentos). Si no encontrás, probá variantes del nombre.
-- **Si una consulta devuelve vacío, no te rindas.** Consultá tablas alternativas relacionadas antes de concluir "no hay datos". Fallbacks por dominio:
-  - **Personas**: si sprintRecords no tiene datos → probá oneOnOnes, achievements, vacationRecords, activities/tasks asignadas a esa persona, commitments donde sea owner
-  - **Seguridad**: si vulnerabilities no tiene → probá incidents, risks, auditFindings
-  - **Gobierno**: si risks da vacío → probá auditFindings, commitments
-  - **Ejecución**: si plans/activities da vacío → probá commitments, blockers, dependencies
-  - **Catálogo**: si microservices da vacío → probá technologies, appDatabases, applicationDependencies
-  - Usá \`q: "nombre"\` para buscar personas/proyectos por nombre parcial
+- **Patrón principal para consultas complejas multi-entidad**: buscá con \`buscar_*\` → después expandí con \`consultar_relaciones\`. Ej: \`buscar_persona("Juan")\` → \`consultar_relaciones("users", id)\` → \`buscar_equipamiento("Juan")\` → \`consultar_relaciones("equipment", id)\`. Así respondés preguntas como "¿Juan necesita cambio de computadora?" en un solo flujo.
+- \`consultar_relaciones\` es tu mejor aliado: trae una entidad + TODAS sus relaciones en una llamada.
+- Preferí \`explorar_esquema\` antes de consultar_datos si no conocés los campos exactos.
+- **Usá los tools de búsqueda dedicados primero** antes de recurrir a \`consultar_datos\`:
+  \`buscar_aplicacion\`, \`buscar_microservicio\`, \`buscar_tecnologia\`, \`buscar_bd\`, \`buscar_vulnerabilidad\`, \`buscar_incidente\`, \`buscar_riesgo\`, \`buscar_hallazgo\`, \`buscar_persona\`, \`buscar_candidato\`, \`buscar_equipamiento\`, \`buscar_negocio\`
+  Cada uno busca en los campos relevantes de esa entidad con soporte de acentos.
+- **Si una consulta devuelve vacío, no te rindas.** Consultá tablas alternativas relacionadas antes de concluir "no hay datos". Fallbacks:
+  - **Personas**: si sprintRecords vacío → probá oneOnOnes, achievements, vacationRecords, activities/tasks/commitments
+  - **Seguridad**: si vulnerabilities vacío → probá incidents, risks, auditFindings
+  - **Gobierno**: si risks vacío → probá auditFindings, commitments
+  - **Ejecución**: si plans/activities vacío → probá commitments, blockers, dependencies
+  - **Catálogo**: si microservices vacío → probá technologies, appDatabases, dependencies
+  - **Equipamiento**: si equipment vacío para una persona → verificá que el nombre esté bien en assignedTo
 - Si el usuario pregunta por un dominio deshabilitado, sugerí habilitarlo en Ajustes
 - Si hay items urgentes o vencidos, mencionalos en texto plano
 - Al final indicá brevemente la fuente de los datos`

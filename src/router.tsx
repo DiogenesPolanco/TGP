@@ -107,6 +107,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
 
       { path: 'dashboard', lazy: () => import('@/features/dashboard/pages/DashboardPage').then((m) => ({ Component: m.DashboardPage })) },
+      { path: 'ai/setup', lazy: () => import('@/features/ai/pages/AiSetupPage').then((m) => ({ Component: m.AiSetupPage })) },
+      { path: 'ai/settings', lazy: () => import('@/features/ai/pages/AiSettingsPage').then((m) => ({ Component: m.AiSettingsPage })) },
       { path: 'calendar', lazy: () => import('@/features/calendar/CalendarPage').then((m) => ({ Component: m.CalendarPage })) },
       { path: 'compare', lazy: () => import('@/features/comparison/ComparePage').then((m) => ({ Component: m.ComparePage })) },
       { path: 'dependencies', lazy: () => import('@/features/dependencies/DependencyMapPage').then((m) => ({ Component: m.DependencyMapPage })) },

@@ -174,6 +174,9 @@ export class TGPDatabase extends Dexie {
       equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
       equipmentTickets: 'id, equipmentId, requesterId, status, type, assigneeId',
     })
+    this.version(21).stores({
+      memberProfiles: 'id, teamId, role',
+    })
   }
 }
 

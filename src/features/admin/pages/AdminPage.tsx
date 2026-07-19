@@ -10,6 +10,7 @@ import { getSecret, verifyTotp } from '@/services/auth/authService'
 import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 import { AzureCloudConfig } from '@/features/admin/components/AzureCloudConfig'
+import { AiAdminConfig } from '@/features/admin/components/AiAdminConfig'
 import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConfig'
 import { MobileSnapshotConfig } from '@/features/admin/components/MobileSnapshotConfig'
 import { JiraConfigPanel } from '@/components/jira/JiraConfigPanel'
@@ -126,6 +127,11 @@ export function AdminPage() {
 
   return (
     <div className="space-y-6">
+
+      {/* Asistente AI - siempre visible */}
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
+        <AiAdminConfig />
+      </div>
 
       {/* Grid de acciones rápidas */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

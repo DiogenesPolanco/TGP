@@ -139,6 +139,7 @@ interface Relation {
 }
 
 const RELATIONS: Record<string, Relation[]> = {
+  // ── Catálogo ────────────────────────────────────────────────────
   applications: [
     { table: 'microservices', foreignKey: 'applicationId', label: 'Microservicios' },
     { table: 'vulnerabilities', foreignKey: 'applicationId', label: 'Vulnerabilidades' },
@@ -159,6 +160,24 @@ const RELATIONS: Record<string, Relation[]> = {
     { junction: { table: 'riskMicroservices', sourceFk: 'microserviceId', targetFk: 'riskId', targetTable: 'risks', targetLabel: 'Riesgos' }, table: '', foreignKey: '', label: '' },
     { junction: { table: 'appDatabaseMicroservices', sourceFk: 'microserviceId', targetFk: 'appDatabaseId', targetTable: 'appDatabases', targetLabel: 'Bases de datos' }, table: '', foreignKey: '', label: '' },
   ],
+
+  // ── Seguridad (con M:N inversas a microservicios) ──────────────
+  vulnerabilities: [
+    { junction: { table: 'vulnerabilityMicroservices', sourceFk: 'vulnerabilityId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios afectados' }, table: '', foreignKey: '', label: '' },
+  ],
+  incidents: [
+    { junction: { table: 'incidentMicroservices', sourceFk: 'incidentId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios afectados' }, table: '', foreignKey: '', label: '' },
+  ],
+
+  // ── Gobierno (con M:N inversas a microservicios) ───────────────
+  risks: [
+    { junction: { table: 'riskMicroservices', sourceFk: 'riskId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios asociados' }, table: '', foreignKey: '', label: '' },
+  ],
+  auditFindings: [
+    { junction: { table: 'auditFindingMicroservices', sourceFk: 'auditFindingId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios asociados' }, table: '', foreignKey: '', label: '' },
+  ],
+
+  // ── Personas ────────────────────────────────────────────────────
   teams: [
     { table: 'memberProfiles', foreignKey: 'teamId', label: 'Miembros' },
     { table: 'plans', foreignKey: 'teamId', label: 'Planes' },
@@ -166,13 +185,11 @@ const RELATIONS: Record<string, Relation[]> = {
     { table: 'commitments', foreignKey: 'teamId', label: 'Compromisos' },
     { table: 'teamSprints', foreignKey: 'teamId', label: 'Sprints' },
   ],
-  businessUnits: [
-    { table: 'applications', foreignKey: 'businessUnitId', label: 'Aplicaciones' },
-    { table: 'teams', foreignKey: 'businessUnitId', label: 'Equipos' },
-    { table: 'objectives', foreignKey: 'businessUnitId', label: 'Objetivos' },
-    { table: 'risks', foreignKey: 'businessUnitId', label: 'Riesgos' },
-    { table: 'healthIndexHistory', foreignKey: 'businessUnitId', label: 'Health Index' },
-    { table: 'plans', foreignKey: 'businessUnitId', label: 'Planes' },
+  memberProfiles: [
+    { table: 'oneOnOnes', foreignKey: 'memberId', label: 'One-on-Ones' },
+    { table: 'achievements', foreignKey: 'memberId', label: 'Logros' },
+    { table: 'vacationRecords', foreignKey: 'memberId', label: 'Vacaciones' },
+    { table: 'sprintRecords', foreignKey: 'memberId', label: 'Registros de sprint' },
   ],
   users: [
     { table: 'tasks', foreignKey: 'assigneeId', label: 'Tareas asignadas' },
@@ -186,6 +203,8 @@ const RELATIONS: Record<string, Relation[]> = {
     { table: 'vacationRecords', foreignKey: 'memberId', label: 'Vacaciones' },
     { table: 'sprintRecords', foreignKey: 'memberId', label: 'Registros de sprint' },
   ],
+
+  // ── Estrategia ──────────────────────────────────────────────────
   plans: [
     { table: 'activities', foreignKey: 'planId', label: 'Actividades' },
     { table: 'tasks', foreignKey: 'planId', label: 'Tareas' },
@@ -193,13 +212,29 @@ const RELATIONS: Record<string, Relation[]> = {
   activities: [
     { table: 'tasks', foreignKey: 'activityId', label: 'Tareas' },
   ],
+
+  // ── Unidades de negocio ─────────────────────────────────────────
+  businessUnits: [
+    { table: 'applications', foreignKey: 'businessUnitId', label: 'Aplicaciones' },
+    { table: 'teams', foreignKey: 'businessUnitId', label: 'Equipos' },
+    { table: 'objectives', foreignKey: 'businessUnitId', label: 'Objetivos' },
+    { table: 'risks', foreignKey: 'businessUnitId', label: 'Riesgos' },
+    { table: 'healthIndexHistory', foreignKey: 'businessUnitId', label: 'Health Index' },
+    { table: 'plans', foreignKey: 'businessUnitId', label: 'Planes' },
+  ],
+
+  // ── Equipamiento ────────────────────────────────────────────────
+  equipment: [
+    { table: 'equipmentAssignments', foreignKey: 'equipmentId', label: 'Historial de asignaciones' },
+    { table: 'equipmentTickets', foreignKey: 'equipmentId', label: 'Tickets de soporte' },
+  ],
 }
 
 // ─── consultar_relaciones ─────────────────────────────────────────
 
 export const consultarRelacionesTool: AiToolDefinition = {
   name: 'consultar_relaciones',
-  description: 'Obtené una entidad completa con TODOS sus datos relacionados en una sola llamada. Ej: pasá "microservices" + id de microservicio y obtené el microservicio + su aplicación padre + vulnerabilidades + incidentes + riesgos + hallazgos + bases de datos asociadas.',
+  description: 'Obtené una entidad completa con TODOS sus datos relacionados en una sola llamada. Soporta: applications (microservicios, vulns, incidents, riesgos, hallazgos, BBDD, dependencias, entregables, compromisos), microservices (aplicación padre + M:N a vulns/incidents/riesgos/hallazgos/BBDD), vulnerabilities/incidents (M:N a microservicios), risks/auditFindings (M:N a microservicios), teams (miembros, planes, objetivos, compromisos, sprints), memberProfiles (1:1, logros, vacaciones, sprints), users (tareas, compromisos, bloqueos, actividades, 1:1, logros, vacaciones, sprints), plans (actividades, tareas), activities (tareas), businessUnits (aplicaciones, equipos, objetivos, riesgos, healthIndex, planes), equipment (asignaciones, tickets).',
   parameters: {
     type: 'object',
     properties: {

@@ -15,7 +15,6 @@ import {
   ChevronUp,
   ClipboardList,
   FileText,
-  FileSignature,
   Monitor,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -208,23 +207,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Enlace a Términos */}
-      <div className="border-t border-boundary px-2 py-3">
-        <NavLink
-          to="/terms"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors',
-              isActive
-                ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                : 'text-neutral-40 dark:text-neutral-50 hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-60 dark:hover:text-neutral-40'
-            )
-          }
-        >
-          <FileSignature size={16} />
-          {sidebarOpen && <span>Términos y Privacidad</span>}
-        </NavLink>
-      </div>
+
     </aside>
   )
 }

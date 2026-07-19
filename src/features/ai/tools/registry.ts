@@ -4,6 +4,19 @@ import { objetivosTool, planesTool } from './objetivos'
 import { equiposTool, sprintsTool, buscarPersonaTool } from './equipo'
 import { createConsultarDatosTool } from './consultar-datos'
 import { explorarEsquemaTool, consultarRelacionesTool } from './schema'
+import {
+  buscarAplicacionTool,
+  buscarMicroservicioTool,
+  buscarTecnologiaTool,
+  buscarBDTool,
+  buscarVulnerabilidadTool,
+  buscarIncidenteTool,
+  buscarRiesgoTool,
+  buscarHallazgoTool,
+  buscarEquipamientoTool,
+  buscarCandidatoTool,
+  buscarNegocioTool,
+} from './buscadores'
 
 const SPECIALIZED_TOOLS: AiToolDefinition[] = [
   compromisosTool,
@@ -13,22 +26,31 @@ const SPECIALIZED_TOOLS: AiToolDefinition[] = [
   equiposTool,
   sprintsTool,
   buscarPersonaTool,
+  buscarAplicacionTool,
+  buscarMicroservicioTool,
+  buscarTecnologiaTool,
+  buscarBDTool,
+  buscarVulnerabilidadTool,
+  buscarIncidenteTool,
+  buscarRiesgoTool,
+  buscarHallazgoTool,
+  buscarEquipamientoTool,
+  buscarCandidatoTool,
+  buscarNegocioTool,
   explorarEsquemaTool,
   consultarRelacionesTool,
 ]
 
 // Mapping de cada dominio a las tools especializadas que habilita.
-// Los dominios sin tools especializadas usan la tool genérica consultar_datos
-// para acceder a sus tablas mediante la función createConsultarDatosTool().
 const PERMISSION_TO_TOOL: Record<keyof AiProviderConfig['dataPermissions'], string[]> = {
-  catalogo: [],
-  seguridad: [],
-  gobierno: [],
+  catalogo: ['buscar_aplicacion', 'buscar_microservicio', 'buscar_tecnologia', 'buscar_bd'],
+  seguridad: ['buscar_vulnerabilidad', 'buscar_incidente'],
+  gobierno: ['buscar_riesgo', 'buscar_hallazgo'],
   estrategia: ['consultar_objetivos'],
   ejecucion: ['consultar_compromisos', 'consultar_tareas', 'consultar_planes'],
   personas: ['consultar_equipos', 'consultar_sprints', 'buscar_persona'],
-  reclutamiento: [],
-  equipamiento: [],
+  reclutamiento: ['buscar_candidato'],
+  equipamiento: ['buscar_equipamiento'],
 }
 
 /**
