@@ -64,7 +64,7 @@ export const buscarTicketEquipoTool: AiToolDefinition = {
         }
       }
       const profiles = await db.memberProfiles.toArray()
-      for (const p of profiles) personMap.set(p.id, p.displayName)
+      for (const p of profiles) personMap.set(p.id, p.email)
 
       const equipment = await db.equipment.toArray()
       for (const e of equipment) {

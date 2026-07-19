@@ -35,7 +35,7 @@ export const consultarDependenciasTool: AiToolDefinition = {
     } else {
       const term = n(query)
       const all = await db.applications.toArray()
-      app = all.find((a) => n(a.name).includes(term))
+      app = all.find((a) => n(a.name).includes(term)) as Record<string, unknown> | undefined
     }
 
     if (!app) {
@@ -63,16 +63,15 @@ export const consultarDependenciasTool: AiToolDefinition = {
 
         for (const t of matched) {
           const label = `${t.name} ${t.version}`
-          if (t.supportStatus === 'eol' || t.supportStatus === 'obsolete' || (t.eolDate && new Date(t.eolDate) < new Date())) {
-            expired.push(`    ⛔ ${label} — EOL: ${t.eolDate ? new Date(t.eolDate).toLocaleDateString('es-ES') : 'vencida'}${t.cveList?.length ? ` · ${t.cveList.length} CVE` : ''}`)
-          } else if (t.supportStatus === 'extended' || t.supportStatus === 'limited' || (t.eolDate && new Date(t.eolDate) < new Date(Date.now() + 180 * 24 * 60 * 60 * 1000))) {
+          if (t.supportStatus === 'eol' || (t.eolDate && new Date(t.eolDate) < new Date())) {
+            expired.push(`    ⛔ ${label} — EOL: ${t.eolDate ? new Date(t.eolDate).toLocaleDateString('es-ES') : 'vencida'}${t.cveList.length ? ` · ${t.cveList.length} CVE` : ''}`)
+          } else if (t.supportStatus === 'extended' || (t.eolDate && new Date(t.eolDate) < new Date(Date.now() + 180 * 24 * 60 * 60 * 1000))) {
             expiring.push(`    ⚠️  ${label} — soporte: ${t.supportStatus}${t.eolDate ? `, EOL: ${new Date(t.eolDate).toLocaleDateString('es-ES')}` : ''}`)
           } else {
             healthy.push(`    ✅ ${label} — ${t.supportStatus ?? 'soporte activo'}`)
           }
         }
 
-        const obsCount = expired.length
         if (expired.length > 0 || expiring.length > 0 || healthy.length > 0) {
           output.push(`**Stack tecnológico** (${matched.length} tecnologías):`)
           if (expired.length > 0) output.push(...expired)
@@ -131,7 +130,6 @@ export const consultarDependenciasTool: AiToolDefinition = {
       }
     } catch { /* istanbul ignore next */ }
 
-    const totalDeps = 0
     if (output.length > 2) {
       output.push(`💡 Usá \`consultar_relaciones({ tabla: "applications", id: "${appId}" })\` para ver todos los datos vinculados.`)
     }

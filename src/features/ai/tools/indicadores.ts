@@ -29,28 +29,32 @@ export const consultarIndicadoresTool: AiToolDefinition = {
         : healthRecords
       const latest = buRecords.length > 0
         ? buRecords.reduce((latest, curr) =>
-            new Date(curr.date) > new Date(latest.date) ? curr : latest
+            new Date(curr.calculatedAt) > new Date(latest.calculatedAt) ? curr : latest
           )
         : null
 
       if (latest) {
-        const thi = latest.score ?? latest.overallScore ?? '—'
+        const thi = latest.overallScore ?? 0
         output.push(`🏥 **THI (Technology Health Index):** ${typeof thi === 'number' ? thi.toFixed(1) : thi}/10`)
-        if (latest.components) {
-          const comps = Object.entries(latest.components as Record<string, number>)
-            .map(([k, v]) => `  · ${k}: ${v.toFixed(1)}`)
-            .join('\n')
-          if (comps) output.push(comps)
-        }
+        const dims = [
+          `  · Entrega: ${latest.deliveryScore.toFixed(1)}`,
+          `  · Calidad: ${latest.qualityScore.toFixed(1)}`,
+          `  · Seguridad: ${latest.securityScore.toFixed(1)}`,
+          `  · Disponibilidad: ${latest.availabilityScore.toFixed(1)}`,
+          `  · Obsolescencia: ${latest.obsolescenceScore.toFixed(1)}`,
+          `  · Riesgo: ${latest.riskScore.toFixed(1)}`,
+          `  · Compliance: ${latest.complianceScore.toFixed(1)}`,
+        ].join('\n')
+        output.push(dims)
         output.push('')
       }
     } catch {}
 
     try {
       let vulns = await db.vulnerabilities.toArray()
-      const critical = vulns.filter((v) => v.severity === 'critical' && v.status !== 'resolved' && v.status !== 'closed')
-      const high = vulns.filter((v) => v.severity === 'high' && v.status !== 'resolved' && v.status !== 'closed')
-      const totalOpen = vulns.filter((v) => v.status !== 'resolved' && v.status !== 'closed')
+      const critical = vulns.filter((v) => v.severity === 'critical' && v.status !== 'fixed' && v.status !== 'accepted')
+      const high = vulns.filter((v) => v.severity === 'high' && v.status !== 'fixed' && v.status !== 'accepted')
+      const totalOpen = vulns.filter((v) => v.status !== 'fixed' && v.status !== 'accepted')
 
       if (totalOpen.length > 0 || critical.length > 0) {
         output.push(`🔒 **Vulnerabilidades:** ${totalOpen.length} abiertas (${critical.length} críticas, ${high.length} altas)`)
@@ -60,8 +64,8 @@ export const consultarIndicadoresTool: AiToolDefinition = {
 
     try {
       let incidents = await db.incidents.toArray()
-      const p1 = incidents.filter((i) => i.severity === 'P1' && i.status !== 'resolved' && i.status !== 'closed')
-      const p2 = incidents.filter((i) => i.severity === 'P2' && i.status !== 'resolved' && i.status !== 'closed')
+      const p1 = incidents.filter((i) => i.severity === 'critical' && i.status !== 'resolved' && i.status !== 'closed')
+      const p2 = incidents.filter((i) => i.severity === 'high' && i.status !== 'resolved' && i.status !== 'closed')
       const activeIncidents = incidents.filter((i) => i.status !== 'resolved' && i.status !== 'closed')
 
       if (activeIncidents.length > 0 || p1.length > 0) {
@@ -89,7 +93,7 @@ export const consultarIndicadoresTool: AiToolDefinition = {
       const atRisk = objectives.filter((o) => o.status === 'at_risk')
       const behind = objectives.filter((o) => o.status === 'behind')
       const achieved = objectives.filter((o) => o.status === 'achieved')
-      const active = objectives.filter((o) => o.status !== 'achieved' && o.status !== 'cancelled')
+      const active = objectives.filter((o) => o.status !== 'achieved')
 
       if (active.length > 0 || atRisk.length > 0) {
         output.push(`🎯 **OKRs:** ${active.length} activos (${atRisk.length} en riesgo, ${behind.length} atrasados, ${achieved.length} logrados)`)
@@ -99,7 +103,12 @@ export const consultarIndicadoresTool: AiToolDefinition = {
 
     try {
       let commitments = await db.commitments.toArray()
-      if (buId) commitments = commitments.filter((c) => c.businessUnitId === buId)
+      if (buId) {
+        // Intentar filtrar por unidades de negocio a través de equipos
+        const teams = await db.teams.filter((t) => t.businessUnitId === buId).toArray()
+        const teamIds = new Set(teams.map((t) => t.id))
+        commitments = commitments.filter((c) => c.teamId && teamIds.has(c.teamId))
+      }
       const vencidos = commitments.filter(
         (c) => c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now
       )

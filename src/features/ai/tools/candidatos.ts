@@ -59,7 +59,7 @@ export const consultarCandidatoTool: AiToolDefinition = {
       candidate = all.find((c) => {
         const haystack = n([c.name, c.email, c.position].filter(Boolean).join(' '))
         return haystack.includes(term)
-      })
+      }) as Record<string, unknown> | undefined
     }
 
     if (!candidate) {

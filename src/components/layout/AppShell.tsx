@@ -34,7 +34,7 @@ export function AppShell() {
   const currentUser = useUserStore((s) => s.currentUser)
   const getConfig = useAiConfigStore((s) => s.getConfig)
   const aiConfig = currentUser ? getConfig(currentUser.id) : null
-  const aiConfigured = aiConfig?.enabled && (aiConfig.provider === 'ollama' || !!aiConfig?.apiKey)
+  const aiConfigured = !!(aiConfig?.enabled && (aiConfig.provider === 'ollama' || !!aiConfig?.apiKey))
 
   const onboardingComplete = isOnboardingDone() || wizardDone
 

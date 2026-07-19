@@ -33,7 +33,6 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
       params.incluirDORA === 'true' || params.incluirDORA === '1'
 
     const output: string[] = []
-    const now = new Date()
     const teams = await db.teams.toArray()
     const teamMap = new Map(teams.map((t) => [t.id, t.name]))
 
@@ -65,7 +64,7 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
       })
 
       const total = sorted.length
-      const completed = sorted.filter((s) => s.status === 'completed').length
+      const completed = sorted.filter((s) => s.completedSP > 0).length
       const avgCompletion = sorted.reduce((sum, s) => {
         const pct = s.plannedSP > 0 ? (s.completedSP / s.plannedSP) * 100 : 0
         return sum + pct
@@ -93,30 +92,33 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
       output.push('**Métricas DORA**')
       output.push('')
 
-      let metricas = await db.doraMetrics.toArray()
-      if (teamId) metricas = metricas.filter((m) => m.teamId === teamId)
+      try {
+        // Las métricas DORA pueden estar en teamSprints o en team.currentMetrics
+        const doraData = await db.teamSprints.toArray()
+        if (teamId) doraData.filter((s) => s.teamId === teamId)
 
-      if (metricas.length > 0) {
-        for (const m of metricas) {
-          const name = teamMap.get(m.teamId) ?? m.teamId
-          output.push(`**${name}**`)
-          if (m.deployFrequency) output.push(`  🚀 Deploy frequency: ${m.deployFrequency}`)
-          if (m.leadTime) output.push(`  ⏱️  Lead time: ${m.leadTime}`)
-          if (m.mttr) output.push(`  🔧 MTTR: ${m.mttr}`)
-          if (m.changeFailureRate) output.push(`  💥 Change failure rate: ${m.changeFailureRate}`)
+        const byTeam = new Map<string, { deploys: number; changes: number }>()
+        for (const s of doraData) {
+          const prev = byTeam.get(s.teamId) ?? { deploys: 0, changes: 0 }
+          if (s.completedSP > 0) prev.deploys++
+          prev.changes += s.notCompletedSP
+          byTeam.set(s.teamId, prev)
+        }
 
-          const benchmarks: { label: string; check: boolean }[] = []
-          if (m.changeFailureRate) {
-            const rate = parseFloat(String(m.changeFailureRate).replace('%', ''))
-            if (!isNaN(rate)) benchmarks.push({ label: rate <= 15 ? 'Elite' : rate <= 25 ? 'Alto' : rate <= 45 ? 'Medio' : 'Bajo', check: true })
+        if (byTeam.size > 0) {
+          for (const [tid, data] of byTeam) {
+            const name = teamMap.get(tid) ?? tid
+            output.push(`**${name}**`)
+            output.push(`  🚀 Deploy frequency: ${data.deploys} deploys`)
+            output.push(`  💥 Change failure rate: ${data.changes > 0 ? ((data.changes / (data.deploys + data.changes)) * 100).toFixed(1) : 0}%`)
+            output.push('')
           }
-          if (benchmarks.length > 0) {
-            output.push(`  🏆 Benchmark: ${benchmarks.map((b) => b.label).join(', ')}`)
-          }
+        } else {
+          output.push('_(No hay métricas DORA disponibles para este equipo/período)_')
           output.push('')
         }
-      } else {
-        output.push('_(No hay métricas DORA registradas para este equipo/período)_')
+      } catch {
+        output.push('_(No hay métricas DORA disponibles)_')
         output.push('')
       }
     }

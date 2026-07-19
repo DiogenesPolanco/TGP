@@ -7,9 +7,8 @@ const IN_6M = new Date(NOW.getTime() + 180 * 24 * 60 * 60 * 1000)
 const SUPPORT_ORDER: Record<string, number> = {
   active: 0,
   extended: 1,
-  limited: 2,
   eol: 3,
-  obsolete: 4,
+  unknown: 2,
 }
 
 export const consultarObsolescenciaTool: AiToolDefinition = {
@@ -28,12 +27,12 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
       },
       estado: {
         type: 'string',
-        enum: ['eol', 'obsolete', 'limited', 'extended', 'active'],
+        enum: ['eol', 'extended', 'active', 'unknown'],
         description: 'Filtrar por estado de soporte específico',
       },
       soloCriticas: {
         type: ['boolean', 'string', 'number'],
-        description: 'Solo tecnologías EOL u obsoletas (true)',
+        description: 'Solo tecnologías EOL (true)',
       },
       limit: { type: 'number', description: 'Máximo de resultados (default 50)' },
     },
@@ -53,12 +52,12 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
     if (estado) techs = techs.filter((t) => t.supportStatus === estado)
 
     const expired = techs.filter((t) =>
-      t.supportStatus === 'eol' || t.supportStatus === 'obsolete' ||
+      t.supportStatus === 'eol' ||
       (t.eolDate && new Date(t.eolDate) < NOW)
     )
     const expiring = techs.filter((t) =>
       !expired.includes(t) && (
-        t.supportStatus === 'limited' || t.supportStatus === 'extended' ||
+        t.supportStatus === 'extended' ||
         (t.eolDate && new Date(t.eolDate) >= NOW && new Date(t.eolDate) <= IN_6M)
       )
     )
@@ -100,11 +99,11 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
       output.push(title)
 
       for (const t of display) {
-        const cves = t.cveList?.length ? ` · ${t.cveList.length} CVE` : ''
+        const cves = t.cveList.length ? ` · ${t.cveList.length} CVE` : ''
         const eol = t.eolDate ? ` · EOL: ${new Date(t.eolDate).toLocaleDateString('es-ES')}` : ''
-        const icon = t.supportStatus === 'eol' || t.supportStatus === 'obsolete' ? '⛔' :
-          t.supportStatus === 'limited' ? '⚠️' :
-          t.supportStatus === 'extended' ? '⚡' : '✅'
+        const icon = t.supportStatus === 'eol' ? '⛔' :
+          t.supportStatus === 'extended' ? '⚡' :
+          t.supportStatus === 'unknown' ? '❓' : '✅'
         output.push(`  ${icon} **${t.name}** ${t.version} · ${t.vendor} · ${t.supportStatus}${eol}${cves}`)
       }
       output.push('')

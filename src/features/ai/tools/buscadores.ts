@@ -28,8 +28,8 @@ async function buildMemberIdMap(): Promise<Map<string, string>> {
     const profiles = await db.memberProfiles.toArray()
     for (const p of profiles) {
       if (!map.has(n(p.id))) {
-        map.set(n((p as any).displayName), p.id)
-        map.set(n(p.id), (p as any).displayName)
+        map.set(n(p.email), p.id)
+        map.set(n(p.id), p.email)
       }
     }
   } catch { /* tablas no disponibles */ }
@@ -41,7 +41,7 @@ function defineBuscador(
   name: string,
   description: string,
   tableName: string,
-  labelSingular: string,
+  _labelSingular: string,
   labelPlural: string,
   searchFields: string[],
   displayFields: string[],
@@ -132,7 +132,7 @@ function defineBuscador(
           }
           const profiles = await db.memberProfiles.toArray()
           for (const p of profiles) {
-            memberNameMap.set(p.id, p.displayName)
+            memberNameMap.set(p.id, p.email)
           }
         } catch { /* ok */ }
       }
@@ -150,7 +150,6 @@ function defineBuscador(
           return s.length > 60 ? s.slice(0, 60) + '…' : s
         }).filter(Boolean)
 
-        const extra = null
         let line = `${i + 1}. **${parts[0] ?? '(sin nombre)'}**`
         if (parts.length > 1) line += ` · ${parts.slice(1).join(' · ')}`
         return line
@@ -290,7 +289,7 @@ export const buscarEquipamientoTool: AiToolDefinition = {
         }
       }
       const profiles = await db.memberProfiles.toArray()
-      for (const p of profiles) displayMap.set(p.id, p.displayName)
+      for (const p of profiles) displayMap.set(p.id, p.email)
     } catch { /* ok */ }
 
     const lines = sliced.map((r, i) => {

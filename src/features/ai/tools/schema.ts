@@ -134,6 +134,8 @@ interface Relation {
   table: string
   foreignKey: string
   label: string
+  /** When set, use this field on the source entity instead of the provided `id` */
+  localKey?: string
   /** If set, also fetch records from this junction table and resolve the target */
   junction?: { table: string; sourceFk: string; targetFk: string; targetTable: string; targetLabel: string }
 }

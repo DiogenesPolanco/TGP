@@ -10,10 +10,6 @@ interface Issue {
   severidad: 'alta' | 'media' | 'baja'
 }
 
-function nameOrId(item: Record<string, unknown>): string {
-  return (item.title as string) ?? (item.name as string) ?? (item.displayName as string) ?? idSnippet(item.id as string)
-}
-
 function idSnippet(id: string): string {
   return `#${id.slice(0, 8)}…`
 }
@@ -23,34 +19,6 @@ function tiene(val: unknown): boolean {
   if (typeof val === 'string' && val.trim() === '') return false
   if (typeof val === 'number' && val === 0) return true
   return true
-}
-
-function count(arr: unknown[]): number {
-  return arr.length
-}
-
-async function checkOrphans<T extends { id: string }>(
-  table: { toArray: () => Promise<T[]> },
-  field: keyof T,
-  parentTable: string,
-  tipo: string,
-  issues: Issue[],
-  severidad: 'alta' | 'media' | 'baja' = 'media'
-) {
-  try {
-    const items = await table.toArray()
-    const orphans = items.filter((item) => !tiene(item[field]))
-    for (const o of orphans) {
-      issues.push({
-        tipo,
-        entidad: parentTable,
-        descripcion: `No está vinculad@ a ninguna entidad padre`,
-        id: o.id,
-        nombre: nameOrId(o as unknown as Record<string, unknown>),
-        severidad,
-      })
-    }
-  } catch {}
 }
 
 export const auditarDatosTool: AiToolDefinition = {
@@ -85,8 +53,6 @@ export const auditarDatosTool: AiToolDefinition = {
     const issues: Issue[] = []
     const sevOrder: Record<string, number> = { alta: 3, media: 2, baja: 1 }
     const minSev = sevOrder[severidadMinima] ?? 1
-
-    const check = dominio === 'todo'
 
     async function audit(categoria: string, fn: () => Promise<void>) {
       if (dominio === 'todo' || dominio === categoria) {
@@ -154,7 +120,7 @@ export const auditarDatosTool: AiToolDefinition = {
         if (v.status === 'open' || v.status === 'in_progress') {
           if (!tiene(v.slaDeadline)) {
             issues.push({ tipo: 'Vuln sin SLA', entidad: 'Vulnerability', descripcion: `Está abierta pero no tiene fecha tope SLA — no se puede medir cumplimiento`, id: v.id, nombre: nom, severidad: 'alta' })
-          } else if (new Date(v.slaDeadline) < new Date() && v.status !== 'fixed' && v.status !== 'accepted') {
+          } else if (new Date(v.slaDeadline) < new Date()) {
             issues.push({ tipo: 'SLA vencido', entidad: 'Vulnerability', descripcion: `SLA vencido el ${new Date(v.slaDeadline).toLocaleDateString('es-ES')} y sigue sin resolver`, id: v.id, nombre: nom, severidad: 'alta' })
           }
         }
@@ -253,7 +219,7 @@ export const auditarDatosTool: AiToolDefinition = {
 
       const hi = await db.healthIndexHistory.toArray()
       if (hi.length > 0) {
-        const fechas = hi.map((h) => new Date(h.date ?? h.calculatedAt).getTime()).sort((a, b) => a - b)
+        const fechas = hi.map((h) => new Date(h.calculatedAt).getTime()).sort((a, b) => a - b)
         for (let i = 1; i < fechas.length; i++) {
           const gap = fechas[i] - fechas[i - 1]
           if (gap > 45 * 24 * 60 * 60 * 1000) {
@@ -286,7 +252,7 @@ export const auditarDatosTool: AiToolDefinition = {
         const profiles = await db.memberProfiles.toArray()
         for (const p of profiles) {
           if (!p.teamId) {
-            issues.push({ tipo: 'Persona sin equipo', entidad: 'MemberProfile', descripcion: `No pertenece a ningún equipo — no aparece en reportes de dotación`, id: p.id, nombre: p.displayName, severidad: 'media' })
+            issues.push({ tipo: 'Persona sin equipo', entidad: 'MemberProfile', descripcion: `No pertenece a ningún equipo — no aparece en reportes de dotación`, id: p.id, nombre: p.email, severidad: 'media' })
           }
         }
       } catch {}

@@ -166,10 +166,6 @@ function InlineChat({ config }: { config: AiProviderConfig }) {
   )
 }
 
-function copyText(text: string) {
-  navigator.clipboard.writeText(text)
-}
-
 /** Renderiza markdown simple: **bold**, listas, separadores, saltos de línea. */
 function renderMarkdown(text: string): ReactNode[] {
   if (!text) return []

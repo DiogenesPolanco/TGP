@@ -38,7 +38,7 @@ export const buscarEntregableTool: AiToolDefinition = {
     let entregables = await db.deliverables.toArray()
     const now = new Date()
     const apps = await db.applications.toArray()
-    const appMap = new Map(apps.map((a) => [a.id, a.name ?? a.code ?? a.id]))
+    const appMap = new Map(apps.map((a) => [a.id, a.name ?? a.id]))
 
     if (q) {
       const term = q.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
