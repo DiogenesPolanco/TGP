@@ -48,6 +48,10 @@ Skillfile.lock
 # Claude memory
 .claude-memory/
 
+# Local config (no subir a GitHub)
+CLAUDE.md
+.sisyphus/
+
 # Build version
 version.json
 e2e/test-data/large.xlsx
