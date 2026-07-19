@@ -4,6 +4,16 @@ import { objetivosTool, planesTool } from './objetivos'
 import { equiposTool, sprintsTool, buscarPersonaTool } from './equipo'
 import { createConsultarDatosTool } from './consultar-datos'
 import { explorarEsquemaTool, consultarRelacionesTool } from './schema'
+import { consultarCandidatoTool } from './candidatos'
+import { consultarDependenciasTool } from './dependencias'
+import { consultarObsolescenciaTool } from './obsolescencia'
+import { consultarIndicadoresTool } from './indicadores'
+import { consultarBloqueosTool } from './bloqueos'
+import { consultarPersonaTool } from './persona'
+import { buscarEntregableTool } from './entregables'
+import { consultarMetricasSprintTool } from './metricas-sprint'
+import { buscarTicketEquipoTool } from './tickets-equipo'
+import { consultarHealthIndexTool } from './health-index'
 import {
   buscarAplicacionTool,
   buscarMicroservicioTool,
@@ -36,21 +46,31 @@ const SPECIALIZED_TOOLS: AiToolDefinition[] = [
   buscarHallazgoTool,
   buscarEquipamientoTool,
   buscarCandidatoTool,
+  consultarCandidatoTool,
   buscarNegocioTool,
+  consultarDependenciasTool,
+  consultarObsolescenciaTool,
+  consultarIndicadoresTool,
+  consultarBloqueosTool,
+  consultarPersonaTool,
+  buscarEntregableTool,
+  consultarMetricasSprintTool,
+  buscarTicketEquipoTool,
+  consultarHealthIndexTool,
   explorarEsquemaTool,
   consultarRelacionesTool,
 ]
 
 // Mapping de cada dominio a las tools especializadas que habilita.
 const PERMISSION_TO_TOOL: Record<keyof AiProviderConfig['dataPermissions'], string[]> = {
-  catalogo: ['buscar_aplicacion', 'buscar_microservicio', 'buscar_tecnologia', 'buscar_bd'],
+  catalogo: ['buscar_aplicacion', 'buscar_microservicio', 'buscar_tecnologia', 'buscar_bd', 'consultar_dependencias', 'consultar_obsolescencia'],
   seguridad: ['buscar_vulnerabilidad', 'buscar_incidente'],
   gobierno: ['buscar_riesgo', 'buscar_hallazgo'],
-  estrategia: ['consultar_objetivos'],
-  ejecucion: ['consultar_compromisos', 'consultar_tareas', 'consultar_planes'],
-  personas: ['consultar_equipos', 'consultar_sprints', 'buscar_persona'],
-  reclutamiento: ['buscar_candidato'],
-  equipamiento: ['buscar_equipamiento'],
+  estrategia: ['consultar_objetivos', 'consultar_indicadores', 'consultar_health_index'],
+  ejecucion: ['consultar_compromisos', 'consultar_tareas', 'consultar_planes', 'consultar_bloqueos', 'buscar_entregable'],
+  personas: ['consultar_equipos', 'consultar_sprints', 'consultar_metricas_sprint', 'buscar_persona', 'consultar_persona'],
+  reclutamiento: ['buscar_candidato', 'consultar_candidato'],
+  equipamiento: ['buscar_equipamiento', 'buscar_ticket_equipo'],
 }
 
 /**

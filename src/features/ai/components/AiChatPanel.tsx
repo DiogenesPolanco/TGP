@@ -86,59 +86,14 @@ function providerLabel(config: AiProviderConfig): string {
   }
 }
 
-// ─── Quick commands ───────────────────────────────────────────────
+// ─── Quick suggestions ────────────────────────────────────────────
 
-interface CmdGroup { group: string; items: { label: string; cmd: string }[] }
-const CMD_GROUPS: CmdGroup[] = [
-  {
-    group: 'Catálogo',
-    items: [
-      { label: 'Aplicaciones por criticidad', cmd: '¿Cuántas aplicaciones hay por criticidad?' },
-      { label: 'Microservicios activos', cmd: 'Mostrame los microservicios activos con sus aplicaciones' },
-      { label: 'Tecnologías EOL', cmd: 'Tecnologías con soporte vencido o por vencer' },
-      { label: 'Dependencias entre apps', cmd: 'Dependencias entre aplicaciones' },
-    ],
-  },
-  {
-    group: 'Seguridad',
-    items: [
-      { label: 'Vulnerabilidades críticas', cmd: 'Vulnerabilidades críticas abiertas' },
-      { label: 'Incidentes activos', cmd: 'Incidentes activos por severidad' },
-      { label: 'Vulnerabilidades vencidas', cmd: 'Vulnerabilidades con SLA vencido' },
-    ],
-  },
-  {
-    group: 'Ejecución',
-    items: [
-      { label: 'Compromisos vencidos', cmd: 'Compromisos vencidos' },
-      { label: 'Tareas por prioridad', cmd: 'Tareas pendientes por prioridad' },
-      { label: 'Planes activos', cmd: 'Planes en progreso con avance' },
-      { label: 'Bloqueos críticos', cmd: 'Bloqueos activos por severidad' },
-    ],
-  },
-  {
-    group: 'Personas',
-    items: [
-      { label: 'Miembros por equipo', cmd: '¿Cuántos miembros hay por equipo?' },
-      { label: 'Sprints del trimestre', cmd: 'Sprints del trimestre actual' },
-      { label: 'One-on-Ones recientes', cmd: 'One-on-Ones de este mes' },
-    ],
-  },
-  {
-    group: 'Estrategia',
-    items: [
-      { label: 'OKRs en riesgo', cmd: 'Objetivos en riesgo o atrasados' },
-      { label: 'Health Index', cmd: 'Health Index por unidad de negocio' },
-      { label: 'Entregables pendientes', cmd: 'Entregables por vencer este mes' },
-    ],
-  },
-  {
-    group: 'Equipamiento',
-    items: [
-      { label: 'Equipos asignados', cmd: 'Equipos asignados por persona' },
-      { label: 'Tickets abiertos', cmd: 'Tickets de equipamiento abiertos' },
-    ],
-  },
+const SUGGESTIONS = [
+  { label: 'Panorama general', cmd: 'Dashboard ejecutivo con los indicadores principales' },
+  { label: 'Vulnerabilidades críticas', cmd: 'Vulnerabilidades críticas abiertas' },
+  { label: 'OKRs en riesgo', cmd: 'Objetivos en riesgo o atrasados' },
+  { label: 'Tecnologías por vencer', cmd: 'Tecnologías con soporte vencido o por vencer' },
+  { label: 'Bloqueos activos', cmd: 'Bloqueos activos en la plataforma' },
 ]
 
 // ─── Sub-components ───────────────────────────────────────────────
@@ -237,48 +192,39 @@ function MessageBanner({ msg, index }: { msg: AiChatMessage; index: number }) {
 
 function EmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
-    <div className="flex flex-col min-h-full px-4 py-6 select-none">
-      {/* Terminal header */}
-      <div className="flex items-center gap-2.5 mb-6 px-1">
-        <div className="w-8 h-8 rounded-lg bg-subtle border border-boundary flex items-center justify-center">
-          <Sparkles size={15} className="text-secondary" />
+    <div className="flex flex-col min-h-full px-5 py-8 select-none">
+      <div className="mb-8">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/80 to-primary/30 border border-primary/20 flex items-center justify-center mb-3">
+          <Sparkles size={16} className="text-white" />
         </div>
-        <div>
-          <p className="text-sm font-semibold text-default tracking-tight">
-            Copilot TGP
-          </p>
-          <p className="text-[10px] text-muted font-mono">
-            Consultá datos de la plataforma en lenguaje natural
-          </p>
-        </div>
+        <h2 className="text-base font-semibold text-default tracking-tight mb-1">
+          Hola, soy GobIA
+        </h2>
+        <p className="text-[13px] text-muted leading-relaxed max-w-md">
+          Consultá la plataforma en lenguaje natural: aplicaciones, seguridad, equipos, estrategia y más.
+        </p>
       </div>
 
-      {/* Command palette */}
-      <div className="space-y-5 flex-1 overflow-y-auto scrollbar-thin pr-1">
-        {CMD_GROUPS.map((group) => (
-          <div key={group.group}>
-            <p className="text-[10px] font-semibold text-muted uppercase tracking-widest mb-2 px-1">
-              {group.group}
-            </p>
-            <div className="space-y-1">
-              {group.items.map((item) => (
-                  <button
-                          key={item.cmd}
-                          onClick={() => onPick(item.cmd)}
-                          className="w-full text-left px-3 py-2 rounded-lg text-[12px] text-secondary hover:text-default bg-card/50 hover:bg-subtle border border-boundary transition-all duration-150 active:scale-[0.98]"
-                        >
-                          <span className="text-muted font-mono mr-2 text-[10px]">↳</span>
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="flex-1 overflow-y-auto scrollbar-thin pr-1">
+        <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-2.5">
+          Probá preguntar
+        </p>
+        <div className="flex flex-col gap-1.5">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s.cmd}
+              onClick={() => onPick(s.cmd)}
+              className="w-full text-left px-3.5 py-2.5 rounded-xl text-[13px] text-secondary hover:text-default bg-card/40 hover:bg-subtle border border-boundary/60 hover:border-boundary transition-all duration-150 active:scale-[0.98]"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Hint */}
-      <p className="text-[10px] text-muted text-center mt-6 pt-4 border-t border-boundary font-mono">
-        Escribí una pregunta o seleccioná un comando  ·  Enter para enviar
+      <p className="text-[10px] text-muted/50 text-center mt-6 pt-4 border-t border-boundary/50 font-mono">
+        Escribí lo que necesites
       </p>
     </div>
   )

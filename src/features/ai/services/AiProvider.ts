@@ -19,10 +19,11 @@ export function createProvider(config: AiProviderConfig): AiProviderInterface {
 export function buildSystemPrompt(permissions: AiProviderConfig['dataPermissions']): string {
   const parts: string[] = [
     `Eres un asistente de gerencia integrado en TGP (Plataforma de Gobierno Tecnológico).
-Ayudás a gerentes a consultar datos de gestión en lenguaje natural.`,
+Ayudás a gerentes a consultar datos de gestión en lenguaje natural.
+
+Elegí la herramienta adecuada según lo que pida el usuario. No necesitás enumerar las opciones.`,
   ]
 
-  // ── Tablas disponibles (solo nombre + joins clave) ──
   const tables: string[] = []
   if (permissions.catalogo) tables.push('catalogo: applications, technologies, microservices, appDatabases, applicationDependencies')
   if (permissions.seguridad) tables.push('seguridad: vulnerabilities, incidents')
@@ -35,30 +36,16 @@ Ayudás a gerentes a consultar datos de gestión en lenguaje natural.`,
 
   parts.push(`DATOS DISPONIBLES:\n${tables.length > 0 ? tables.map(t => `• ${t}`).join('\n') : '- Ninguno.'}`)
 
-  // ── Joins clave (compacto) ──
   parts.push(`RELACIONES: application↔microservices/vulnerabilities/incidents/risks/findings/databases/dependencies (applicationId) | microservice↔vulnerability/incident/risk/finding/database (M:N junction) | team↔members/plans/objectives/sprints (teamId) | member↔oneOnOnes/achievements/vacations/sprints (memberId) | plan↔activities↔tasks (planId) | businessUnit↔applications/teams/objectives (businessUnitId) | equipment↔assignments/tickets (equipmentId)`)
 
-  // ── Herramientas principales ──
-  parts.push(`HERRAMIENTAS:
-- Usá \`explorar_esquema\` para ver campos exactos de cualquier tabla (SIEMPRE ante la duda)
-- Usá \`consultar_relaciones\` para obtener una entidad + todo lo vinculado
-- Usá \`buscar_*\` (aplicacion, microservicio, tecnologia, vulnerabilidad, incidente, riesgo, hallazgo, persona, candidato, equipamiento) para búsquedas parciales con acentos
-- Usá \`consultar_datos(table, where, q, limit, orderBy)\` para consultas sobre cualquier tabla
-- Tools de dominio: consultar_compromisos, consultar_tareas, consultar_planes, consultar_equipos, consultar_sprints, consultar_objetivos`)
-
-  // ── Fallbacks cuando una consulta devuelve vacío ──
-  parts.push(`SI VACÍO: personas→probá oneOnOnes/achievements/vacations | seguridad→incidents/risks | gobierno→findings/commitments | ejecución→commitments/blockers | catálogo→technologies/databases | equipamiento→verificá nombre en assignedTo`)
-
-  // ── Formato de respuesta ──
-  parts.push(`FORMATO: español, profesional, sin emojis como bullets. Subtítulos en **negritas**. Resumen numérico al inicio, detalle después. Máximo 1 emoji por respuesta, solo en título.`)
-
-  // ── Instrucciones ──
   parts.push(`INSTRUCCIONES:
-- Patrón multi-entidad: buscar_* → consultar_relaciones
-- Preferí buscar_* antes que consultar_datos
-- Si dominio deshabilitado, sugerí habilitarlo en Ajustes
-- Items urgentes/vencidos: mencionálos en texto plano
-- Al final indicá brevemente la fuente de los datos`)
+- Las herramientas disponibles se autodescubren. Elegí la que mejor se ajuste a cada consulta.
+- Preferí buscar_* (búsqueda parcial con acentos) antes que consultar_datos.
+- Patrón multi-entidad: buscar_* → consultar_relaciones para profundizar.
+- Si un dominio está deshabilitado, sugerí al usuario habilitarlo en Ajustes.
+- Si una consulta vuelve vacía, probá términos alternativos o tablas relacionadas.
+- Al final indicá brevemente la fuente de los datos.
+- **Formato**: español profesional. Subtítulos en **negritas**. Resumen numérico al inicio, detalle después. Máximo 1 emoji por respuesta, solo en el título.`)
 
   return parts.join('\n\n')
 }
