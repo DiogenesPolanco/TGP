@@ -16,28 +16,55 @@ import './styles/globals.css'
 
 setupGlobalErrorHandler()
 
-const isPublicRoute = () =>
-  typeof window !== 'undefined' && window.location.pathname.startsWith('/public/')
+const isPublicRoute = () => {
+  if (typeof window === 'undefined') return false
+  const { pathname } = window.location
+  return pathname === '/' || pathname === '/docs' || pathname.startsWith('/public/')
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
   const [checking, setChecking] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [showTerms, setShowTerms] = useState<'loading' | 'terms' | 'declined' | 'done'>('loading')
+  const [pathname, setPathname] = useState(() => window.location.pathname)
   const expiryRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Detect SPA navigations (React Router uses pushState/replaceState)
+  useEffect(() => {
+    const originalPushState = history.pushState
+    history.pushState = function (...args) {
+      originalPushState.apply(this, args)
+      setPathname(window.location.pathname)
+    }
+    const originalReplaceState = history.replaceState
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args)
+      setPathname(window.location.pathname)
+    }
+    const handlePopState = () => setPathname(window.location.pathname)
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      history.pushState = originalPushState
+      history.replaceState = originalReplaceState
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [])
 
   useEffect(() => {
     if (isPublicRoute()) {
       setChecking(false)
       return
     }
+    setChecking(true)
+    setShowTerms('loading')
     queueMicrotask(() => {
       const session = getSession()
       if (session) setAuthed(true)
       setShowTerms(isTermsAccepted() ? 'done' : 'terms')
       setChecking(false)
     })
-  }, [sessionExpired])
+  }, [sessionExpired, pathname])
 
   // Periodic session expiry check — runs every 30s while authenticated
   useEffect(() => {
@@ -68,6 +95,14 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (checking) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (showTerms === 'loading') {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />

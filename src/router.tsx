@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import LandingPage from '@/features/landing/LandingPage'
+import NotFoundPage from '@/features/landing/NotFoundPage'
 import { RouteErrorPage } from '@/components/error/RouteErrorPage'
 import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
 import { PublicPerformancePage } from '@/features/share/PublicPerformancePage'
@@ -21,6 +23,7 @@ import { PublicEquipmentPage } from '@/features/equipment/pages/PublicEquipmentP
 import { TermsPage } from '@/features/share/TermsPage'
 import { MobileDashboardPage } from '@/features/mobile/dashboard/MobileDashboardPage'
 import ReportsPage from '@/features/reports/pages/ReportsPage'
+import DocsPage from '@/features/docs/pages/DocsPage'
 
 export const router = createBrowserRouter([
   {
@@ -99,6 +102,11 @@ export const router = createBrowserRouter([
     path: '/mobile/dashboard',
     element: <MobileDashboardPage />,
   },
+  // Landing page — standalone, no AppShell layout
+  { index: true, element: <LandingPage /> },
+  // Docs — standalone, public
+  { path: '/docs', element: <DocsPage /> },
+  // App shell routes (require auth + AppShell layout)
   {
     path: '/',
     element: <AppShell />,
@@ -222,4 +230,6 @@ export const router = createBrowserRouter([
       { path: 'execution/predictability', lazy: () => import('@/features/execution/pages/PredictabilityPage').then((m) => ({ Component: m.PredictabilityPage })) },
     ],
   },
+  // Catch-all 404
+  { path: '*', element: <NotFoundPage /> },
 ])

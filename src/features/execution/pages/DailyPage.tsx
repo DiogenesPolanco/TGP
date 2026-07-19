@@ -300,9 +300,9 @@ export function DailyPage() {
                         <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
                         <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <p className="text-xs text-muted mt-1 ml-1">
+                      <div className="text-xs text-muted mt-1 ml-1">
                         <HtmlDescription html={blocker.description} lines={1} />
-                      </p>
+                      </div>
                       <div className="flex items-center gap-2 mt-1 ml-1">
                         {plan && <span className="text-xs text-primary font-medium">{plan.title}</span>}
                         {blocker.assigneeId && <span className="text-xs text-neutral-50">Asignado: {blocker.assigneeId}</span>}
