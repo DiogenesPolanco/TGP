@@ -21,7 +21,7 @@
   <img src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite" alt="Vite 6" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss" alt="Tailwind CSS 4" />
   <img src="https://img.shields.io/badge/Dexie.js-4-4B32C3" alt="Dexie.js 4" />
-  <img src="https://img.shields.io/badge/Licencia-Propietaria-ef4444" alt="Licencia" />
+  <img src="https://img.shields.io/badge/Licencia-MIT-green" alt="Licencia MIT" />
 </p>
 
 ---
@@ -162,6 +162,40 @@ Desarrollo activo. Construido para necesidades de gobierno empresarial, diseñad
 
 ---
 
-## Licencia
+## 📄 Licencia
 
-Propietaria — TGP &copy; 2026
+**MIT License** — TGP &copy; 2026
+
+Este software es open-source y libre de usar, modificar y distribuir bajo los términos de la licencia MIT.  
+Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+---
+
+## 📌 Contribución
+
+¡Contribuciones bienvenidas! Para contribuir:
+
+1. Fork el repositorio
+2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
+3. Realiza tus cambios y pruebas
+4. Envía un Pull Request
+
+---
+
+## 📞 Soporte
+
+- **GitHub Issues**: [Reportar bugs o solicitar features](https://github.com/DiogenesPolanco/TGP/issues)
+- **Documentación**: `/docs` en la aplicación o [GitHub Wiki](https://github.com/DiogenesPolanco/TGP/wiki)
+
+---
+
+## 📅 Versión
+
+**v1.0.0** — Lanzamiento inicial
+
+---
+
+## 📌 Notas
+
+- **Privacidad**: No se recopilan datos personales. Todo se almacena localmente o en Azure (opcional).
+- **Offline-first**: La aplicación funciona sin conexión. Las integraciones cloud son opcionales.
