@@ -22,8 +22,17 @@ export interface AiProviderConfig {
   updatedAt: Date
 }
 
+export interface AiConversation {
+  id: string
+  title: string
+  createdAt: Date
+  updatedAt: Date
+  messageCount: number
+}
+
 export interface AiChatMessage {
   id: string
+  conversationId?: string
   role: 'user' | 'assistant' | 'system' | 'tool'
   content: string
   toolCalls?: AiToolCall[]

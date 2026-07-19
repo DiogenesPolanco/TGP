@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, ArrowLeft, Bot, Trash2, Check, X, Save, Wifi, WifiOff, Loader2,
   ClipboardList, FolderKanban, Shield, Scale, Target, Users, UserPlus, Monitor,
-  Send, Terminal, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, User,
-  Copy,
+  Send, Terminal, Eye, EyeOff, Pencil, User, Copy, RefreshCw, Cloud,
 } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
 import { useAiConfigStore } from '../store/aiConfigStore'
@@ -12,6 +11,8 @@ import { useAiChat } from '../hooks/useAiChat'
 import { createProvider } from '../services/AiProvider'
 import type { AiProviderType, AiProviderConfig, AiChatMessage } from '../types'
 import { AI_PROVIDER_DEFAULTS } from '../types'
+import { Select } from '@/components/ui/Select'
+import { Badge } from '@/components/ui/Badge'
 
 // ─── Provider definitions ─────────────────────────────────────────
 
@@ -20,14 +21,36 @@ interface ProviderOption {
   icon: string
   name: string
   desc: string
+  tooltip: string
   badge: string
+  disabled?: boolean
 }
 
 const PROVIDERS: ProviderOption[] = [
-  { type: 'ollama', icon: '🦙', name: 'Ollama (local)', desc: 'Modelo local · 100% offline', badge: '$0' },
-  { type: 'groq', icon: '⚡', name: 'Groq', desc: 'Cloud gratis · API key requerida', badge: '$0' },
-  { type: 'openai', icon: '🔵', name: 'OpenAI', desc: 'GPT-4o mini · API key requerida', badge: 'API key' },
-  { type: 'anthropic', icon: '🟠', name: 'Anthropic (Claude)', desc: 'Claude Haiku · excelente para análisis', badge: 'API key' },
+  {
+    type: 'ollama', icon: '🦙', name: 'Ollama (local)',
+    desc: 'Local · 100% gratis, sin límites',
+    tooltip: 'Ejecutás el modelo en tu máquina. Sin costos, sin límites de uso, 100% offline.',
+    badge: 'Gratis',
+  },
+  {
+    type: 'groq', icon: '⚡', name: 'Groq',
+    desc: 'Cloud gratuito · 30 req/min',
+    tooltip: 'Cloud gratuito con inferencia ultrarrápida. Limitado a 30 requests por minuto en el plan free.',
+    badge: 'Gratis',
+  },
+  {
+    type: 'openai', icon: '🔵', name: 'OpenAI',
+    desc: 'Pago por uso · requiere API key',
+    tooltip: 'Modelos GPT de pago. Necesitás una API key de OpenAI con crédito disponible.',
+    badge: 'API key',
+  },
+  {
+    type: 'anthropic', icon: '🟠', name: 'Anthropic (Claude)',
+    desc: 'Próximamente — análisis avanzado',
+    tooltip: 'Claude de Anthropic. Pendiente de integración — estará disponible pronto.',
+    badge: 'Pronto', disabled: true,
+  },
 ]
 
 function providerLabel(p: AiProviderType): string {
@@ -306,16 +329,10 @@ export function AiSettingsPage() {
 
   const [editing, setEditing] = useState(false)
   const [dirty, setDirty] = useState<EditState | null>(null)
+  const [availableModels, setAvailableModels] = useState<string[]>([])
   const [testResult, setTestResult] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [testError, setTestError] = useState<string | null>(null)
   const [showApiKey, setShowApiKey] = useState(false)
-  const [permissionsExpanded, setPermissionsExpanded] = useState(false)
-
-  // Reset test result when edits change
-  useEffect(() => {
-    setTestResult('idle')
-    setTestError(null)
-  }, [dirty])
 
   if (!config) {
     return (
@@ -355,6 +372,7 @@ export function AiSettingsPage() {
       apiKey: config.apiKey,
       model: config.model,
     })
+    setAvailableModels([config.model])
     setEditing(true)
     setTestResult('idle')
     setTestError(null)
@@ -396,6 +414,9 @@ export function AiSettingsPage() {
       const provider = createProvider(testConfig)
       const ok = await provider.testConnection()
       if (ok) {
+        const models = await provider.getModels()
+        setAvailableModels(models)
+        setDirty({ ...dirty, model: models.length > 0 ? models[0] : dirty.model })
         setTestResult('success')
       } else {
         setTestResult('error')
@@ -417,302 +438,407 @@ export function AiSettingsPage() {
   const totalPerms = PERMISSION_DEFS.length
 
   return (
-    <div className="py-6 px-4 space-y-6">
-      {/* ── Header (full width) ── */}
+    <div className="space-y-6">
+      {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Volver
-        </button>
-      </div>
-
-      <div className="flex items-start gap-4">
-        <div className="w-11 h-11 rounded-xl bg-neutral-10 dark:bg-neutral-75 flex items-center justify-center shrink-0">
-          <Sparkles size={22} className="text-neutral-90 dark:text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold text-neutral-90 dark:text-white">Asistente AI</h1>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
-              {config.enabled ? 'Activo' : 'Inactivo'}
-            </span>
-          </div>
-          <p className="text-sm text-neutral-50 mt-0.5">
-            Configuración unificada del asistente de IA — proveedor, permisos y pruebas.
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">GobIA</h1>
+          <p className="text-sm text-muted mt-1">
+            Configuración del asistente de IA — proveedor, permisos y pruebas.
           </p>
         </div>
-      </div>
-
-      {/* ── 2-Column Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
-        {/* Left column: Provider */}
-        <div className="lg:col-span-3 space-y-6">
-
-      {/* ── Provider Configuration ── */}
-      <section className="bg-card border border-boundary rounded-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-boundary">
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg leading-none">🔌</span>
-            <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Proveedor</h2>
-          </div>
+        <div className="flex items-center gap-2">
           {!editing && (
             <button
               onClick={startEditing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-60 hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white bg-card border border-boundary hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
             >
-              <Pencil size={12} />
+              <Pencil size={14} />
               Editar
             </button>
           )}
         </div>
+      </div>
 
-        {!editing ? (
-        <div className="p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{PROVIDERS.find((p) => p.type === config.provider)?.icon ?? '🤖'}</span>
-                <div>
-                  <p className="text-sm font-medium text-neutral-90 dark:text-white capitalize">
-                    {providerLabel(config.provider)}
-                  </p>
-                  <p className="text-xs text-neutral-50 font-mono">{config.model}</p>
+      {!editing ? (
+        /* ── View mode ── */
+        <>
+          <div className="bg-card rounded-xl border border-boundary overflow-hidden">
+            <div className="p-5 space-y-5">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-neutral-10 dark:bg-neutral-75 flex items-center justify-center text-xl shrink-0">
+                    {PROVIDERS.find((p) => p.type === config.provider)?.icon ?? '🤖'}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm font-semibold text-neutral-90 dark:text-white">
+                        {providerLabel(config.provider)}
+                      </span>
+                      <Badge color={config.enabled ? 'success' : 'neutral'} size="sm">
+                        {config.enabled ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted mt-0.5 font-mono">{config.model}</p>
+                  </div>
                 </div>
               </div>
-              <span className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-success/10 text-success border border-success/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                Conectado
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-neutral-50">
-              <span className="font-mono truncate max-w-[300px]">{config.baseUrl}</span>
-              {config.apiKey && (
-                <span className="text-neutral-30 dark:text-neutral-60">
-                  API Key ••••••••{config.apiKey.slice(-4)}
-                </span>
-              )}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted">
+                <span className="font-mono truncate max-w-[400px]">{config.baseUrl}</span>
+                {config.apiKey && (
+                  <span>API Key ••••••••{config.apiKey.slice(-4)}</span>
+                )}
+              </div>
             </div>
           </div>
-        ) : dirty ? (
-        <div className="p-5 space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-neutral-60 mb-2">Proveedor</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {PROVIDERS.map((p) => (
-                  <button
-                    key={p.type}
-                    onClick={() => {
-                      const defaults = AI_PROVIDER_DEFAULTS[p.type]
-                      setDirty({ ...dirty, provider: p.type, baseUrl: defaults.baseUrl, model: defaults.model, apiKey: '' })
-                    }}
-                    className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border text-center transition-all ${
-                      dirty.provider === p.type
-                        ? 'border-neutral-50 dark:border-neutral-40 bg-neutral-5 dark:bg-neutral-85'
-                        : 'border-boundary hover:border-neutral-30 dark:hover:border-neutral-50'
-                    }`}
-                  >
-                    <span className="text-lg">{p.icon}</span>
-                    <span className="text-[11px] font-medium text-neutral-80 dark:text-neutral-20 leading-tight">{p.name}</span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                      p.badge === '$0' ? 'bg-success/10 text-success' : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
-                    }`}>{p.badge}</span>
-                  </button>
-                ))}
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3">
+              <div className="bg-card rounded-xl border border-boundary overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-boundary flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base leading-none">🛡️</span>
+                    <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Permisos de datos</h2>
+                  </div>
+                  <span className="text-xs text-muted tabular-nums">{activePerms}/{totalPerms}</span>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {PERMISSION_DEFS.map((perm) => (
+                      <label
+                        key={perm.key}
+                        title={perm.tooltip}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer ${
+                          config.dataPermissions[perm.key]
+                            ? 'bg-neutral-10 dark:bg-neutral-80'
+                            : 'hover:bg-neutral-5 dark:hover:bg-neutral-85'
+                        }`}
+                      >
+                        <span className={`shrink-0 ${config.dataPermissions[perm.key] ? 'text-neutral-90 dark:text-white' : 'text-muted'}`}>
+                          {perm.icon}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm transition-colors ${
+                            config.dataPermissions[perm.key]
+                              ? 'text-neutral-90 dark:text-white font-medium'
+                              : 'text-muted'
+                          }`}>{perm.label}</p>
+                        </div>
+                        <ToggleSwitch
+                          checked={config.dataPermissions[perm.key]}
+                          onChange={() => updatePermission(currentUser!.id, perm.key, !config.dataPermissions[perm.key])}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-neutral-60 mb-1">URL del servidor</label>
-              <input
-                type="text"
-                value={dirty.baseUrl}
-                onChange={(e) => setDirty({ ...dirty, baseUrl: e.target.value })}
-                className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono"
-              />
+            <div className="lg:col-span-2">
+              <div className="bg-card rounded-xl border border-boundary overflow-hidden h-full flex flex-col">
+                <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
+                  <span className="text-base leading-none">💬</span>
+                  <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Probar asistente</h2>
+                  <span className="text-xs text-muted ml-auto font-mono truncate max-w-[120px]">
+                    {config.provider}·{config.model}
+                  </span>
+                </div>
+                <div className="p-4 flex-1 flex flex-col">
+                  <InlineChat config={config} />
+                </div>
+              </div>
             </div>
+          </div>
 
-            {dirty.provider !== 'ollama' && (
+          <div className="bg-card rounded-xl border border-boundary overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
+              <span className="text-base leading-none">ℹ️</span>
+              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Información</h2>
+            </div>
+            <div className="p-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <InfoItem icon={<Bot size={15} />} title="Datos locales" desc="Con Ollama los datos nunca salen de tu navegador." />
+                <InfoItem icon={<Shield size={15} />} title="API Key cifrada" desc="Se guarda cifrada en localStorage de tu navegador." />
+                <InfoItem icon={<RefreshCw size={15} />} title="Sin pérdida de permisos" desc="Cambiá de proveedor sin perder la configuración de permisos." />
+                <InfoItem icon={<Cloud size={15} />} title="Proveedores cloud" desc="Los datos se envían al API pero no se almacenan." />
+              </div>
+              <div className="mt-4 pt-4 border-t border-boundary">
+                <button
+                  onClick={handleRemove}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-muted hover:text-danger hover:bg-danger/5 transition-colors"
+                >
+                  <Trash2 size={14} />
+                  Desconectar asistente
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : dirty ? (
+        /* ── Edit mode ── */
+        <>
+          <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
+              <span className="text-base leading-none">✏️</span>
+              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Editar configuración</h2>
+            </div>
+            <div className="p-5 space-y-5">
               <div>
-                <label className="block text-xs font-medium text-neutral-60 mb-1">API Key</label>
-                <div className="relative">
+                <label className="block text-sm font-medium text-neutral-60 mb-3">Proveedor de IA</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {PROVIDERS.map((p) => (
+                    <button
+                      key={p.type}
+                      disabled={p.disabled}
+                      title={p.tooltip}
+                      onClick={() => {
+                        if (p.disabled) return
+                        const defaults = AI_PROVIDER_DEFAULTS[p.type]
+                        setDirty({ ...dirty, provider: p.type, baseUrl: defaults.baseUrl, model: defaults.model, apiKey: '' })
+                        setAvailableModels([])
+                        setTestResult('idle')
+                        setTestError(null)
+                      }}
+                      className={`relative flex flex-col items-center gap-3 p-5 rounded-2xl border text-center transition-all duration-300 ${
+                        p.disabled
+                          ? 'border-dashed border-neutral-30 dark:border-neutral-60 bg-neutral-5 dark:bg-neutral-85 opacity-50 cursor-not-allowed'
+                          : dirty.provider === p.type
+                            ? 'border-boundary bg-card shadow-md ring-2 ring-neutral-90 dark:ring-white'
+                            : 'border-boundary bg-card shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] active:shadow-sm cursor-pointer'
+                      }`}
+                    >
+                      {!p.disabled && dirty.provider === p.type && (
+                        <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-neutral-90 dark:bg-white flex items-center justify-center ring-1 ring-neutral-90/20 dark:ring-white/20">
+                          <Check size={12} className="text-white dark:text-neutral-90" strokeWidth={3} />
+                        </div>
+                      )}
+                      <div className={`p-3 rounded-xl flex items-center justify-center text-xl shrink-0 ${
+                        p.disabled ? 'bg-neutral-10 dark:bg-neutral-75' :
+                        dirty.provider === p.type
+                          ? 'bg-neutral-5 dark:bg-neutral-75 ring-1 ring-neutral-90/10 dark:ring-white/10'
+                          : 'bg-neutral-5 dark:bg-neutral-75'
+                      }`}>
+                        {p.icon}
+                      </div>
+                      <span className={`text-xs font-semibold leading-tight ${
+                        p.disabled ? 'text-neutral-50' : 'text-neutral-90 dark:text-white'
+                      }`}>{p.name}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        p.badge === 'Gratis' ? 'bg-success/10 text-success' :
+                        p.badge === 'Pronto' ? 'bg-warning/10 text-warning' :
+                        'bg-neutral-10 dark:bg-neutral-75 text-muted'
+                      }`}>{p.badge}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-5 border-t border-boundary">
+                <div className={`p-2.5 rounded-xl text-lg ${
+                  dirty.provider === 'ollama' ? 'bg-neutral-5 dark:bg-neutral-75' :
+                  dirty.provider === 'groq' ? 'bg-neutral-5 dark:bg-neutral-75' :
+                  dirty.provider === 'openai' ? 'bg-neutral-5 dark:bg-neutral-75' :
+                  'bg-neutral-5 dark:bg-neutral-75'
+                }`}>
+                  {PROVIDERS.find(p => p.type === dirty.provider)?.icon}
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold text-neutral-90 dark:text-white">
+                    Configuración de {PROVIDERS.find(p => p.type === dirty.provider)?.name}
+                  </span>
+                  <span className="text-xs text-muted">{PROVIDERS.find(p => p.type === dirty.provider)?.desc}</span>
+                </div>
+              </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-60 mb-1.5">URL del servidor</label>
                   <input
-                    type={showApiKey ? 'text' : 'password'}
-                    value={dirty.apiKey}
-                    onChange={(e) => setDirty({ ...dirty, apiKey: e.target.value })}
-                    className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg pl-3 pr-9 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono"
-                    placeholder={dirty.provider === 'groq' ? 'gsk_...' : 'sk-...'}
+                    type="text"
+                    value={dirty.baseUrl}
+                    onChange={(e) => setDirty({ ...dirty, baseUrl: e.target.value })}
+                    className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono transition-all"
                   />
+                </div>
+
+                {dirty.provider !== 'ollama' && (
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-60 mb-1.5">API Key</label>
+                    <div className="relative">
+                      <input
+                        type={showApiKey ? 'text' : 'password'}
+                        value={dirty.apiKey}
+                        onChange={(e) => setDirty({ ...dirty, apiKey: e.target.value })}
+                        className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg pl-3 pr-9 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono transition-all"
+                        placeholder={dirty.provider === 'groq' ? 'gsk_...' : 'sk-...'}
+                      />
+                      <button
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-neutral-90 dark:hover:text-white transition-colors"
+                      >
+                        {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted mt-1">Se guarda cifrada en localStorage de tu navegador.</p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-60 mb-1.5">Modelo</label>
+                  {availableModels.length > 0 ? (
+                    <Select
+                      value={dirty.model}
+                      onChange={(v) => setDirty({ ...dirty, model: v })}
+                      options={availableModels}
+                      searchable
+                      placeholder="Buscá o seleccioná un modelo..."
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={dirty.model}
+                      onChange={(e) => setDirty({ ...dirty, model: e.target.value })}
+                      className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 transition-all"
+                      placeholder={AI_PROVIDER_DEFAULTS[dirty.provider]?.model ?? ''}
+                    />
+                  )}
+                </div>
+
+                <div className="bg-neutral-5 dark:bg-neutral-85 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Wifi size={14} className="text-muted" />
+                    <span className="text-sm font-medium text-muted">Prueba de conexión</span>
+                    <span className="text-xs text-muted ml-auto">Requerido para guardar</span>
+                  </div>
                   <button
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-neutral-40 hover:text-neutral-70 dark:hover:text-neutral-30 transition-colors"
+                    onClick={handleTestConnection}
+                    disabled={testResult === 'testing'}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-50"
                   >
-                    {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                    {testResult === 'testing' ? (
+                      <><Loader2 size={14} className="animate-spin" /> Probando conexión...</>
+                    ) : (
+                      <><Wifi size={14} /> Probar conexión</>
+                    )}
+                  </button>
+                  {testResult === 'success' && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-success/10 text-sm text-success font-medium">
+                      <Check size={14} />
+                      Conexión exitosa
+                      {availableModels.length > 0 && ` · ${availableModels.length} modelo(s) disponible(s)`}
+                    </div>
+                  )}
+                  {testResult === 'error' && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-danger/10 text-sm text-danger font-medium">
+                      <WifiOff size={14} />
+                      {testError}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-4 border-t border-boundary">
+                  <button
+                    onClick={cancelEditing}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={saveEditing}
+                    disabled={testResult !== 'success'}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Save size={14} />
+                    Guardar cambios
                   </button>
                 </div>
-                <p className="text-[10px] text-neutral-40 dark:text-neutral-60 mt-1">
-                  Se guarda solo en localStorage, cifrada en tu navegador.
-                </p>
               </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-medium text-neutral-60 mb-1">Modelo</label>
-              <input
-                type="text"
-                value={dirty.model}
-                onChange={(e) => setDirty({ ...dirty, model: e.target.value })}
-                className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50"
-                placeholder={AI_PROVIDER_DEFAULTS[dirty.provider]?.model ?? ''}
-              />
             </div>
 
-            <button
-              onClick={handleTestConnection}
-              disabled={testResult === 'testing'}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-15 dark:bg-neutral-80 text-neutral-70 dark:text-neutral-30 hover:bg-neutral-20 dark:hover:bg-neutral-75 transition-colors text-sm font-medium disabled:opacity-50"
-            >
-              {testResult === 'testing' ? (
-                <><Loader2 size={14} className="animate-spin" /> Probando conexión...</>
-              ) : (
-                <><Wifi size={14} /> Probar conexión</>
-              )}
-            </button>
-
-            {testResult === 'success' && (
-              <div className="flex items-center gap-2 text-xs text-success">
-                <Check size={14} />
-                Conexión exitosa
-              </div>
-            )}
-            {testResult === 'error' && (
-              <div className="flex items-center gap-2 text-xs text-danger">
-                <WifiOff size={14} />
-                {testError}
-              </div>
-            )}
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-boundary">
-              <button
-                onClick={cancelEditing}
-                className="px-4 py-2 rounded-lg text-xs font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={saveEditing}
-                disabled={testResult !== 'success'}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-xs font-medium disabled:opacity-40"
-              >
-                <Save size={13} />
-                Guardar cambios
-              </button>
-            </div>
-            {testResult !== 'success' && (
-              <p className="text-[10px] text-neutral-40 dark:text-neutral-60 text-center -mt-2">
-                Probá la conexión antes de guardar.
-              </p>
-            )}
-          </div>
-        ) : null}
-      </section>
-
-      {/* ── Data Permissions ── */}
-      <section className="bg-card border border-boundary rounded-2xl overflow-hidden">
-        <button
-          onClick={() => setPermissionsExpanded(!permissionsExpanded)}
-          className="w-full flex items-center justify-between px-5 py-3.5 border-b border-boundary hover:bg-neutral-5 dark:hover:bg-neutral-85 transition-colors"
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg leading-none">🛡️</span>
-            <div className="text-left">
-              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Permisos de datos</h2>
-              <p className="text-[10px] text-neutral-50 mt-0.5">{activePerms} de {totalPerms} dominios habilitados</p>
-            </div>
-          </div>
-          {permissionsExpanded ? <ChevronDown size={16} className="text-neutral-40" /> : <ChevronRight size={16} className="text-neutral-40" />}
-        </button>
-
-        {permissionsExpanded && (
-          <div className="p-5 space-y-1">
-            {PERMISSION_DEFS.map((perm) => (
-              <label
-                key={perm.key}
-                title={perm.tooltip}
-                className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-neutral-5 dark:hover:bg-neutral-85 transition-colors cursor-pointer group"
-              >
-                <span className="text-neutral-50 dark:text-neutral-60 shrink-0">{perm.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-neutral-90 dark:text-white">{perm.label}</p>
-                  <p className="text-[10px] text-neutral-40 dark:text-neutral-60">{perm.tables}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3">
+              <div className="bg-card rounded-xl border border-boundary overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-boundary flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base leading-none">🛡️</span>
+                    <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Permisos de datos</h2>
+                  </div>
+                  <span className="text-xs text-muted tabular-nums">{activePerms}/{totalPerms}</span>
                 </div>
-                <ToggleSwitch
-                  checked={config.dataPermissions[perm.key]}
-                  onChange={() => updatePermission(currentUser!.id, perm.key, !config.dataPermissions[perm.key])}
-                />
-              </label>
-            ))}
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {PERMISSION_DEFS.map((perm) => (
+                      <label
+                        key={perm.key}
+                        title={perm.tooltip}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer ${
+                          config.dataPermissions[perm.key]
+                            ? 'bg-neutral-10 dark:bg-neutral-80'
+                            : 'hover:bg-neutral-5 dark:hover:bg-neutral-85'
+                        }`}
+                      >
+                        <span className={`shrink-0 ${config.dataPermissions[perm.key] ? 'text-neutral-90 dark:text-white' : 'text-muted'}`}>
+                          {perm.icon}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm transition-colors ${
+                            config.dataPermissions[perm.key]
+                              ? 'text-neutral-90 dark:text-white font-medium'
+                              : 'text-muted'
+                          }`}>{perm.label}</p>
+                        </div>
+                        <ToggleSwitch
+                          checked={config.dataPermissions[perm.key]}
+                          onChange={() => updatePermission(currentUser!.id, perm.key, !config.dataPermissions[perm.key])}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <div className="bg-card rounded-xl border border-boundary overflow-hidden h-full flex flex-col">
+                <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
+                  <span className="text-base leading-none">💬</span>
+                  <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Probar asistente</h2>
+                  <span className="text-xs text-muted ml-auto font-mono truncate max-w-[120px]">
+                    {config.provider}·{config.model}
+                  </span>
+                </div>
+                <div className="p-4 flex-1 flex flex-col">
+                  <InlineChat config={config} />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </section>
 
-      {/* ── Info ── */}
-      <section className="bg-card border border-boundary rounded-2xl p-5 space-y-3">
-        <div className="flex items-center gap-2.5">
-          <span className="text-lg leading-none">ℹ️</span>
-          <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Información</h2>
-        </div>
-        <ul className="space-y-2 text-xs text-neutral-60 leading-relaxed">
-          <li className="flex items-start gap-2">
-            <span className="w-1 h-1 rounded-full bg-neutral-40 mt-1.5 shrink-0" />
-            <span>Los datos nunca salen de tu navegador si usás Ollama local.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="w-1 h-1 rounded-full bg-neutral-40 mt-1.5 shrink-0" />
-            <span>Con proveedores cloud (Groq, OpenAI, Anthropic), los datos se envían al API pero no se almacenan.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="w-1 h-1 rounded-full bg-neutral-40 mt-1.5 shrink-0" />
-            <span>Tu API key se guarda solo en localStorage, cifrada en tu navegador.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="w-1 h-1 rounded-full bg-neutral-40 mt-1.5 shrink-0" />
-            <span>Podés cambiar de proveedor o modelo en cualquier momento sin perder la configuración de permisos.</span>
-          </li>
-        </ul>
-        <div className="pt-2 border-t border-boundary">
-          <button
-            onClick={handleRemove}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-neutral-50 hover:text-danger hover:bg-danger/5 transition-colors"
-          >
-            <Trash2 size={13} />
-            Desconectar asistente
-          </button>
-        </div>
-      </section>
-
-        </div>{/* end left column */}
-
-        {/* Right column: Chat, Danger */}
-        <div className="lg:col-span-2 space-y-6">
-
-      {/* ── Inline Chat Test ── */}
-      <section className="bg-card border border-boundary rounded-2xl overflow-hidden">
-        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-boundary">
-          <span className="text-lg leading-none">💬</span>
-          <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Probar asistente</h2>
-          <span className="text-[10px] text-neutral-40 dark:text-neutral-60 ml-auto">
-            {config.provider} · {config.model}
-          </span>
-        </div>
-        <div className="p-4">
-          <InlineChat config={config} />
-        </div>
-      </section>
-
-        </div>{/* end right column */}
-      </div>{/* end 2-column grid */}
+          <div className="bg-card rounded-xl border border-boundary overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
+              <span className="text-base leading-none">ℹ️</span>
+              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Información</h2>
+            </div>
+            <div className="p-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <InfoItem icon={<Bot size={15} />} title="Datos locales" desc="Con Ollama los datos nunca salen de tu navegador." />
+                <InfoItem icon={<Shield size={15} />} title="API Key cifrada" desc="Se guarda cifrada en localStorage de tu navegador." />
+                <InfoItem icon={<RefreshCw size={15} />} title="Sin pérdida de permisos" desc="Cambiá de proveedor sin perder la configuración de permisos." />
+                <InfoItem icon={<Cloud size={15} />} title="Proveedores cloud" desc="Los datos se envían al API pero no se almacenan." />
+              </div>
+              <div className="mt-4 pt-4 border-t border-boundary">
+                <button
+                  onClick={handleRemove}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-muted hover:text-danger hover:bg-danger/5 transition-colors"
+                >
+                  <Trash2 size={14} />
+                  Desconectar asistente
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}
 
       <style>{`
         @keyframes fadeSlideIn {
@@ -720,6 +846,20 @@ export function AiSettingsPage() {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+    </div>
+  )
+}
+
+function InfoItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-neutral-5 dark:bg-neutral-85">
+      <div className="w-8 h-8 rounded-lg bg-card border border-boundary flex items-center justify-center shrink-0 text-muted">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-neutral-90 dark:text-white">{title}</p>
+        <p className="text-sm text-muted mt-0.5 leading-relaxed">{desc}</p>
+      </div>
     </div>
   )
 }

@@ -5,13 +5,13 @@
 @theme {
   /* Semantic tokens — auto-invert via html.dark override below.
    * Usage: text-default, text-secondary, text-muted, bg-canvas, bg-card, bg-subtle, border-boundary */
-  --color-default: #0d0d0d;
-  --color-secondary: #42526E;
-  --color-muted: #6B778C;
-  --color-canvas: #F4F5F7;
-  --color-card: #FFFFFF;
-  --color-boundary: #DFE1E6;
-  --color-subtle: #EBECF0;
+  --color-default: #2a2a3a;
+  --color-secondary: #4a4a5a;
+  --color-muted: #7a7a8a;
+  --color-canvas: #ececf2;
+  --color-card: #f4f4f7;
+  --color-boundary: #d8d8e2;
+  --color-subtle: #eaeaef;
 
   /* Primary colors */
   --color-primary: #0052CC;
@@ -71,13 +71,13 @@
 
 /* Dark mode overrides for semantic tokens */
 html.dark {
-  --color-default: #F4F5F7;
-  --color-secondary: #DFE1E6;
-  --color-muted: #C1C7CD;
-  --color-canvas: #0d0d0d;
-  --color-card: #1a1a1a;
-  --color-boundary: #42526E;
-  --color-subtle: #2a2a2a;
+  --color-default: #d4d4dc;
+  --color-secondary: #b0b0be;
+  --color-muted: #8888a0;
+  --color-canvas: #14141e;
+  --color-card: #1a1a24;
+  --color-boundary: #2e2e3e;
+  --color-subtle: #242430;
 }
 
 @layer base {

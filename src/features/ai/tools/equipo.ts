@@ -89,14 +89,16 @@ export const buscarPersonaTool: AiToolDefinition = {
       const teamMap = new Map(teams.map((t) => [t.id, t]))
 
       for (const m of members) {
+        const displayName = (m as any).displayName ?? m.email
+        const phone = m.phoneCell || m.phoneHome || ''
         const haystack = normalizeDiacritics(
-          [m.displayName, m.email, m.phone, m.role].filter(Boolean).join(' ')
+          [displayName, m.email, phone, m.role].filter(Boolean).join(' ')
         )
         if (!haystack.includes(term)) continue
 
         const team = m.teamId ? teamMap.get(m.teamId) : undefined
         results.push({
-          nombre: m.displayName,
+          nombre: displayName,
           email: m.email ?? null,
           rol: m.role ?? null,
           equipo: team?.name ?? '(sin equipo)',

@@ -52,7 +52,7 @@ export function AiAdminConfig() {
           </p>
         </div>
       </div>
-      <Button onClick={() => window.location.href = '/ai/setup'} leftIcon={<Sparkles size={14} />} className="text-sm">
+      <Button variant="secondary" onClick={() => window.location.href = '/ai/setup'} leftIcon={<Sparkles size={14} />} className="text-sm">
         Configurar asistente
       </Button>
     </div>

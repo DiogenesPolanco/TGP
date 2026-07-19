@@ -10,10 +10,22 @@ export function createOllamaProvider(config: AiProviderConfig): AiProviderInterf
     const body: Record<string, unknown> = {
       model: config.model,
       messages: messages.map((m) => ({
-        role: m.role === 'tool' ? 'user' : m.role,
-        content: m.role === 'tool'
-          ? `[Tool ${m.toolName}] resultado:\n${m.content}`
-          : m.content,
+        role: m.role === 'tool' ? 'tool' : m.role,
+        content: m.content,
+        ...(m.role === 'tool' ? { tool_call_id: m.toolCallId } : {}),
+        ...(m.role === 'assistant' && m.toolCalls
+          ? {
+              tool_calls: m.toolCalls.map((tc) => ({
+                function: {
+                  name: tc.name,
+                  // Ollama espera arguments como objeto, no como string
+                  arguments: typeof tc.arguments === 'string'
+                    ? (() => { try { return JSON.parse(tc.arguments) } catch { return tc.arguments } })()
+                    : tc.arguments,
+                },
+              })),
+            }
+          : {}),
       })),
       stream: false,
     }

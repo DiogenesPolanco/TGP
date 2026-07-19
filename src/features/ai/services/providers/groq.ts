@@ -11,7 +11,9 @@ import { buildToolDefinitions } from '../AiProvider'
  *   <function=nombre> , "key": "val", "key2": "val2" }</function>  ← con leading comma
  */
 function parseLegacyFunctionCall(text: string): { name: string; arguments: Record<string, unknown>; id: string } | null {
-  const match = text.match(/<function=(\w+)>([\s\S]*?)<\/function>/)
+  // Groq puede devolver tanto </function> (con slash, estándar XML) como
+  // <function> (sin slash, formato legacy Groq). Aceptamos ambos.
+  const match = text.match(/<function=(\w+)>([\s\S]*?)<\/?function>/)
   if (!match) return null
 
   const name = match[1]
@@ -94,6 +96,18 @@ export function createGroqProvider(config: AiProviderConfig): AiProviderInterfac
         role: m.role === 'tool' ? 'tool' : m.role,
         content: m.content,
         ...(m.role === 'tool' ? { tool_call_id: m.toolCallId } : {}),
+        ...(m.role === 'assistant' && m.toolCalls
+          ? {
+              tool_calls: m.toolCalls.map((tc) => ({
+                id: tc.id,
+                type: 'function' as const,
+                function: {
+                  name: tc.name,
+                  arguments: JSON.stringify(tc.arguments),
+                },
+              })),
+            }
+          : {}),
       })),
     }
 

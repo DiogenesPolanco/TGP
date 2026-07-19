@@ -16,6 +16,7 @@ import {
   ClipboardList,
   FileText,
   Monitor,
+  Bot,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
@@ -103,7 +104,13 @@ const navItems: NavItem[] = [
   },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  chatOpen: boolean
+  onToggleChat: () => void
+  aiConfigured: boolean
+}
+
+export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) {
   const { sidebarOpen, toggleSidebar } = useAppStore()
   const location = useLocation()
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
@@ -207,6 +214,24 @@ export function Sidebar() {
         ))}
       </nav>
 
+      {/* AI Copilot */}
+      {aiConfigured && (
+        <div className="border-t border-boundary px-2 py-3">
+          <button
+            onClick={onToggleChat}
+            className={cn(
+              'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+              chatOpen
+                ? 'bg-primary/10 text-primary dark:bg-primary/20'
+                : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white'
+            )}
+            title="Abrir GobIA (Alt+A)"
+          >
+            <Bot size={20} />
+            {sidebarOpen && <span>GobIA</span>}
+          </button>
+        </div>
+      )}
 
     </aside>
   )

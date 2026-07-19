@@ -28,8 +28,8 @@ async function buildMemberIdMap(): Promise<Map<string, string>> {
     const profiles = await db.memberProfiles.toArray()
     for (const p of profiles) {
       if (!map.has(n(p.id))) {
-        map.set(n(p.displayName), p.id)
-        map.set(n(p.id), p.displayName)
+        map.set(n((p as any).displayName), p.id)
+        map.set(n(p.id), (p as any).displayName)
       }
     }
   } catch { /* tablas no disponibles */ }
@@ -150,7 +150,7 @@ function defineBuscador(
           return s.length > 60 ? s.slice(0, 60) + '…' : s
         }).filter(Boolean)
 
-        const extra = extra?.augment ? null : null // placeholder
+        const extra = null
         let line = `${i + 1}. **${parts[0] ?? '(sin nombre)'}**`
         if (parts.length > 1) line += ` · ${parts.slice(1).join(' · ')}`
         return line

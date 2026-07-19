@@ -40,6 +40,7 @@ import type {
   EquipmentAssignmentLog,
   EquipmentTicket,
 } from '@/types/domain'
+import type { AiConversation, AiChatMessage } from '@/features/ai/types'
 
 export class TGPDatabase extends Dexie {
   tenants!: Table<Tenant, string>
@@ -91,6 +92,10 @@ export class TGPDatabase extends Dexie {
   auditFindingMicroservices!: Table<AuditFindingMicroservice, string>
   riskMicroservices!: Table<RiskMicroservice, string>
   appDatabaseMicroservices!: Table<AppDatabaseMicroservice, string>
+
+  // AI Chat
+  aiConversations!: Table<AiConversation, string>
+  aiMessages!: Table<AiChatMessage, string>
 
   constructor() {
     super('TGPDatabase')
@@ -176,6 +181,10 @@ export class TGPDatabase extends Dexie {
     })
     this.version(21).stores({
       memberProfiles: 'id, teamId, role',
+    })
+    this.version(22).stores({
+      aiConversations: 'id, updatedAt',
+      aiMessages: 'id, conversationId, timestamp',
     })
   }
 }

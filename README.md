@@ -28,6 +28,9 @@
 
 ## Características
 
+### 🤖 GobIA — Asistente de IA
+**GobIA** (Gobierno + IA) es un asistente conversacional integrado en el sidebar que permite consultar la plataforma en lenguaje natural. Soporta múltiples proveedores (OpenAI, Groq, Ollama) con tool calls nativos, ejecuta consultas en tiempo real sobre aplicaciones, tecnologías, equipos, riesgos y más, y maneja resultados vacíos, dominios deshabilitados y multi-turno con respuestas contextualizadas.
+
 ### 📊 Dashboard Ejecutivo
 **Technology Health Index (THI)** en tiempo real — puntuación compuesta en 7 dimensiones ponderadas (Delivery, Seguridad, Obsolescencia, Riesgo, y más). Tarjetas KPI interactivas con drill-down, gráficos de distribución por severidad y filtro por período.
 
@@ -51,6 +54,9 @@ CRUD completo de equipos (laptops, monitores, teléfonos, periféricos, etc.) co
 
 ### 🔗 Enlaces Públicos
 Generación de **enlaces públicos cifrados y con expiración** para cualquier vista — dashboard, daily, planes, vulnerabilidades, riesgos, auditoría, OKRs y más. Cifrado AES-GCM 256 en reposo con passphrase opcional. Almacenamiento en Azure Blob Storage o localStorage.
+
+### 🧭 Onboarding Guiado
+Asistente de primer inicio con 10 pasos interactivos que guían al usuario desde la creación de unidades de negocio hasta la carga de datos demo, cubriendo aplicaciones, tecnologías, equipos, seguridad, ejecución y dashboard.
 
 ### ⚡ 100% Cliente-Side
 Sin dependencias de servidor. Todos los datos en **IndexedDB** (Dexie.js). Backup en la nube y enlaces públicos vía Azure Blob Storage. Autenticación TOTP con código QR.
@@ -122,7 +128,7 @@ npm run build
 
 La aplicación corre completamente en el navegador — no requiere backend. Puedes cargar un dataset demo desde la interfaz para explorar las funcionalidades.
 
-> **Primer inicio**: Escanea el código QR con cualquier app de autenticación (Google Authenticator, Authy, 1Password) para configurar TOTP.
+> **Primer inicio**: Al ingresar por primera vez, un **onboarding interactivo de 10 pasos** te guiará en la configuración inicial (unidades de negocio, aplicaciones, tecnologías, equipos, seguridad y más). Una vez completado, puedes acceder a **GobIA** desde el sidebar (Alt+A) para consultar la plataforma en lenguaje natural.
 
 ---
 

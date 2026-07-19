@@ -1,6 +1,8 @@
 import { Check, ChevronRight, ChevronLeft, Loader2, Wifi, WifiOff, Sparkles, ClipboardList, FolderKanban, Shield, Scale, Target, Users, UserPlus, Monitor } from 'lucide-react'
 import type { AiProviderType } from '../types'
+import { AI_PROVIDER_DEFAULTS } from '../types'
 import type { WizardState } from '../hooks/useAiSetup'
+import { Select } from '@/components/ui/Select'
 
 interface AiSetupWizardProps {
   wizard: WizardState
@@ -13,11 +15,11 @@ interface AiSetupWizardProps {
   isStepValid: () => boolean
 }
 
-const PROVIDERS: { type: AiProviderType; icon: string; name: string; desc: string; badge: string; color: string }[] = [
-  { type: 'ollama', icon: '🦙', name: 'Ollama (local)', desc: 'Modelo corre en tu máquina · 100% offline', badge: '$0', color: 'text-neutral-90 dark:text-white' },
-  { type: 'groq', icon: '⚡', name: 'Groq', desc: 'Cloud gratis · rapidísimo · API key requerida', badge: '$0', color: 'text-neutral-90 dark:text-white' },
-  { type: 'openai', icon: '🔵', name: 'OpenAI', desc: 'GPT-4o mini · API key requerida', badge: 'API key', color: 'text-neutral-90 dark:text-white' },
-  { type: 'anthropic', icon: '🟠', name: 'Anthropic (Claude)', desc: 'Claude Haiku · excelente para análisis', badge: 'API key', color: 'text-neutral-90 dark:text-white' },
+const PROVIDERS: { type: AiProviderType; icon: string; name: string; desc: string; tooltip: string; badge: string; color: string; disabled?: boolean }[] = [
+  { type: 'ollama', icon: '🦙', name: 'Ollama (local)', desc: 'Local · 100% gratis, sin límites', tooltip: 'Ejecutás el modelo en tu máquina. Sin costos, sin límites de uso, 100% offline.', badge: 'Gratis', color: 'text-neutral-90 dark:text-white' },
+  { type: 'groq', icon: '⚡', name: 'Groq', desc: 'Cloud gratuito · 30 req/min', tooltip: 'Cloud gratuito con inferencia ultrarrápida. Limitado a 30 requests por minuto en el plan free.', badge: 'Gratis', color: 'text-neutral-90 dark:text-white' },
+  { type: 'openai', icon: '🔵', name: 'OpenAI', desc: 'Pago por uso · requiere API key', tooltip: 'Modelos GPT de pago. Necesitás una API key de OpenAI con crédito disponible.', badge: 'API key', color: 'text-neutral-90 dark:text-white' },
+  { type: 'anthropic', icon: '🟠', name: 'Anthropic (Claude)', desc: 'Próximamente — análisis avanzado', tooltip: 'Claude de Anthropic. Pendiente de integración — estará disponible pronto.', badge: 'Pronto', color: 'text-neutral-40 dark:text-neutral-50', disabled: true },
 ]
 
 const STEPS = ['Proveedor', 'Conexión', 'Permisos', 'Listo']
@@ -55,30 +57,45 @@ export function AiSetupWizard({
           {PROVIDERS.map((p) => (
             <button
               key={p.type}
-              onClick={() => onSelectProvider(p.type)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
-                wizard.provider === p.type
-                  ? 'border-neutral-50 dark:border-neutral-40 bg-neutral-5 dark:bg-neutral-85'
-                  : 'border-boundary bg-card hover:border-neutral-30 dark:hover:border-neutral-50'
+              onClick={() => !p.disabled && onSelectProvider(p.type)}
+              disabled={p.disabled}
+              title={p.tooltip}
+              className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all duration-300 ${
+                p.disabled
+                  ? 'border-dashed border-neutral-30 dark:border-neutral-60 bg-neutral-5 dark:bg-neutral-85 opacity-50 cursor-not-allowed'
+                  : wizard.provider === p.type
+                    ? 'border-boundary bg-card shadow-md ring-2 ring-neutral-90 dark:ring-white'
+                    : 'border-boundary bg-card shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] active:shadow-sm cursor-pointer'
               }`}
             >
-              <span className="text-xl w-8 text-center">{p.icon}</span>
+              <div className={`p-3 rounded-xl flex items-center justify-center text-lg shrink-0 ${
+                p.disabled ? 'bg-neutral-10 dark:bg-neutral-75' :
+                wizard.provider === p.type
+                  ? 'bg-neutral-5 dark:bg-neutral-75 ring-1 ring-neutral-90/10 dark:ring-white/10'
+                  : 'bg-neutral-5 dark:bg-neutral-75'
+              }`}>
+                {p.icon}
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-neutral-90 dark:text-white">{p.name}</p>
+                <p className={`text-sm font-medium ${p.color}`}>{p.name}</p>
                 <p className="text-xs text-neutral-50 truncate">{p.desc}</p>
               </div>
               <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                p.badge === '$0' ? 'border-success/30 text-success' : 'border-neutral-30 dark:border-neutral-60 text-neutral-50'
+                p.badge === 'Gratis' ? 'border-success/30 text-success' :
+                p.badge === 'Pronto' ? 'border-warning/30 text-warning' :
+                'border-neutral-30 dark:border-neutral-60 text-neutral-50'
               }`}>
                 {p.badge}
               </span>
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                wizard.provider === p.type ? 'border-neutral-60 dark:border-neutral-40' : 'border-neutral-30 dark:border-neutral-60'
+              {!p.disabled && (
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
+                wizard.provider === p.type ? 'border-neutral-90 dark:border-white' : 'border-neutral-30 dark:border-neutral-60'
               }`}>
                 {wizard.provider === p.type && (
-                  <div className="w-2 h-2 rounded-full bg-neutral-60 dark:bg-neutral-40" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-90 dark:bg-white" />
                 )}
               </div>
+              )}
             </button>
           ))}
         </div>
@@ -128,12 +145,23 @@ export function AiSetupWizard({
           {wizard.provider !== 'ollama' && (
             <div>
               <label className="block text-xs font-medium text-neutral-60 mb-1">Modelo</label>
-              <input
-                type="text"
-                value={wizard.model}
-                onChange={(e) => onUpdateField('model', e.target.value)}
-                className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50"
-              />
+              {wizard.availableModels.length > 0 ? (
+                <Select
+                  value={wizard.model}
+                  onChange={(v) => onUpdateField('model', v)}
+                  options={wizard.availableModels}
+                  searchable
+                  placeholder="Buscá o seleccioná un modelo..."
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={wizard.model}
+                  onChange={(e) => onUpdateField('model', e.target.value)}
+                  placeholder={AI_PROVIDER_DEFAULTS[wizard.provider]?.model ?? 'Ej: gpt-4o-mini'}
+                  className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50"
+                />
+              )}
             </div>
           )}
 
