@@ -171,6 +171,5 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 - **Privacidad**: No se recopilan datos personales. Todo se almacena localmente o en Azure (opcional).
 - **Offline-first**: La aplicación funciona sin conexión. Las integraciones cloud son opcionales.
-- **Archivos excluidos del repositorio**: CLAUDE.md, report_fluitattack.csv, e2e/, screenshots/, staticwebapp.config.json, package-lock.json, .sisyphus/plans/
 
 ---
