@@ -174,9 +174,3 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 - **Archivos excluidos del repositorio**: CLAUDE.md, report_fluitattack.csv, e2e/, screenshots/, staticwebapp.config.json, package-lock.json, .sisyphus/plans/
 
 ---
-
-## 📌 Notas Adicionales
-
-- Los archivos excluidos no están en el repositorio de GitHub
-- La carpeta `.sisyphus/plans` también fue eliminada para evitar subida innecesaria
-- La aplicación está optimizada para ser autónoma y fácil de desplegar
