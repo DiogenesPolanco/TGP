@@ -63,34 +63,6 @@ Sin dependencias de servidor. Todos los datos en **IndexedDB** (Dexie.js). Backu
 
 ---
 
-## Capturas
-
-<p align="center">
-  <img src="screenshots/dashboard.png" alt="Dashboard Ejecutivo" width="700" />
-  <br />
-  <em>Dashboard Ejecutivo — THI, KPI cards y distribución por severidad</em>
-</p>
-
-<p align="center">
-  <img src="screenshots/applications.png" alt="Catálogo de Aplicaciones" width="700" />
-  <br />
-  <em>Catálogo de Aplicaciones — CRUD, filtros y vista de portafolio</em>
-</p>
-
-<p align="center">
-  <img src="screenshots/vulnerabilities.png" alt="Vulnerabilidades" width="700" />
-  <br />
-  <em>Seguridad — Vulnerabilidades con CVSS, SLA y flujo de estados</em>
-</p>
-
-<p align="center">
-  <img src="screenshots/timeline.png" alt="Timeline Ejecutivo" width="700" />
-  <br />
-  <em>Ejecución — Timeline con diagrama de Gantt y planificación</em>
-</p>
-
----
-
 ## Stack
 
 | Capa | Tecnología |
@@ -199,3 +171,12 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 - **Privacidad**: No se recopilan datos personales. Todo se almacena localmente o en Azure (opcional).
 - **Offline-first**: La aplicación funciona sin conexión. Las integraciones cloud son opcionales.
+- **Archivos excluidos del repositorio**: CLAUDE.md, report_fluitattack.csv, e2e/, screenshots/, staticwebapp.config.json, package-lock.json, .sisyphus/plans/
+
+---
+
+## 📌 Notas Adicionales
+
+- Los archivos excluidos no están en el repositorio de GitHub
+- La carpeta `.sisyphus/plans` también fue eliminada para evitar subida innecesaria
+- La aplicación está optimizada para ser autónoma y fácil de desplegar
