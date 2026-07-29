@@ -22,12 +22,26 @@ export function PlanDetailPage() {
   const { confirm } = useConfirm()
 
   const plan = useLiveQuery(() => db.plans.get(id ?? ''), [id])
-  const rawActivities = useLiveQuery(() => db.activities.where('planId').equals(id ?? '').toArray(), [id])
+  const rawActivities = useLiveQuery(
+    () =>
+      db.activities
+        .where('planId')
+        .equals(id ?? '')
+        .toArray(),
+    [id],
+  )
   const activities = useMemo(
     () => (rawActivities ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
     [rawActivities],
   )
-  const rawTasks = useLiveQuery(() => db.tasks.where('planId').equals(id ?? '').toArray(), [id])
+  const rawTasks = useLiveQuery(
+    () =>
+      db.tasks
+        .where('planId')
+        .equals(id ?? '')
+        .toArray(),
+    [id],
+  )
   const tasks = useMemo(() => rawTasks ?? [], [rawTasks])
   const rawTeams = useLiveQuery(() => db.teams.toArray())
   const teams = useMemo(() => rawTeams ?? [], [rawTeams])
@@ -76,22 +90,27 @@ export function PlanDetailPage() {
     }
   }, [shareUrl])
 
-  const childActivities = (parentId: string) => activities.filter((a) => a.parentActivityId === parentId)
+  const childActivities = (parentId: string) =>
+    activities.filter((a) => a.parentActivityId === parentId)
 
-  const stats = useMemo(() => ({
-    total: activities.length,
-    completed: activities.filter((a) => a.status === 'completed').length,
-    inProgress: activities.filter((a) => a.status === 'in_progress').length,
-    pending: activities.filter((a) => a.status === 'pending').length,
-    totalTasks: tasks.length,
-    doneTasks: tasks.filter((t) => t.status === 'done').length,
-  }), [activities, tasks])
+  const stats = useMemo(
+    () => ({
+      total: activities.length,
+      completed: activities.filter((a) => a.status === 'completed').length,
+      inProgress: activities.filter((a) => a.status === 'in_progress').length,
+      pending: activities.filter((a) => a.status === 'pending').length,
+      totalTasks: tasks.length,
+      doneTasks: tasks.filter((t) => t.status === 'done').length,
+    }),
+    [activities, tasks],
+  )
 
   const handleDeleteActivity = async (activity: Activity) => {
     const childCount = childActivities(activity.id).length
-    const msg = childCount > 0
-      ? `"${activity.title}" tiene ${childCount} sub-actividad(es). Eliminar todo?`
-      : `Eliminar "${activity.title}"?`
+    const msg =
+      childCount > 0
+        ? `"${activity.title}" tiene ${childCount} sub-actividad(es). Eliminar todo?`
+        : `Eliminar "${activity.title}"?`
     if (!(await confirm(msg))) return
     for (const child of childActivities(activity.id)) {
       await db.tasks.where('activityId').equals(child.id).delete()
@@ -114,17 +133,26 @@ export function PlanDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-neutral-50">Plan no encontrado</p>
-        <Button onClick={() => navigate('/execution/plans')} variant="ghost" className="mt-4 text-sm text-primary hover:underline">
+        <Button
+          onClick={() => navigate('/execution/plans')}
+          variant="ghost"
+          className="mt-4 text-sm text-primary hover:underline"
+        >
           Volver a planes
         </Button>
       </div>
     )
   }
 
-  const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
-  // eslint-disable-next-line react-hooks/purity
-  const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
+  const daysTotal = Math.ceil(
+    (new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24),
+  )
+
+  const daysLeft = Math.ceil(
+    (new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+  )
+  const progress =
+    daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
 
   const objective = plan.objectiveId ? objectives.find((o) => o.id === plan.objectiveId) : null
 
@@ -132,7 +160,11 @@ export function PlanDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button onClick={() => navigate('/execution/plans')} variant="ghost" className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/execution/plans')}
+          variant="ghost"
+          className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <div className="flex-1">
@@ -152,25 +184,35 @@ export function PlanDetailPage() {
             >
               <Share2 size={18} />
             </Button>
-            <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
-              plan.health === 'red' ? 'bg-danger/10 text-danger border-danger/30' :
-              plan.health === 'yellow' ? 'bg-warning/10 text-warning border-warning/30' :
-              'bg-success/10 text-success border-success/30'
-            }`}>
-              {plan.health === 'red' ? 'Critico' : plan.health === 'yellow' ? 'En Riesgo' : 'Saludable'}
+            <span
+              className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
+                plan.health === 'red'
+                  ? 'bg-danger/10 text-danger border-danger/30'
+                  : plan.health === 'yellow'
+                    ? 'bg-warning/10 text-warning border-warning/30'
+                    : 'bg-success/10 text-success border-success/30'
+              }`}
+            >
+              {plan.health === 'red'
+                ? 'Critico'
+                : plan.health === 'yellow'
+                  ? 'En Riesgo'
+                  : 'Saludable'}
             </span>
           </div>
-          {plan.description && (
-            <HtmlDescription html={plan.description} full className="mt-1" />
-          )}
+          {plan.description && <HtmlDescription html={plan.description} full className="mt-1" />}
         </div>
       </div>
 
       {shareUrl && (
         <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
+          <a
+            href={cleanUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+          >
             {cleanUrl}
           </a>
           <Button
@@ -198,11 +240,15 @@ export function PlanDetailPage() {
           <p className="text-xs text-muted">En Progreso</p>
         </div>
         <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
-          <p className="text-2xl font-bold text-neutral-90 dark:text-white">{stats.doneTasks}/{stats.totalTasks}</p>
+          <p className="text-2xl font-bold text-neutral-90 dark:text-white">
+            {stats.doneTasks}/{stats.totalTasks}
+          </p>
           <p className="text-xs text-muted">Tareas</p>
         </div>
         <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
-          <p className="text-2xl font-bold text-neutral-90 dark:text-white">{daysLeft > 0 ? `${daysLeft}d` : 'Vencido'}</p>
+          <p className="text-2xl font-bold text-neutral-90 dark:text-white">
+            {daysLeft > 0 ? `${daysLeft}d` : 'Vencido'}
+          </p>
           <p className="text-xs text-muted">Tiempo restante</p>
         </div>
       </div>
@@ -216,7 +262,11 @@ export function PlanDetailPage() {
         <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2.5">
           <div
             className={`h-2.5 rounded-full transition-all ${
-              plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
+              plan.health === 'red'
+                ? 'bg-danger'
+                : plan.health === 'yellow'
+                  ? 'bg-warning'
+                  : 'bg-success'
             }`}
             style={{ width: `${Math.min(100, progress)}%` }}
           />
@@ -241,7 +291,9 @@ export function PlanDetailPage() {
         tasks={tasks}
         teamMap={teamMap}
         appMap={appMap}
-        onEditActivity={(activityId) => navigate(`/execution/plans/${plan.id}/activities/${activityId}/edit`)}
+        onEditActivity={(activityId) =>
+          navigate(`/execution/plans/${plan.id}/activities/${activityId}/edit`)
+        }
         onDeleteActivity={handleDeleteActivity}
         onTaskToggle={handleTaskStatusToggle}
         onNewActivity={() => navigate(`/execution/plans/${plan.id}/activities/new`)}
@@ -250,7 +302,9 @@ export function PlanDetailPage() {
       {showTerms && (
         <TermsModal
           onAccept={handleTermsAccepted}
-          onClose={() => { setShowTerms(false) }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -273,11 +327,12 @@ export function PlanDetailPage() {
             setShowPassphrase(false)
             setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
     </div>
   )
 }
-
-

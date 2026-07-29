@@ -31,11 +31,23 @@ export function UserFormPage() {
   const isEdit = !!id
 
   const user = useLiveQuery(() => (id ? db.users.get(id) : undefined), [id])
-  const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormData>()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>()
 
   useEffect(() => {
     if (user) {
-      reset({ displayName: user.displayName, email: user.email, role: user.role, isActive: user.isActive === 1, otpRequestIntervalHours: user.otpRequestIntervalHours ?? 1 })
+      reset({
+        displayName: user.displayName,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive === 1,
+        otpRequestIntervalHours: user.otpRequestIntervalHours ?? 1,
+      })
     }
   }, [user, reset])
 
@@ -75,36 +87,75 @@ export function UserFormPage() {
         <div className="space-y-4">
           <div>
             <Label>Nombre completo</Label>
-            <input {...register('displayName', { required: 'El nombre es obligatorio' })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-            {errors.displayName && <p className="text-xs text-danger mt-1">{errors.displayName.message}</p>}
+            <input
+              {...register('displayName', { required: 'El nombre es obligatorio' })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {errors.displayName && (
+              <p className="text-xs text-danger mt-1">{errors.displayName.message}</p>
+            )}
           </div>
           <div>
             <Label>Email</Label>
-            <input type="email" {...register('email', { required: 'El email es obligatorio' })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              type="email"
+              {...register('email', { required: 'El email es obligatorio' })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
             {errors.email && <p className="text-xs text-danger mt-1">{errors.email.message}</p>}
           </div>
           <div>
             <Label>Rol</Label>
-            <Controller name="role" control={control} render={({ field }) => (
-              <Select value={field.value} onChange={(v) => field.onChange(v)} options={roleOptions.map((o) => ({ value: o.value, label: o.label }))} />
-            )} />
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={(v) => field.onChange(v)}
+                  options={roleOptions.map((o) => ({ value: o.value, label: o.label }))}
+                />
+              )}
+            />
           </div>
           <div className="flex items-center gap-2">
-            <input type="checkbox" {...register('isActive')} id="isActive" className="rounded border-neutral-30" />
-            <label htmlFor="isActive" className="text-sm text-neutral-90 dark:text-white">Usuario activo</label>
+            <input
+              type="checkbox"
+              {...register('isActive')}
+              id="isActive"
+              className="rounded border-neutral-30"
+            />
+            <label htmlFor="isActive" className="text-sm text-neutral-90 dark:text-white">
+              Usuario activo
+            </label>
           </div>
           <div>
             <Label>Intervalo OTP (horas)</Label>
-            <p className="text-xs text-neutral-50 dark:text-neutral-40 mb-1.5">Tiempo antes de solicitar nuevamente el código OTP</p>
-            <input type="number" min={1} max={720} step={1} {...register('otpRequestIntervalHours', { valueAsNumber: true, min: { value: 1, message: 'Mínimo 1 hora' } })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-            {errors.otpRequestIntervalHours && <p className="text-xs text-danger mt-1">{errors.otpRequestIntervalHours.message}</p>}
+            <p className="text-xs text-neutral-50 dark:text-neutral-40 mb-1.5">
+              Tiempo antes de solicitar nuevamente el código OTP
+            </p>
+            <input
+              type="number"
+              min={1}
+              max={720}
+              step={1}
+              {...register('otpRequestIntervalHours', {
+                valueAsNumber: true,
+                min: { value: 1, message: 'Mínimo 1 hora' },
+              })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {errors.otpRequestIntervalHours && (
+              <p className="text-xs text-danger mt-1">{errors.otpRequestIntervalHours.message}</p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-boundary">
-          <Button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50"
+          >
             {isEdit ? 'Guardar Cambios' : 'Crear Usuario'}
           </Button>
           <Button type="button" onClick={() => navigate('/admin/users')}>

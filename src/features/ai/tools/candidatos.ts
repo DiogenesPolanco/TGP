@@ -2,7 +2,10 @@ import { db } from '@/services/db/database'
 import { type AiToolDefinition } from '../types'
 
 function n(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
 }
 
 const EVAL_LABELS: Record<string, string> = {
@@ -27,7 +30,8 @@ const STATUS_LABELS: Record<string, string> = {
 
 export const consultarCandidatoTool: AiToolDefinition = {
   name: 'consultar_candidato',
-  description: 'Obtené el perfil completo de un candidato: datos personales, evaluaciones por categoría y tecnologías. Buscá por ID exacto o por nombre/email.',
+  description:
+    'Obtené el perfil completo de un candidato: datos personales, evaluaciones por categoría y tecnologías. Buscá por ID exacto o por nombre/email.',
   parameters: {
     type: 'object',
     properties: {
@@ -43,7 +47,7 @@ export const consultarCandidatoTool: AiToolDefinition = {
   },
   execute: async (params) => {
     const id = params.id as string | undefined
-    const query = (params.q as string ?? '').trim()
+    const query = ((params.q as string) ?? '').trim()
 
     if (!id && !query) {
       return 'Error: proporcioná un `id` (UUID) o un `q` (nombre/email) para buscar.'
@@ -52,7 +56,7 @@ export const consultarCandidatoTool: AiToolDefinition = {
     let candidate: Record<string, unknown> | undefined
 
     if (id) {
-      candidate = await db.candidates.get(id) as Record<string, unknown> | undefined
+      candidate = (await db.candidates.get(id)) as Record<string, unknown> | undefined
     } else {
       const term = n(query)
       const all = await db.candidates.toArray()
@@ -73,13 +77,17 @@ export const consultarCandidatoTool: AiToolDefinition = {
     const statusLabel = STATUS_LABELS[candidate.status as string] ?? candidate.status
     const interviewDate = candidate.interviewDate
       ? new Date(candidate.interviewDate as string).toLocaleDateString('es-ES', {
-          day: 'numeric', month: 'long', year: 'numeric',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
         })
       : 'Pendiente'
 
     output.push(`📋 **${candidate.name}**`)
     output.push(`**Posición:** ${candidate.position}`)
-    output.push(`**Estado:** ${statusLabel}${candidate.totalScore != null ? ` · Puntaje total: ${candidate.totalScore}` : ''}`)
+    output.push(
+      `**Estado:** ${statusLabel}${candidate.totalScore != null ? ` · Puntaje total: ${candidate.totalScore}` : ''}`,
+    )
     output.push(`**Email:** ${candidate.email ?? '—'}`)
     output.push(`**Teléfono:** ${candidate.phone ?? '—'}`)
     output.push(`**Entrevista:** ${interviewDate}`)
@@ -96,18 +104,19 @@ export const consultarCandidatoTool: AiToolDefinition = {
         output.push(`**Tecnologías** (${techs.length}):`)
         const sorted = techs.sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
         for (const t of sorted) {
-          const bar = '█'.repeat(Math.round((t.points ?? 0) / 10)) + '░'.repeat(Math.max(0, 10 - Math.round((t.points ?? 0) / 10)))
+          const bar =
+            '█'.repeat(Math.round((t.points ?? 0) / 10)) +
+            '░'.repeat(Math.max(0, 10 - Math.round((t.points ?? 0) / 10)))
           output.push(`  · ${t.name}: ${t.points}/100 ${bar}`)
         }
         output.push('')
       }
-    } catch { /* istanbul ignore next */ }
+    } catch {
+      /* istanbul ignore next */
+    }
 
     try {
-      const evals = await db.candidateEvaluations
-        .where('candidateId')
-        .equals(candidateId)
-        .toArray()
+      const evals = await db.candidateEvaluations.where('candidateId').equals(candidateId).toArray()
 
       if (evals.length > 0) {
         output.push(`**Evaluaciones** (${evals.length} categorías):`)
@@ -123,14 +132,20 @@ export const consultarCandidatoTool: AiToolDefinition = {
         for (const [cat, pts] of grouped) {
           const label = EVAL_LABELS[cat] ?? cat
           const promedio = avg(pts)
-          const bar = '█'.repeat(Math.round(promedio / 10)) + '░'.repeat(Math.max(0, 10 - Math.round(promedio / 10)))
+          const bar =
+            '█'.repeat(Math.round(promedio / 10)) +
+            '░'.repeat(Math.max(0, 10 - Math.round(promedio / 10)))
           output.push(`  · ${label}: ${promedio}/100 ${bar}`)
         }
         output.push('')
       }
-    } catch { /* istanbul ignore next */ }
+    } catch {
+      /* istanbul ignore next */
+    }
 
-    output.push(`💡 Usá \`buscar_candidato({ q: "${(candidate.name as string).split(' ')[0]}" })\` para buscar otros candidatos.`)
+    output.push(
+      `💡 Usá \`buscar_candidato({ q: "${(candidate.name as string).split(' ')[0]}" })\` para buscar otros candidatos.`,
+    )
 
     return output.join('\n')
   },

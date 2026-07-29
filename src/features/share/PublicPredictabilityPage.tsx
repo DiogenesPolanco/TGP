@@ -1,20 +1,32 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidShareHash, getPublicPredictabilityData, type PublicPredictabilityData } from '@/services/share/publicShareService'
+import {
+  isValidShareHash,
+  getPublicPredictabilityData,
+  type PublicPredictabilityData,
+} from '@/services/share/publicShareService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { PrintButton } from '@/components/ui/PrintButton'
-import type { PeriodGranularity, PredictabilityPeriod } from '@/features/execution/hooks/usePredictability'
+import type {
+  PeriodGranularity,
+  PredictabilityPeriod,
+} from '@/features/execution/hooks/usePredictability'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts'
-import {
-  Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar,
-} from 'lucide-react'
+import { Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
@@ -119,20 +131,32 @@ function buildPeriods(
       .map(([periodKey, periodSprints]) => {
         const totalEstimated = periodSprints.reduce((sum, sp) => sum + sp.plannedSP, 0)
         const totalActual = periodSprints.reduce((sum, sp) => sum + sp.completedSP, 0)
-        const avgPredictability = totalEstimated > 0
-          ? Math.round((totalActual / totalEstimated) * 100)
-          : 0
-        const color: 'success' | 'warning' | 'danger' = avgPredictability >= 80 && avgPredictability <= 120
-          ? 'success'
-          : avgPredictability >= 50 && avgPredictability <= 150
-            ? 'warning'
-            : 'danger'
+        const avgPredictability =
+          totalEstimated > 0 ? Math.round((totalActual / totalEstimated) * 100) : 0
+        const color: 'success' | 'warning' | 'danger' =
+          avgPredictability >= 80 && avgPredictability <= 120
+            ? 'success'
+            : avgPredictability >= 50 && avgPredictability <= 150
+              ? 'warning'
+              : 'danger'
 
         let label: string
         switch (granularity) {
           case 'monthly': {
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+            const months = [
+              'Enero',
+              'Febrero',
+              'Marzo',
+              'Abril',
+              'Mayo',
+              'Junio',
+              'Julio',
+              'Agosto',
+              'Septiembre',
+              'Octubre',
+              'Noviembre',
+              'Diciembre',
+            ]
             const monthIdx = periodSprints[0].endDate.getMonth()
             label = `${months[monthIdx]} ${periodSprints[0].endDate.getFullYear()}`
             break
@@ -166,7 +190,15 @@ function buildPeriods(
   }
 }
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: Record<string, unknown> }>; label?: string }) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: Array<{ payload: Record<string, unknown> }>
+  label?: string
+}) {
   if (!active || !payload?.length) return null
   const data = payload[0].payload
   return (
@@ -177,19 +209,27 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Predictibilidad</span>
-          <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad as string}%</span>
+          <span className="font-semibold text-neutral-90 dark:text-white">
+            {data.predictabilidad as string}%
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Planificados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.estimado as string} pts</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.estimado as string} pts
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Completados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.real as string} pts</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.real as string} pts
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4 pt-1 border-t border-boundary">
           <span className="text-muted">Planes</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.planes as string}</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.planes as string}
+          </span>
         </div>
       </div>
     </div>
@@ -197,13 +237,22 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
-  { key: 'label', label: 'Período', sortable: true, render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span> },
+  {
+    key: 'label',
+    label: 'Período',
+    sortable: true,
+    render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>,
+  },
   {
     key: 'avgPredictability',
     label: 'Predictibilidad',
     sortable: true,
     className: 'text-right',
-    render: (p) => <span className={`font-semibold ${getColor(p.avgPredictability)}`}>{p.avgPredictability}%</span>,
+    render: (p) => (
+      <span className={`font-semibold ${getColor(p.avgPredictability)}`}>
+        {p.avgPredictability}%
+      </span>
+    ),
   },
   {
     key: 'totalEstimated',
@@ -232,13 +281,21 @@ const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
     sortable: true,
     className: 'text-right',
     render: (p) => (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getBg(p.avgPredictability)} ${getColor(p.avgPredictability)}`}>
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getBg(p.avgPredictability)} ${getColor(p.avgPredictability)}`}
+      >
         {p.avgPredictability >= 80 && p.avgPredictability <= 120 ? (
-          <><Minus size={12} /> Consistente</>
+          <>
+            <Minus size={12} /> Consistente
+          </>
         ) : p.avgPredictability < 80 ? (
-          <><TrendingDown size={12} /> Subestima</>
+          <>
+            <TrendingDown size={12} /> Subestima
+          </>
         ) : (
-          <><TrendingUp size={12} /> Sobreestima</>
+          <>
+            <TrendingUp size={12} /> Sobreestima
+          </>
         )}
       </span>
     ),
@@ -254,7 +311,11 @@ export function PublicPredictabilityPage() {
   const [granularity, setGranularity] = useState<PeriodGranularity>('monthly')
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
+    if (!hash) {
+      setValid(false)
+      setLoading(false)
+      return
+    }
     ;(async () => {
       const tryLoad = (raw: unknown) => {
         if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
@@ -274,17 +335,24 @@ export function PublicPredictabilityPage() {
           const fragment = decodeURIComponent(rawHash)
           const { downloadUsingManifest } = await import('@/services/share/azureShareService')
           const azureData = await downloadUsingManifest(fragment)
-          if (azureData) { tryLoad(azureData); return }
+          if (azureData) {
+            tryLoad(azureData)
+            return
+          }
         } catch {}
       }
       try {
         const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
         const viewerData = await downloadShareFromAzure(hash)
-        if (viewerData) { tryLoad(viewerData); return }
+        if (viewerData) {
+          tryLoad(viewerData)
+          return
+        }
       } catch {}
       if (isValidShareHash(hash)) {
         const d = await getPublicPredictabilityData()
-        setData(d); setValid(true)
+        setData(d)
+        setValid(true)
       } else {
         setValid(false)
       }
@@ -301,7 +369,13 @@ export function PublicPredictabilityPage() {
 
   const summary = useMemo(() => {
     if (currentPeriods.length === 0) {
-      return { avg: 0, best: null as { label: string; value: number } | null, worst: null as { label: string; value: number } | null, totalPlans: 0, healthyCount: 0 }
+      return {
+        avg: 0,
+        best: null as { label: string; value: number } | null,
+        worst: null as { label: string; value: number } | null,
+        totalPlans: 0,
+        healthyCount: 0,
+      }
     }
     const totalEstimated = currentPeriods.reduce((s, p) => s + p.totalEstimated, 0)
     const totalActual = currentPeriods.reduce((s, p) => s + p.totalActual, 0)
@@ -334,7 +408,12 @@ export function PublicPredictabilityPage() {
     }))
   }, [currentPeriods])
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -345,8 +424,12 @@ export function PublicPredictabilityPage() {
             description="Esta vista fue compartida con cifrado. Ingresa la contraseña para verla."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
-              if (decrypted) { setData(decrypted as PublicPredictabilityData); setPendingEncrypted(null) }
-              else { alert('Contraseña incorrecta') }
+              if (decrypted) {
+                setData(decrypted as PublicPredictabilityData)
+                setPendingEncrypted(null)
+              } else {
+                alert('Contraseña incorrecta')
+              }
             }}
           />
         </div>
@@ -365,7 +448,9 @@ export function PublicPredictabilityPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Predictibilidad de Sprints</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Predictibilidad de Sprints
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -407,7 +492,13 @@ export function PublicPredictabilityPage() {
             title="Predictibilidad Promedio"
             value={`${summary.avg}%`}
             icon={<Target size={20} />}
-            color={summary.avg >= 80 && summary.avg <= 120 ? 'success' : summary.avg >= 50 ? 'warning' : 'danger'}
+            color={
+              summary.avg >= 80 && summary.avg <= 120
+                ? 'success'
+                : summary.avg >= 50
+                  ? 'warning'
+                  : 'danger'
+            }
           />
           <SummaryCard
             title="Mejor Período"
@@ -513,12 +604,13 @@ export function PublicPredictabilityPage() {
                   shape={(props: { x?: number; y?: number; width?: number; height?: number }) => {
                     const { x, y, width, height } = props
                     const payload = (props as any).payload
-                    const fill = payload.color === 'success' ? 'url(#pred-chart-success)'
-                      : payload.color === 'warning' ? 'url(#pred-chart-warning)'
-                      : 'url(#pred-chart-danger)'
-                    return (
-                      <rect x={x} y={y} width={width} height={height} rx={6} fill={fill} />
-                    )
+                    const fill =
+                      payload.color === 'success'
+                        ? 'url(#pred-chart-success)'
+                        : payload.color === 'warning'
+                          ? 'url(#pred-chart-warning)'
+                          : 'url(#pred-chart-danger)'
+                    return <rect x={x} y={y} width={width} height={height} rx={6} fill={fill} />
                   }}
                 />
               </BarChart>
@@ -543,7 +635,9 @@ export function PublicPredictabilityPage() {
             </div>
             <SortableTable
               columns={periodColumns}
-              data={currentPeriods.map((p) => ({ ...p, id: p.periodKey } as PredictabilityPeriod & { id: string }))}
+              data={currentPeriods.map(
+                (p) => ({ ...p, id: p.periodKey }) as PredictabilityPeriod & { id: string },
+              )}
               pageSize={10}
             />
           </div>
@@ -558,7 +652,11 @@ export function PublicPredictabilityPage() {
 }
 
 function SummaryCard({
-  title, value, subtitle, icon, color,
+  title,
+  value,
+  subtitle,
+  icon,
+  color,
 }: {
   title: string
   value: string
@@ -571,14 +669,20 @@ function SummaryCard({
       <div
         className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
       />
-      <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`} />
+      <div
+        className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`}
+      />
       <div className="relative">
-        <div className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}>
+        <div
+          className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}
+        >
           {icon}
         </div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
         <p className="text-xs text-muted mt-0.5">{title}</p>
-        {subtitle && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>
+        )}
       </div>
     </div>
   )

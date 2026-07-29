@@ -14,10 +14,24 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { encryptData } from '@/services/share/encryptionService'
 import {
-  Search, Filter, Download, Upload, Share2,
-  Trash2, Eye, Pencil, X, Server, Check, Copy,
-  AlertTriangle, Shield,
-  RefreshCw, Clock, Ban, Calendar,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Share2,
+  Trash2,
+  Eye,
+  Pencil,
+  X,
+  Server,
+  Check,
+  Copy,
+  AlertTriangle,
+  Shield,
+  RefreshCw,
+  Clock,
+  Ban,
+  Calendar,
 } from 'lucide-react'
 import type { Microservice, MicroserviceLifecycleStatus } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
@@ -65,7 +79,6 @@ export function MicroservicesPage() {
   const [filterApp, setFilterApp] = useState('')
   const [filterRisk, setFilterRisk] = useState<string | null>(null)
 
-
   // Share state
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -100,7 +113,9 @@ export function MicroservicesPage() {
 
   // Per-microservice aggregations for each risk dimension
   const riskMap = useMemo(() => {
-    const eolTechIds = new Set(technologies.filter((t) => t.supportStatus === 'eol').map((t) => t.id))
+    const eolTechIds = new Set(
+      technologies.filter((t) => t.supportStatus === 'eol').map((t) => t.id),
+    )
 
     const vulns = new Map<string, number>()
     const incidents = new Map<string, number>()
@@ -108,10 +123,14 @@ export function MicroservicesPage() {
     const risks = new Map<string, number>()
     const eolCount = new Map<string, number>()
 
-    for (const j of vulnJunction) vulns.set(j.microserviceId, (vulns.get(j.microserviceId) ?? 0) + 1)
-    for (const j of incidentJunction) incidents.set(j.microserviceId, (incidents.get(j.microserviceId) ?? 0) + 1)
-    for (const j of auditJunction) audits.set(j.microserviceId, (audits.get(j.microserviceId) ?? 0) + 1)
-    for (const j of riskJunction) risks.set(j.microserviceId, (risks.get(j.microserviceId) ?? 0) + 1)
+    for (const j of vulnJunction)
+      vulns.set(j.microserviceId, (vulns.get(j.microserviceId) ?? 0) + 1)
+    for (const j of incidentJunction)
+      incidents.set(j.microserviceId, (incidents.get(j.microserviceId) ?? 0) + 1)
+    for (const j of auditJunction)
+      audits.set(j.microserviceId, (audits.get(j.microserviceId) ?? 0) + 1)
+    for (const j of riskJunction)
+      risks.set(j.microserviceId, (risks.get(j.microserviceId) ?? 0) + 1)
 
     for (const ms of microservices) {
       const count = (ms.technologies ?? []).filter((tId) => eolTechIds.has(tId)).length
@@ -243,9 +262,7 @@ export function MicroservicesPage() {
           <div className="flex items-center gap-2">
             <span
               className={`inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full ${
-                count > 0
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-danger/10 text-danger'
+                count > 0 ? 'bg-primary/10 text-primary' : 'bg-danger/10 text-danger'
               }`}
             >
               {count}
@@ -268,11 +285,7 @@ export function MicroservicesPage() {
       key: 'technicalLead',
       label: 'Tech Lead',
       sortable: true,
-      render: (ms) => (
-        <span className="text-sm text-secondary">
-          {ms.technicalLead || '—'}
-        </span>
-      ),
+      render: (ms) => <span className="text-sm text-secondary">{ms.technicalLead || '—'}</span>,
     },
     {
       key: 'lifecycleStatus',
@@ -306,9 +319,7 @@ export function MicroservicesPage() {
       key: 'technologies',
       label: 'Tecnologías',
       render: (ms) => (
-        <span className="text-sm text-secondary">
-          {ms.technologies?.length ?? 0} techs
-        </span>
+        <span className="text-sm text-secondary">{ms.technologies?.length ?? 0} techs</span>
       ),
     },
     {
@@ -364,7 +375,10 @@ export function MicroservicesPage() {
             <Pencil size={16} className="text-muted" />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(ms.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(ms.id)
+            }}
             className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
           >
             <Trash2 size={16} className="text-danger" />
@@ -380,7 +394,9 @@ export function MicroservicesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Catálogo de Microservicios</h2>
+        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          Catálogo de Microservicios
+        </h2>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/catalog/microservices/new')}
@@ -427,7 +443,11 @@ export function MicroservicesPage() {
             {shareUrl.split('#')[0]}
           </span>
           <Button
-            onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+            onClick={() => {
+              navigator.clipboard.writeText(shareUrl)
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -439,7 +459,11 @@ export function MicroservicesPage() {
       {/* Terms & Passphrase modals */}
       {showTerms && (
         <TermsModal
-          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
+          onAccept={() => {
+            acceptTerms()
+            setShowTerms(false)
+            doShare()
+          }}
           onClose={() => setShowTerms(false)}
         />
       )}
@@ -451,13 +475,20 @@ export function MicroservicesPage() {
           onSubmit={async (pass) => {
             const payload = pass ? await encryptData(sharePending, pass) : sharePending
             const { url } = await createShareLink(48, 'dashboard', undefined, payload)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
           onSkip={async () => {
             const { url } = await createShareLink(48, 'dashboard', undefined, sharePending)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
 
@@ -517,7 +548,10 @@ export function MicroservicesPage() {
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar microservicios..."
@@ -536,9 +570,7 @@ export function MicroservicesPage() {
           >
             <Filter size={16} />
             Filtros
-            {(filterLifecycle || filterApp) && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
+            {(filterLifecycle || filterApp) && <span className="w-2 h-2 rounded-full bg-primary" />}
           </Button>
         </div>
 
@@ -571,7 +603,10 @@ export function MicroservicesPage() {
               </div>
               {(filterLifecycle || filterApp) && (
                 <Button
-                  onClick={() => { setFilterLifecycle(''); setFilterApp('') }}
+                  onClick={() => {
+                    setFilterLifecycle('')
+                    setFilterApp('')
+                  }}
                   className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
                 >
                   <X size={14} />
@@ -579,9 +614,9 @@ export function MicroservicesPage() {
                 </Button>
               )}
             </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       {!rawMicroservices ? (
@@ -615,7 +650,12 @@ export function MicroservicesPage() {
 }
 
 function StatCard({
-  icon, label, value, color, active, onClick,
+  icon,
+  label,
+  value,
+  color,
+  active,
+  onClick,
 }: {
   icon: React.ReactNode
   label: string
@@ -636,15 +676,17 @@ function StatCard({
   return (
     <Comp
       onClick={onClick}
-        className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
-          active
-            ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
-            : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
-        }${onClick ? ' cursor-pointer' : ''}`}
-      >
-        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
-        <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
-        <p className="text-xs text-muted">{label}</p>
+      className={`rounded-2xl border p-4 flex items-center justify-center gap-3 transition-all ${
+        active
+          ? 'ring-2 ring-primary/40 border-primary bg-primary/5 dark:bg-primary/10 shadow-sm'
+          : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
+      }${onClick ? ' cursor-pointer' : ''}`}
+    >
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
+      <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
+      <p className="text-xs text-muted">{label}</p>
     </Comp>
   )
 }

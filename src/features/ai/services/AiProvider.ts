@@ -1,4 +1,9 @@
-import type { AiProviderType, AiProviderConfig, AiToolDefinition, AiProviderInterface } from '../types'
+import type {
+  AiProviderType,
+  AiProviderConfig,
+  AiToolDefinition,
+  AiProviderInterface,
+} from '../types'
 import { createOllamaProvider } from './providers/ollama'
 import { createGroqProvider } from './providers/groq'
 import { createOpenAiProvider } from './providers/openai'
@@ -25,18 +30,32 @@ Elegí la herramienta adecuada según lo que pida el usuario. No necesitás enum
   ]
 
   const tables: string[] = []
-  if (permissions.catalogo) tables.push('catalogo: applications, technologies, microservices, appDatabases, applicationDependencies')
+  if (permissions.catalogo)
+    tables.push(
+      'catalogo: applications, technologies, microservices, appDatabases, applicationDependencies',
+    )
   if (permissions.seguridad) tables.push('seguridad: vulnerabilities, incidents')
   if (permissions.gobierno) tables.push('gobierno: risks, auditFindings')
-  if (permissions.estrategia) tables.push('estrategia: objectives, healthIndexHistory, deliverables')
-  if (permissions.ejecucion) tables.push('ejecucion: plans, activities, tasks, commitments, dependencies, blockers')
-  if (permissions.personas) tables.push('personas: teams, memberProfiles, sprintRecords, oneOnOnes, achievements, vacationRecords, teamSprints')
-  if (permissions.reclutamiento) tables.push('reclutamiento: candidates, candidateTechnologies, candidateEvaluations')
-  if (permissions.equipamiento) tables.push('equipamiento: equipment, equipmentAssignments, equipmentTickets')
+  if (permissions.estrategia)
+    tables.push('estrategia: objectives, healthIndexHistory, deliverables')
+  if (permissions.ejecucion)
+    tables.push('ejecucion: plans, activities, tasks, commitments, dependencies, blockers')
+  if (permissions.personas)
+    tables.push(
+      'personas: teams, memberProfiles, sprintRecords, oneOnOnes, achievements, vacationRecords, teamSprints',
+    )
+  if (permissions.reclutamiento)
+    tables.push('reclutamiento: candidates, candidateTechnologies, candidateEvaluations')
+  if (permissions.equipamiento)
+    tables.push('equipamiento: equipment, equipmentAssignments, equipmentTickets')
 
-  parts.push(`DATOS DISPONIBLES:\n${tables.length > 0 ? tables.map(t => `• ${t}`).join('\n') : '- Ninguno.'}`)
+  parts.push(
+    `DATOS DISPONIBLES:\n${tables.length > 0 ? tables.map((t) => `• ${t}`).join('\n') : '- Ninguno.'}`,
+  )
 
-  parts.push(`RELACIONES: application↔microservices/vulnerabilities/incidents/risks/findings/databases/dependencies (applicationId) | microservice↔vulnerability/incident/risk/finding/database (M:N junction) | team↔members/plans/objectives/sprints (teamId) | member↔oneOnOnes/achievements/vacations/sprints (memberId) | plan↔activities↔tasks (planId) | businessUnit↔applications/teams/objectives (businessUnitId) | equipment↔assignments/tickets (equipmentId)`)
+  parts.push(
+    `RELACIONES: application↔microservices/vulnerabilities/incidents/risks/findings/databases/dependencies (applicationId) | microservice↔vulnerability/incident/risk/finding/database (M:N junction) | team↔members/plans/objectives/sprints (teamId) | member↔oneOnOnes/achievements/vacations/sprints (memberId) | plan↔activities↔tasks (planId) | businessUnit↔applications/teams/objectives (businessUnitId) | equipment↔assignments/tickets (equipmentId)`,
+  )
 
   parts.push(`INSTRUCCIONES:
 - Las herramientas disponibles se autodescubren. Elegí la que mejor se ajuste a cada consulta.

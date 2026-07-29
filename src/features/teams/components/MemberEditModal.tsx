@@ -19,7 +19,8 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'profile' | 'vacations' | 'skills' | 'sprints' | 'oneonone' | 'achievements' | 'equipment'
+type Tab =
+  'profile' | 'vacations' | 'skills' | 'sprints' | 'oneonone' | 'achievements' | 'equipment'
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'profile', label: 'Datos Personales', icon: <FileText size={16} /> },
@@ -35,10 +36,7 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [visible, setVisible] = useState(false)
 
-  const profile = useLiveQuery(
-    () => db.memberProfiles.get(memberId),
-    [memberId]
-  ) ?? null
+  const profile = useLiveQuery(() => db.memberProfiles.get(memberId), [memberId]) ?? null
 
   useEffect(() => {
     if (open) {
@@ -88,7 +86,9 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
               {memberName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">{memberName}</h2>
+              <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+                {memberName}
+              </h2>
               <p className="text-xs text-neutral-50">Gestionar información del miembro</p>
             </div>
           </div>
@@ -126,7 +126,9 @@ export function MemberEditModal({ memberId, memberName, teamId, open, onClose }:
           )}
           {activeTab === 'vacations' && <VacationsSection memberId={memberId} />}
           {activeTab === 'skills' && <SkillsSection memberId={memberId} />}
-          {activeTab === 'sprints' && <SprintsSection memberId={memberId} teamId={teamId || profile?.teamId || ''} />}
+          {activeTab === 'sprints' && (
+            <SprintsSection memberId={memberId} teamId={teamId || profile?.teamId || ''} />
+          )}
           {activeTab === 'oneonone' && <OneOnOneSection memberId={memberId} />}
           {activeTab === 'achievements' && <AchievementsSection memberId={memberId} />}
           {activeTab === 'equipment' && <EquipmentSection memberId={memberId} />}

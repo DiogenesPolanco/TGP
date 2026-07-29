@@ -14,10 +14,26 @@ interface Props {
 }
 
 const typeConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  logro: { icon: <Trophy size={16} />, label: 'Logro', color: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' },
-  reconocimiento: { icon: <Star size={16} />, label: 'Reconocimiento', color: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' },
-  certificacion: { icon: <BookOpen size={16} />, label: 'Certificación', color: 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300' },
-  ascenso: { icon: <TrendingUp size={16} />, label: 'Ascenso', color: 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300' },
+  logro: {
+    icon: <Trophy size={16} />,
+    label: 'Logro',
+    color: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300',
+  },
+  reconocimiento: {
+    icon: <Star size={16} />,
+    label: 'Reconocimiento',
+    color: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300',
+  },
+  certificacion: {
+    icon: <BookOpen size={16} />,
+    label: 'Certificación',
+    color: 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300',
+  },
+  ascenso: {
+    icon: <TrendingUp size={16} />,
+    label: 'Ascenso',
+    color: 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300',
+  },
 }
 
 export function AchievementsSection({ memberId }: Props) {
@@ -88,7 +104,7 @@ export function AchievementsSection({ memberId }: Props) {
     const updated = achievements.map((a) =>
       a.id === editingId
         ? { ...a, ...editData, title: editData.title.trim(), date: parseLocalDate(editData.date) }
-        : a
+        : a,
     )
     const record = updated.find((a) => a.id === editingId)!
     await db.achievements.put(record)
@@ -103,14 +119,20 @@ export function AchievementsSection({ memberId }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Logros y Reconocimientos</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+            Logros y Reconocimientos
+          </h2>
           {promotionReady.length > 0 && (
             <p className="text-xs text-green-600 mt-0.5">
               {promotionReady.length} logro(s) marcados para ascenso
             </p>
           )}
         </div>
-        <Button onClick={() => setShowForm(true)} variant="ghost" className="flex items-center gap-1.5 rounded-lg">
+        <Button
+          onClick={() => setShowForm(true)}
+          variant="ghost"
+          className="flex items-center gap-1.5 rounded-lg"
+        >
           <Plus size={16} /> Nuevo Logro
         </Button>
       </div>
@@ -121,9 +143,7 @@ export function AchievementsSection({ memberId }: Props) {
           const count = achievements.filter((a) => a.type === key).length
           return (
             <div key={key} className="text-center p-3 bg-card rounded-xl border border-boundary">
-              <div className={`inline-flex p-2 rounded-lg mb-1 ${cfg.color}`}>
-                {cfg.icon}
-              </div>
+              <div className={`inline-flex p-2 rounded-lg mb-1 ${cfg.color}`}>{cfg.icon}</div>
               <p className="text-lg font-bold text-neutral-90 dark:text-white">{count}</p>
               <p className="text-xs text-neutral-50">{cfg.label}</p>
             </div>
@@ -149,7 +169,9 @@ export function AchievementsSection({ memberId }: Props) {
               <label className="text-xs font-medium text-neutral-60 mb-1 block">Tipo</label>
               <Select
                 value={newAchievement.type}
-                onChange={(v) => setNewAchievement({ ...newAchievement, type: v as Achievement['type'] })}
+                onChange={(v) =>
+                  setNewAchievement({ ...newAchievement, type: v as Achievement['type'] })
+                }
                 options={[
                   { value: 'logro', label: 'Logro' },
                   { value: 'reconocimiento', label: 'Reconocimiento' },
@@ -180,17 +202,26 @@ export function AchievementsSection({ memberId }: Props) {
               <input
                 type="checkbox"
                 checked={newAchievement.linkedToPromotion}
-                onChange={(e) => setNewAchievement({ ...newAchievement, linkedToPromotion: e.target.checked })}
+                onChange={(e) =>
+                  setNewAchievement({ ...newAchievement, linkedToPromotion: e.target.checked })
+                }
                 className="rounded border-neutral-30"
               />
               <span className="text-sm text-secondary">Considerar para ascenso</span>
             </label>
           </div>
           <div className="flex gap-2">
-            <Button onClick={addAchievement} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
+            <Button
+              onClick={addAchievement}
+              className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark"
+            >
               Guardar Logro
             </Button>
-            <Button onClick={() => setShowForm(false)} variant="ghost" className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            <Button
+              onClick={() => setShowForm(false)}
+              variant="ghost"
+              className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90"
+            >
               Cancelar
             </Button>
           </div>
@@ -218,7 +249,10 @@ export function AchievementsSection({ memberId }: Props) {
                       onChange={(e) => setEditData({ ...editData, title: e.target.value })}
                       className="w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent px-3 py-2 text-sm"
                       autoFocus
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit()
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
                     />
                   </div>
                   <div>
@@ -236,12 +270,14 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                 </div>
                 <div className="mb-3">
-                <label className="text-xs font-medium text-neutral-60 mb-1 block">Descripción</label>
-                <RichTextEditor
-                  value={editData.description}
-                  onChange={(html) => setEditData({ ...editData, description: html })}
-                  placeholder="Descripción del logro..."
-                />
+                  <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                    Descripción
+                  </label>
+                  <RichTextEditor
+                    value={editData.description}
+                    onChange={(html) => setEditData({ ...editData, description: html })}
+                    placeholder="Descripción del logro..."
+                  />
                 </div>
                 <div className="flex items-center gap-4 mb-3">
                   <div>
@@ -256,15 +292,27 @@ export function AchievementsSection({ memberId }: Props) {
                     <input
                       type="checkbox"
                       checked={editData.linkedToPromotion}
-                      onChange={(e) => setEditData({ ...editData, linkedToPromotion: e.target.checked })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, linkedToPromotion: e.target.checked })
+                      }
                       className="rounded border-neutral-30"
                     />
                     <span className="text-sm text-secondary">Ascenso</span>
                   </label>
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={saveEdit} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">Guardar</Button>
-                  <Button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">Cancelar</Button>
+                  <Button
+                    onClick={saveEdit}
+                    className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark"
+                  >
+                    Guardar
+                  </Button>
+                  <Button
+                    onClick={() => setEditingId(null)}
+                    className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -273,13 +321,15 @@ export function AchievementsSection({ memberId }: Props) {
                 className="flex items-start justify-between p-4 bg-card rounded-xl border border-boundary group/ach"
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${cfg.color}`}>
-                    {cfg.icon}
-                  </div>
+                  <div className={`p-2 rounded-lg ${cfg.color}`}>{cfg.icon}</div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{a.title}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${cfg.color}`}>{cfg.label}</span>
+                      <p className="text-sm font-medium text-neutral-90 dark:text-white">
+                        {a.title}
+                      </p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${cfg.color}`}>
+                        {cfg.label}
+                      </span>
                       {a.linkedToPromotion && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300">
                           Ascenso
@@ -295,10 +345,16 @@ export function AchievementsSection({ memberId }: Props) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 ml-3 shrink-0">
-                  <button onClick={() => startEdit(a)} className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
+                  <button
+                    onClick={() => startEdit(a)}
+                    className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white"
+                  >
                     <Edit3 size={14} />
                   </button>
-                  <button onClick={() => removeAchievement(a.id)} className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400">
+                  <button
+                    onClick={() => removeAchievement(a.id)}
+                    className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400"
+                  >
                     <Trash2 size={14} />
                   </button>
                 </div>

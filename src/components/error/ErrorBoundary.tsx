@@ -46,9 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-xl font-bold text-neutral-90 dark:text-white">
-                Algo salió mal
-              </h1>
+              <h1 className="text-xl font-bold text-neutral-90 dark:text-white">Algo salió mal</h1>
               <p className="text-sm text-muted leading-relaxed">
                 Se produjo un error inesperado. Puedes intentar recargar la página o reintentar.
               </p>
@@ -66,11 +64,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-center justify-center gap-3">
-                <Button onClick={this.handleReset} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-secondary bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+                <Button
+                  onClick={this.handleReset}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-secondary bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 rounded-lg transition-colors"
+                >
                   <RefreshCw size={16} />
                   Reintentar
                 </Button>
-                <Button onClick={this.handleReload} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors">
+                <Button
+                  onClick={this.handleReload}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
+                >
                   <RefreshCw size={16} />
                   Recargar
                 </Button>

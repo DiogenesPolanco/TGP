@@ -2,12 +2,16 @@ import { db } from '@/services/db/database'
 import { type AiToolDefinition } from '../types'
 
 function n(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
 }
 
 export const buscarTicketEquipoTool: AiToolDefinition = {
   name: 'buscar_ticket_equipo',
-  description: 'Buscá tickets de equipamiento por tipo, estado, prioridad, equipo asociado o persona solicitante/asignada. Incluye tickets de reparación, reemplazo y nuevos.',
+  description:
+    'Buscá tickets de equipamiento por tipo, estado, prioridad, equipo asociado o persona solicitante/asignada. Incluye tickets de reparación, reemplazo y nuevos.',
   parameters: {
     type: 'object',
     properties: {
@@ -38,7 +42,7 @@ export const buscarTicketEquipoTool: AiToolDefinition = {
     },
   },
   execute: async (params) => {
-    const q = (params.q as string ?? '').trim()
+    const q = ((params.q as string) ?? '').trim()
     const tipo = params.tipo as string | undefined
     const estado = params.estado as string | undefined
     const prioridad = params.prioridad as string | undefined
@@ -57,7 +61,7 @@ export const buscarTicketEquipoTool: AiToolDefinition = {
     try {
       const teams = await db.teams.toArray()
       for (const t of teams) {
-        for (const m of (t.members ?? [])) {
+        for (const m of t.members ?? []) {
           const id = (m as any).id ?? ''
           const name = (m as any).displayName ?? ''
           if (id && name) personMap.set(id, name)
@@ -80,7 +84,8 @@ export const buscarTicketEquipoTool: AiToolDefinition = {
       }
       tickets = tickets.filter((t) => {
         if (n(t.description).includes(term)) return true
-        if (n(t.type).includes(term) || n(t.status).includes(term) || n(t.priority).includes(term)) return true
+        if (n(t.type).includes(term) || n(t.status).includes(term) || n(t.priority).includes(term))
+          return true
         if (t.jiraTicketId && n(t.jiraTicketId).includes(term)) return true
         if (matchingPersonIds.size > 0) {
           if (t.requesterId && matchingPersonIds.has(t.requesterId)) return true
@@ -98,10 +103,23 @@ export const buscarTicketEquipoTool: AiToolDefinition = {
 
     tickets = tickets.slice(0, limit)
     const lines = tickets.map((t) => {
-      const nombreEquipo = t.equipmentId ? equipmentMap.get(t.equipmentId) ?? t.equipmentId.slice(0, 12) : '—'
-      const solicitante = t.requesterId ? personMap.get(t.requesterId) ?? t.requesterId.slice(0, 12) : '—'
-      const asignado = t.assigneeId ? personMap.get(t.assigneeId) ?? t.assigneeId.slice(0, 12) : '—'
-      const icon = t.status === 'closed' ? '✅' : t.status === 'resolved' ? '🟢' : t.status === 'in_progress' ? '🔄' : '🔴'
+      const nombreEquipo = t.equipmentId
+        ? (equipmentMap.get(t.equipmentId) ?? t.equipmentId.slice(0, 12))
+        : '—'
+      const solicitante = t.requesterId
+        ? (personMap.get(t.requesterId) ?? t.requesterId.slice(0, 12))
+        : '—'
+      const asignado = t.assigneeId
+        ? (personMap.get(t.assigneeId) ?? t.assigneeId.slice(0, 12))
+        : '—'
+      const icon =
+        t.status === 'closed'
+          ? '✅'
+          : t.status === 'resolved'
+            ? '🟢'
+            : t.status === 'in_progress'
+              ? '🔄'
+              : '🔴'
       const jira = t.jiraTicketId ? ` · Jira: ${t.jiraTicketId}` : ''
       return `${icon} **${t.type}** · ${t.priority} · ${t.status} · Eq: ${nombreEquipo}${jira}\n   Solicitante: ${solicitante} · Asignado: ${asignado}`
     })

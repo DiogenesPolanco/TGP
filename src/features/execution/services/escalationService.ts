@@ -7,7 +7,11 @@ import { db } from '@/services/db/database'
  * - Commitments with commitmentDate past due and status 'active' → auto-set to 'at_risk'
  * - Commitments with commitmentDate 7+ days past due and not fulfilled → auto-set to 'breached'
  */
-export async function runEscalation(): Promise<{ blockersEscalated: number; commitmentsAtRisk: number; commitmentsBreached: number }> {
+export async function runEscalation(): Promise<{
+  blockersEscalated: number
+  commitmentsAtRisk: number
+  commitmentsBreached: number
+}> {
   const now = new Date()
   const HOURS_48 = 48 * 60 * 60 * 1000
   const HOURS_24 = 24 * 60 * 60 * 1000
@@ -23,7 +27,11 @@ export async function runEscalation(): Promise<{ blockersEscalated: number; comm
     const age = now.getTime() - new Date(blocker.createdAt).getTime()
     const shouldEscalate = blocker.severity === 'critical' ? age >= HOURS_24 : age >= HOURS_48
     if (shouldEscalate) {
-      await db.blockers.update(blocker.id, { status: 'escalated', escalatedAt: now, updatedAt: now })
+      await db.blockers.update(blocker.id, {
+        status: 'escalated',
+        escalatedAt: now,
+        updatedAt: now,
+      })
       blockersEscalated++
     }
   }

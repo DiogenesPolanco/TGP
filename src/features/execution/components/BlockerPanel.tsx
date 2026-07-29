@@ -2,7 +2,17 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { AlertTriangle, ChevronDown, ChevronRight, Plus, RotateCcw, Trash2, X, Check, Pencil } from 'lucide-react'
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  RotateCcw,
+  Trash2,
+  X,
+  Check,
+  Pencil,
+} from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
@@ -71,7 +81,7 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
       raisedById: editId ? undefined : 'unknown',
       assigneeId: editAssigneeId || null,
       escalatedAt: editId ? undefined : null,
-      resolvedAt: editStatus === 'resolved' ? now : (editId ? undefined : null),
+      resolvedAt: editStatus === 'resolved' ? now : editId ? undefined : null,
       resolutionNotes: editResolutionNotes || null,
       updatedAt: now,
     }
@@ -135,7 +145,11 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
         </div>
         <div className="flex items-center gap-2">
           <Button
-            onClick={(e) => { e.stopPropagation(); resetForm(); setShowForm(!showForm) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              resetForm()
+              setShowForm(!showForm)
+            }}
             className="p-1 rounded-md hover:bg-neutral-30 dark:hover:bg-neutral-60 transition-colors"
             title="Agregar bloqueo"
           >
@@ -151,7 +165,9 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
           {showForm && (
             <div className="p-4 space-y-3 bg-neutral-10 dark:bg-neutral-80">
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1">Titulo <span className="text-danger">*</span></label>
+                <label className="block text-xs font-medium text-secondary mb-1">
+                  Titulo <span className="text-danger">*</span>
+                </label>
                 <input
                   type="text"
                   value={editTitle}
@@ -204,7 +220,9 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               </div>
               {editStatus === 'resolved' && (
                 <div>
-                  <label className="block text-xs font-medium text-secondary mb-1">Notas de resolucion</label>
+                  <label className="block text-xs font-medium text-secondary mb-1">
+                    Notas de resolucion
+                  </label>
                   <RichTextEditor
                     value={editResolutionNotes}
                     onChange={(html) => setEditResolutionNotes(html)}
@@ -241,31 +259,49 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium text-neutral-80 dark:text-white truncate ${blocker.status === 'resolved' ? 'line-through' : ''}`}>
+                    <span
+                      className={`text-sm font-medium text-neutral-80 dark:text-white truncate ${blocker.status === 'resolved' ? 'line-through' : ''}`}
+                    >
                       {blocker.title}
                     </span>
-                    <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded-full text-nowrap ${statusBadge[blocker.status]}`}>
-                      {blocker.status === 'open' ? 'Abierto' : blocker.status === 'escalated' ? 'Escalado' : 'Resuelto'}
+                    <span
+                      className={`px-1.5 py-0.5 text-[10px] font-semibold rounded-full text-nowrap ${statusBadge[blocker.status]}`}
+                    >
+                      {blocker.status === 'open'
+                        ? 'Abierto'
+                        : blocker.status === 'escalated'
+                          ? 'Escalado'
+                          : 'Resuelto'}
                     </span>
                   </div>
-                  {blocker.description && (
-                    <HtmlDescription html={blocker.description} lines={2} />
-                  )}
+                  {blocker.description && <HtmlDescription html={blocker.description} lines={2} />}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 text-[11px] text-neutral-50">
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${severityColors[blocker.severity]}`}>
-                    {blocker.severity === 'low' ? 'Baja' : blocker.severity === 'medium' ? 'Media' : blocker.severity === 'high' ? 'Alta' : 'Critica'}
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${severityColors[blocker.severity]}`}
+                  >
+                    {blocker.severity === 'low'
+                      ? 'Baja'
+                      : blocker.severity === 'medium'
+                        ? 'Media'
+                        : blocker.severity === 'high'
+                          ? 'Alta'
+                          : 'Critica'}
                   </span>
-                  {blocker.assigneeId && (
-                    <span>Asignado: {blocker.assigneeId}</span>
-                  )}
+                  {blocker.assigneeId && <span>Asignado: {blocker.assigneeId}</span>}
                   {blocker.escalatedAt && (
-                    <span className="text-danger">Escalado {new Date(blocker.escalatedAt).toLocaleDateString()}</span>
+                    <span className="text-danger">
+                      Escalado {new Date(blocker.escalatedAt).toLocaleDateString()}
+                    </span>
                   )}
                   {blocker.resolutionNotes && blocker.status === 'resolved' && (
-                    <HtmlDescription html={blocker.resolutionNotes} lines={1} className="text-success max-w-[200px]" />
+                    <HtmlDescription
+                      html={blocker.resolutionNotes}
+                      lines={1}
+                      className="text-success max-w-[200px]"
+                    />
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0 ml-2">

@@ -66,7 +66,16 @@ export function useAiSetup() {
         apiKey: wizard.apiKey,
         model: wizard.model,
         enabled: true,
-        dataPermissions: { catalogo: true, seguridad: false, gobierno: false, estrategia: false, ejecucion: false, personas: false, reclutamiento: false, equipamiento: false },
+        dataPermissions: {
+          catalogo: true,
+          seguridad: false,
+          gobierno: false,
+          estrategia: false,
+          ejecucion: false,
+          personas: false,
+          reclutamiento: false,
+          equipamiento: false,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -83,7 +92,11 @@ export function useAiSetup() {
           model: models.length > 0 ? models[0] : prev.model,
         }))
       } else {
-        setWizard((prev) => ({ ...prev, testResult: 'error', testError: 'No se pudo conectar. Verifica la URL y credenciales.' }))
+        setWizard((prev) => ({
+          ...prev,
+          testResult: 'error',
+          testError: 'No se pudo conectar. Verifica la URL y credenciales.',
+        }))
       }
     } catch (err) {
       setWizard((prev) => ({
@@ -118,11 +131,16 @@ export function useAiSetup() {
 
   const isStepValid = useCallback(() => {
     switch (wizard.step) {
-      case 0: return wizard.provider !== null
-      case 1: return wizard.testResult === 'success'
-      case 2: return true // permissions are optional
-      case 3: return true
-      default: return false
+      case 0:
+        return wizard.provider !== null
+      case 1:
+        return wizard.testResult === 'success'
+      case 2:
+        return true // permissions are optional
+      case 3:
+        return true
+      default:
+        return false
     }
   }, [wizard])
 

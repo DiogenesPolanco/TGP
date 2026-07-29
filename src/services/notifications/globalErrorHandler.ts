@@ -17,9 +17,7 @@ export function setupGlobalErrorHandler() {
 
     console.error('[UnhandledRejection]', reason)
 
-    const isChunkError = CHUNK_LOAD_PATTERNS.some((p) =>
-      message.includes(p),
-    )
+    const isChunkError = CHUNK_LOAD_PATTERNS.some((p) => message.includes(p))
 
     if (isChunkError) {
       event.preventDefault()
@@ -27,8 +25,7 @@ export function setupGlobalErrorHandler() {
       try {
         useAppStore.getState().addNotification({
           type: 'error',
-          message:
-            'Hay una nueva versión de TGP disponible. Recarga la aplicación para aplicarla.',
+          message: 'Hay una nueva versión de TGP disponible. Recarga la aplicación para aplicarla.',
           duration: 0,
         })
       } catch {}

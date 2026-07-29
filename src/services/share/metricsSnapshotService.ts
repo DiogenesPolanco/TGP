@@ -94,11 +94,9 @@ export async function computeMobileSnapshot(): Promise<MobileSnapshot> {
     db.auditFindings.toArray(),
   ])
 
-  const openIncidents = incidents.filter(
-    (i) => i.status !== 'resolved' && i.status !== 'closed'
-  )
+  const openIncidents = incidents.filter((i) => i.status !== 'resolved' && i.status !== 'closed')
   const p1Incidents = incidents.filter(
-    (i) => i.severity === 'critical' && i.status !== 'resolved' && i.status !== 'closed'
+    (i) => i.severity === 'critical' && i.status !== 'resolved' && i.status !== 'closed',
   )
 
   const openBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated')
@@ -114,12 +112,16 @@ export async function computeMobileSnapshot(): Promise<MobileSnapshot> {
   const overduePlans = activePlans.filter((p) => p.endDate < now)
 
   const openCommitments = commitments.filter(
-    (c) => c.status !== 'fulfilled' && c.status !== 'cancelled'
+    (c) => c.status !== 'fulfilled' && c.status !== 'cancelled',
   )
   const overdueCommitments = openCommitments.filter((c) => c.commitmentDate < now)
 
   const activeObjectives = objectives.filter(
-    (o) => o.status === 'on_track' || o.status === 'at_risk' || o.status === 'behind' || o.status === 'not_started'
+    (o) =>
+      o.status === 'on_track' ||
+      o.status === 'at_risk' ||
+      o.status === 'behind' ||
+      o.status === 'not_started',
   )
   const onTrack = activeObjectives.filter((o) => o.status === 'on_track')
   const atRiskObjs = activeObjectives.filter((o) => o.status === 'at_risk')
@@ -132,61 +134,113 @@ export async function computeMobileSnapshot(): Promise<MobileSnapshot> {
   // Derive alerts from computed data
   const alerts: MobileSnapshot['alerts'] = []
   if (p1Incidents.length > 0) {
-    alerts.push({ type: 'critical', message: `${p1Incidents.length} incidente${p1Incidents.length > 1 ? 's' : ''} P1 activo${p1Incidents.length > 1 ? 's' : ''}` })
+    alerts.push({
+      type: 'critical',
+      message: `${p1Incidents.length} incidente${p1Incidents.length > 1 ? 's' : ''} P1 activo${p1Incidents.length > 1 ? 's' : ''}`,
+    })
   }
   if (criticalBlockers.length > 0) {
-    alerts.push({ type: 'critical', message: `${criticalBlockers.length} bloqueo${criticalBlockers.length > 1 ? 's' : ''} crítico${criticalBlockers.length > 1 ? 's' : ''} sin resolver` })
+    alerts.push({
+      type: 'critical',
+      message: `${criticalBlockers.length} bloqueo${criticalBlockers.length > 1 ? 's' : ''} crítico${criticalBlockers.length > 1 ? 's' : ''} sin resolver`,
+    })
   }
   if (criticalVulns.length > 0) {
-    alerts.push({ type: 'critical', message: `${criticalVulns.length} vulnerabilidad${criticalVulns.length > 1 ? 'es' : ''} crítica${criticalVulns.length > 1 ? 's' : ''} sin corregir` })
+    alerts.push({
+      type: 'critical',
+      message: `${criticalVulns.length} vulnerabilidad${criticalVulns.length > 1 ? 'es' : ''} crítica${criticalVulns.length > 1 ? 's' : ''} sin corregir`,
+    })
   }
   if (criticalRisks.length > 0) {
-    alerts.push({ type: 'warning', message: `${criticalRisks.length} riesgo${criticalRisks.length > 1 ? 's' : ''} crítico${criticalRisks.length > 1 ? 's' : ''} sin mitigar` })
+    alerts.push({
+      type: 'warning',
+      message: `${criticalRisks.length} riesgo${criticalRisks.length > 1 ? 's' : ''} crítico${criticalRisks.length > 1 ? 's' : ''} sin mitigar`,
+    })
   }
   if (overdueCommitments.length > 0) {
-    alerts.push({ type: 'warning', message: `${overdueCommitments.length} compromiso${overdueCommitments.length > 1 ? 's' : ''} vencido${overdueCommitments.length > 1 ? 's' : ''}` })
+    alerts.push({
+      type: 'warning',
+      message: `${overdueCommitments.length} compromiso${overdueCommitments.length > 1 ? 's' : ''} vencido${overdueCommitments.length > 1 ? 's' : ''}`,
+    })
   }
   if (atRiskPlans.length > 0) {
-    alerts.push({ type: 'warning', message: `${atRiskPlans.length} plan${atRiskPlans.length > 1 ? 'es' : ''} en riesgo${atRiskPlans.length > 1 ? 's' : ''}` })
+    alerts.push({
+      type: 'warning',
+      message: `${atRiskPlans.length} plan${atRiskPlans.length > 1 ? 'es' : ''} en riesgo${atRiskPlans.length > 1 ? 's' : ''}`,
+    })
   }
 
   // THI calculation (same 7-dimension formula as desktop dashboard)
-  const deliveryScore = teams.length === 0 ? 50
-    : Math.round(
-        teams.reduce((s, t) => {
-          const m = t.currentMetrics
-          if (!m) return s + 50
-          return s + (Math.min(m.velocity / 50, 1) * 100 + Math.max(0, 100 - (m.leadTimeHours / 168) * 100) + Math.max(0, 100 - m.changeFailureRate * 5) + Math.max(0, 100 - (m.mttrHours / 24) * 100)) / 4
-        }, 0) / teams.length
-      )
+  const deliveryScore =
+    teams.length === 0
+      ? 50
+      : Math.round(
+          teams.reduce((s, t) => {
+            const m = t.currentMetrics
+            if (!m) return s + 50
+            return (
+              s +
+              (Math.min(m.velocity / 50, 1) * 100 +
+                Math.max(0, 100 - (m.leadTimeHours / 168) * 100) +
+                Math.max(0, 100 - m.changeFailureRate * 5) +
+                Math.max(0, 100 - (m.mttrHours / 24) * 100)) /
+                4
+            )
+          }, 0) / teams.length,
+        )
 
   const qualityScore = 75
 
-  const criticalHighOpen = openVulns.filter((v) => v.severity === 'critical' || v.severity === 'high').length
-  const securityScore = applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
+  const criticalHighOpen = openVulns.filter(
+    (v) => v.severity === 'critical' || v.severity === 'high',
+  ).length
+  const securityScore =
+    applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
 
-  const totalDowntime = incidents.filter((i) => i.status === 'resolved').reduce((s, i) => s + (i.downtimeMinutes ?? 0), 0)
-  const availabilityScore = applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
+  const totalDowntime = incidents
+    .filter((i) => i.status === 'resolved')
+    .reduce((s, i) => s + (i.downtimeMinutes ?? 0), 0)
+  const availabilityScore =
+    applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
 
   const usedTechIds = new Set<string>()
   for (const app of applications) for (const tId of app.technologies ?? []) usedTechIds.add(tId)
   const usedTechs = technologies.filter((t) => usedTechIds.has(t.id))
   const eolTechs = usedTechs.filter((t) => t.supportStatus === 'eol')
-  const obsolescenceScore = usedTechs.length === 0 ? 100 : Math.round((1 - eolTechs.length / usedTechs.length) * 100)
+  const obsolescenceScore =
+    usedTechs.length === 0 ? 100 : Math.round((1 - eolTechs.length / usedTechs.length) * 100)
 
   const activeRiskScore = openRisks.reduce((s, r) => s + r.riskScore, 0)
-  const riskDimensionScore = applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(activeRiskScore / 5, 80))
+  const riskDimensionScore =
+    applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(activeRiskScore / 5, 80))
 
-  const closedOnTime = auditFindings.filter((f) =>
-    (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= now
+  const closedOnTime = auditFindings.filter(
+    (f) => (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= now,
   ).length
-  const complianceScore = auditFindings.length === 0 ? 100 : Math.round((closedOnTime / auditFindings.length) * 100)
+  const complianceScore =
+    auditFindings.length === 0 ? 100 : Math.round((closedOnTime / auditFindings.length) * 100)
 
   const overallScore = Math.round(
-    (deliveryScore * 20 + qualityScore * 15 + securityScore * 20 + availabilityScore * 15 + obsolescenceScore * 10 + riskDimensionScore * 10 + complianceScore * 10) / 100
+    (deliveryScore * 20 +
+      qualityScore * 15 +
+      securityScore * 20 +
+      availabilityScore * 15 +
+      obsolescenceScore * 10 +
+      riskDimensionScore * 10 +
+      complianceScore * 10) /
+      100,
   )
 
-  const thiLabel = overallScore >= 90 ? 'Excelente' : overallScore >= 70 ? 'Saludable' : overallScore >= 50 ? 'Regular' : overallScore >= 30 ? 'En Riesgo' : 'Crítico'
+  const thiLabel =
+    overallScore >= 90
+      ? 'Excelente'
+      : overallScore >= 70
+        ? 'Saludable'
+        : overallScore >= 50
+          ? 'Regular'
+          : overallScore >= 30
+            ? 'En Riesgo'
+            : 'Crítico'
 
   const snapshot: MobileSnapshot = {
     version: 1,
@@ -206,18 +260,35 @@ export async function computeMobileSnapshot(): Promise<MobileSnapshot> {
     },
     incidents: { p1: p1Incidents.length, open: openIncidents.length, total: incidents.length },
     blockers: {
-      open: openBlockers.length, critical: criticalBlockers.length,
-      list: criticalBlockers.slice(0, 10).map((b) => ({ id: b.id, title: b.title, severity: b.severity })),
+      open: openBlockers.length,
+      critical: criticalBlockers.length,
+      list: criticalBlockers
+        .slice(0, 10)
+        .map((b) => ({ id: b.id, title: b.title, severity: b.severity })),
     },
-    risks: { open: openRisks.length, high: highRisks.length, critical: criticalRisks.length, totalScore: totalRiskScore },
+    risks: {
+      open: openRisks.length,
+      high: highRisks.length,
+      critical: criticalRisks.length,
+      totalScore: totalRiskScore,
+    },
     plans: { active: activePlans.length, atRisk: atRiskPlans.length, overdue: overduePlans.length },
     commitments: { overdue: overdueCommitments.length, total: commitments.length },
     objectives: {
-      total: activeObjectives.length, onTrack: onTrack.length, atRisk: atRiskObjs.length, behind: behindObjs.length,
-      items: activeObjectives.slice(0, 10).map((o) => ({ id: o.id, title: o.title, progress: o.progress, status: o.status })),
+      total: activeObjectives.length,
+      onTrack: onTrack.length,
+      atRisk: atRiskObjs.length,
+      behind: behindObjs.length,
+      items: activeObjectives
+        .slice(0, 10)
+        .map((o) => ({ id: o.id, title: o.title, progress: o.progress, status: o.status })),
     },
     alerts,
-    vulnerabilities: { critical: criticalVulns.length, high: highVulns.length, total: openVulns.length },
+    vulnerabilities: {
+      critical: criticalVulns.length,
+      high: highVulns.length,
+      total: openVulns.length,
+    },
     applications: applications.length,
     teams: teams.length,
   }
@@ -239,24 +310,32 @@ export function getStoredSnapshotInfo(): {
     const raw = localStorage.getItem(MOBILE_SNAPSHOT_KEY)
     if (!raw) return null
     return JSON.parse(raw)
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 function storeSnapshotInfo(sasUrl: string, container: string) {
-  localStorage.setItem(MOBILE_SNAPSHOT_KEY, JSON.stringify({
-    sasUrl, container, uploadedAt: new Date().toISOString(),
-  }))
+  localStorage.setItem(
+    MOBILE_SNAPSHOT_KEY,
+    JSON.stringify({
+      sasUrl,
+      container,
+      uploadedAt: new Date().toISOString(),
+    }),
+  )
 }
 
 export async function uploadMobileSnapshot(
   snapshot: MobileSnapshot,
-  passphrase: string
+  passphrase: string,
 ): Promise<{ success: boolean; error?: string; url?: string }> {
   try {
     const { encryptData } = await import('@/services/share/encryptionService')
     const encrypted = await encryptData(snapshot, passphrase)
 
-    const { getShareAzureConfig, getAzureBackupConfig } = await import('@/services/share/azureShareService')
+    const { getShareAzureConfig, getAzureBackupConfig } =
+      await import('@/services/share/azureShareService')
     const config = getShareAzureConfig() ?? getAzureBackupConfig()
     if (!config?.sasUrl || !config.containerName) {
       return { success: false, error: 'Azure no configurado' }
@@ -295,9 +374,9 @@ export async function uploadMobileSnapshot(
 // ─── Download snapshot using URL hash fragment ─────────────────────
 
 export interface MobileSnapshotManifest {
-  s: string  // sasUrl
-  c: string  // container
-  f: string  // filename
+  s: string // sasUrl
+  c: string // container
+  f: string // filename
 }
 
 export function parseManifestFromHash(hash: string): MobileSnapshotManifest | null {
@@ -305,7 +384,12 @@ export function parseManifestFromHash(hash: string): MobileSnapshotManifest | nu
     const raw = hash.replace(/^#/, '')
     if (!raw) return null
     const decoded = JSON.parse(decodeURIComponent(atob(raw)))
-    if (decoded && typeof decoded.s === 'string' && typeof decoded.c === 'string' && typeof decoded.f === 'string') {
+    if (
+      decoded &&
+      typeof decoded.s === 'string' &&
+      typeof decoded.c === 'string' &&
+      typeof decoded.f === 'string'
+    ) {
       return decoded as MobileSnapshotManifest
     }
     return null
@@ -314,7 +398,9 @@ export function parseManifestFromHash(hash: string): MobileSnapshotManifest | nu
   }
 }
 
-export async function downloadSnapshotFromManifest(manifest: MobileSnapshotManifest): Promise<unknown | null> {
+export async function downloadSnapshotFromManifest(
+  manifest: MobileSnapshotManifest,
+): Promise<unknown | null> {
   try {
     const qi = manifest.s.indexOf('?')
     const params = qi >= 0 ? manifest.s.substring(qi) : ''
@@ -339,11 +425,17 @@ export function getCachedMobileSnapshot(): MobileSnapshot | null {
     const raw = localStorage.getItem(CACHED_SNAPSHOT_KEY)
     if (!raw) return null
     return JSON.parse(raw) as MobileSnapshot
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 export function setCachedMobileSnapshot(snapshot: MobileSnapshot): void {
-  try { localStorage.setItem(CACHED_SNAPSHOT_KEY, JSON.stringify(snapshot)) } catch { /* noop */ }
+  try {
+    localStorage.setItem(CACHED_SNAPSHOT_KEY, JSON.stringify(snapshot))
+  } catch {
+    /* noop */
+  }
 }
 
 export function clearCachedMobileSnapshot(): void {
@@ -355,7 +447,11 @@ export function clearCachedMobileSnapshot(): void {
 const MOBILE_SNAPSHOT_PASSPHRASE_KEY = 'tgp-mobile-snapshot-passphrase'
 
 export function getMobileSnapshotPassphrase(): string {
-  try { return localStorage.getItem(MOBILE_SNAPSHOT_PASSPHRASE_KEY) ?? '' } catch { return '' }
+  try {
+    return localStorage.getItem(MOBILE_SNAPSHOT_PASSPHRASE_KEY) ?? ''
+  } catch {
+    return ''
+  }
 }
 export function setMobileSnapshotPassphrase(passphrase: string): void {
   localStorage.setItem(MOBILE_SNAPSHOT_PASSPHRASE_KEY, passphrase)

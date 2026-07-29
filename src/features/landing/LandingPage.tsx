@@ -22,44 +22,84 @@ const STARS = [
 ]
 const FEATURES = [
   {
-    icon: LayoutDashboard, title: 'Dashboard THI',
+    icon: LayoutDashboard,
+    title: 'Dashboard THI',
     desc: '"Está todo bien" no es un reporte. El THI sí.',
-    highlights: ['THI compuesto en 7 dimensiones', 'KPIs ejecutivos con drill-down', 'Tendencias y distribución por severidad'],
+    highlights: [
+      'THI compuesto en 7 dimensiones',
+      'KPIs ejecutivos con drill-down',
+      'Tendencias y distribución por severidad',
+    ],
   },
   {
-    icon: Layers, title: 'Catálogo',
+    icon: Layers,
+    title: 'Catálogo',
     desc: 'Esa app que nadie recuerda — existe y ya está documentada.',
-    highlights: ['CRUD completo con búsqueda avanzada', 'Filtros por criticidad, estado y BU', 'Vulnerabilidades y riesgos heredados'],
+    highlights: [
+      'CRUD completo con búsqueda avanzada',
+      'Filtros por criticidad, estado y BU',
+      'Vulnerabilidades y riesgos heredados',
+    ],
   },
   {
-    icon: Shield, title: 'Seguridad',
+    icon: Shield,
+    title: 'Seguridad',
     desc: 'Vulnerabilidades que no se arreglan solas. Pero al menos sabes cuáles son.',
-    highlights: ['CVSS scoring y SLA tracking', 'Incidentes P1–P4 con tiempos de respuesta', 'Matriz de riesgos y hallazgos de auditoría'],
+    highlights: [
+      'CVSS scoring y SLA tracking',
+      'Incidentes P1–P4 con tiempos de respuesta',
+      'Matriz de riesgos y hallazgos de auditoría',
+    ],
   },
   {
-    icon: Users, title: 'Equipos DORA',
+    icon: Users,
+    title: 'Equipos DORA',
     desc: 'Benchmarking real. Porque "hacemos deploy rápido" no es una métrica.',
-    highlights: ['Deploy frequency, Lead time, CFR, MTTR', 'Benchmarking Elite / Alto / Medio / Bajo', 'Vinculación con OKRs y entregables'],
+    highlights: [
+      'Deploy frequency, Lead time, CFR, MTTR',
+      'Benchmarking Elite / Alto / Medio / Bajo',
+      'Vinculación con OKRs y entregables',
+    ],
   },
   {
-    icon: Crosshair, title: 'OKRs',
+    icon: Crosshair,
+    title: 'OKRs',
     desc: 'Objetivos que no se pierden en el Slack del Q3.',
-    highlights: ['Key Results con progreso automático', 'Estados: on track, at risk, behind, achieved', 'Vinculación con planes y ejecución'],
+    highlights: [
+      'Key Results con progreso automático',
+      'Estados: on track, at risk, behind, achieved',
+      'Vinculación con planes y ejecución',
+    ],
   },
   {
-    icon: Kanban, title: 'Ejecución',
+    icon: Kanban,
+    title: 'Ejecución',
     desc: 'Planes, blockers y compromisos. Todo lo que un líder necesita seguir.',
-    highlights: ['Diagramas de Gantt y timeline diaria', 'Bloqueos con escalamiento automático', 'Mapa de dependencias y compromisos'],
+    highlights: [
+      'Diagramas de Gantt y timeline diaria',
+      'Bloqueos con escalamiento automático',
+      'Mapa de dependencias y compromisos',
+    ],
   },
   {
-    icon: CalendarClock, title: 'Obsolescencia',
+    icon: CalendarClock,
+    title: 'Obsolescencia',
     desc: '"Esa versión salió hace 3 años" — sí, y ya deberías haber migrado.',
-    highlights: ['Sincronización con endoflife.date', 'Alertas de vencimiento y mapa global', 'Impacto sobre aplicaciones y tecnologías'],
+    highlights: [
+      'Sincronización con endoflife.date',
+      'Alertas de vencimiento y mapa global',
+      'Impacto sobre aplicaciones y tecnologías',
+    ],
   },
   {
-    icon: Bot, title: 'GobIA',
+    icon: Bot,
+    title: 'GobIA',
     desc: 'Un asistente que responde. No que "procesa tu solicitud".',
-    highlights: ['Consultas en lenguaje natural sobre tus datos', 'Proveedores: OpenAI, Groq, Anthropic, Ollama', 'Tool calls: auditoría, consultas, análisis'],
+    highlights: [
+      'Consultas en lenguaje natural sobre tus datos',
+      'Proveedores: OpenAI, Groq, Anthropic, Ollama',
+      'Tool calls: auditoría, consultas, análisis',
+    ],
   },
 ]
 
@@ -121,7 +161,10 @@ export default function LandingPage() {
 
       <div className="relative z-10 max-w-[1100px] mx-auto px-6">
         {/* NAV */}
-        <nav style={{ borderBottom: '1px solid rgba(0,255,136,0.1)' }} className="flex items-center justify-between py-6">
+        <nav
+          style={{ borderBottom: '1px solid rgba(0,255,136,0.1)' }}
+          className="flex items-center justify-between py-6"
+        >
           <button
             onClick={() => navigate('/')}
             className="font-mono font-extrabold text-xl tracking-tight"
@@ -129,7 +172,10 @@ export default function LandingPage() {
           >
             TGP<span style={{ color: '#ffb900' }}>_</span>
           </button>
-          <ul className="hidden md:flex gap-8 list-none text-xs font-semibold uppercase tracking-wider" style={{ color: '#6b7a99' }}>
+          <ul
+            className="hidden md:flex gap-8 list-none text-xs font-semibold uppercase tracking-wider"
+            style={{ color: '#6b7a99' }}
+          >
             {[
               { label: 'Dashboard', to: '/dashboard', external: false },
               { label: 'Funcionalidades', to: '#features', external: false, scroll: true },
@@ -191,22 +237,31 @@ export default function LandingPage() {
             >
               ✦ Technology Governance Platform
             </div>
-            <h1 className="font-mono text-[52px] font-extrabold leading-[1.1] tracking-[-1.5px] mb-5" style={{ color: '#e8edf5' }}>
-              Gobierno de TI<br />
-              <span style={{
-                background: 'linear-gradient(135deg, #00ff88, #00cc6a)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>
+            <h1
+              className="font-mono text-[52px] font-extrabold leading-[1.1] tracking-[-1.5px] mb-5"
+              style={{ color: '#e8edf5' }}
+            >
+              Gobierno de TI
+              <br />
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #00ff88, #00cc6a)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
                 en tiempo real
               </span>
               <br />
               sin servidores<span style={{ color: '#ffb900' }}>.</span>
             </h1>
-            <p className="text-base leading-relaxed mb-10 max-w-[460px]" style={{ color: '#6b7a99' }}>
-              TGP es la primera plataforma de governance tecnológico 100% cliente-side.
-              Gestiona aplicaciones, vulnerabilidades, equipos y obsolescencia con privacidad
-              total — tus datos nunca salen de tu dispositivo.
+            <p
+              className="text-base leading-relaxed mb-10 max-w-[460px]"
+              style={{ color: '#6b7a99' }}
+            >
+              TGP es la primera plataforma de governance tecnológico 100% cliente-side. Gestiona
+              aplicaciones, vulnerabilidades, equipos y obsolescencia con privacidad total — tus
+              datos nunca salen de tu dispositivo.
             </p>
             <div className="flex gap-4 items-center">
               <button
@@ -230,7 +285,9 @@ export default function LandingPage() {
                 Comenzar →
               </button>
               <button
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
+                }
                 className="font-mono text-[13px] font-semibold uppercase tracking-wider cursor-pointer transition-all"
                 style={{
                   background: 'transparent',
@@ -255,7 +312,11 @@ export default function LandingPage() {
 
           {/* THI Gauge */}
           <div className="relative w-[280px] h-[280px] mx-auto">
-            <svg viewBox="0 0 120 120" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
+            <svg
+              viewBox="0 0 120 120"
+              className="w-full h-full"
+              style={{ transform: 'rotate(-90deg)' }}
+            >
               <defs>
                 <linearGradient id="gg" x1="0%" x2="100%">
                   <stop offset="0%" stopColor="#ffb900" />
@@ -263,7 +324,14 @@ export default function LandingPage() {
                   <stop offset="100%" stopColor="#00ff88" />
                 </linearGradient>
               </defs>
-              <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(0,255,136,0.08)" strokeWidth="12" />
+              <circle
+                cx="60"
+                cy="60"
+                r={R}
+                fill="none"
+                stroke="rgba(0,255,136,0.08)"
+                strokeWidth="12"
+              />
               <circle
                 cx="60"
                 cy="60"
@@ -278,10 +346,16 @@ export default function LandingPage() {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <div className="font-mono text-[56px] font-extrabold leading-none" style={{ color: '#00ff88' }}>
+              <div
+                className="font-mono text-[56px] font-extrabold leading-none"
+                style={{ color: '#00ff88' }}
+              >
                 {THI_SCORE}
               </div>
-              <div className="font-mono text-[11px] uppercase tracking-wider mt-2" style={{ color: '#6b7a99' }}>
+              <div
+                className="font-mono text-[11px] uppercase tracking-wider mt-2"
+                style={{ color: '#6b7a99' }}
+              >
                 THI Score
               </div>
               <div className="font-mono text-[11px] mt-3" style={{ color: 'rgba(0,255,136,0.5)' }}>
@@ -300,12 +374,17 @@ export default function LandingPage() {
             <div
               key={stat.label}
               className="text-center py-5 px-4"
-              style={{ borderRight: i < STARS.length - 1 ? '1px solid rgba(0,255,136,0.06)' : 'none' }}
+              style={{
+                borderRight: i < STARS.length - 1 ? '1px solid rgba(0,255,136,0.06)' : 'none',
+              }}
             >
               <div className="font-mono text-[28px] font-bold" style={{ color: '#e8edf5' }}>
                 {stat.value}
               </div>
-              <div className="font-mono text-[10px] uppercase tracking-wider mt-1.5" style={{ color: '#6b7a99' }}>
+              <div
+                className="font-mono text-[10px] uppercase tracking-wider mt-1.5"
+                style={{ color: '#6b7a99' }}
+              >
                 {stat.label}
               </div>
               <div className="font-mono text-[10px] mt-1" style={{ color: '#00ff88' }}>
@@ -334,14 +413,29 @@ export default function LandingPage() {
             {/* Window title bar */}
             <div
               className="flex items-center gap-3 px-5 py-3"
-              style={{ borderBottom: '1px solid rgba(0,255,136,0.06)', background: 'rgba(0,255,136,0.02)' }}
+              style={{
+                borderBottom: '1px solid rgba(0,255,136,0.06)',
+                background: 'rgba(0,255,136,0.02)',
+              }}
             >
               <div className="flex gap-1.5">
-                <span className="w-[8px] h-[8px] rounded-full block" style={{ background: 'rgba(255,107,107,0.5)' }} />
-                <span className="w-[8px] h-[8px] rounded-full block" style={{ background: 'rgba(255,217,61,0.5)' }} />
-                <span className="w-[8px] h-[8px] rounded-full block" style={{ background: 'rgba(0,255,136,0.5)' }} />
+                <span
+                  className="w-[8px] h-[8px] rounded-full block"
+                  style={{ background: 'rgba(255,107,107,0.5)' }}
+                />
+                <span
+                  className="w-[8px] h-[8px] rounded-full block"
+                  style={{ background: 'rgba(255,217,61,0.5)' }}
+                />
+                <span
+                  className="w-[8px] h-[8px] rounded-full block"
+                  style={{ background: 'rgba(0,255,136,0.5)' }}
+                />
               </div>
-              <span className="font-mono text-[10px] tracking-wider ml-2" style={{ color: '#4a5568' }}>
+              <span
+                className="font-mono text-[10px] tracking-wider ml-2"
+                style={{ color: '#4a5568' }}
+              >
                 dashboard / thi
               </span>
             </div>
@@ -364,9 +458,21 @@ export default function LandingPage() {
                       background: 'rgba(0,255,136,0.01)',
                     }}
                   >
-                    <div className="font-mono text-xl font-bold" style={{ color: '#e8edf5' }}>{kpi.val}</div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest mt-2" style={{ color: '#6b7a99' }}>{kpi.label}</div>
-                    <div className="font-mono text-[10px] mt-2" style={{ color: 'rgba(0,255,136,0.4)' }}>{kpi.sub}</div>
+                    <div className="font-mono text-xl font-bold" style={{ color: '#e8edf5' }}>
+                      {kpi.val}
+                    </div>
+                    <div
+                      className="font-mono text-[9px] uppercase tracking-widest mt-2"
+                      style={{ color: '#6b7a99' }}
+                    >
+                      {kpi.label}
+                    </div>
+                    <div
+                      className="font-mono text-[10px] mt-2"
+                      style={{ color: 'rgba(0,255,136,0.4)' }}
+                    >
+                      {kpi.sub}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -374,8 +480,15 @@ export default function LandingPage() {
               {/* Dimension bars */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#6b7a99' }}>Dimensiones THI</span>
-                  <span className="font-mono text-[10px]" style={{ color: 'rgba(0,255,136,0.3)' }}>score compuesto</span>
+                  <span
+                    className="font-mono text-[10px] uppercase tracking-wider"
+                    style={{ color: '#6b7a99' }}
+                  >
+                    Dimensiones THI
+                  </span>
+                  <span className="font-mono text-[10px]" style={{ color: 'rgba(0,255,136,0.3)' }}>
+                    score compuesto
+                  </span>
                 </div>
                 {[
                   { label: 'Seguridad', pct: 78 },
@@ -387,17 +500,32 @@ export default function LandingPage() {
                   { label: 'Costos', pct: 55 },
                 ].map((d) => (
                   <div key={d.label} className="flex items-center gap-4">
-                    <span className="font-mono text-[10px] w-[110px] text-right shrink-0" style={{ color: '#6b7a99' }}>{d.label}</span>
+                    <span
+                      className="font-mono text-[10px] w-[110px] text-right shrink-0"
+                      style={{ color: '#6b7a99' }}
+                    >
+                      {d.label}
+                    </span>
                     <div className="flex-1 h-[6px]" style={{ background: 'rgba(0,255,136,0.04)' }}>
                       <div
                         className="h-full transition-all"
                         style={{
                           width: `${d.pct}%`,
-                          background: d.pct >= 80 ? 'rgba(0,255,136,0.5)' : d.pct >= 65 ? 'rgba(255,217,61,0.4)' : 'rgba(255,107,107,0.4)',
+                          background:
+                            d.pct >= 80
+                              ? 'rgba(0,255,136,0.5)'
+                              : d.pct >= 65
+                                ? 'rgba(255,217,61,0.4)'
+                                : 'rgba(255,107,107,0.4)',
                         }}
                       />
                     </div>
-                    <span className="font-mono text-[10px] w-8 shrink-0" style={{ color: 'rgba(0,255,136,0.3)' }}>{d.pct}%</span>
+                    <span
+                      className="font-mono text-[10px] w-8 shrink-0"
+                      style={{ color: 'rgba(0,255,136,0.3)' }}
+                    >
+                      {d.pct}%
+                    </span>
                   </div>
                 ))}
               </div>
@@ -490,7 +618,10 @@ export default function LandingPage() {
             {/* Header */}
             <div
               className="flex items-center gap-3 px-5 py-3"
-              style={{ borderBottom: '1px solid rgba(0,255,136,0.06)', background: 'rgba(0,255,136,0.02)' }}
+              style={{
+                borderBottom: '1px solid rgba(0,255,136,0.06)',
+                background: 'rgba(0,255,136,0.02)',
+              }}
             >
               <div
                 className="w-6 h-6 flex items-center justify-center text-[11px] font-bold"
@@ -503,8 +634,13 @@ export default function LandingPage() {
                 G
               </div>
               <div className="flex-1">
-                <div className="font-mono text-[11px] font-semibold" style={{ color: '#e8edf5' }}>GobIA</div>
-                <div className="font-mono text-[9px] tracking-wider" style={{ color: 'rgba(0,255,136,0.3)' }}>
+                <div className="font-mono text-[11px] font-semibold" style={{ color: '#e8edf5' }}>
+                  GobIA
+                </div>
+                <div
+                  className="font-mono text-[9px] tracking-wider"
+                  style={{ color: 'rgba(0,255,136,0.3)' }}
+                >
                   online · groq/llama-4
                 </div>
               </div>
@@ -565,11 +701,7 @@ export default function LandingPage() {
                   ].join('\n'),
                 },
               ].map((msg, i) => (
-                <div
-                  key={i}
-                  className="gobia-msg"
-                  style={{ animationDelay: `${i * 2.2}s` }}
-                >
+                <div key={i} className="gobia-msg" style={{ animationDelay: `${i * 2.2}s` }}>
                   {msg.from === 'gobia' && (
                     <div className="flex items-start gap-3">
                       <div
@@ -625,10 +757,7 @@ export default function LandingPage() {
               ))}
 
               {/* Typing indicator */}
-              <div
-                className="gobia-msg"
-                style={{ animationDelay: '8.8s' }}
-              >
+              <div className="gobia-msg" style={{ animationDelay: '8.8s' }}>
                 <div className="flex items-start gap-3">
                   <div
                     className="w-5 h-5 shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5"
@@ -739,11 +868,7 @@ export default function LandingPage() {
                   </div>
                   <ul className="space-y-1.5">
                     {phase.items.map((item) => (
-                      <li
-                        key={item}
-                        className="font-mono text-[11px]"
-                        style={{ color: '#4a5568' }}
-                      >
+                      <li key={item} className="font-mono text-[11px]" style={{ color: '#4a5568' }}>
                         {item}
                       </li>
                     ))}
@@ -754,7 +879,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <footer className="flex items-center justify-between py-6 text-[10px] font-mono uppercase tracking-wider" style={{ borderTop: '1px solid rgba(0,255,136,0.06)', color: 'rgba(107,122,153,0.5)' }}>
+        <footer
+          className="flex items-center justify-between py-6 text-[10px] font-mono uppercase tracking-wider"
+          style={{ borderTop: '1px solid rgba(0,255,136,0.06)', color: 'rgba(107,122,153,0.5)' }}
+        >
           <div className="flex items-center gap-4">
             <span>© {new Date().getFullYear()} TGP — Governance Intelligence</span>
             <span className="w-px h-3" style={{ background: 'rgba(0,255,136,0.1)' }} />
@@ -762,8 +890,12 @@ export default function LandingPage() {
               onClick={() => navigate('/docs')}
               className="bg-transparent border-none cursor-pointer font-mono text-[10px] uppercase tracking-wider transition-colors"
               style={{ color: 'rgba(107,122,153,0.5)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#00ff88' }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(107,122,153,0.5)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#00ff88'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'rgba(107,122,153,0.5)'
+              }}
             >
               Documentación
             </button>

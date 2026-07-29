@@ -65,13 +65,22 @@ export interface TechSearchResult {
 
 export function searchTechnologies(
   query: string,
-  catalog: ({ id: string; name: string; category?: string; vendor?: string; version?: string; supportStatus?: string })[],
+  catalog: {
+    id: string
+    name: string
+    category?: string
+    vendor?: string
+    version?: string
+    supportStatus?: string
+  }[],
 ): TechSearchResult[] {
   if (!query.trim()) return []
 
   const q = query.toLowerCase()
   const fromCatalog = catalog
-    .filter((t) => t.name.toLowerCase().includes(q) || (t.vendor && t.vendor.toLowerCase().includes(q)))
+    .filter(
+      (t) => t.name.toLowerCase().includes(q) || (t.vendor && t.vendor.toLowerCase().includes(q)),
+    )
     .map((t) => ({
       id: t.id,
       name: t.name,
@@ -82,10 +91,16 @@ export function searchTechnologies(
       isSkill: false,
     }))
 
-  const fromSkills = COMMON_SKILLS
-    .filter((s) => s.name.toLowerCase().includes(q))
+  const fromSkills = COMMON_SKILLS.filter((s) => s.name.toLowerCase().includes(q))
     .filter((s) => !fromCatalog.some((c) => c.name.toLowerCase() === s.name.toLowerCase()))
-    .map((s) => ({ id: s.id, name: s.name, category: s.category, version: undefined, supportStatus: undefined, isSkill: true }))
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      version: undefined,
+      supportStatus: undefined,
+      isSkill: true,
+    }))
 
   return [...fromCatalog, ...fromSkills].slice(0, 20)
 }

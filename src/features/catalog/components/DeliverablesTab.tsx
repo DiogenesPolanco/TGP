@@ -27,10 +27,11 @@ const statusLabel: Record<DeliverableStatus, string> = {
 }
 
 export function DeliverablesTab({ applicationId }: { applicationId: string }) {
-  const deliverables = useLiveQuery(
-    () => db.deliverables.where('applicationId').equals(applicationId).toArray(),
-    [applicationId],
-  ) ?? []
+  const deliverables =
+    useLiveQuery(
+      () => db.deliverables.where('applicationId').equals(applicationId).toArray(),
+      [applicationId],
+    ) ?? []
 
   const allObjectives = useLiveQuery(() => db.objectives.toArray()) ?? []
   const { confirm } = useConfirm()
@@ -41,81 +42,92 @@ export function DeliverablesTab({ applicationId }: { applicationId: string }) {
     await db.deliverables.delete(id)
   }
 
-  const columns: Column<Deliverable>[] = useMemo(() => [
-    {
-      key: 'title',
-      label: 'Título',
-      sortable: true,
-      render: (d) => (
-        <div>
-          <p className="text-sm font-medium text-neutral-90 dark:text-white">{d.title}</p>
-          {d.description && (
-            <HtmlDescription html={d.description} lines={1} />
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      label: 'Estado',
-      sortable: true,
-      render: (d) => (
-        <span className={cn('text-xs px-2 py-0.5 rounded-full border', statusColors[d.status])}>
-          {statusLabel[d.status]}
-        </span>
-      ),
-    },
-    {
-      key: 'dueDate',
-      label: 'Fecha Límite',
-      sortable: true,
-      render: (d) => (
-        <span className="text-sm text-secondary">
-          {d.dueDate ? new Date(d.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'objectiveId',
-      label: 'OKR',
-      sortable: true,
-      render: (d) => {
-        const obj = allObjectives.find((o) => o.id === d.objectiveId)
-        return <span className="text-sm text-secondary">{obj?.title || '—'}</span>
+  const columns: Column<Deliverable>[] = useMemo(
+    () => [
+      {
+        key: 'title',
+        label: 'Título',
+        sortable: true,
+        render: (d) => (
+          <div>
+            <p className="text-sm font-medium text-neutral-90 dark:text-white">{d.title}</p>
+            {d.description && <HtmlDescription html={d.description} lines={1} />}
+          </div>
+        ),
       },
-    },
-    {
-      key: 'actions',
-      label: '',
-      className: 'text-right',
-      headerClassName: 'text-right',
-      render: (d) => (
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            onClick={(e) => { e.stopPropagation(); setEditingId(editingId === d.id ? null : d.id) }}
-            className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
-            title="Editar"
-          >
-            <Pencil size={14} />
-          </Button>
-          <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(d.id) }}
-            className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
-            title="Eliminar"
-          >
-            <Trash2 size={14} />
-          </Button>
-        </div>
-      ),
-    },
-  ], [allObjectives, editingId])
+      {
+        key: 'status',
+        label: 'Estado',
+        sortable: true,
+        render: (d) => (
+          <span className={cn('text-xs px-2 py-0.5 rounded-full border', statusColors[d.status])}>
+            {statusLabel[d.status]}
+          </span>
+        ),
+      },
+      {
+        key: 'dueDate',
+        label: 'Fecha Límite',
+        sortable: true,
+        render: (d) => (
+          <span className="text-sm text-secondary">
+            {d.dueDate
+              ? new Date(d.dueDate).toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })
+              : '—'}
+          </span>
+        ),
+      },
+      {
+        key: 'objectiveId',
+        label: 'OKR',
+        sortable: true,
+        render: (d) => {
+          const obj = allObjectives.find((o) => o.id === d.objectiveId)
+          return <span className="text-sm text-secondary">{obj?.title || '—'}</span>
+        },
+      },
+      {
+        key: 'actions',
+        label: '',
+        className: 'text-right',
+        headerClassName: 'text-right',
+        render: (d) => (
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                setEditingId(editingId === d.id ? null : d.id)
+              }}
+              className="p-1.5 rounded text-neutral-50 hover:text-primary hover:bg-primary/10 transition-colors"
+              title="Editar"
+            >
+              <Pencil size={14} />
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDelete(d.id)
+              }}
+              className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+              title="Eliminar"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [allObjectives, editingId],
+  )
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
-          Entregables
-        </h4>
+        <h4 className="text-xl font-bold text-neutral-90 dark:text-white">Entregables</h4>
       </div>
 
       {/* New deliverable form */}
@@ -218,10 +230,15 @@ function DeliverableForm({
             </div>
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Objetivo relacionado</label>
-              <Select value={objectiveId} onChange={(v) => setObjectiveId(v)} options={[
-                { value: '', label: 'Sin objetivo' },
-                ...allObjectives.map((obj) => ({ value: obj.id, label: obj.title })),
-              ]} className="text-xs" />
+              <Select
+                value={objectiveId}
+                onChange={(v) => setObjectiveId(v)}
+                options={[
+                  { value: '', label: 'Sin objetivo' },
+                  ...allObjectives.map((obj) => ({ value: obj.id, label: obj.title })),
+                ]}
+                className="text-xs"
+              />
             </div>
           </div>
           <div className="flex justify-end">

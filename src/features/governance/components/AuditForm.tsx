@@ -56,7 +56,10 @@ export function AuditForm({ finding, onClose, onSave }: AuditFormProps) {
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {finding ? 'Editar Hallazgo' : 'Nuevo Hallazgo'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <X size={20} />
           </Button>
         </div>
@@ -73,10 +76,15 @@ export function AuditForm({ finding, onClose, onSave }: AuditFormProps) {
               />
             </div>
             <div>
-              <Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
-                { value: '', label: 'Sin aplicación' },
-                ...applications.map((app) => ({ value: app.id, label: app.name })),
-              ]} />
+              <Select
+                label="Aplicación"
+                value={formData.applicationId}
+                onChange={(v) => setFormData({ ...formData, applicationId: v })}
+                options={[
+                  { value: '', label: 'Sin aplicación' },
+                  ...applications.map((app) => ({ value: app.id, label: app.name })),
+                ]}
+              />
             </div>
           </div>
 
@@ -102,39 +110,60 @@ export function AuditForm({ finding, onClose, onSave }: AuditFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Severidad" value={formData.severity} onChange={(v) => setFormData({ ...formData, severity: v as typeof formData.severity })} options={[
-                { value: 'critical', label: 'Crítica' },
-                { value: 'high', label: 'Alta' },
-                { value: 'medium', label: 'Media' },
-                { value: 'low', label: 'Baja' },
-                { value: 'info', label: 'Info' },
-              ]} />
+              <Select
+                label="Severidad"
+                value={formData.severity}
+                onChange={(v) =>
+                  setFormData({ ...formData, severity: v as typeof formData.severity })
+                }
+                options={[
+                  { value: 'critical', label: 'Crítica' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'low', label: 'Baja' },
+                  { value: 'info', label: 'Info' },
+                ]}
+              />
             </div>
             <div>
-              <Select label="Categoría" value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as typeof formData.category })} options={[
-                { value: 'security', label: 'Seguridad' },
-                { value: 'compliance', label: 'Cumplimiento' },
-                { value: 'architecture', label: 'Arquitectura' },
-                { value: 'process', label: 'Proceso' },
-                { value: 'data_governance', label: 'Data Governance' },
-                { value: 'access_control', label: 'Control de Acceso' },
-                { value: 'business_continuity', label: 'Continuidad' },
-              ]} />
+              <Select
+                label="Categoría"
+                value={formData.category}
+                onChange={(v) =>
+                  setFormData({ ...formData, category: v as typeof formData.category })
+                }
+                options={[
+                  { value: 'security', label: 'Seguridad' },
+                  { value: 'compliance', label: 'Cumplimiento' },
+                  { value: 'architecture', label: 'Arquitectura' },
+                  { value: 'process', label: 'Proceso' },
+                  { value: 'data_governance', label: 'Data Governance' },
+                  { value: 'access_control', label: 'Control de Acceso' },
+                  { value: 'business_continuity', label: 'Continuidad' },
+                ]}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })} options={[
-                { value: 'open', label: 'Abierto' },
-                { value: 'in_progress', label: 'En Progreso' },
-                { value: 'resolved', label: 'Resuelto' },
-                { value: 'closed', label: 'Cerrado' },
-                { value: 'overdue', label: 'Vencido' },
-              ]} />
+              <Select
+                label="Estado"
+                value={formData.status}
+                onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })}
+                options={[
+                  { value: 'open', label: 'Abierto' },
+                  { value: 'in_progress', label: 'En Progreso' },
+                  { value: 'resolved', label: 'Resuelto' },
+                  { value: 'closed', label: 'Cerrado' },
+                  { value: 'overdue', label: 'Vencido' },
+                ]}
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-secondary mb-1">Fecha vencimiento *</label>
+              <label className="block text-sm font-medium text-secondary mb-1">
+                Fecha vencimiento *
+              </label>
               <DatePicker
                 required
                 value={formData.dueDate}
@@ -145,11 +174,17 @@ export function AuditForm({ finding, onClose, onSave }: AuditFormProps) {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button"
-              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <Button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            >
               Cancelar
             </Button>
-            <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
+            <Button
+              type="submit"
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+            >
               {finding ? 'Actualizar' : 'Crear'}
             </Button>
           </div>

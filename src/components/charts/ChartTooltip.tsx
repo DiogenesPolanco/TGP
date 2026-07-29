@@ -63,9 +63,7 @@ export function ChartTooltipSimple({ active, payload, label }: ChartTooltipProps
           if (entry.name === 'color' || entry.dataKey === 'color') return null
           return (
             <div key={idx} className="flex items-center justify-between gap-4">
-              <span className="text-muted text-xs capitalize">
-                {entry.name ?? entry.dataKey}
-              </span>
+              <span className="text-muted text-xs capitalize">{entry.name ?? entry.dataKey}</span>
               <span className="font-semibold text-neutral-90 dark:text-white">
                 {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
               </span>

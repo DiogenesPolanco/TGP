@@ -1,13 +1,28 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '@/services/db/database'
 import type { TeamSprint, SprintRecord, TeamMember } from '@/types/domain'
-import { Plus, Trash2, Edit3, AlertTriangle, CheckCircle2, Loader2, Calendar, RefreshCw } from 'lucide-react'
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  Calendar,
+  RefreshCw,
+} from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useAppStore } from '@/stores/appStore'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { isJiraConfigured } from '@/services/jira/jiraConfigService'
-import { getBoards, getSprints, getSprintIssues, calcSprintMetrics, syncJiraSprints } from '@/services/jira/jiraService'
+import {
+  getBoards,
+  getSprints,
+  getSprintIssues,
+  calcSprintMetrics,
+  syncJiraSprints,
+} from '@/services/jira/jiraService'
 import { Button } from '@/components/ui/Button'
 import { parseLocalDate } from '@/lib/utils'
 
@@ -39,7 +54,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [validationMsg, setValidationMsg] = useState<{ type: 'ok' | 'warn'; text: string } | null>(null)
+  const [validationMsg, setValidationMsg] = useState<{ type: 'ok' | 'warn'; text: string } | null>(
+    null,
+  )
   const [syncing, setSyncing] = useState(false)
 
   const [form, setForm] = useState({
@@ -59,14 +76,17 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
   const handleSyncFromJira = async () => {
     if (!jiraConfigured) {
-      addNotification({ type: 'error', message: 'Jira no está configurado. Ve a Administración → Jira.' })
+      addNotification({
+        type: 'error',
+        message: 'Jira no está configurado. Ve a Administración → Jira.',
+      })
       return
     }
     setSyncing(true)
     try {
       const boards = await getBoards()
       const matchBoard = boards.find(
-        (b) => b.name.toLowerCase().trim() === teamName.toLowerCase().trim()
+        (b) => b.name.toLowerCase().trim() === teamName.toLowerCase().trim(),
       )
       if (!matchBoard) {
         addNotification({
@@ -86,11 +106,13 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
         const q = sprint.startDate
           ? `Q${Math.floor(new Date(sprint.startDate).getMonth() / 3) + 1}`
           : `Q${Math.ceil((new Date().getMonth() + 1) / 3)}`
-        const yr = sprint.startDate ? new Date(sprint.startDate).getFullYear() : new Date().getFullYear()
+        const yr = sprint.startDate
+          ? new Date(sprint.startDate).getFullYear()
+          : new Date().getFullYear()
 
         for (const [, data] of Object.entries(metrics.perAssignee)) {
           const matchedMember = members.find(
-            (m) => m.displayName.toLowerCase().trim() === data.displayName.toLowerCase().trim()
+            (m) => m.displayName.toLowerCase().trim() === data.displayName.toLowerCase().trim(),
           )
           if (!matchedMember) continue
 
@@ -143,10 +165,14 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   }
 
   useEffect(() => {
-    db.teamSprints.where('teamId').equals(teamId).toArray().then((data) => {
-      setSprints(data)
-      setLoading(false)
-    })
+    db.teamSprints
+      .where('teamId')
+      .equals(teamId)
+      .toArray()
+      .then((data) => {
+        setSprints(data)
+        setLoading(false)
+      })
   }, [teamId])
 
   const memberIds = useMemo(() => new Set(members.map((m) => m.id)), [members])
@@ -185,7 +211,7 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   const validateAgainstMembers = async (
     sprintName: string,
     completedSP: number,
-    notCompletedSP: number
+    notCompletedSP: number,
   ): Promise<{ type: 'ok' | 'warn'; text: string } | null> => {
     const agg = await getMemberAgg(sprintName)
     if (!agg) return null
@@ -215,7 +241,11 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
   const handleFieldBlur = async () => {
     if (form.sprintName.trim()) {
-      const msg = await validateAgainstMembers(form.sprintName, form.completedSP, form.notCompletedSP)
+      const msg = await validateAgainstMembers(
+        form.sprintName,
+        form.completedSP,
+        form.notCompletedSP,
+      )
       setValidationMsg(msg)
     }
   }
@@ -310,7 +340,8 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
     }, {})
   }, [sprints])
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
+  const inputClass =
+    'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   if (loading) {
     return (
@@ -323,7 +354,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   return (
     <div className="bg-card rounded-xl border border-boundary p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints del Equipo</h2>
+        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+          Sprints del Equipo
+        </h2>
         <div className="flex items-center gap-2">
           {jiraConfigured && !showForm && editingId === null && (
             <Button
@@ -337,7 +370,10 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
           )}
           {!showForm && editingId === null && (
             <Button
-              onClick={() => { setShowForm(true); resetForm() }}
+              onClick={() => {
+                setShowForm(true)
+                resetForm()
+              }}
               className="flex items-center gap-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
             >
               <Plus size={16} /> Agregar Sprint
@@ -351,7 +387,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
         <div className="mb-6 p-4 border border-boundary rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-4 mb-3">
             <div className="sm:col-span-2">
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">Nombre del Sprint</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                Nombre del Sprint
+              </label>
               <input
                 type="text"
                 value={form.sprintName}
@@ -403,7 +441,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
           </div>
           <div className="grid gap-3 sm:grid-cols-3 mb-3">
             <div>
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">SP Planificados</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                SP Planificados
+              </label>
               <input
                 type="number"
                 value={form.plannedSP}
@@ -413,7 +453,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">SP Completados</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                SP Completados
+              </label>
               <input
                 type="number"
                 value={form.completedSP}
@@ -424,7 +466,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">SP No Completados</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                SP No Completados
+              </label>
               <input
                 type="number"
                 value={form.notCompletedSP}
@@ -438,12 +482,18 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
           {/* Validation message */}
           {validationMsg && (
-            <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-xs ${
-              validationMsg.type === 'ok'
-                ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-            }`}>
-              {validationMsg.type === 'ok' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+            <div
+              className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-xs ${
+                validationMsg.type === 'ok'
+                  ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                  : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+              }`}
+            >
+              {validationMsg.type === 'ok' ? (
+                <CheckCircle2 size={14} />
+              ) : (
+                <AlertTriangle size={14} />
+              )}
               <span>{validationMsg.text}</span>
             </div>
           )}
@@ -462,7 +512,14 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
               Validar vs Miembros
             </Button>
             <Button
-              onClick={editingId ? cancelEdit : () => { setShowForm(false); resetForm() }}
+              onClick={
+                editingId
+                  ? cancelEdit
+                  : () => {
+                      setShowForm(false)
+                      resetForm()
+                    }
+              }
               className="px-3 py-2 text-sm text-neutral-60 hover:text-neutral-90"
             >
               Cancelar
@@ -497,10 +554,20 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                   </span>
                 </div>
                 <div className="hidden sm:flex items-center gap-4 text-[11px] text-neutral-50">
-                  <span><strong className="text-secondary">{qPlanned}</strong> SP plan.</span>
-                  <span className="text-success"><strong>{qDone}</strong> complet.</span>
-                  <span className="text-danger"><strong>{qNotDone}</strong> no compl.</span>
-                  <span className={qEff >= 80 ? 'text-success' : qEff >= 50 ? 'text-warning' : 'text-danger'}>
+                  <span>
+                    <strong className="text-secondary">{qPlanned}</strong> SP plan.
+                  </span>
+                  <span className="text-success">
+                    <strong>{qDone}</strong> complet.
+                  </span>
+                  <span className="text-danger">
+                    <strong>{qNotDone}</strong> no compl.
+                  </span>
+                  <span
+                    className={
+                      qEff >= 80 ? 'text-success' : qEff >= 50 ? 'text-warning' : 'text-danger'
+                    }
+                  >
                     <strong>{qEff}%</strong> efic.
                   </span>
                 </div>
@@ -508,8 +575,18 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
               <div className="space-y-3">
                 {records.map((s) => {
-                  const startStr = s.startDate instanceof Date ? s.startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : ''
-                  const endStr = s.endDate instanceof Date ? s.endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+                  const startStr =
+                    s.startDate instanceof Date
+                      ? s.startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+                      : ''
+                  const endStr =
+                    s.endDate instanceof Date
+                      ? s.endDate.toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : ''
                   const doneSP = s.completedSP
                   const notDoneSP = s.notCompletedSP
                   const totalSP = doneSP + notDoneSP
@@ -517,17 +594,11 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                   const plannedPct = s.plannedSP > 0 ? Math.round((doneSP / s.plannedSP) * 100) : 0
 
                   const effColor =
-                    effPct >= 80 ? 'text-success' :
-                    effPct >= 50 ? 'text-warning' :
-                    'text-danger'
+                    effPct >= 80 ? 'text-success' : effPct >= 50 ? 'text-warning' : 'text-danger'
                   const effBg =
-                    effPct >= 80 ? 'bg-success/10' :
-                    effPct >= 50 ? 'bg-warning/10' :
-                    'bg-danger/10'
+                    effPct >= 80 ? 'bg-success/10' : effPct >= 50 ? 'bg-warning/10' : 'bg-danger/10'
                   const progressColor =
-                    effPct >= 80 ? 'bg-success' :
-                    effPct >= 50 ? 'bg-warning' :
-                    'bg-danger'
+                    effPct >= 80 ? 'bg-success' : effPct >= 50 ? 'bg-warning' : 'bg-danger'
 
                   return (
                     <div
@@ -540,7 +611,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                             <h4 className="text-base font-semibold text-neutral-90 dark:text-white truncate">
                               {s.sprintName}
                             </h4>
-                            <div className={`shrink-0 px-2 py-0.5 text-xs font-bold rounded-md ${effBg} ${effColor}`}>
+                            <div
+                              className={`shrink-0 px-2 py-0.5 text-xs font-bold rounded-md ${effBg} ${effColor}`}
+                            >
                               {effPct}%
                             </div>
                           </div>
@@ -553,31 +626,45 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                       <div className="mb-3">
                         <div className="flex items-center justify-between text-[11px] text-neutral-50 mb-1">
                           <span>Progreso de ejecución</span>
-                          <span>{doneSP}/{totalSP || s.plannedSP} SP</span>
+                          <span>
+                            {doneSP}/{totalSP || s.plannedSP} SP
+                          </span>
                         </div>
                         <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
-                            style={{ width: `${Math.min(100, totalSP > 0 ? effPct : plannedPct)}%` }}
+                            style={{
+                              width: `${Math.min(100, totalSP > 0 ? effPct : plannedPct)}%`,
+                            }}
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-4 gap-2 mb-3">
                         <div className="text-center py-2 px-1 rounded-lg bg-neutral-10 dark:bg-neutral-70">
-                          <p className="text-[10px] font-medium text-neutral-50 uppercase tracking-wider">Plan</p>
-                          <p className="text-sm font-bold text-neutral-90 dark:text-white mt-0.5">{s.plannedSP}</p>
+                          <p className="text-[10px] font-medium text-neutral-50 uppercase tracking-wider">
+                            Plan
+                          </p>
+                          <p className="text-sm font-bold text-neutral-90 dark:text-white mt-0.5">
+                            {s.plannedSP}
+                          </p>
                         </div>
                         <div className="text-center py-2 px-1 rounded-lg bg-success/5">
-                          <p className="text-[10px] font-medium text-success uppercase tracking-wider">Completado</p>
+                          <p className="text-[10px] font-medium text-success uppercase tracking-wider">
+                            Completado
+                          </p>
                           <p className="text-sm font-bold text-success mt-0.5">{doneSP}</p>
                         </div>
                         <div className="text-center py-2 px-1 rounded-lg bg-danger/5">
-                          <p className="text-[10px] font-medium text-danger uppercase tracking-wider">No Compl.</p>
+                          <p className="text-[10px] font-medium text-danger uppercase tracking-wider">
+                            No Compl.
+                          </p>
                           <p className="text-sm font-bold text-danger mt-0.5">{notDoneSP}</p>
                         </div>
                         <div className="text-center py-2 px-1 rounded-lg bg-primary/5">
-                          <p className="text-[10px] font-medium text-primary uppercase tracking-wider">Entrega</p>
+                          <p className="text-[10px] font-medium text-primary uppercase tracking-wider">
+                            Entrega
+                          </p>
                           <p className="text-sm font-bold text-primary mt-0.5">{plannedPct}%</p>
                         </div>
                       </div>
@@ -585,7 +672,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                       <div className="flex items-center justify-between pt-2 border-t border-neutral-10 dark:border-neutral-70">
                         <div className="text-[11px] text-neutral-40">
                           <span className="inline-flex items-center gap-1">
-                            <div className={`w-1.5 h-1.5 rounded-full ${doneSP + notDoneSP > 0 ? 'bg-success' : 'bg-neutral-30'}`} />
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full ${doneSP + notDoneSP > 0 ? 'bg-success' : 'bg-neutral-30'}`}
+                            />
                             {doneSP + notDoneSP > 0
                               ? `${doneSP} SP completados de ${s.plannedSP} planificados`
                               : 'Sin actividad registrada'}

@@ -1,4 +1,10 @@
-import type { AiProviderConfig, AiChatMessage, AiToolDefinition, AiChatResponse, AiProviderInterface } from '../../types'
+import type {
+  AiProviderConfig,
+  AiChatMessage,
+  AiToolDefinition,
+  AiChatResponse,
+  AiProviderInterface,
+} from '../../types'
 
 export function createAnthropicProvider(config: AiProviderConfig): AiProviderInterface {
   const baseUrl = (config.baseUrl || 'https://api.anthropic.com').replace(/\/+$/, '')
@@ -18,11 +24,13 @@ export function createAnthropicProvider(config: AiProviderConfig): AiProviderInt
           // tool_result: Anthropic lo envía como user con content blocks
           anthropicMessages.push({
             role: 'user',
-            content: [{
-              type: 'tool_result',
-              tool_use_id: m.toolCallId,
-              content: m.content,
-            }],
+            content: [
+              {
+                type: 'tool_result',
+                tool_use_id: m.toolCallId,
+                content: m.content,
+              },
+            ],
           })
         } else {
           anthropicMessages.push({
@@ -58,7 +66,7 @@ export function createAnthropicProvider(config: AiProviderConfig): AiProviderInt
 
   async function chat(
     messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
+    tools?: AiToolDefinition[],
   ): Promise<AiChatResponse> {
     const { system, messages: anthropicMessages } = toAnthropicMessages(messages)
 

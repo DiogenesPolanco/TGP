@@ -22,7 +22,13 @@ interface WeekBucket {
   isPast: boolean
 }
 
-export function WeeklyTimeline({ activities, commitments, today, selectedWeek, onWeekSelect }: WeeklyTimelineProps) {
+export function WeeklyTimeline({
+  activities,
+  commitments,
+  today,
+  selectedWeek,
+  onWeekSelect,
+}: WeeklyTimelineProps) {
   const [offset, setOffset] = useState(0)
 
   const weeks = useMemo(() => {
@@ -79,9 +85,11 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
                       : 'hover:bg-neutral-10 dark:hover:bg-neutral-70/30'
               }`}
             >
-              <span className={`text-[11px] font-semibold uppercase tracking-wider ${
-                selected ? 'text-primary' : 'text-muted'
-              }`}>
+              <span
+                className={`text-[11px] font-semibold uppercase tracking-wider ${
+                  selected ? 'text-primary' : 'text-muted'
+                }`}
+              >
                 {week.shortLabel}
               </span>
 
@@ -105,21 +113,21 @@ export function WeeklyTimeline({ activities, commitments, today, selectedWeek, o
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className={`text-sm font-bold ${
-                  selected
-                    ? 'text-primary'
-                    : week.isPast
-                      ? 'text-neutral-40'
-                      : isOverloaded
-                        ? 'text-danger'
-                        : 'text-neutral-90 dark:text-white'
-                }`}>
+                <span
+                  className={`text-sm font-bold ${
+                    selected
+                      ? 'text-primary'
+                      : week.isPast
+                        ? 'text-neutral-40'
+                        : isOverloaded
+                          ? 'text-danger'
+                          : 'text-neutral-90 dark:text-white'
+                  }`}
+                >
                   {week.count}
                 </span>
                 {week.overdueCount > 0 && (
-                  <span className="text-xs font-semibold text-danger/80">
-                    +{week.overdueCount}
-                  </span>
+                  <span className="text-xs font-semibold text-danger/80">+{week.overdueCount}</span>
                 )}
               </div>
 
@@ -187,9 +195,10 @@ function buildWeeks(
 
     weeks.push({
       label: `Sem ${getWeekNumber(weekStart)}`,
-      shortLabel: weekStart === getMonday(today)
-        ? 'Esta'
-        : `${weekStart.getDate()}/${weekStart.getMonth() + 1}`,
+      shortLabel:
+        weekStart === getMonday(today)
+          ? 'Esta'
+          : `${weekStart.getDate()}/${weekStart.getMonth() + 1}`,
       start: weekStart,
       end: weekEnd,
       count: data.count,
@@ -220,5 +229,8 @@ function getWeekNumber(date: Date): number {
   d.setHours(0, 0, 0, 0)
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7))
   const week1 = new Date(d.getFullYear(), 0, 4)
-  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)
+  return (
+    1 +
+    Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)
+  )
 }

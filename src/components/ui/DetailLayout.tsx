@@ -10,11 +10,22 @@ interface DetailLayoutProps {
   children: React.ReactNode
 }
 
-export function DetailLayout({ title, subtitle, onBack, backLabel = 'Volver', actions, children }: DetailLayoutProps) {
+export function DetailLayout({
+  title,
+  subtitle,
+  onBack,
+  backLabel = 'Volver',
+  actions,
+  children,
+}: DetailLayoutProps) {
   return (
     <div className="space-y-6">
       <nav className="flex items-center gap-1 text-sm text-neutral-50">
-        <Button onClick={onBack} variant="ghost" className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors">
+        <Button
+          onClick={onBack}
+          variant="ghost"
+          className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors"
+        >
           <ChevronLeft size={16} />
           {backLabel}
         </Button>
@@ -28,9 +39,7 @@ export function DetailLayout({ title, subtitle, onBack, backLabel = 'Volver', ac
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
       </div>
 
-      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-6">
-        {children}
-      </div>
+      <div className="bg-card rounded-2xl border border-boundary shadow-sm p-6">{children}</div>
     </div>
   )
 }

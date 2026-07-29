@@ -72,9 +72,7 @@ const navItems: NavItem[] = [
   {
     label: 'Estrategia',
     icon: <Target size={20} />,
-    children: [
-      { label: 'OKRs / KPIs', path: '/strategy/objectives' },
-    ],
+    children: [{ label: 'OKRs / KPIs', path: '/strategy/objectives' }],
   },
   {
     label: 'Equipos',
@@ -132,7 +130,7 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
     <aside
       className={cn(
         'fixed left-0 top-0 h-full bg-card border-r border-boundary transition-all duration-300 z-50 flex flex-col',
-        sidebarOpen ? 'w-60' : 'w-16'
+        sidebarOpen ? 'w-60' : 'w-16',
       )}
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-boundary">
@@ -142,7 +140,11 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
             <span className="font-semibold text-neutral-90 dark:text-neutral-0 text-sm">TGP</span>
           </div>
         )}
-        <Button variant="ghost" onClick={toggleSidebar} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          variant="ghost"
+          onClick={toggleSidebar}
+          className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
         </Button>
       </div>
@@ -158,7 +160,7 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
                       ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                      : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white'
+                      : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
                   )
                 }
               >
@@ -167,13 +169,14 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
               </NavLink>
             ) : (
               <div>
-                <Button onClick={() => sidebarOpen && toggleItem(item.label)}
+                <Button
+                  onClick={() => sidebarOpen && toggleItem(item.label)}
                   className={cn(
                     'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
-                    item.children?.some((c) =>
-                      location.pathname === c.path || location.pathname.startsWith(c.path + '/')
-                    ) &&
-                      'bg-primary/10 text-primary dark:bg-primary/20'
+                    item.children?.some(
+                      (c) =>
+                        location.pathname === c.path || location.pathname.startsWith(c.path + '/'),
+                    ) && 'bg-primary/10 text-primary dark:bg-primary/20',
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -199,7 +202,7 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
                             'block px-3 py-2 rounded-lg text-sm transition-colors',
                             isActive
                               ? 'text-primary font-medium'
-                              : 'text-muted hover:text-neutral-90 dark:hover:text-white'
+                              : 'text-muted hover:text-neutral-90 dark:hover:text-white',
                           )
                         }
                       >
@@ -223,7 +226,7 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
               'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
               chatOpen
                 ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white'
+                : 'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
             )}
             title="Abrir GobIA (Alt+A)"
           >
@@ -232,7 +235,6 @@ export function Sidebar({ chatOpen, onToggleChat, aiConfigured }: SidebarProps) 
           </button>
         </div>
       )}
-
     </aside>
   )
 }

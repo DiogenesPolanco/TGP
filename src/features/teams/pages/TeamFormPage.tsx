@@ -42,9 +42,18 @@ export function TeamFormPage() {
     description: '',
     doraClassification: 'medium' as DoraLevel,
     businessUnitId: '',
-    doraMetrics: { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 } as Record<string, number>,
+    doraMetrics: {
+      deploymentFrequency: 0,
+      leadTime: 0,
+      cycleTime: 0,
+      throughput: 0,
+      changeFailureRate: 0,
+      mttr: 0,
+    } as Record<string, number>,
   })
-  const [members, setMembers] = useState<MemberInput[]>([{ id: '', role: 'developer', allocation: 100 }])
+  const [members, setMembers] = useState<MemberInput[]>([
+    { id: '', role: 'developer', allocation: 100 },
+  ])
 
   useEffect(() => {
     if (team) {
@@ -55,21 +64,38 @@ export function TeamFormPage() {
           description: (meta.description as string) ?? '',
           doraClassification: (meta.doraClassification as DoraLevel) ?? 'medium',
           businessUnitId: team.businessUnitId ?? '',
-          doraMetrics: (meta.doraMetrics as Record<string, number>) ?? { deploymentFrequency: 0, leadTime: 0, cycleTime: 0, throughput: 0, changeFailureRate: 0, mttr: 0 },
+          doraMetrics: (meta.doraMetrics as Record<string, number>) ?? {
+            deploymentFrequency: 0,
+            leadTime: 0,
+            cycleTime: 0,
+            throughput: 0,
+            changeFailureRate: 0,
+            mttr: 0,
+          },
         })
-        setMembers(team.members?.map((m) => ({ id: m.id, role: m.role as MemberRole, allocation: m.allocationPct ?? 100 })) ?? [{ id: '', role: 'developer' as MemberRole, allocation: 100 }])
+        setMembers(
+          team.members?.map((m) => ({
+            id: m.id,
+            role: m.role as MemberRole,
+            allocation: m.allocationPct ?? 100,
+          })) ?? [{ id: '', role: 'developer' as MemberRole, allocation: 100 }],
+        )
       })
     }
   }, [team])
 
   if (id && !team) return <div className="p-6 text-neutral-50">Cargando...</div>
 
-  const updateMetric = (key: string, value: number) => setFormData({ ...formData, doraMetrics: { ...formData.doraMetrics, [key]: value } })
+  const updateMetric = (key: string, value: number) =>
+    setFormData({ ...formData, doraMetrics: { ...formData.doraMetrics, [key]: value } })
 
-  const addMember = () => setMembers([...members, { id: '', role: 'developer' as MemberRole, allocation: 100 }])
+  const addMember = () =>
+    setMembers([...members, { id: '', role: 'developer' as MemberRole, allocation: 100 }])
 
   const updateMember = (index: number, field: keyof MemberInput, value: string | number) => {
-    const updated = [...members]; updated[index] = { ...updated[index], [field]: value }; setMembers(updated)
+    const updated = [...members]
+    updated[index] = { ...updated[index], [field]: value }
+    setMembers(updated)
   }
 
   const removeMember = async (index: number) => {
@@ -90,14 +116,16 @@ export function TeamFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const teamMembers = members.filter((m) => m.id).map((m) => ({
-      id: m.id,
-      userPrincipal: lookupDisplayName(m.id).toLowerCase().replace(/\s+/g, '.'),
-      displayName: lookupDisplayName(m.id),
-      role: m.role as MemberRole,
-      allocationPct: m.allocation,
-      status: 'activo' as const,
-    }))
+    const teamMembers = members
+      .filter((m) => m.id)
+      .map((m) => ({
+        id: m.id,
+        userPrincipal: lookupDisplayName(m.id).toLowerCase().replace(/\s+/g, '.'),
+        displayName: lookupDisplayName(m.id),
+        role: m.role as MemberRole,
+        allocationPct: m.allocation,
+        status: 'activo' as const,
+      }))
     const metadata = {
       ...(team?.metadata ?? {}),
       description: formData.description,
@@ -116,16 +144,20 @@ export function TeamFormPage() {
       updatedAt: new Date(),
     }
     if (team) {
-      await db.teams.update(team.id, data);
+      await db.teams.update(team.id, data)
       for (const m of teamMembers) {
         const profile = await db.memberProfiles.get(m.id)
         if (profile && profile.role !== m.role) {
-          await db.memberProfiles.put({ ...profile, role: m.role as MemberRole, updatedAt: new Date() })
+          await db.memberProfiles.put({
+            ...profile,
+            role: m.role as MemberRole,
+            updatedAt: new Date(),
+          })
         }
       }
       addNotification({ type: 'success', message: 'Equipo actualizado' })
     } else {
-      await db.teams.add({ ...data, id: crypto.randomUUID() });
+      await db.teams.add({ ...data, id: crypto.randomUUID() })
       addNotification({ type: 'success', message: 'Equipo creado' })
     }
     navigate('/teams')
@@ -134,27 +166,68 @@ export function TeamFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/teams')} variant="ghost" className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
-        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{team ? 'Editar Equipo' : 'Nuevo Equipo'}</h1>
+        <Button
+          onClick={() => navigate('/teams')}
+          variant="ghost"
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
+          <ArrowLeft size={20} className="text-neutral-60" />
+        </Button>
+        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          {team ? 'Editar Equipo' : 'Nuevo Equipo'}
+        </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm"
+      >
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-5">
           {/* Left column */}
           <div className="space-y-5">
-            <div><label className="block text-sm font-medium text-secondary mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-            <div><label className="block text-sm font-medium text-secondary mb-1">Descripción</label><RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el equipo..." /></div>
+            <div>
+              <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
+              <RichTextEditor
+                value={formData.description}
+                onChange={(html) => setFormData({ ...formData, description: html })}
+                placeholder="Describe el equipo..."
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Select label="Clasificación DORA" value={formData.doraClassification} onChange={(v) => setFormData({ ...formData, doraClassification: v as DoraLevel })} options={[
-                { value: 'elite', label: 'Elite' },
-                { value: 'high', label: 'Alto' },
-                { value: 'medium', label: 'Medio' },
-                { value: 'low', label: 'Bajo' },
-              ]} /></div>
-              <div><Select label="Business Unit" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-                { value: '', label: 'Sin BU' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} /></div>
+              <div>
+                <Select
+                  label="Clasificación DORA"
+                  value={formData.doraClassification}
+                  onChange={(v) => setFormData({ ...formData, doraClassification: v as DoraLevel })}
+                  options={[
+                    { value: 'elite', label: 'Elite' },
+                    { value: 'high', label: 'Alto' },
+                    { value: 'medium', label: 'Medio' },
+                    { value: 'low', label: 'Bajo' },
+                  ]}
+                />
+              </div>
+              <div>
+                <Select
+                  label="Business Unit"
+                  value={formData.businessUnitId}
+                  onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+                  options={[
+                    { value: '', label: 'Sin BU' },
+                    ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                  ]}
+                />
+              </div>
             </div>
           </div>
 
@@ -163,7 +236,20 @@ export function TeamFormPage() {
             <div>
               <label className="text-sm font-medium text-secondary block mb-2">Métricas DORA</label>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                {doraMetricOptions.map((metric) => (<div key={metric.key}><label className="block text-xs text-neutral-50 mb-1">{metric.label}</label><div className="flex items-center gap-1"><input type="number" value={(formData.doraMetrics as Record<string, number>)[metric.key]} onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))} className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm" /><span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span></div></div>))}
+                {doraMetricOptions.map((metric) => (
+                  <div key={metric.key}>
+                    <label className="block text-xs text-neutral-50 mb-1">{metric.label}</label>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={(formData.doraMetrics as Record<string, number>)[metric.key]}
+                        onChange={(e) => updateMetric(metric.key, parseFloat(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
+                      />
+                      <span className="text-xs text-neutral-50 w-14 shrink-0">{metric.unit}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -173,7 +259,13 @@ export function TeamFormPage() {
         <div className="mt-6 pt-6 border-t border-boundary">
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm font-medium text-secondary">Miembros</label>
-            <Button type="button" onClick={addMember} className="flex items-center gap-1 text-sm text-primary hover:underline"><Plus size={14} /> Agregar</Button>
+            <Button
+              type="button"
+              onClick={addMember}
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Plus size={14} /> Agregar
+            </Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -182,14 +274,21 @@ export function TeamFormPage() {
                   <th className="text-left px-3 py-2 font-medium text-neutral-50 w-8"></th>
                   <th className="text-left px-3 py-2 font-medium text-neutral-50">Nombre</th>
                   <th className="text-left px-3 py-2 font-medium text-neutral-50">Rol</th>
-                  <th className="text-right px-3 py-2 font-medium text-neutral-50 w-24">Asignación</th>
+                  <th className="text-right px-3 py-2 font-medium text-neutral-50 w-24">
+                    Asignación
+                  </th>
                   <th className="w-10 px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody>
                 {members.map((member, index) => (
-                  <tr key={index} className="border-b border-neutral-20/50 dark:border-neutral-70/50 last:border-0">
-                    <td className="px-3 py-2.5 text-neutral-50"><Users size={14} /></td>
+                  <tr
+                    key={index}
+                    className="border-b border-neutral-20/50 dark:border-neutral-70/50 last:border-0"
+                  >
+                    <td className="px-3 py-2.5 text-neutral-50">
+                      <Users size={14} />
+                    </td>
                     <td className="px-3 py-2.5 min-w-[200px]">
                       <MemberSelector
                         value={member.id}
@@ -201,13 +300,39 @@ export function TeamFormPage() {
                       <Select
                         value={member.role}
                         onChange={(v) => updateMember(index, 'role', v as MemberRole)}
-                        options={MEMBER_ROLES.map((r) => ({ value: r, label: MEMBER_ROLE_LABELS[r] }))}
+                        options={MEMBER_ROLES.map((r) => ({
+                          value: r,
+                          label: MEMBER_ROLE_LABELS[r],
+                        }))}
                         className="w-full min-w-28"
                         placeholder="Rol"
                       />
                     </td>
-                    <td className="px-3 py-2.5"><div className="flex items-center justify-end gap-1"><input type="number" min="1" max="100" value={member.allocation} onChange={(e) => updateMember(index, 'allocation', parseInt(e.target.value))} className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-right" /><span className="text-xs text-neutral-50">%</span></div></td>
-                    <td className="px-3 py-2.5"><Button type="button" onClick={() => removeMember(index)} className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors" title="Eliminar miembro"><Trash2 size={14} /></Button></td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center justify-end gap-1">
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={member.allocation}
+                          onChange={(e) =>
+                            updateMember(index, 'allocation', parseInt(e.target.value))
+                          }
+                          className="w-16 px-2 py-1 rounded border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm text-right"
+                        />
+                        <span className="text-xs text-neutral-50">%</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <Button
+                        type="button"
+                        onClick={() => removeMember(index)}
+                        className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
+                        title="Eliminar miembro"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -216,8 +341,19 @@ export function TeamFormPage() {
         </div>
 
         <div className="flex justify-end gap-3 mt-6 pt-4">
-          <Button type="button" onClick={() => navigate('/teams')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
-          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{team ? 'Actualizar' : 'Crear'}</Button>
+          <Button
+            type="button"
+            onClick={() => navigate('/teams')}
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+          >
+            {team ? 'Actualizar' : 'Crear'}
+          </Button>
         </div>
       </form>
     </div>

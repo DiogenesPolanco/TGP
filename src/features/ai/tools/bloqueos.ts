@@ -3,7 +3,8 @@ import { type AiToolDefinition } from '../types'
 
 export const consultarBloqueosTool: AiToolDefinition = {
   name: 'consultar_bloqueos',
-  description: 'Bloqueos activos registrados en el sistema. Permite filtrar por tipo de item (plan, tarea, actividad, compromiso), severidad o responsable.',
+  description:
+    'Bloqueos activos registrados en el sistema. Permite filtrar por tipo de item (plan, tarea, actividad, compromiso), severidad o responsable.',
   parameters: {
     type: 'object',
     properties: {
@@ -55,7 +56,11 @@ export const consultarBloqueosTool: AiToolDefinition = {
     }
 
     // Resolver nombres de responsables y items relacionados
-    const userIds = new Set(bloqueos.map((b) => b.raisedById).concat(bloqueos.map((b) => b.assigneeId).filter(Boolean) as string[]))
+    const userIds = new Set(
+      bloqueos
+        .map((b) => b.raisedById)
+        .concat(bloqueos.map((b) => b.assigneeId).filter(Boolean) as string[]),
+    )
     const planIds = new Set<string>()
     const taskIds = new Set<string>()
     const activityIds = new Set<string>()
@@ -70,11 +75,34 @@ export const consultarBloqueosTool: AiToolDefinition = {
 
     // Cargar datos relacionados
     const [users, plans, tasks, activities, commitments] = await Promise.all([
-      db.users.where('id').anyOf([...userIds]).toArray(),
-      planIds.size > 0 ? db.plans.where('id').anyOf([...planIds]).toArray() : [],
-      taskIds.size > 0 ? db.tasks.where('id').anyOf([...taskIds]).toArray() : [],
-      activityIds.size > 0 ? db.activities.where('id').anyOf([...activityIds]).toArray() : [],
-      commitmentIds.size > 0 ? db.commitments.where('id').anyOf([...commitmentIds]).toArray() : [],
+      db.users
+        .where('id')
+        .anyOf([...userIds])
+        .toArray(),
+      planIds.size > 0
+        ? db.plans
+            .where('id')
+            .anyOf([...planIds])
+            .toArray()
+        : [],
+      taskIds.size > 0
+        ? db.tasks
+            .where('id')
+            .anyOf([...taskIds])
+            .toArray()
+        : [],
+      activityIds.size > 0
+        ? db.activities
+            .where('id')
+            .anyOf([...activityIds])
+            .toArray()
+        : [],
+      commitmentIds.size > 0
+        ? db.commitments
+            .where('id')
+            .anyOf([...commitmentIds])
+            .toArray()
+        : [],
     ])
 
     const userMap = new Map(users.map((u) => [u.id, u.displayName ?? u.email]))
@@ -83,18 +111,28 @@ export const consultarBloqueosTool: AiToolDefinition = {
     const activityMap = new Map(activities.map((a) => [a.id, a.title]))
     const commitmentMap = new Map(commitments.map((c) => [c.id, c.title]))
 
-    const itemTitle = (b: typeof bloqueos[0]): string => {
+    const itemTitle = (b: (typeof bloqueos)[0]): string => {
       switch (b.sourceType) {
-        case 'plan': return planMap.get(b.sourceId) ?? `plan #${b.sourceId.slice(0, 8)}`
-        case 'task': return taskMap.get(b.sourceId) ?? `tarea #${b.sourceId.slice(0, 8)}`
-        case 'activity': return activityMap.get(b.sourceId) ?? `actividad #${b.sourceId.slice(0, 8)}`
-        case 'commitment': return commitmentMap.get(b.sourceId) ?? `compromiso #${b.sourceId.slice(0, 8)}`
-        default: return `#${b.sourceId.slice(0, 8)}`
+        case 'plan':
+          return planMap.get(b.sourceId) ?? `plan #${b.sourceId.slice(0, 8)}`
+        case 'task':
+          return taskMap.get(b.sourceId) ?? `tarea #${b.sourceId.slice(0, 8)}`
+        case 'activity':
+          return activityMap.get(b.sourceId) ?? `actividad #${b.sourceId.slice(0, 8)}`
+        case 'commitment':
+          return commitmentMap.get(b.sourceId) ?? `compromiso #${b.sourceId.slice(0, 8)}`
+        default:
+          return `#${b.sourceId.slice(0, 8)}`
       }
     }
 
     const typeLabel = (t: string): string => {
-      const labels: Record<string, string> = { plan: 'plan', task: 'tarea', activity: 'actividad', commitment: 'compromiso' }
+      const labels: Record<string, string> = {
+        plan: 'plan',
+        task: 'tarea',
+        activity: 'actividad',
+        commitment: 'compromiso',
+      }
       return labels[t] ?? t
     }
 
@@ -108,7 +146,8 @@ export const consultarBloqueosTool: AiToolDefinition = {
       output.push(`  🔸 **${nombre}** (${typeLabel(b.sourceType)}) · ${b.severity}`)
       output.push(`    ${b.description}`)
       output.push(`    Desde: ${desde} · Reportó: ${reportadoPor} · Asignado: ${asignadoA}`)
-      if (b.escalatedAt) output.push(`    ⚡ Escalado: ${new Date(b.escalatedAt).toLocaleDateString('es-ES')}`)
+      if (b.escalatedAt)
+        output.push(`    ⚡ Escalado: ${new Date(b.escalatedAt).toLocaleDateString('es-ES')}`)
       if (resuelto) output.push(`    ✅ Resuelto: ${resuelto}`)
       output.push('')
     }

@@ -3,9 +3,19 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import {
-  Target, AlertTriangle, XCircle, Clock,
-  Calendar, ArrowRight, Filter, ChevronLeft, ChevronRight,
-  AlertOctagon, Share2, Copy, Check,
+  Target,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  Calendar,
+  ArrowRight,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  AlertOctagon,
+  Share2,
+  Copy,
+  Check,
 } from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import { createShareLink, getPublicTimelineData } from '@/services/share/publicShareService'
@@ -32,7 +42,11 @@ const healthConfig: Record<string, { label: string; bar: string; dot: string; bg
 
 export function ExecutiveTimelinePage() {
   const navigate = useNavigate()
-  const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
+  const today = useMemo(() => {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    return d
+  }, [])
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all')
   const [healthFilter, setHealthFilter] = useState<'all' | 'green' | 'yellow' | 'red'>('all')
   const [overdueFilter, setOverdueFilter] = useState(false)
@@ -128,10 +142,19 @@ export function ExecutiveTimelinePage() {
 
   // Upcoming milestones
   const milestones = useMemo(() => {
-    const items: { date: Date; title: string; planTitle: string; planId: string; type: 'due' | 'end' }[] = []
+    const items: {
+      date: Date
+      title: string
+      planTitle: string
+      planId: string
+      type: 'due' | 'end'
+    }[] = []
 
     for (const p of filteredPlans) {
-      const planActivities = activities.filter((a) => a.planId === p.id && a.dueDate && a.status !== 'completed' && a.status !== 'cancelled')
+      const planActivities = activities.filter(
+        (a) =>
+          a.planId === p.id && a.dueDate && a.status !== 'completed' && a.status !== 'cancelled',
+      )
       for (const a of planActivities) {
         const d = new Date(a.dueDate!)
         const diff = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
@@ -140,9 +163,17 @@ export function ExecutiveTimelinePage() {
         }
       }
       // Plan end dates coming up
-      const endDiff = Math.ceil((new Date(p.endDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      const endDiff = Math.ceil(
+        (new Date(p.endDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+      )
       if (endDiff >= -7 && endDiff <= 30 && p.status !== 'completed' && p.status !== 'cancelled') {
-        items.push({ date: new Date(p.endDate), title: `Fin: ${p.title}`, planTitle: p.title, planId: p.id, type: 'end' })
+        items.push({
+          date: new Date(p.endDate),
+          title: `Fin: ${p.title}`,
+          planTitle: p.title,
+          planId: p.id,
+          type: 'end',
+        })
       }
     }
 
@@ -152,24 +183,45 @@ export function ExecutiveTimelinePage() {
 
   // Alerts
   const alerts = useMemo(() => {
-    const items: { severity: 'critical' | 'warning' | 'info'; message: string; link?: string }[] = []
+    const items: { severity: 'critical' | 'warning' | 'info'; message: string; link?: string }[] =
+      []
 
-    const criticalBlockers = blockers.filter((b) => b.severity === 'critical' && (b.status === 'open' || b.status === 'escalated'))
+    const criticalBlockers = blockers.filter(
+      (b) => b.severity === 'critical' && (b.status === 'open' || b.status === 'escalated'),
+    )
     if (criticalBlockers.length > 0) {
-      items.push({ severity: 'critical', message: `${criticalBlockers.length} bloqueo(s) crítico(s) sin resolver`, link: '/execution/blockers' })
+      items.push({
+        severity: 'critical',
+        message: `${criticalBlockers.length} bloqueo(s) crítico(s) sin resolver`,
+        link: '/execution/blockers',
+      })
     }
 
     if (stats.overdueActivities > 0) {
-      items.push({ severity: 'warning', message: `${stats.overdueActivities} actividad(es) vencida(s)`, link: '/execution/daily' })
+      items.push({
+        severity: 'warning',
+        message: `${stats.overdueActivities} actividad(es) vencida(s)`,
+        link: '/execution/daily',
+      })
     }
 
     if (stats.atRiskCommitments > 0) {
-      items.push({ severity: 'warning', message: `${stats.atRiskCommitments} compromiso(s) en riesgo`, link: '/execution/commitments' })
+      items.push({
+        severity: 'warning',
+        message: `${stats.atRiskCommitments} compromiso(s) en riesgo`,
+        link: '/execution/commitments',
+      })
     }
 
-    const overduePlans = plans.filter((p) => p.status === 'in_progress' && new Date(p.endDate) < today)
+    const overduePlans = plans.filter(
+      (p) => p.status === 'in_progress' && new Date(p.endDate) < today,
+    )
     if (overduePlans.length > 0) {
-      items.push({ severity: 'critical', message: `${overduePlans.length} plan(es) vencido(s)`, link: '/execution/plans' })
+      items.push({
+        severity: 'critical',
+        message: `${overduePlans.length} plan(es) vencido(s)`,
+        link: '/execution/plans',
+      })
     }
 
     return items
@@ -210,12 +262,8 @@ export function ExecutiveTimelinePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
-            Timeline Ejecutivo
-          </h2>
-          <p className="text-sm text-muted mt-1">
-            Visión consolidada de todos los planes
-          </p>
+          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Timeline Ejecutivo</h2>
+          <p className="text-sm text-muted mt-1">Visión consolidada de todos los planes</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -255,7 +303,11 @@ export function ExecutiveTimelinePage() {
           color="text-primary"
           bg="bg-primary/10"
           active={statusFilter === 'all' && healthFilter === 'all' && !overdueFilter}
-          onClick={() => { setStatusFilter('all'); setHealthFilter('all'); setOverdueFilter(false) }}
+          onClick={() => {
+            setStatusFilter('all')
+            setHealthFilter('all')
+            setOverdueFilter(false)
+          }}
         />
         <StatBox
           icon={<Clock size={16} />}
@@ -264,7 +316,11 @@ export function ExecutiveTimelinePage() {
           color="text-success"
           bg="bg-success/10"
           active={statusFilter === 'in_progress' && healthFilter === 'all' && !overdueFilter}
-          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('all'); setOverdueFilter(false) }}
+          onClick={() => {
+            setStatusFilter('in_progress')
+            setHealthFilter('all')
+            setOverdueFilter(false)
+          }}
         />
         <StatBox
           icon={<AlertTriangle size={16} />}
@@ -273,7 +329,11 @@ export function ExecutiveTimelinePage() {
           color="text-warning"
           bg="bg-warning/10"
           active={statusFilter === 'in_progress' && healthFilter !== 'all' && !overdueFilter}
-          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('red'); setOverdueFilter(false) }}
+          onClick={() => {
+            setStatusFilter('in_progress')
+            setHealthFilter('red')
+            setOverdueFilter(false)
+          }}
         />
         <StatBox
           icon={<XCircle size={16} />}
@@ -282,7 +342,11 @@ export function ExecutiveTimelinePage() {
           color="text-danger"
           bg="bg-danger/10"
           active={statusFilter === 'in_progress' && healthFilter === 'all' && overdueFilter}
-          onClick={() => { setStatusFilter('in_progress'); setHealthFilter('all'); setOverdueFilter(true) }}
+          onClick={() => {
+            setStatusFilter('in_progress')
+            setHealthFilter('all')
+            setOverdueFilter(true)
+          }}
         />
       </div>
 
@@ -290,25 +354,37 @@ export function ExecutiveTimelinePage() {
       <div className="flex flex-wrap items-center gap-3">
         <Filter size={16} className="text-neutral-50" />
         <div className="min-w-[170px]">
-          <Select value={statusFilter} onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')} options={[
-            { value: 'all', label: 'Todos los estados' },
-            { value: 'planned', label: 'Planificado' },
-            { value: 'in_progress', label: 'En Progreso' },
-            { value: 'on_hold', label: 'En Pausa' },
-            { value: 'completed', label: 'Completado' },
-          ]} />
+          <Select
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')}
+            options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'planned', label: 'Planificado' },
+              { value: 'in_progress', label: 'En Progreso' },
+              { value: 'on_hold', label: 'En Pausa' },
+              { value: 'completed', label: 'Completado' },
+            ]}
+          />
         </div>
         <div className="min-w-[170px]">
-          <Select value={buFilter} onChange={setBuFilter} options={[
-            { value: 'all', label: 'Todas las UB' },
-            ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-          ]} />
+          <Select
+            value={buFilter}
+            onChange={setBuFilter}
+            options={[
+              { value: 'all', label: 'Todas las UB' },
+              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+            ]}
+          />
         </div>
         <div className="min-w-[170px]">
-          <Select value={teamFilter} onChange={setTeamFilter} options={[
-            { value: 'all', label: 'Todos los equipos' },
-            ...teams.map((t) => ({ value: t.id, label: t.name })),
-          ]} />
+          <Select
+            value={teamFilter}
+            onChange={setTeamFilter}
+            options={[
+              { value: 'all', label: 'Todos los equipos' },
+              ...teams.map((t) => ({ value: t.id, label: t.name })),
+            ]}
+          />
         </div>
         <span className="text-xs text-neutral-50 ml-auto">{filteredPlans.length} plan(es)</span>
       </div>
@@ -321,11 +397,14 @@ export function ExecutiveTimelinePage() {
           <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
             <div className="flex items-center gap-2">
               <Calendar size={15} className="text-primary" />
-              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Línea de Tiempo</h3>
+              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                Línea de Tiempo
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-neutral-50">
-                {timelineStart.toLocaleDateString('es-ES')} — {timelineEnd.toLocaleDateString('es-ES')}
+                {timelineStart.toLocaleDateString('es-ES')} —{' '}
+                {timelineEnd.toLocaleDateString('es-ES')}
               </span>
               <Button
                 onClick={() => setWeekOffset((o) => o - 12)}
@@ -334,7 +413,9 @@ export function ExecutiveTimelinePage() {
                 <ChevronLeft size={16} />
               </Button>
               <Button
-                onClick={() => { setWeekOffset(0) }}
+                onClick={() => {
+                  setWeekOffset(0)
+                }}
                 className="px-2 py-0.5 text-xs font-medium rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
               >
                 Hoy
@@ -360,7 +441,8 @@ export function ExecutiveTimelinePage() {
                   {Array.from({ length: Math.min(totalWeeks, 24) }).map((_, i) => {
                     const weekDate = new Date(timelineStart)
                     weekDate.setDate(weekDate.getDate() + i * 7)
-                    const isCurrent = weekDate <= today && new Date(weekDate.getTime() + 6 * 86400000) >= today
+                    const isCurrent =
+                      weekDate <= today && new Date(weekDate.getTime() + 6 * 86400000) >= today
                     return (
                       <div
                         key={i}
@@ -369,7 +451,9 @@ export function ExecutiveTimelinePage() {
                         }`}
                         style={{ width: `${weekWidth}px` }}
                       >
-                        <span>{weekDate.getDate()}/{weekDate.getMonth() + 1}</span>
+                        <span>
+                          {weekDate.getDate()}/{weekDate.getMonth() + 1}
+                        </span>
                       </div>
                     )
                   })}
@@ -386,19 +470,26 @@ export function ExecutiveTimelinePage() {
                   const planStart = new Date(plan.startDate)
                   const planEnd = new Date(plan.endDate)
                   const totalSpan = timelineEnd.getTime() - timelineStart.getTime()
-                  const leftPct = totalSpan > 0
-                    ? ((planStart.getTime() - timelineStart.getTime()) / totalSpan) * 100
-                    : 0
-                  const widthPct = totalSpan > 0
-                    ? ((planEnd.getTime() - planStart.getTime()) / totalSpan) * 100
-                    : 0
+                  const leftPct =
+                    totalSpan > 0
+                      ? ((planStart.getTime() - timelineStart.getTime()) / totalSpan) * 100
+                      : 0
+                  const widthPct =
+                    totalSpan > 0
+                      ? ((planEnd.getTime() - planStart.getTime()) / totalSpan) * 100
+                      : 0
                   const isOverdue = planEnd < today && plan.status === 'in_progress'
                   const health = healthConfig[plan.health] ?? healthConfig.green
 
                   const planActivities = activities.filter((a) => a.planId === plan.id)
-                  const completedPct = planActivities.length > 0
-                    ? Math.round((planActivities.filter((a) => a.status === 'completed').length / planActivities.length) * 100)
-                    : 0
+                  const completedPct =
+                    planActivities.length > 0
+                      ? Math.round(
+                          (planActivities.filter((a) => a.status === 'completed').length /
+                            planActivities.length) *
+                            100,
+                        )
+                      : 0
 
                   return (
                     <div
@@ -410,12 +501,20 @@ export function ExecutiveTimelinePage() {
                       <div className="w-48 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full shrink-0 ${health.dot}`} />
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{plan.title}</p>
+                          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                            {plan.title}
+                          </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={`text-[10px] font-medium ${
-                              isOverdue ? 'text-danger' : statusConfig[plan.status]?.color ?? 'text-neutral-50'
-                            }`}>
-                              {isOverdue ? 'Vencido' : statusConfig[plan.status]?.label ?? plan.status}
+                            <span
+                              className={`text-[10px] font-medium ${
+                                isOverdue
+                                  ? 'text-danger'
+                                  : (statusConfig[plan.status]?.color ?? 'text-neutral-50')
+                              }`}
+                            >
+                              {isOverdue
+                                ? 'Vencido'
+                                : (statusConfig[plan.status]?.label ?? plan.status)}
                             </span>
                             <span className="text-[10px] text-neutral-50">{completedPct}%</span>
                           </div>
@@ -443,7 +542,9 @@ export function ExecutiveTimelinePage() {
                             <div
                               key={i}
                               className="absolute top-0 bottom-0 border-l border-neutral-20/50 dark:border-neutral-70/30"
-                              style={{ left: `${(i * weekWidth / (totalWeeks * weekWidth)) * 100}%` }}
+                              style={{
+                                left: `${((i * weekWidth) / (totalWeeks * weekWidth)) * 100}%`,
+                              }}
                             />
                           ))}
                         </div>
@@ -455,7 +556,12 @@ export function ExecutiveTimelinePage() {
                             style={{
                               left: `${Math.max(0, leftPct)}%`,
                               width: `${Math.max(2, widthPct)}%`,
-                              backgroundColor: plan.health === 'red' ? 'rgba(255, 86, 48, 0.15)' : plan.health === 'yellow' ? 'rgba(255, 171, 0, 0.15)' : 'rgba(54, 179, 126, 0.12)',
+                              backgroundColor:
+                                plan.health === 'red'
+                                  ? 'rgba(255, 86, 48, 0.15)'
+                                  : plan.health === 'yellow'
+                                    ? 'rgba(255, 171, 0, 0.15)'
+                                    : 'rgba(54, 179, 126, 0.12)',
                               borderLeft: `3px solid ${plan.health === 'red' ? '#FF5630' : plan.health === 'yellow' ? '#FFAB00' : '#36B37E'}`,
                             }}
                           >
@@ -464,7 +570,12 @@ export function ExecutiveTimelinePage() {
                               className="absolute inset-0 rounded-md opacity-20"
                               style={{
                                 width: `${completedPct}%`,
-                                backgroundColor: plan.health === 'red' ? '#FF5630' : plan.health === 'yellow' ? '#FFAB00' : '#36B37E',
+                                backgroundColor:
+                                  plan.health === 'red'
+                                    ? '#FF5630'
+                                    : plan.health === 'yellow'
+                                      ? '#FFAB00'
+                                      : '#36B37E',
                               }}
                             />
                             <span className="relative text-[11px] font-medium text-neutral-90 dark:text-white truncate z-10">
@@ -482,11 +593,24 @@ export function ExecutiveTimelinePage() {
 
           {/* Legend */}
           <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary">
-            <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
-            <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" /> Saludable</span>
-            <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En Riesgo</span>
-            <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-danger/30 border-l-[3px] border-danger" /> Crítico</span>
-            <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-2 h-2 rounded-full bg-danger" /> Hoy</span>
+            <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">
+              Leyenda
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" />{' '}
+              Saludable
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En
+              Riesgo
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-danger/30 border-l-[3px] border-danger" />{' '}
+              Crítico
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-2 h-2 rounded-full bg-danger" /> Hoy
+            </span>
           </div>
         </div>
 
@@ -496,17 +620,19 @@ export function ExecutiveTimelinePage() {
           <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
               <Calendar size={15} className="text-primary" />
-              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Próximos Hitos</h3>
+              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                Próximos Hitos
+              </h3>
             </div>
             <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
               {milestones.length === 0 ? (
-                <div className="p-4 text-center text-xs text-neutral-50">
-                  No hay hitos próximos
-                </div>
+                <div className="p-4 text-center text-xs text-neutral-50">No hay hitos próximos</div>
               ) : (
                 milestones.map((m, i) => {
                   const d = new Date(m.date)
-                  const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+                  const diffDays = Math.ceil(
+                    (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                  )
                   return (
                     <div
                       key={i}
@@ -519,8 +645,14 @@ export function ExecutiveTimelinePage() {
                         ) : (
                           <Calendar size={12} className="text-warning" />
                         )}
-                        <span className={`text-xs font-semibold ${diffDays <= 0 ? 'text-danger' : diffDays <= 3 ? 'text-warning' : 'text-neutral-90 dark:text-white'}`}>
-                          {diffDays <= 0 ? 'VENCE HOY' : diffDays === 1 ? 'MAÑANA' : `${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
+                        <span
+                          className={`text-xs font-semibold ${diffDays <= 0 ? 'text-danger' : diffDays <= 3 ? 'text-warning' : 'text-neutral-90 dark:text-white'}`}
+                        >
+                          {diffDays <= 0
+                            ? 'VENCE HOY'
+                            : diffDays === 1
+                              ? 'MAÑANA'
+                              : `${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
                         </span>
                       </div>
                       <p className="text-xs text-secondary truncate">{m.title}</p>
@@ -544,13 +676,24 @@ export function ExecutiveTimelinePage() {
                   <div
                     key={i}
                     className={`px-4 py-3 flex items-start gap-2 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors ${
-                      a.severity === 'critical' ? 'bg-danger/[0.02]' : a.severity === 'warning' ? 'bg-warning/[0.02]' : ''
+                      a.severity === 'critical'
+                        ? 'bg-danger/[0.02]'
+                        : a.severity === 'warning'
+                          ? 'bg-warning/[0.02]'
+                          : ''
                     }`}
                     onClick={() => a.link && navigate(a.link)}
                   >
-                    <AlertTriangle size={14} className={`shrink-0 mt-0.5 ${
-                      a.severity === 'critical' ? 'text-danger' : a.severity === 'warning' ? 'text-warning' : 'text-info'
-                    }`} />
+                    <AlertTriangle
+                      size={14}
+                      className={`shrink-0 mt-0.5 ${
+                        a.severity === 'critical'
+                          ? 'text-danger'
+                          : a.severity === 'warning'
+                            ? 'text-warning'
+                            : 'text-info'
+                      }`}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-secondary">{a.message}</p>
                     </div>
@@ -566,7 +709,9 @@ export function ExecutiveTimelinePage() {
       {showTerms && (
         <TermsModal
           onAccept={handleTermsAccepted}
-          onClose={() => { setShowTerms(false) }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -589,16 +734,32 @@ export function ExecutiveTimelinePage() {
             setShowPassphrase(false)
             setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
     </div>
   )
 }
 
-function StatBox({ icon, label, value, color, bg, active, onClick }: {
-  icon: React.ReactNode; label: string; value: number; color: string; bg: string;
-  active?: boolean; onClick?: () => void
+function StatBox({
+  icon,
+  label,
+  value,
+  color,
+  bg,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+  bg: string
+  active?: boolean
+  onClick?: () => void
 }) {
   if (!onClick) {
     return (

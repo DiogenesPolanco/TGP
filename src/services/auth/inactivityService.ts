@@ -13,8 +13,14 @@ let currentTimeoutMs = DEFAULT_INACTIVITY_TIMEOUT_MS
 const EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'] as const
 
 function clear() {
-  if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null }
-  if (warningTimer) { clearInterval(warningTimer); warningTimer = null }
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = null
+  }
+  if (warningTimer) {
+    clearInterval(warningTimer)
+    warningTimer = null
+  }
 }
 
 function onUserActivity() {

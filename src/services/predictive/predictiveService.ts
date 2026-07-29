@@ -30,7 +30,10 @@ function linearRegression(values: number[]): { slope: number; intercept: number;
   return { slope, intercept, r2 }
 }
 
-function predictNext(values: number[], steps = 30): { prediction: number; confidence: 'high' | 'medium' | 'low' } {
+function predictNext(
+  values: number[],
+  steps = 30,
+): { prediction: number; confidence: 'high' | 'medium' | 'low' } {
   const { slope, intercept, r2 } = linearRegression(values)
   const nextIndex = values.length + steps - 1
   const prediction = Math.max(0, Math.min(100, slope * nextIndex + intercept))
@@ -45,9 +48,7 @@ function predictNext(values: number[], steps = 30): { prediction: number; confid
 export async function getPredictions(): Promise<Prediction[]> {
   const predictions: Prediction[] = []
 
-  const history = await db.healthIndexHistory
-    .orderBy('calculatedAt')
-    .toArray()
+  const history = await db.healthIndexHistory.orderBy('calculatedAt').toArray()
 
   if (history.length >= 3) {
     const scores = history.map((h) => h.overallScore)
@@ -61,9 +62,10 @@ export async function getPredictions(): Promise<Prediction[]> {
       predicted: thiPred,
       trend,
       confidence: thiConf,
-      detail: thiConf === 'high'
-        ? `Proyección basada en ${scores.length} registros históricos con tendencia ${trend === 'up' ? 'positiva' : trend === 'down' ? 'negativa' : 'estable'}`
-        : `Se necesitan más datos históricos para mejorar la precisión (actual: ${scores.length} registros)`,
+      detail:
+        thiConf === 'high'
+          ? `Proyección basada en ${scores.length} registros históricos con tendencia ${trend === 'up' ? 'positiva' : trend === 'down' ? 'negativa' : 'estable'}`
+          : `Se necesitan más datos históricos para mejorar la precisión (actual: ${scores.length} registros)`,
     })
   }
 
@@ -75,16 +77,24 @@ export async function getPredictions(): Promise<Prediction[]> {
     const recentVulns = vulns.filter((v) => new Date(v.createdAt).getTime() > thirtyDaysAgo)
     const monthlyRate = Math.round((recentVulns.length / Math.max(1, 30)) * 30)
 
-    const criticalOpen = vulns.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length
-    const slaRisk = criticalOpen > 0
-      ? 'Riesgo de incumplimiento SLA: vulnerabilidades críticas sin corregir'
-      : 'Sin riesgo SLA detectado'
+    const criticalOpen = vulns.filter(
+      (v) => v.severity === 'critical' && v.status !== 'fixed',
+    ).length
+    const slaRisk =
+      criticalOpen > 0
+        ? 'Riesgo de incumplimiento SLA: vulnerabilidades críticas sin corregir'
+        : 'Sin riesgo SLA detectado'
 
     predictions.push({
       metric: 'Velocidad Vulnerabilidades',
       current: recentVulns.length,
       predicted: monthlyRate,
-      trend: monthlyRate > recentVulns.length ? 'up' : monthlyRate < recentVulns.length ? 'down' : 'stable',
+      trend:
+        monthlyRate > recentVulns.length
+          ? 'up'
+          : monthlyRate < recentVulns.length
+            ? 'down'
+            : 'stable',
       confidence: vulns.length >= 10 ? 'high' : 'medium',
       detail: `${recentVulns.length} vulnerabilidades en los últimos 30 días. Proyección mensual: ${monthlyRate}. ${slaRisk}`,
     })
@@ -110,7 +120,9 @@ export async function getPredictions(): Promise<Prediction[]> {
   const apps = await db.applications.toArray()
   if (techs.length > 0 && apps.length > 0) {
     const eolTechs = techs.filter((t) => t.supportStatus === 'eol')
-    const appsWithEol = apps.filter((a) => a.technologies.some((tId) => eolTechs.some((e) => e.id === tId)))
+    const appsWithEol = apps.filter((a) =>
+      a.technologies.some((tId) => eolTechs.some((e) => e.id === tId)),
+    )
     const pct = Math.round((appsWithEol.length / apps.length) * 100)
 
     predictions.push({

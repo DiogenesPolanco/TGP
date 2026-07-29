@@ -2,7 +2,20 @@ import { useState, useEffect, useCallback, startTransition } from 'react'
 import { generateReport, type ReportSection } from '@/services/reports/pdfService'
 import { generateExcel } from '@/services/reports/excelService'
 import * as reportData from '@/services/reports/reportDataService'
-import { Loader2, FileText, Download, AlertTriangle, TrendingUp, Bug, ShieldHalf, GitBranch, Goal, ClipboardCheck, Package, FileSpreadsheet } from 'lucide-react'
+import {
+  Loader2,
+  FileText,
+  Download,
+  AlertTriangle,
+  TrendingUp,
+  Bug,
+  ShieldHalf,
+  GitBranch,
+  Goal,
+  ClipboardCheck,
+  Package,
+  FileSpreadsheet,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 interface TabDef {
@@ -18,30 +31,77 @@ interface TabDef {
 }
 
 const tabs: TabDef[] = [
-  { id: 'obsolescencia', label: 'Obsolescencia', icon: <Package className="w-4 h-4" />, fetcher: reportData.getObsolescenceReport },
-  { id: 'rendimiento', label: 'Rendimiento', icon: <TrendingUp className="w-4 h-4" />, fetcher: reportData.getPerformanceReport },
-  { id: 'incidentes', label: 'Incidentes', icon: <Bug className="w-4 h-4" />, fetcher: reportData.getIncidentsReport },
-  { id: 'vulnerabilidades', label: 'Vulnerabilidades', icon: <ShieldHalf className="w-4 h-4" />, fetcher: reportData.getVulnerabilitiesReport },
-  { id: 'predictibilidad', label: 'Predictibilidad', icon: <GitBranch className="w-4 h-4" />, fetcher: reportData.getSprintPredictabilityReport },
-  { id: 'riesgos', label: 'Riesgos', icon: <AlertTriangle className="w-4 h-4" />, fetcher: reportData.getRisksReport },
-  { id: 'auditoria', label: 'Auditoría', icon: <ClipboardCheck className="w-4 h-4" />, fetcher: reportData.getAuditReport },
-  { id: 'entregables', label: 'Entregables', icon: <Goal className="w-4 h-4" />, fetcher: reportData.getDeliverablesReport },
+  {
+    id: 'obsolescencia',
+    label: 'Obsolescencia',
+    icon: <Package className="w-4 h-4" />,
+    fetcher: reportData.getObsolescenceReport,
+  },
+  {
+    id: 'rendimiento',
+    label: 'Rendimiento',
+    icon: <TrendingUp className="w-4 h-4" />,
+    fetcher: reportData.getPerformanceReport,
+  },
+  {
+    id: 'incidentes',
+    label: 'Incidentes',
+    icon: <Bug className="w-4 h-4" />,
+    fetcher: reportData.getIncidentsReport,
+  },
+  {
+    id: 'vulnerabilidades',
+    label: 'Vulnerabilidades',
+    icon: <ShieldHalf className="w-4 h-4" />,
+    fetcher: reportData.getVulnerabilitiesReport,
+  },
+  {
+    id: 'predictibilidad',
+    label: 'Predictibilidad',
+    icon: <GitBranch className="w-4 h-4" />,
+    fetcher: reportData.getSprintPredictabilityReport,
+  },
+  {
+    id: 'riesgos',
+    label: 'Riesgos',
+    icon: <AlertTriangle className="w-4 h-4" />,
+    fetcher: reportData.getRisksReport,
+  },
+  {
+    id: 'auditoria',
+    label: 'Auditoría',
+    icon: <ClipboardCheck className="w-4 h-4" />,
+    fetcher: reportData.getAuditReport,
+  },
+  {
+    id: 'entregables',
+    label: 'Entregables',
+    icon: <Goal className="w-4 h-4" />,
+    fetcher: reportData.getDeliverablesReport,
+  },
 ]
 
 const colorMap: Record<string, string> = {
   '#2563eb': 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-  '#6366f1': 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800',
-  '#16a34a': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800',
-  '#ca8a04': 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
+  '#6366f1':
+    'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800',
+  '#16a34a':
+    'bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800',
+  '#ca8a04':
+    'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
   '#dc2626': 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800',
-  '#ea580c': 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
-  '#94a3b8': 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800',
+  '#ea580c':
+    'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+  '#94a3b8':
+    'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800',
 }
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState(tabs[0].id)
   const [loading, setLoading] = useState(true)
-  const [data, setData] = useState<Awaited<ReturnType<typeof reportData.getObsolescenceReport>> | null>(null)
+  const [data, setData] = useState<Awaited<
+    ReturnType<typeof reportData.getObsolescenceReport>
+  > | null>(null)
   const [exportingPDF, setExportingPDF] = useState(false)
   const [exportingExcel, setExportingExcel] = useState(false)
 
@@ -61,7 +121,9 @@ export default function ReportsPage() {
   }, [activeTabDef])
 
   useEffect(() => {
-    startTransition(() => { loadData() })
+    startTransition(() => {
+      loadData()
+    })
   }, [loadData])
 
   const handleExportPDF = () => {
@@ -92,11 +154,16 @@ export default function ReportsPage() {
 
   const severityBadge = (value: string) => {
     const lower = value.toLowerCase()
-    if (lower === 'eol' || lower === 'critical') return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-    if (lower === 'extended' || lower === 'high') return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-    if (lower === 'medium') return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-    if (lower === 'low' || lower === 'active') return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-    if (lower === 'info') return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
+    if (lower === 'eol' || lower === 'critical')
+      return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+    if (lower === 'extended' || lower === 'high')
+      return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+    if (lower === 'medium')
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+    if (lower === 'low' || lower === 'active')
+      return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+    if (lower === 'info')
+      return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
     return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400'
   }
 
@@ -171,7 +238,9 @@ export default function ReportsPage() {
                     key={i}
                     className={`rounded-lg border p-4 ${colorMap[item.color || '#2563eb'] || colorMap['#2563eb']}`}
                   >
-                    <div className="text-xs font-medium opacity-70 dark:text-white/70 mb-1">{item.label}</div>
+                    <div className="text-xs font-medium opacity-70 dark:text-white/70 mb-1">
+                      {item.label}
+                    </div>
                     <div className="text-2xl font-bold dark:text-white">{item.value}</div>
                   </div>
                 ))}
@@ -180,9 +249,13 @@ export default function ReportsPage() {
 
             {data.sections.map((section, si) => (
               <div key={si} className="bg-card rounded-lg border border-boundary">
-                  <div className="px-5 py-3 border-b border-boundary">
-                    <h3 className="text-sm font-semibold text-neutral-80 dark:text-white">{section.title}</h3>
-                  <p className="text-xs text-neutral-50 dark:text-neutral-40 mt-0.5">{section.rows.length} registros</p>
+                <div className="px-5 py-3 border-b border-boundary">
+                  <h3 className="text-sm font-semibold text-neutral-80 dark:text-white">
+                    {section.title}
+                  </h3>
+                  <p className="text-xs text-neutral-50 dark:text-neutral-40 mt-0.5">
+                    {section.rows.length} registros
+                  </p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -192,7 +265,11 @@ export default function ReportsPage() {
                           <th
                             key={ci}
                             className={`px-4 py-3 text-xs font-semibold text-neutral-60 dark:text-neutral-30 uppercase tracking-wider ${
-                              col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'
+                              col.align === 'center'
+                                ? 'text-center'
+                                : col.align === 'right'
+                                  ? 'text-right'
+                                  : 'text-left'
                             }`}
                           >
                             {col.header}
@@ -203,26 +280,41 @@ export default function ReportsPage() {
                     <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
                       {section.rows.length === 0 ? (
                         <tr>
-                          <td colSpan={section.columns.length} className="px-4 py-8 text-center text-neutral-40 dark:text-neutral-30">
+                          <td
+                            colSpan={section.columns.length}
+                            className="px-4 py-8 text-center text-neutral-40 dark:text-neutral-30"
+                          >
                             No hay datos disponibles.
                           </td>
                         </tr>
                       ) : (
                         section.rows.map((row, ri) => (
-                          <tr key={ri} className="hover:bg-neutral-10 dark:hover:bg-neutral-85 transition-colors">
+                          <tr
+                            key={ri}
+                            className="hover:bg-neutral-10 dark:hover:bg-neutral-85 transition-colors"
+                          >
                             {section.columns.map((col, ci) => {
                               const val = row[col.dataKey]
                               const display = val != null ? String(val) : '-'
-                              const isSeverityCol = col.dataKey === 'severidad' || col.dataKey === 'estado' || col.dataKey === 'cvss'
+                              const isSeverityCol =
+                                col.dataKey === 'severidad' ||
+                                col.dataKey === 'estado' ||
+                                col.dataKey === 'cvss'
                               return (
                                 <td
                                   key={ci}
                                   className={`px-4 py-2.5 text-sm text-neutral-70 dark:text-white ${
-                                    col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'
+                                    col.align === 'center'
+                                      ? 'text-center'
+                                      : col.align === 'right'
+                                        ? 'text-right'
+                                        : 'text-left'
                                   }`}
                                 >
                                   {isSeverityCol ? (
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${severityBadge(display)}`}>
+                                    <span
+                                      className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${severityBadge(display)}`}
+                                    >
                                       {display}
                                     </span>
                                   ) : (

@@ -62,7 +62,9 @@ export function ApplicationFormPage() {
           criticality: application.criticality ?? 'medium',
           architecture: application.architecture ?? 'monolith',
           status: application.status ?? 'active',
-          supportEndDate: application.supportEndDate ? new Date(application.supportEndDate).toISOString().split('T')[0] : '',
+          supportEndDate: application.supportEndDate
+            ? new Date(application.supportEndDate).toISOString().split('T')[0]
+            : '',
         })
         setSelectedTechIds(application.technologies ?? [])
       })
@@ -96,7 +98,10 @@ export function ApplicationFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/catalog/applications')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/catalog/applications')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
@@ -104,7 +109,10 @@ export function ApplicationFormPage() {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4"
+      >
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
           <input
@@ -133,46 +141,71 @@ export function ApplicationFormPage() {
         />
 
         <div>
-          <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-            { value: '', label: 'Seleccionar...' },
-            ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-          ]} />
+          <Select
+            label="Business Unit *"
+            required
+            value={formData.businessUnitId}
+            onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+            options={[
+              { value: '', label: 'Seleccionar...' },
+              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+            ]}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Criticidad *" required value={formData.criticality} onChange={(v) => setFormData({ ...formData, criticality: v as Criticality })} options={[
-              { value: 'low', label: 'Baja' },
-              { value: 'medium', label: 'Media' },
-              { value: 'high', label: 'Alta' },
-              { value: 'critical', label: 'Crítica' },
-            ]} />
+            <Select
+              label="Criticidad *"
+              required
+              value={formData.criticality}
+              onChange={(v) => setFormData({ ...formData, criticality: v as Criticality })}
+              options={[
+                { value: 'low', label: 'Baja' },
+                { value: 'medium', label: 'Media' },
+                { value: 'high', label: 'Alta' },
+                { value: 'critical', label: 'Crítica' },
+              ]}
+            />
           </div>
 
           <div>
-            <Select label="Arquitectura" value={formData.architecture} onChange={(v) => setFormData({ ...formData, architecture: v as ArchitectureType })} options={[
-              { value: 'monolith', label: 'Monolito' },
-              { value: 'microservices', label: 'Microservicios' },
-              { value: 'serverless', label: 'Serverless' },
-              { value: 'soa', label: 'SOA' },
-              { value: 'event_driven', label: 'Event Driven' },
-              { value: 'hybrid', label: 'Híbrida' },
-            ]} />
+            <Select
+              label="Arquitectura"
+              value={formData.architecture}
+              onChange={(v) => setFormData({ ...formData, architecture: v as ArchitectureType })}
+              options={[
+                { value: 'monolith', label: 'Monolito' },
+                { value: 'microservices', label: 'Microservicios' },
+                { value: 'serverless', label: 'Serverless' },
+                { value: 'soa', label: 'SOA' },
+                { value: 'event_driven', label: 'Event Driven' },
+                { value: 'hybrid', label: 'Híbrida' },
+              ]}
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Estado *" required value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ApplicationStatus })} options={[
-              { value: 'active', label: 'Activa' },
-              { value: 'deprecated', label: 'Deprecada' },
-              { value: 'retired', label: 'Retirada' },
-              { value: 'planned', label: 'Planificada' },
-            ]} />
+            <Select
+              label="Estado *"
+              required
+              value={formData.status}
+              onChange={(v) => setFormData({ ...formData, status: v as ApplicationStatus })}
+              options={[
+                { value: 'active', label: 'Activa' },
+                { value: 'deprecated', label: 'Deprecada' },
+                { value: 'retired', label: 'Retirada' },
+                { value: 'planned', label: 'Planificada' },
+              ]}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Fecha fin soporte</label>
+            <label className="block text-sm font-medium text-secondary mb-1">
+              Fecha fin soporte
+            </label>
             <DatePicker
               value={formData.supportEndDate}
               onChange={(v) => setFormData({ ...formData, supportEndDate: v })}
@@ -182,9 +215,7 @@ export function ApplicationFormPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-secondary mb-2">
-            Tecnologías
-          </label>
+          <label className="block text-sm font-medium text-secondary mb-2">Tecnologías</label>
           <TechSearch
             selectedIds={selectedTechIds}
             onChange={setSelectedTechIds}

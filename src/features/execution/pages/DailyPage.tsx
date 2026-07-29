@@ -9,8 +9,19 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import {
-  AlertTriangle, Clock, CheckCircle2, XCircle, ArrowRight, Pencil,
-  Calendar, ListTodo, Ban, Target, Share2, Check, Copy,
+  AlertTriangle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Pencil,
+  Calendar,
+  ListTodo,
+  Ban,
+  Target,
+  Share2,
+  Check,
+  Copy,
 } from 'lucide-react'
 import type { Blocker } from '@/types/domain'
 
@@ -71,7 +82,9 @@ export function DailyPage() {
     }
   }, [shareUrl])
 
-  useEffect(() => { runEscalation() }, [])
+  useEffect(() => {
+    runEscalation()
+  }, [])
 
   const rawPlans = useLiveQuery(() => db.plans.toArray())
   const plans = useMemo(() => rawPlans ?? [], [rawPlans])
@@ -90,21 +103,24 @@ export function DailyPage() {
   const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p])), [plans])
   const activityMap = useMemo(() => new Map(activities.map((a) => [a.id, a])), [activities])
 
-  const blockerPlan = useMemo(() => (blocker: Blocker) => {
-    if (blocker.sourceType === 'plan') return planMap.get(blocker.sourceId)
-    if (blocker.sourceType === 'activity') {
-      const act = activityMap.get(blocker.sourceId)
-      return act ? planMap.get(act.planId) : undefined
-    }
-    if (blocker.sourceType === 'commitment') {
+  const blockerPlan = useMemo(
+    () => (blocker: Blocker) => {
+      if (blocker.sourceType === 'plan') return planMap.get(blocker.sourceId)
+      if (blocker.sourceType === 'activity') {
+        const act = activityMap.get(blocker.sourceId)
+        return act ? planMap.get(act.planId) : undefined
+      }
+      if (blocker.sourceType === 'commitment') {
+        return undefined
+      }
+      if (blocker.sourceType === 'task') {
+        const task = tasks.find((t) => t.id === blocker.sourceId)
+        return task?.planId ? planMap.get(task.planId) : undefined
+      }
       return undefined
-    }
-    if (blocker.sourceType === 'task') {
-      const task = tasks.find((t) => t.id === blocker.sourceId)
-      return task?.planId ? planMap.get(task.planId) : undefined
-    }
-    return undefined
-  }, [planMap, activityMap, tasks])
+    },
+    [planMap, activityMap, tasks],
+  )
 
   const agenda = useMemo(() => {
     const ref = selectedWeek ? new Date(selectedWeek.start) : new Date(today)
@@ -123,10 +139,14 @@ export function DailyPage() {
       const d = new Date(a.dueDate!)
       d.setHours(0, 0, 0, 0)
       const boundary = selectedWeek ? ref : today
-      return d.getTime() < boundary.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
+      return (
+        d.getTime() < boundary.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
+      )
     })
 
-    const activeCommitments = commitments.filter((c) => c.status === 'active' || c.status === 'at_risk')
+    const activeCommitments = commitments.filter(
+      (c) => c.status === 'active' || c.status === 'at_risk',
+    )
     const commitmentsDueSoon = activeCommitments.filter((c) => {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
@@ -140,7 +160,9 @@ export function DailyPage() {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
       const boundary = selectedWeek ? ref : today
-      return d.getTime() < boundary.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
+      return (
+        d.getTime() < boundary.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
+      )
     })
 
     const activeBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated')
@@ -179,18 +201,23 @@ export function DailyPage() {
     }
   }, [today, selectedWeek, activities, commitments, blockers, tasks, plans])
 
-  const criticalBlockers = agenda.activeBlockers.filter((b) => b.severity === 'critical' || b.severity === 'high')
+  const criticalBlockers = agenda.activeBlockers.filter(
+    (b) => b.severity === 'critical' || b.severity === 'high',
+  )
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
-            Seguimiento Diario
-          </h2>
+          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Seguimiento Diario</h2>
           <p className="text-sm text-muted mt-1">
-            {today.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            {today.toLocaleDateString('es-ES', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
           </p>
         </div>
         <Button
@@ -205,8 +232,12 @@ export function DailyPage() {
       {shareUrl && (
         <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
+          <a
+            href={cleanUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+          >
             {cleanUrl}
           </a>
           <Button
@@ -278,7 +309,9 @@ export function DailyPage() {
             <div className="bg-card rounded-xl border border-danger/30 shadow-sm overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 bg-danger/5 border-b border-danger/20">
                 <Ban size={16} className="text-danger" />
-                <h3 className="text-sm font-semibold text-danger">Bloqueos Activos ({agenda.activeBlockers.length})</h3>
+                <h3 className="text-sm font-semibold text-danger">
+                  Bloqueos Activos ({agenda.activeBlockers.length})
+                </h3>
               </div>
               <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
                 {agenda.activeBlockers.slice(0, 5).map((blocker) => {
@@ -290,22 +323,37 @@ export function DailyPage() {
                       onClick={() => navigate(`/execution/blockers/${blocker.id}/edit`)}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-                          blocker.severity === 'critical' ? 'bg-danger/10 text-danger' :
-                          blocker.severity === 'high' ? 'bg-warning/10 text-warning' :
-                          'bg-neutral-10 text-neutral-60'
-                        }`}>
+                        <span
+                          className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                            blocker.severity === 'critical'
+                              ? 'bg-danger/10 text-danger'
+                              : blocker.severity === 'high'
+                                ? 'bg-warning/10 text-warning'
+                                : 'bg-neutral-10 text-neutral-60'
+                          }`}
+                        >
                           {severityLabel[blocker.severity]}
                         </span>
-                        <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">{blocker.title}</span>
-                        <Pencil size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="text-sm font-medium text-neutral-90 dark:text-white flex-1 truncate">
+                          {blocker.title}
+                        </span>
+                        <Pencil
+                          size={14}
+                          className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
                       </div>
                       <div className="text-xs text-muted mt-1 ml-1">
                         <HtmlDescription html={blocker.description} lines={1} />
                       </div>
                       <div className="flex items-center gap-2 mt-1 ml-1">
-                        {plan && <span className="text-xs text-primary font-medium">{plan.title}</span>}
-                        {blocker.assigneeId && <span className="text-xs text-neutral-50">Asignado: {blocker.assigneeId}</span>}
+                        {plan && (
+                          <span className="text-xs text-primary font-medium">{plan.title}</span>
+                        )}
+                        {blocker.assigneeId && (
+                          <span className="text-xs text-neutral-50">
+                            Asignado: {blocker.assigneeId}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )
@@ -319,16 +367,22 @@ export function DailyPage() {
             <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
                 <XCircle size={16} className="text-danger" />
-                <h3 className="text-sm font-semibold text-danger">Vencidas ({agenda.overdue.length})</h3>
+                <h3 className="text-sm font-semibold text-danger">
+                  Vencidas ({agenda.overdue.length})
+                </h3>
               </div>
               <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
                 {agenda.overdue.map((act) => {
                   const plan = planMap.get(act.planId)
-                  const daysOverdue = Math.ceil((today.getTime() - new Date(act.dueDate!).getTime()) / (1000 * 60 * 60 * 24))
+                  const daysOverdue = Math.ceil(
+                    (today.getTime() - new Date(act.dueDate!).getTime()) / (1000 * 60 * 60 * 24),
+                  )
                   return (
                     <div key={act.id} className="px-4 py-3 flex items-center justify-between">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{act.title}</p>
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                          {act.title}
+                        </p>
                         <p className="text-xs text-neutral-50">
                           {plan?.title} &middot; {daysOverdue}d vencida
                           {act.assigneeId && <span> &middot; {act.assigneeId}</span>}
@@ -355,7 +409,9 @@ export function DailyPage() {
                 {selectedWeek ? 'Vence Esta Semana' : 'Vence Hoy'}
               </h3>
               {agenda.dueToday.length > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning">{agenda.dueToday.length}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning">
+                  {agenda.dueToday.length}
+                </span>
               )}
             </div>
             <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -376,14 +432,19 @@ export function DailyPage() {
                         onClick={() => navigate(`/execution/plans/${act.planId}`)}
                       >
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{act.title}</p>
+                          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                            {act.title}
+                          </p>
                           <p className="text-xs text-neutral-50">
                             {plan?.title}
                             {app && <span> &middot; {app.name}</span>}
                             {act.assigneeId && <span> &middot; {act.assigneeId}</span>}
                           </p>
                         </div>
-                        <ArrowRight size={16} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowRight
+                          size={16}
+                          className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
                       </div>
                     )
                   })}
@@ -404,7 +465,10 @@ export function DailyPage() {
                             {app && <span> &middot; {app.name}</span>}
                           </p>
                         </div>
-                        <ArrowRight size={16} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowRight
+                          size={16}
+                          className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
                       </div>
                     )
                   })}
@@ -418,7 +482,9 @@ export function DailyPage() {
             <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-boundary">
                 <ListTodo size={16} className="text-info" />
-                <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Tareas Pendientes ({agenda.tasksDue.length})</h3>
+                <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                  Tareas Pendientes ({agenda.tasksDue.length})
+                </h3>
               </div>
               <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
                 {agenda.tasksDue.slice(0, 8).map((task) => {
@@ -429,14 +495,25 @@ export function DailyPage() {
                       className="px-4 py-2.5 flex items-center gap-3 cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors group"
                       onClick={() => task.planId && navigate(`/execution/plans/${task.planId}`)}
                     >
-                      <div className={`w-2 h-2 rounded-full ${
-                        task.priority === 'critical' ? 'bg-danger' :
-                        task.priority === 'high' ? 'bg-warning' :
-                        'bg-neutral-40'
-                      }`} />
-                      <span className="text-sm text-neutral-90 dark:text-white flex-1 truncate">{task.title}</span>
-                      {plan && <span className="text-xs text-neutral-50 shrink-0">{plan.title}</span>}
-                      <ArrowRight size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          task.priority === 'critical'
+                            ? 'bg-danger'
+                            : task.priority === 'high'
+                              ? 'bg-warning'
+                              : 'bg-neutral-40'
+                        }`}
+                      />
+                      <span className="text-sm text-neutral-90 dark:text-white flex-1 truncate">
+                        {task.title}
+                      </span>
+                      {plan && (
+                        <span className="text-xs text-neutral-50 shrink-0">{plan.title}</span>
+                      )}
+                      <ArrowRight
+                        size={14}
+                        className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
                     </div>
                   )
                 })}
@@ -454,15 +531,15 @@ export function DailyPage() {
             commitments={commitments}
             today={selectedWeek?.start ?? today}
           />
-
-
         </div>
       </div>
 
       {showTerms && (
         <TermsModal
           onAccept={handleTermsAccepted}
-          onClose={() => { setShowTerms(false) }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -485,7 +562,10 @@ export function DailyPage() {
             setShowPassphrase(false)
             setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
     </div>
@@ -493,7 +573,11 @@ export function DailyPage() {
 }
 
 function StatCard({
-  icon, label, value, color, onClick,
+  icon,
+  label,
+  value,
+  color,
+  onClick,
 }: {
   icon: React.ReactNode
   label: string
@@ -514,7 +598,9 @@ function StatCard({
       onClick={onClick}
       className="bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3"
     >
-      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </CardComp>

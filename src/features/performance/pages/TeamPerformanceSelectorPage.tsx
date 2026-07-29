@@ -15,7 +15,9 @@ export function TeamPerformanceSelectorPage() {
   return (
     <div className="max-w-full">
       <div className="mb-6">
-        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">Rendimiento de Equipos</h1>
+        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
+          Rendimiento de Equipos
+        </h1>
         <p className="text-muted mt-1">
           Selecciona un equipo para ver sus indicadores de rendimiento
         </p>

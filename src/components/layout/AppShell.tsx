@@ -12,7 +12,11 @@ import { usePrivacyBlur } from '@/hooks/usePrivacyBlur'
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts'
 import { useVersionCheck } from '@/hooks/useVersionCheck'
 import { UpdateAvailable } from '@/components/error/UpdateAvailable'
-import { OnboardingWizard, useFirstTimeuser, isOnboardingDone } from '@/features/onboarding/OnboardingWizard'
+import {
+  OnboardingWizard,
+  useFirstTimeuser,
+  isOnboardingDone,
+} from '@/features/onboarding/OnboardingWizard'
 import { cn } from '@/lib/utils'
 import { startAutomatedChecks } from '@/services/jobs/automatedChecksService'
 import { AiChatPanel } from '@/features/ai/components/AiChatPanel'
@@ -34,7 +38,10 @@ export function AppShell() {
   const currentUser = useUserStore((s) => s.currentUser)
   const getConfig = useAiConfigStore((s) => s.getConfig)
   const aiConfig = currentUser ? getConfig(currentUser.id) : null
-  const aiConfigured = !!(aiConfig?.enabled && (aiConfig.provider === 'ollama' || !!aiConfig?.apiKey))
+  const aiConfigured = !!(
+    aiConfig?.enabled &&
+    (aiConfig.provider === 'ollama' || !!aiConfig?.apiKey)
+  )
 
   const onboardingComplete = isOnboardingDone() || wizardDone
 
@@ -56,22 +63,26 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', handler)
   }, [])
 
-  const appShortcuts = useCallback(() => ({
-    b: () => toggleSidebar(),
-    n: () => {
-      const path = window.location.pathname
-      if (path.startsWith('/catalog/applications')) navigate('/catalog/applications/new')
-      else if (path.startsWith('/catalog/obsolescence')) navigate('/catalog/obsolescence/new')
-      else if (path.startsWith('/security/vulnerabilities')) navigate('/security/vulnerabilities/new')
-      else if (path.startsWith('/security/incidents')) navigate('/security/incidents/new')
-      else if (path.startsWith('/governance/risks')) navigate('/governance/risks/new')
-      else if (path.startsWith('/governance/audit')) navigate('/governance/audit/new')
-      else if (path.startsWith('/teams')) navigate('/teams/new')
-      else if (path.startsWith('/strategy/objectives')) navigate('/strategy/objectives/new')
-      else if (path.startsWith('/execution/plans')) navigate('/execution/plans/new')
-      else if (path.startsWith('/execution/commitments')) navigate('/execution/commitments/new')
-    },
-  }), [navigate, toggleSidebar])
+  const appShortcuts = useCallback(
+    () => ({
+      b: () => toggleSidebar(),
+      n: () => {
+        const path = window.location.pathname
+        if (path.startsWith('/catalog/applications')) navigate('/catalog/applications/new')
+        else if (path.startsWith('/catalog/obsolescence')) navigate('/catalog/obsolescence/new')
+        else if (path.startsWith('/security/vulnerabilities'))
+          navigate('/security/vulnerabilities/new')
+        else if (path.startsWith('/security/incidents')) navigate('/security/incidents/new')
+        else if (path.startsWith('/governance/risks')) navigate('/governance/risks/new')
+        else if (path.startsWith('/governance/audit')) navigate('/governance/audit/new')
+        else if (path.startsWith('/teams')) navigate('/teams/new')
+        else if (path.startsWith('/strategy/objectives')) navigate('/strategy/objectives/new')
+        else if (path.startsWith('/execution/plans')) navigate('/execution/plans/new')
+        else if (path.startsWith('/execution/commitments')) navigate('/execution/commitments/new')
+      },
+    }),
+    [navigate, toggleSidebar],
+  )
 
   useGlobalShortcuts(appShortcuts())
 
@@ -79,12 +90,17 @@ export function AppShell() {
   if (stale) return <UpdateAvailable onReload={reload} />
 
   return (
-    <div className={cn('flex h-screen bg-canvas', isTabHidden && 'blur-xl transition-all duration-300')}>
+    <div
+      className={cn(
+        'flex h-screen bg-canvas',
+        isTabHidden && 'blur-xl transition-all duration-300',
+      )}
+    >
       <Sidebar chatOpen={chatOpen} onToggleChat={toggleChat} aiConfigured={aiConfigured} />
       <div
         className={cn(
           'flex flex-col flex-1 transition-all duration-300',
-          sidebarOpen ? 'ml-60' : 'ml-16'
+          sidebarOpen ? 'ml-60' : 'ml-16',
         )}
       >
         <Header />
@@ -95,7 +111,9 @@ export function AppShell() {
         </main>
         <footer className="shrink-0 border-t border-boundary px-6 py-2 flex items-center justify-between text-[11px] text-muted">
           <span>TGP — Technology Governance Platform</span>
-          <span>v{version} · {new Date().getFullYear()}</span>
+          <span>
+            v{version} · {new Date().getFullYear()}
+          </span>
           <button
             onClick={() => navigate('/terms')}
             className="hover:text-primary transition-colors underline underline-offset-2"

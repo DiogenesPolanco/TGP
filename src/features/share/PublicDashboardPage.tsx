@@ -1,10 +1,23 @@
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidShareHash, getPublicDashboardData, type PublicDashboardData } from '@/services/share/publicShareService'
 import {
-  Shield, AlertTriangle, Clock, TrendingUp, TrendingDown,
-  Users, Package, Building2, AlertOctagon, Target, CheckCircle2,
+  isValidShareHash,
+  getPublicDashboardData,
+  type PublicDashboardData,
+} from '@/services/share/publicShareService'
+import {
+  Shield,
+  AlertTriangle,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Package,
+  Building2,
+  AlertOctagon,
+  Target,
+  CheckCircle2,
 } from 'lucide-react'
 import { ThiGauge } from '@/components/charts/ThiGauge'
 import { cn } from '@/lib/utils'
@@ -22,53 +35,62 @@ export function PublicDashboardPage() {
   const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
-    ;(async () => {
-
-    const tryDecryptOrShow = (raw: unknown) => {
-      if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
-        setPendingEncrypted(raw as EncryptedPayload)
-        setValid(true)
-        setLoading(false)
-      } else {
-        setData(raw as PublicDashboardData)
-        setValid(true)
-        setLoading(false)
-      }
-    }
-
-    // 1. Try URL hash fragment (manifest)
-    const rawHash = window.location.hash.replace(/^#/, '')
-    if (rawHash) {
-      try {
-        const fragment = decodeURIComponent(rawHash)
-        const { downloadUsingManifest } = await import('@/services/share/azureShareService')
-        const azureData = await downloadUsingManifest(fragment)
-        if (azureData) { tryDecryptOrShow(azureData); return }
-        console.warn('[PublicDashboard] Manifest found but Azure returned no data')
-      } catch (err) {
-        console.error('[PublicDashboard] Azure download error:', err)
-      }
-    }
-
-    // 2. Fallback: viewer's own Azure config
-    try {
-      const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
-      const viewerData = await downloadShareFromAzure(hash)
-      if (viewerData) { tryDecryptOrShow(viewerData); return }
-    } catch (err) {
-      console.warn('[PublicDashboard] Viewer Azure config error:', err)
-    }
-
-    // 3. Last fallback: localStorage
-    if (isValidShareHash(hash)) {
-      const d = await getPublicDashboardData()
-      setData(d); setValid(true)
-    } else {
+    if (!hash) {
       setValid(false)
+      setLoading(false)
+      return
     }
-    setLoading(false)
+    ;(async () => {
+      const tryDecryptOrShow = (raw: unknown) => {
+        if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
+          setPendingEncrypted(raw as EncryptedPayload)
+          setValid(true)
+          setLoading(false)
+        } else {
+          setData(raw as PublicDashboardData)
+          setValid(true)
+          setLoading(false)
+        }
+      }
 
+      // 1. Try URL hash fragment (manifest)
+      const rawHash = window.location.hash.replace(/^#/, '')
+      if (rawHash) {
+        try {
+          const fragment = decodeURIComponent(rawHash)
+          const { downloadUsingManifest } = await import('@/services/share/azureShareService')
+          const azureData = await downloadUsingManifest(fragment)
+          if (azureData) {
+            tryDecryptOrShow(azureData)
+            return
+          }
+          console.warn('[PublicDashboard] Manifest found but Azure returned no data')
+        } catch (err) {
+          console.error('[PublicDashboard] Azure download error:', err)
+        }
+      }
+
+      // 2. Fallback: viewer's own Azure config
+      try {
+        const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
+        const viewerData = await downloadShareFromAzure(hash)
+        if (viewerData) {
+          tryDecryptOrShow(viewerData)
+          return
+        }
+      } catch (err) {
+        console.warn('[PublicDashboard] Viewer Azure config error:', err)
+      }
+
+      // 3. Last fallback: localStorage
+      if (isValidShareHash(hash)) {
+        const d = await getPublicDashboardData()
+        setData(d)
+        setValid(true)
+      } else {
+        setValid(false)
+      }
+      setLoading(false)
     })()
   }, [hash])
 
@@ -82,74 +104,159 @@ export function PublicDashboardPage() {
     const applications = data.applications ?? []
     const auditFindings = data.auditFindings ?? []
     const healthHistory = data.healthHistory ?? []
-    const criticalVulns = vulnerabilities.filter((v: any) => v.severity === 'critical' && v.status !== 'fixed').length
-    const highVulns = vulnerabilities.filter((v: any) => v.severity === 'high' && v.status !== 'fixed').length
-    const openIncidents = incidents.filter((i: any) => i.status !== 'resolved' && i.status !== 'closed').length
-    const p1Incidents = incidents.filter((i: any) => i.severity === 'critical' && i.status !== 'resolved').length
+    const criticalVulns = vulnerabilities.filter(
+      (v: any) => v.severity === 'critical' && v.status !== 'fixed',
+    ).length
+    const highVulns = vulnerabilities.filter(
+      (v: any) => v.severity === 'high' && v.status !== 'fixed',
+    ).length
+    const openIncidents = incidents.filter(
+      (i: any) => i.status !== 'resolved' && i.status !== 'closed',
+    ).length
+    const p1Incidents = incidents.filter(
+      (i: any) => i.severity === 'critical' && i.status !== 'resolved',
+    ).length
     const openRisks = risks.filter((r: any) => r.status === 'open')
     const criticalRisks = openRisks.filter((r: any) => r.riskScore >= 15).length
     const totalRisk = openRisks.reduce((s: number, r: any) => s + r.riskScore, 0)
     const eolTechs = technologies.filter((t: any) => t.supportStatus === 'eol').length
-    const eliteTeams = teams.filter((t: any) => (t.currentMetrics?.deploymentFrequency ?? 0) >= 1).length
+    const eliteTeams = teams.filter(
+      (t: any) => (t.currentMetrics?.deploymentFrequency ?? 0) >= 1,
+    ).length
     const totalTeams = teams.length
 
     // THI calculation: same 7-dimension formula as main dashboard
-    const deliveryScore = teams.length === 0 ? 50
-      : Math.round(teams.reduce((s, t) => {
-          const m = t.currentMetrics
-          if (!m) return s + 50
-          return s + (Math.min(m.velocity / 50, 1) * 100
-            + Math.max(0, 100 - (m.leadTimeHours / 168) * 100)
-            + Math.max(0, 100 - m.changeFailureRate * 5)
-            + Math.max(0, 100 - (m.mttrHours / 24) * 100)) / 4
-        }, 0) / teams.length)
+    const deliveryScore =
+      teams.length === 0
+        ? 50
+        : Math.round(
+            teams.reduce((s, t) => {
+              const m = t.currentMetrics
+              if (!m) return s + 50
+              return (
+                s +
+                (Math.min(m.velocity / 50, 1) * 100 +
+                  Math.max(0, 100 - (m.leadTimeHours / 168) * 100) +
+                  Math.max(0, 100 - m.changeFailureRate * 5) +
+                  Math.max(0, 100 - (m.mttrHours / 24) * 100)) /
+                  4
+              )
+            }, 0) / teams.length,
+          )
     const qualityScore = 75
-    const criticalHighOpen = vulnerabilities.filter((v: any) =>
-      (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed'
+    const criticalHighOpen = vulnerabilities.filter(
+      (v: any) => (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed',
     ).length
-    const securityScore = applications.length === 0 ? 100
-      : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
-    const totalDowntime = incidents.filter((i: any) => i.status === 'resolved')
+    const securityScore =
+      applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(criticalHighOpen * 5, 80))
+    const totalDowntime = incidents
+      .filter((i: any) => i.status === 'resolved')
       .reduce((s: number, i: any) => s + ((i as any).downtimeMinutes ?? 0), 0)
-    const availabilityScore = applications.length === 0 ? 100
-      : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
+    const availabilityScore =
+      applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(totalDowntime / 60, 50))
     const appsWithEol = applications.filter((a: any) =>
-      a.technologies?.some((tId: string) => technologies.some((t: any) => t.id === tId && t.supportStatus === 'eol'))
+      a.technologies?.some((tId: string) =>
+        technologies.some((t: any) => t.id === tId && t.supportStatus === 'eol'),
+      ),
     ).length
-    const obsolescenceScore = applications.length === 0 ? 100
-      : Math.round((1 - appsWithEol / applications.length) * 100)
-    const activeRiskScore = risks.filter((r: any) => r.status === 'open')
+    const obsolescenceScore =
+      applications.length === 0 ? 100 : Math.round((1 - appsWithEol / applications.length) * 100)
+    const activeRiskScore = risks
+      .filter((r: any) => r.status === 'open')
       .reduce((s: number, r: any) => s + r.riskScore, 0)
-    const riskScore = applications.length === 0 ? 100
-      : Math.max(0, 100 - Math.min(activeRiskScore / 5, 80))
-    const closedOnTime = auditFindings.filter((f: any) =>
-      (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= new Date()
+    const riskScore =
+      applications.length === 0 ? 100 : Math.max(0, 100 - Math.min(activeRiskScore / 5, 80))
+    const closedOnTime = auditFindings.filter(
+      (f: any) =>
+        (f.status === 'closed' || f.status === 'resolved') && new Date(f.dueDate) >= new Date(),
     ).length
-    const complianceScore = auditFindings.length === 0 ? 100
-      : Math.round((closedOnTime / auditFindings.length) * 100)
+    const complianceScore =
+      auditFindings.length === 0 ? 100 : Math.round((closedOnTime / auditFindings.length) * 100)
     const overallScore = Math.round(
-      (deliveryScore * 20 + qualityScore * 15 + securityScore * 20
-        + availabilityScore * 15 + obsolescenceScore * 10 + riskScore * 10
-        + complianceScore * 10) / 100
+      (deliveryScore * 20 +
+        qualityScore * 15 +
+        securityScore * 20 +
+        availabilityScore * 15 +
+        obsolescenceScore * 10 +
+        riskScore * 10 +
+        complianceScore * 10) /
+        100,
     )
 
-    const thiTrend = healthHistory.length >= 2
-      ? healthHistory[healthHistory.length - 1].score - healthHistory[0].score
-      : 0
+    const thiTrend =
+      healthHistory.length >= 2
+        ? healthHistory[healthHistory.length - 1].score - healthHistory[0].score
+        : 0
 
-    const redFlags: { icon: React.ReactNode; text: string; severity: 'critical' | 'warning' | 'info' }[] = []
-    if (criticalVulns > 0) redFlags.push({ icon: <Shield size={14} />, text: `${criticalVulns} vulnerabilidad${criticalVulns > 1 ? 'es' : ''} crítica${criticalVulns > 1 ? 's' : ''} sin corregir`, severity: 'critical' })
-    if (p1Incidents > 0) redFlags.push({ icon: <AlertOctagon size={14} />, text: `${p1Incidents} incidente${p1Incidents > 1 ? 's' : ''} P1 activo${p1Incidents > 1 ? 's' : ''}`, severity: 'critical' })
-    if (criticalRisks > 0) redFlags.push({ icon: <AlertTriangle size={14} />, text: `${criticalRisks} riesgo${criticalRisks > 1 ? 's' : ''} crítico${criticalRisks > 1 ? 's' : ''} sin mitigar`, severity: 'warning' })
-    if (eolTechs > 5) redFlags.push({ icon: <Package size={14} />, text: `${eolTechs} tecnologías EOL en uso`, severity: 'warning' })
-    if (totalTeams > 0 && eliteTeams / totalTeams < 0.3) redFlags.push({ icon: <Users size={14} />, text: `Solo ${Math.round(eliteTeams / totalTeams * 100)}% de equipos clasifican Elite DORA`, severity: 'info' })
+    const redFlags: {
+      icon: React.ReactNode
+      text: string
+      severity: 'critical' | 'warning' | 'info'
+    }[] = []
+    if (criticalVulns > 0)
+      redFlags.push({
+        icon: <Shield size={14} />,
+        text: `${criticalVulns} vulnerabilidad${criticalVulns > 1 ? 'es' : ''} crítica${criticalVulns > 1 ? 's' : ''} sin corregir`,
+        severity: 'critical',
+      })
+    if (p1Incidents > 0)
+      redFlags.push({
+        icon: <AlertOctagon size={14} />,
+        text: `${p1Incidents} incidente${p1Incidents > 1 ? 's' : ''} P1 activo${p1Incidents > 1 ? 's' : ''}`,
+        severity: 'critical',
+      })
+    if (criticalRisks > 0)
+      redFlags.push({
+        icon: <AlertTriangle size={14} />,
+        text: `${criticalRisks} riesgo${criticalRisks > 1 ? 's' : ''} crítico${criticalRisks > 1 ? 's' : ''} sin mitigar`,
+        severity: 'warning',
+      })
+    if (eolTechs > 5)
+      redFlags.push({
+        icon: <Package size={14} />,
+        text: `${eolTechs} tecnologías EOL en uso`,
+        severity: 'warning',
+      })
+    if (totalTeams > 0 && eliteTeams / totalTeams < 0.3)
+      redFlags.push({
+        icon: <Users size={14} />,
+        text: `Solo ${Math.round((eliteTeams / totalTeams) * 100)}% de equipos clasifican Elite DORA`,
+        severity: 'info',
+      })
 
     return {
-      overallScore, criticalVulns, highVulns, openIncidents, p1Incidents,
-      totalRisk, criticalRisks, eolTechs, eliteTeams, totalTeams, thiTrend,
+      overallScore,
+      criticalVulns,
+      highVulns,
+      openIncidents,
+      p1Incidents,
+      totalRisk,
+      criticalRisks,
+      eolTechs,
+      eliteTeams,
+      totalTeams,
+      thiTrend,
       redFlags,
-      thiLabel: overallScore >= 90 ? 'Excelente' : overallScore >= 70 ? 'Saludable' : overallScore >= 50 ? 'Regular' : overallScore >= 30 ? 'En Riesgo' : 'Crítico',
-      thiColor: overallScore >= 90 ? '#36B37E' : overallScore >= 70 ? '#57D9A3' : overallScore >= 50 ? '#FFAB00' : overallScore >= 30 ? '#FF8B00' : '#FF5630',
+      thiLabel:
+        overallScore >= 90
+          ? 'Excelente'
+          : overallScore >= 70
+            ? 'Saludable'
+            : overallScore >= 50
+              ? 'Regular'
+              : overallScore >= 30
+                ? 'En Riesgo'
+                : 'Crítico',
+      thiColor:
+        overallScore >= 90
+          ? '#36B37E'
+          : overallScore >= 70
+            ? '#57D9A3'
+            : overallScore >= 50
+              ? '#FFAB00'
+              : overallScore >= 30
+                ? '#FF8B00'
+                : '#FF5630',
     }
   }, [data])
 
@@ -189,7 +296,9 @@ export function PublicDashboardPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Executive Dashboard</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Executive Dashboard
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -209,12 +318,24 @@ export function PublicDashboardPage() {
           {/* THI Gauge */}
           <div className="lg:col-span-2 bg-card rounded-2xl border border-boundary p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-muted uppercase tracking-wider">Health Index</h2>
-              <div className={cn(
-                'flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full',
-                kpis.thiTrend > 0 ? 'bg-success/10 text-success' : kpis.thiTrend < 0 ? 'bg-danger/10 text-danger' : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
-              )}>
-                {kpis.thiTrend > 0 ? <TrendingUp size={14} /> : kpis.thiTrend < 0 ? <TrendingDown size={14} /> : null}
+              <h2 className="text-sm font-semibold text-muted uppercase tracking-wider">
+                Health Index
+              </h2>
+              <div
+                className={cn(
+                  'flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full',
+                  kpis.thiTrend > 0
+                    ? 'bg-success/10 text-success'
+                    : kpis.thiTrend < 0
+                      ? 'bg-danger/10 text-danger'
+                      : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50',
+                )}
+              >
+                {kpis.thiTrend > 0 ? (
+                  <TrendingUp size={14} />
+                ) : kpis.thiTrend < 0 ? (
+                  <TrendingDown size={14} />
+                ) : null}
                 {kpis.thiTrend !== 0 ? `${Math.abs(kpis.thiTrend)}pts` : 'Estable'}
               </div>
             </div>
@@ -225,7 +346,9 @@ export function PublicDashboardPage() {
 
           {/* Executive Summary */}
           <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Resumen Ejecutivo</h2>
+            <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">
+              Resumen Ejecutivo
+            </h2>
 
             {/* Top-line metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
@@ -262,15 +385,22 @@ export function PublicDashboardPage() {
             {/* Red flags */}
             {kpis.redFlags.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-neutral-50 uppercase tracking-wider mb-2">Puntos de atención</p>
+                <p className="text-xs font-semibold text-neutral-50 uppercase tracking-wider mb-2">
+                  Puntos de atención
+                </p>
                 <div className="space-y-1.5">
                   {kpis.redFlags.map((flag, i) => (
-                    <div key={i} className={cn(
-                      'flex items-center gap-2 text-xs px-3 py-2 rounded-lg',
-                      flag.severity === 'critical' ? 'bg-danger/5 text-danger' :
-                      flag.severity === 'warning' ? 'bg-warning/5 text-warning' :
-                      'bg-info/5 text-info'
-                    )}>
+                    <div
+                      key={i}
+                      className={cn(
+                        'flex items-center gap-2 text-xs px-3 py-2 rounded-lg',
+                        flag.severity === 'critical'
+                          ? 'bg-danger/5 text-danger'
+                          : flag.severity === 'warning'
+                            ? 'bg-warning/5 text-warning'
+                            : 'bg-info/5 text-info',
+                      )}
+                    >
                       {flag.icon}
                       <span className="font-medium">{flag.text}</span>
                     </div>
@@ -283,7 +413,9 @@ export function PublicDashboardPage() {
             {kpis.redFlags.length === 0 && (
               <div className="flex items-center gap-2 text-sm text-success py-4">
                 <CheckCircle2 size={18} />
-                <span className="font-medium">Sin alertas críticas. El portafolio se encuentra en estado saludable.</span>
+                <span className="font-medium">
+                  Sin alertas críticas. El portafolio se encuentra en estado saludable.
+                </span>
               </div>
             )}
           </div>
@@ -315,16 +447,22 @@ export function PublicDashboardPage() {
           <StatCard
             title="Equipos Elite DORA"
             value={`${kpis.eliteTeams}/${kpis.totalTeams}`}
-            subtitle={`${kpis.totalTeams > 0 ? Math.round(kpis.eliteTeams / kpis.totalTeams * 100) : 0}% del total`}
+            subtitle={`${kpis.totalTeams > 0 ? Math.round((kpis.eliteTeams / kpis.totalTeams) * 100) : 0}% del total`}
             icon={<Target size={18} />}
-            color={kpis.totalTeams > 0 && kpis.eliteTeams / kpis.totalTeams >= 0.3 ? 'success' : 'warning'}
+            color={
+              kpis.totalTeams > 0 && kpis.eliteTeams / kpis.totalTeams >= 0.3
+                ? 'success'
+                : 'warning'
+            }
           />
         </div>
 
         {/* ── Row 3: Technology & Risk Details ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Tecnologías en uso por estado</h3>
+            <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">
+              Tecnologías en uso por estado
+            </h3>
             <div className="space-y-3">
               {(() => {
                 const usedTechIds = new Set<string>()
@@ -336,41 +474,67 @@ export function PublicDashboardPage() {
                 return ['active', 'extended', 'eol', 'unknown'].map((status) => {
                   const count = usedTechs.filter((t) => t.supportStatus === status).length
                   const pct = Math.round((count / total) * 100)
-                const colors: Record<string, string> = { active: 'bg-success', extended: 'bg-warning', eol: 'bg-danger', unknown: 'bg-neutral-40' }
-                const labels: Record<string, string> = { active: 'Activas', extended: 'Soporte extendido', eol: 'EOL', unknown: 'Desconocido' }
-                return (
-                  <div key={status} className="flex items-center gap-3">
-                    <span className="text-sm text-neutral-60 w-28">{labels[status]}</span>
-                    <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
-                      <div className={cn('h-full rounded-full', colors[status])} style={{ width: `${pct}%` }} />
+                  const colors: Record<string, string> = {
+                    active: 'bg-success',
+                    extended: 'bg-warning',
+                    eol: 'bg-danger',
+                    unknown: 'bg-neutral-40',
+                  }
+                  const labels: Record<string, string> = {
+                    active: 'Activas',
+                    extended: 'Soporte extendido',
+                    eol: 'EOL',
+                    unknown: 'Desconocido',
+                  }
+                  return (
+                    <div key={status} className="flex items-center gap-3">
+                      <span className="text-sm text-neutral-60 w-28">{labels[status]}</span>
+                      <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
+                        <div
+                          className={cn('h-full rounded-full', colors[status])}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-neutral-90 dark:text-white w-12 text-right">
+                        {count}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-neutral-90 dark:text-white w-12 text-right">{count}</span>
-                  </div>
-                )
-              })
-            })()}
+                  )
+                })
+              })()}
             </div>
           </div>
 
           <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">Distribución de riesgos</h3>
+            <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-4">
+              Distribución de riesgos
+            </h3>
             <div className="space-y-3">
-              {([
-                { label: 'Crítico (15-25)', range: [15, 25] as const, color: 'bg-danger' },
-                { label: 'Alto (10-14)', range: [10, 14] as const, color: 'bg-warning' },
-                { label: 'Medio (5-9)', range: [5, 9] as const, color: 'bg-info' },
-                { label: 'Bajo (1-4)', range: [1, 4] as const, color: 'bg-success' },
-              ] as const).map(({ label, range, color }) => {
-                const count = data.risks.filter((r: any) => (r.riskScore ?? 0) >= range[0] && (r.riskScore ?? 0) <= range[1]).length
+              {(
+                [
+                  { label: 'Crítico (15-25)', range: [15, 25] as const, color: 'bg-danger' },
+                  { label: 'Alto (10-14)', range: [10, 14] as const, color: 'bg-warning' },
+                  { label: 'Medio (5-9)', range: [5, 9] as const, color: 'bg-info' },
+                  { label: 'Bajo (1-4)', range: [1, 4] as const, color: 'bg-success' },
+                ] as const
+              ).map(({ label, range, color }) => {
+                const count = data.risks.filter(
+                  (r: any) => (r.riskScore ?? 0) >= range[0] && (r.riskScore ?? 0) <= range[1],
+                ).length
                 const total = data.risks.length || 1
                 const pct = Math.round((count / total) * 100)
                 return (
                   <div key={label} className="flex items-center gap-3">
                     <span className="text-sm text-neutral-60 w-28">{label}</span>
                     <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
-                      <div className={cn('h-full rounded-full', color)} style={{ width: `${pct}%` }} />
+                      <div
+                        className={cn('h-full rounded-full', color)}
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
-                    <span className="text-sm font-medium text-neutral-90 dark:text-white w-12 text-right">{count}</span>
+                    <span className="text-sm font-medium text-neutral-90 dark:text-white w-12 text-right">
+                      {count}
+                    </span>
                   </div>
                 )
               })}
@@ -395,9 +559,18 @@ function Loader() {
   )
 }
 
-
-function MiniMetric({ label, value, subtitle, icon, color }: {
-  label: string; value: string; subtitle: string; icon: React.ReactNode; color: string
+function MiniMetric({
+  label,
+  value,
+  subtitle,
+  icon,
+  color,
+}: {
+  label: string
+  value: string
+  subtitle: string
+  icon: React.ReactNode
+  color: string
 }) {
   const colors: Record<string, string> = {
     primary: 'text-primary bg-primary/10',
@@ -419,22 +592,38 @@ function MiniMetric({ label, value, subtitle, icon, color }: {
   )
 }
 
-function StatCard({ title, value, subtitle, icon, color }: {
-  title: string; value: string | number; subtitle: string; icon: React.ReactNode; color: 'danger' | 'warning' | 'success' | 'info' | 'primary'
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  color,
+}: {
+  title: string
+  value: string | number
+  subtitle: string
+  icon: React.ReactNode
+  color: 'danger' | 'warning' | 'success' | 'info' | 'primary'
 }) {
   const dots: Record<string, string> = {
-    danger: 'bg-danger', warning: 'bg-warning', success: 'bg-success', info: 'bg-info', primary: 'bg-primary',
+    danger: 'bg-danger',
+    warning: 'bg-warning',
+    success: 'bg-success',
+    info: 'bg-info',
+    primary: 'bg-primary',
   }
   return (
     <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
       <div className="flex items-start justify-between mb-3">
-        <div className={cn('p-2 rounded-lg', {
-          'bg-danger/10 text-danger': color === 'danger',
-          'bg-warning/10 text-warning': color === 'warning',
-          'bg-success/10 text-success': color === 'success',
-          'bg-info/10 text-info': color === 'info',
-          'bg-primary/10 text-primary': color === 'primary',
-        })}>
+        <div
+          className={cn('p-2 rounded-lg', {
+            'bg-danger/10 text-danger': color === 'danger',
+            'bg-warning/10 text-warning': color === 'warning',
+            'bg-success/10 text-success': color === 'success',
+            'bg-info/10 text-info': color === 'info',
+            'bg-primary/10 text-primary': color === 'primary',
+          })}
+        >
           {icon}
         </div>
       </div>

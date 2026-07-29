@@ -4,10 +4,31 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
-import { getCandidateTechnologies, getCandidateEvaluations, deleteCandidate, preSelectCandidate, selectCandidate, startOnboarding } from '@/services/recruitment/candidateService'
+import {
+  getCandidateTechnologies,
+  getCandidateEvaluations,
+  deleteCandidate,
+  preSelectCandidate,
+  selectCandidate,
+  startOnboarding,
+} from '@/services/recruitment/candidateService'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
-import { ArrowLeft, Pencil, Trash2, Calendar, Mail, Phone, Briefcase, CheckCircle, UserCheck, ThumbsUp, Rocket, Monitor, Package } from 'lucide-react'
+import {
+  ArrowLeft,
+  Pencil,
+  Trash2,
+  Calendar,
+  Mail,
+  Phone,
+  Briefcase,
+  CheckCircle,
+  UserCheck,
+  ThumbsUp,
+  Rocket,
+  Monitor,
+  Package,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -30,8 +51,8 @@ export function CandidateDetailPage() {
   const [onboarding, setOnboarding] = useState(false)
 
   const candidate = useLiveQuery(() => db.candidates.get(id!), [id])
-  const technologies = useLiveQuery(() => id ? getCandidateTechnologies(id) : [], [id]) ?? []
-  const evaluations = useLiveQuery(() => id ? getCandidateEvaluations(id) : [], [id]) ?? []
+  const technologies = useLiveQuery(() => (id ? getCandidateTechnologies(id) : []), [id]) ?? []
+  const evaluations = useLiveQuery(() => (id ? getCandidateEvaluations(id) : []), [id]) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const team = candidate?.teamId ? teams.find((t) => t.id === candidate.teamId) : null
 
@@ -47,7 +68,10 @@ export function CandidateDetailPage() {
   const handleSelect = async () => {
     if (!candidate) return
     if (!candidate.teamId) {
-      addNotification({ type: 'error', message: 'Asigna un equipo al candidato antes de seleccionarlo' })
+      addNotification({
+        type: 'error',
+        message: 'Asigna un equipo al candidato antes de seleccionarlo',
+      })
       return
     }
     setSelecting(true)
@@ -78,7 +102,10 @@ export function CandidateDetailPage() {
   const handleStartOnboarding = async () => {
     if (!candidate) return
     if (!candidate.teamId) {
-      addNotification({ type: 'error', message: 'Asigna un equipo al candidato antes de iniciar onboarding' })
+      addNotification({
+        type: 'error',
+        message: 'Asigna un equipo al candidato antes de iniciar onboarding',
+      })
       return
     }
     setOnboarding(true)
@@ -95,23 +122,37 @@ export function CandidateDetailPage() {
 
   if (!candidate) return null
 
-  const cfg = statusConfig[candidate.status] ?? { label: candidate.status, color: 'bg-neutral-10 text-neutral-60' }
+  const cfg = statusConfig[candidate.status] ?? {
+    label: candidate.status,
+    color: 'bg-neutral-10 text-neutral-60',
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={() => navigate('/teams/recruitment')}
+            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <ArrowLeft size={20} className="text-neutral-60" />
           </Button>
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{candidate.name}</h2>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
+            {cfg.label}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => navigate(`/teams/recruitment/${candidate.id}/edit`)} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors">
+          <Button
+            onClick={() => navigate(`/teams/recruitment/${candidate.id}/edit`)}
+            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-primary transition-colors"
+          >
             <Pencil size={18} />
           </Button>
-          <Button onClick={handleDelete} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors">
+          <Button
+            onClick={handleDelete}
+            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors"
+          >
             <Trash2 size={18} />
           </Button>
         </div>
@@ -121,15 +162,34 @@ export function CandidateDetailPage() {
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="16" fill="none" className="stroke-neutral-20 dark:stroke-neutral-70" strokeWidth="2" />
-              <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="2"
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                className="stroke-neutral-20 dark:stroke-neutral-70"
+                strokeWidth="2"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
                 strokeDasharray={`${candidate.totalScore} ${100 - candidate.totalScore}`}
-                className="text-primary" strokeLinecap="round" />
+                className="text-primary"
+                strokeLinecap="round"
+              />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-primary">{candidate.totalScore}%</span>
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-primary">
+              {candidate.totalScore}%
+            </span>
           </div>
           <div className="space-y-1">
-            <p className="text-lg font-semibold text-neutral-90 dark:text-white">Puntuación General</p>
+            <p className="text-lg font-semibold text-neutral-90 dark:text-white">
+              Puntuación General
+            </p>
             <p className="text-sm text-neutral-60">50% tecnologías + 50% evaluación</p>
           </div>
         </div>
@@ -137,19 +197,41 @@ export function CandidateDetailPage() {
 
       <div className="bg-card rounded-xl border border-boundary p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <InfoRow icon={<Briefcase size={16} />} label="Posición" value={MEMBER_ROLE_LABELS[candidate.position as keyof typeof MEMBER_ROLE_LABELS] ?? candidate.position} />
-          <InfoRow icon={<Calendar size={16} />} label="Entrevista" value={candidate.interviewDate ? new Date(candidate.interviewDate).toLocaleDateString('es') : 'Pendiente'} />
-          {candidate.email && <InfoRow icon={<Mail size={16} />} label="Email" value={candidate.email} />}
-          {candidate.phone && <InfoRow icon={<Phone size={16} />} label="Teléfono" value={candidate.phone} />}
+          <InfoRow
+            icon={<Briefcase size={16} />}
+            label="Posición"
+            value={
+              MEMBER_ROLE_LABELS[candidate.position as keyof typeof MEMBER_ROLE_LABELS] ??
+              candidate.position
+            }
+          />
+          <InfoRow
+            icon={<Calendar size={16} />}
+            label="Entrevista"
+            value={
+              candidate.interviewDate
+                ? new Date(candidate.interviewDate).toLocaleDateString('es')
+                : 'Pendiente'
+            }
+          />
+          {candidate.email && (
+            <InfoRow icon={<Mail size={16} />} label="Email" value={candidate.email} />
+          )}
+          {candidate.phone && (
+            <InfoRow icon={<Phone size={16} />} label="Teléfono" value={candidate.phone} />
+          )}
           {team && <InfoRow icon={<UserCheck size={16} />} label="Equipo" value={team.name} />}
         </div>
 
-          {candidate.comments && (
-            <div className="pt-4 border-t border-boundary">
-              <p className="text-sm font-medium text-secondary mb-2">Comentarios</p>
-              <div className="text-sm text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: candidate.comments }} />
-            </div>
-          )}
+        {candidate.comments && (
+          <div className="pt-4 border-t border-boundary">
+            <p className="text-sm font-medium text-secondary mb-2">Comentarios</p>
+            <div
+              className="text-sm text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: candidate.comments }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="bg-card rounded-xl border border-boundary p-6">
@@ -166,7 +248,10 @@ export function CandidateDetailPage() {
                     <span className="text-sm font-semibold text-primary">{t.points}%</span>
                   </div>
                   <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${t.points}%` }} />
+                    <div
+                      className="h-full bg-primary rounded-full"
+                      style={{ width: `${t.points}%` }}
+                    />
                   </div>
                 </div>
               </div>
@@ -188,13 +273,21 @@ export function CandidateDetailPage() {
                 <div key={cat.key}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-secondary">{cat.label}</span>
-                    <span className="text-sm font-semibold" style={{ color: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444' }}>{pts}%</span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444' }}
+                    >
+                      {pts}%
+                    </span>
                   </div>
                   <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{
-                      width: `${pts}%`,
-                      backgroundColor: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444',
-                    }} />
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${pts}%`,
+                        backgroundColor: pts >= 70 ? '#22c55e' : pts >= 40 ? '#eab308' : '#ef4444',
+                      }}
+                    />
                   </div>
                 </div>
               )
@@ -240,7 +333,9 @@ export function CandidateDetailPage() {
         <div className="space-y-3">
           <div className="bg-info/10 border border-info/20 rounded-xl p-4 text-center">
             <p className="text-sm font-medium text-info">Candidato en proceso de onboarding</p>
-            <p className="text-xs text-info/70 mt-1">Asignación de accesos, equipos y permisos en curso</p>
+            <p className="text-xs text-info/70 mt-1">
+              Asignación de accesos, equipos y permisos en curso
+            </p>
           </div>
 
           <div className="bg-card rounded-xl border border-boundary p-5 space-y-3">
@@ -249,11 +344,13 @@ export function CandidateDetailPage() {
               <h3 className="font-semibold text-sm">Equipamiento Asignado</h3>
             </div>
             <p className="text-xs text-neutral-50">
-              Durante el onboarding se asignan los equipos necesarios (laptop, monitor, teléfono, accesorios).
-              Gestiona las asignaciones desde el inventario de equipamiento.
+              Durante el onboarding se asignan los equipos necesarios (laptop, monitor, teléfono,
+              accesorios). Gestiona las asignaciones desde el inventario de equipamiento.
             </p>
-            <Button onClick={() => navigate('/equipment')}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">
+            <Button
+              onClick={() => navigate('/equipment')}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+            >
               <Package size={16} />
               Ir a Inventario de Equipos
             </Button>

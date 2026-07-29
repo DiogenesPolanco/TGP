@@ -1,6 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { usePublicShare } from '@/hooks/usePublicShare'
-import { getPublicIncidentsData, type PublicIncidentsData } from '@/services/share/publicShareService'
+import {
+  getPublicIncidentsData,
+  type PublicIncidentsData,
+} from '@/services/share/publicShareService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
@@ -23,19 +26,42 @@ export function PublicIncidentsPage() {
   const appMap = new Map(data?.applications.map((a) => [a.id, a.name]) ?? [])
 
   const columns: Column<PublicIncidentsData['incidents'][number] & { id: string }>[] = [
-    { key: 'title', label: 'Incidente', sortable: true, render: (v) => <span className="font-medium text-neutral-90 dark:text-white">{v.title}</span> },
+    {
+      key: 'title',
+      label: 'Incidente',
+      sortable: true,
+      render: (v) => <span className="font-medium text-neutral-90 dark:text-white">{v.title}</span>,
+    },
     {
       key: 'severity',
       label: 'Severidad',
       sortable: true,
       render: (v) => (
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sevColors[v.severity] ?? sevColors.p4}`}>
+        <span
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sevColors[v.severity] ?? sevColors.p4}`}
+        >
           {v.severity.toUpperCase()}
         </span>
       ),
     },
-    { key: 'responseTime', label: 'Tiempo Respuesta', sortable: true, className: 'text-right', render: (v) => <span className="text-muted">{v.responseTime ? `${v.responseTime}h` : '—'}</span> },
-    { key: 'resolutionTime', label: 'Tiempo Resolución', sortable: true, className: 'text-right', render: (v) => <span className="text-muted">{v.resolutionTime ? `${v.resolutionTime}h` : '—'}</span> },
+    {
+      key: 'responseTime',
+      label: 'Tiempo Respuesta',
+      sortable: true,
+      className: 'text-right',
+      render: (v) => (
+        <span className="text-muted">{v.responseTime ? `${v.responseTime}h` : '—'}</span>
+      ),
+    },
+    {
+      key: 'resolutionTime',
+      label: 'Tiempo Resolución',
+      sortable: true,
+      className: 'text-right',
+      render: (v) => (
+        <span className="text-muted">{v.resolutionTime ? `${v.resolutionTime}h` : '—'}</span>
+      ),
+    },
     {
       key: 'applicationId',
       label: 'Aplicación',
@@ -47,13 +73,29 @@ export function PublicIncidentsPage() {
       label: 'Estado',
       sortable: true,
       render: (v) => {
-        const c = v.status === 'resolved' ? 'text-success bg-success/10' : v.status === 'in_progress' ? 'text-warning bg-warning/10' : 'text-danger bg-danger/10'
-        return <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${c}`}>{v.status.replace(/_/g, ' ')}</span>
+        const c =
+          v.status === 'resolved'
+            ? 'text-success bg-success/10'
+            : v.status === 'in_progress'
+              ? 'text-warning bg-warning/10'
+              : 'text-danger bg-danger/10'
+        return (
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${c}`}
+          >
+            {v.status.replace(/_/g, ' ')}
+          </span>
+        )
       },
     },
   ]
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -93,7 +135,9 @@ export function PublicIncidentsPage() {
         <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-boundary flex items-center gap-2">
             <AlertTriangle size={18} className="text-warning" />
-            <span className="font-semibold text-neutral-90 dark:text-white">{data.incidents.length} incidentes compartidos</span>
+            <span className="font-semibold text-neutral-90 dark:text-white">
+              {data.incidents.length} incidentes compartidos
+            </span>
           </div>
           <SortableTable
             columns={columns}

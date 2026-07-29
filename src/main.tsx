@@ -12,9 +12,11 @@ import { getSession } from '@/services/auth/authService'
 import { InactivityGuard } from '@/components/auth/InactivityGuard'
 import { ErrorBoundary } from '@/components/error/ErrorBoundary'
 import { setupGlobalErrorHandler } from '@/services/notifications/globalErrorHandler'
+import { initializeDataLayer } from '@/services/data-layer'
 import './styles/globals.css'
 
 setupGlobalErrorHandler()
+initializeDataLayer()
 
 const isPublicRoute = () => {
   if (typeof window === 'undefined') return false

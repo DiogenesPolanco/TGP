@@ -10,7 +10,9 @@ const badgeConfig: Record<string, { label: string; color: string }> = {
 
 export function EquipmentStatusBadge({ status }: { status: EquipmentStatus }) {
   const cfg = badgeConfig[status] ?? { label: status, color: 'bg-neutral-10 text-neutral-60' }
-  return <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+  )
 }
 
 const conditionConfig: Record<string, { label: string; color: string }> = {

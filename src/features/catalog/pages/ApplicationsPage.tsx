@@ -8,7 +8,19 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonTable } from '@/components/ui/Skeleton'
 import { Select } from '@/components/ui/Select'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Search, Filter, Download, Upload, GitCompare, Trash2, Pencil, Eye, X, AppWindow } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  GitCompare,
+  Trash2,
+  Pencil,
+  Eye,
+  X,
+  AppWindow,
+} from 'lucide-react'
 import type { Application } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
@@ -75,7 +87,9 @@ export function ApplicationsPage() {
       criticality: app.criticality,
       architecture: app.architecture,
       status: app.status,
-      supportEndDate: app.supportEndDate ? new Date(app.supportEndDate).toISOString().split('T')[0] : '',
+      supportEndDate: app.supportEndDate
+        ? new Date(app.supportEndDate).toISOString().split('T')[0]
+        : '',
     }))
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -115,10 +129,19 @@ export function ApplicationsPage() {
       className: 'max-w-xs',
       render: (app) => (
         <div className="min-w-0">
-          <Link to={`/catalog/applications/${app.id}`} className="text-sm font-medium text-primary hover:underline truncate block">
+          <Link
+            to={`/catalog/applications/${app.id}`}
+            className="text-sm font-medium text-primary hover:underline truncate block"
+          >
             {app.name}
           </Link>
-          {app.description && <HtmlDescription html={app.description} lines={1} className="text-neutral-50 dark:text-neutral-50 mt-0.5" />}
+          {app.description && (
+            <HtmlDescription
+              html={app.description}
+              lines={1}
+              className="text-neutral-50 dark:text-neutral-50 mt-0.5"
+            />
+          )}
         </div>
       ),
     },
@@ -142,7 +165,9 @@ export function ApplicationsPage() {
       label: 'Criticidad',
       sortable: true,
       render: (app) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCriticalityColor(app.criticality)}`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCriticalityColor(app.criticality)}`}
+        >
           {criticalityLabel[app.criticality]}
         </span>
       ),
@@ -152,7 +177,9 @@ export function ApplicationsPage() {
       label: 'Estado',
       sortable: true,
       render: (app) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}
+        >
           {appStatusLabel[app.status]}
         </span>
       ),
@@ -170,7 +197,10 @@ export function ApplicationsPage() {
       headerClassName: 'text-right',
       render: (app) => (
         <div className="flex items-center justify-end gap-2">
-          <Link to={`/catalog/applications/${app.id}`} className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Link
+            to={`/catalog/applications/${app.id}`}
+            className="p-1.5 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+          >
             <Eye size={16} className="text-muted" />
           </Link>
           <Link
@@ -180,7 +210,10 @@ export function ApplicationsPage() {
             <Pencil size={16} className="text-muted" />
           </Link>
           <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(app.id)
+            }}
             className="p-1.5 rounded-md hover:bg-danger/10 transition-colors"
           >
             <Trash2 size={16} className="text-danger" />
@@ -193,7 +226,9 @@ export function ApplicationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Catálogo de Aplicaciones</h2>
+        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          Catálogo de Aplicaciones
+        </h2>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/admin/import')}
@@ -222,7 +257,10 @@ export function ApplicationsPage() {
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar aplicaciones..."
@@ -258,34 +296,53 @@ export function ApplicationsPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Criticidad</label>
-              <Select value={filterCriticality} onChange={(v) => setFilterCriticality(v)} options={[
-                { value: '', label: 'Todas' },
-                { value: 'critical', label: 'Crítica' },
-                { value: 'high', label: 'Alta' },
-                { value: 'medium', label: 'Media' },
-                { value: 'low', label: 'Baja' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={filterCriticality}
+                onChange={(v) => setFilterCriticality(v)}
+                options={[
+                  { value: '', label: 'Todas' },
+                  { value: 'critical', label: 'Crítica' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'low', label: 'Baja' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={filterStatus} onChange={(v) => setFilterStatus(v)} options={[
-                { value: '', label: 'Todos' },
-                { value: 'active', label: 'Activo' },
-                { value: 'deprecated', label: 'Deprecado' },
-                { value: 'retired', label: 'Retirado' },
-                { value: 'planned', label: 'Planeado' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={filterStatus}
+                onChange={(v) => setFilterStatus(v)}
+                options={[
+                  { value: '', label: 'Todos' },
+                  { value: 'active', label: 'Activo' },
+                  { value: 'deprecated', label: 'Deprecado' },
+                  { value: 'retired', label: 'Retirado' },
+                  { value: 'planned', label: 'Planeado' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">BU</label>
-              <Select value={filterBU} onChange={(v) => setFilterBU(v)} options={[
-                { value: '', label: 'Todas' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} className="min-w-[120px]" />
+              <Select
+                value={filterBU}
+                onChange={(v) => setFilterBU(v)}
+                options={[
+                  { value: '', label: 'Todas' },
+                  ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             {(filterCriticality || filterStatus || filterBU) && (
               <Button
-                onClick={() => { setFilterCriticality(''); setFilterStatus(''); setFilterBU('') }}
+                onClick={() => {
+                  setFilterCriticality('')
+                  setFilterStatus('')
+                  setFilterBU('')
+                }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
@@ -302,12 +359,16 @@ export function ApplicationsPage() {
         <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <EmptyState
             icon={<AppWindow size={22} className="text-neutral-50" />}
-            title={searchTerm || filterCriticality || filterStatus || filterBU
-              ? 'Sin resultados'
-              : 'No hay aplicaciones registradas'}
-            description={searchTerm || filterCriticality || filterStatus || filterBU
-              ? 'Intenta con otros filtros o términos de búsqueda'
-              : 'Crea tu primera aplicación para empezar'}
+            title={
+              searchTerm || filterCriticality || filterStatus || filterBU
+                ? 'Sin resultados'
+                : 'No hay aplicaciones registradas'
+            }
+            description={
+              searchTerm || filterCriticality || filterStatus || filterBU
+                ? 'Intenta con otros filtros o términos de búsqueda'
+                : 'Crea tu primera aplicación para empezar'
+            }
             action={
               !searchTerm && !filterCriticality && !filterStatus && !filterBU ? (
                 <Button

@@ -2,7 +2,23 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
-import { Server, ExternalLink, Layers, Box, Cpu, Database, Globe, Shield, ArrowRight, AlertTriangle, Wifi, Wrench, Plus, Unlink, Link } from 'lucide-react'
+import {
+  Server,
+  ExternalLink,
+  Layers,
+  Box,
+  Cpu,
+  Database,
+  Globe,
+  Shield,
+  ArrowRight,
+  AlertTriangle,
+  Wifi,
+  Wrench,
+  Plus,
+  Unlink,
+  Link,
+} from 'lucide-react'
 import type { SupportStatus, Criticality } from '@/types/domain'
 import type { DependencyType } from '@/constants/enums'
 import { Select } from '@/components/ui/Select'
@@ -47,15 +63,17 @@ interface ArchitectureTabProps {
 
 export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
   const application = useLiveQuery(() => db.applications.get(applicationId), [applicationId])
-  const microservices = useLiveQuery(
-    () => db.microservices.where('applicationId').equals(applicationId).toArray(),
-    [applicationId],
-  ) ?? []
+  const microservices =
+    useLiveQuery(
+      () => db.microservices.where('applicationId').equals(applicationId).toArray(),
+      [applicationId],
+    ) ?? []
   const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
-  const dependencies = useLiveQuery(
-    () => db.applicationDependencies.where('applicationId').equals(applicationId).toArray(),
-    [applicationId],
-  ) ?? []
+  const dependencies =
+    useLiveQuery(
+      () => db.applicationDependencies.where('applicationId').equals(applicationId).toArray(),
+      [applicationId],
+    ) ?? []
   const allApps = useLiveQuery(() => db.applications.toArray()) ?? []
 
   const { addNotification } = useAppStore()
@@ -76,8 +94,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
 
   const alreadyDepIds = new Set(dependencies.map((d) => d.dependsOnAppId))
   const availableApps = allApps.filter(
-    (a) => a.id !== applicationId && !alreadyDepIds.has(a.id) &&
-      (!depSearch || a.name.toLowerCase().includes(depSearch.toLowerCase()))
+    (a) =>
+      a.id !== applicationId &&
+      !alreadyDepIds.has(a.id) &&
+      (!depSearch || a.name.toLowerCase().includes(depSearch.toLowerCase())),
   )
 
   const handleAddDependency = async (targetAppId: string) => {
@@ -120,12 +140,13 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
       {/* Header info */}
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="text-xl font-bold text-neutral-90 dark:text-white mb-1">Diagrama de Arquitectura C4</h4>
+          <h4 className="text-xl font-bold text-neutral-90 dark:text-white mb-1">
+            Diagrama de Arquitectura C4
+          </h4>
           <p className="text-xs text-neutral-50">
-            {microservices.length} contenedores · {depApps.length} dependencias externas · {appTechnologies.length} tecnologías
-            {eolCount > 0 && (
-              <span className="text-red-500 ml-2">· {eolCount} EOL</span>
-            )}
+            {microservices.length} contenedores · {depApps.length} dependencias externas ·{' '}
+            {appTechnologies.length} tecnologías
+            {eolCount > 0 && <span className="text-red-500 ml-2">· {eolCount} EOL</span>}
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs">
@@ -201,9 +222,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                         className={`
                           relative rounded-xl border-2 bg-card shadow-sm
                           transition-all duration-200 cursor-default
-                          ${isHovered
-                            ? 'border-blue-400 shadow-lg shadow-blue-500/10 scale-[1.02]'
-                            : 'border-neutral-20 dark:border-neutral-60 hover:border-blue-300 dark:hover:border-blue-600'
+                          ${
+                            isHovered
+                              ? 'border-blue-400 shadow-lg shadow-blue-500/10 scale-[1.02]'
+                              : 'border-neutral-20 dark:border-neutral-60 hover:border-blue-300 dark:hover:border-blue-600'
                           }
                         `}
                         onMouseEnter={() => setHoveredElement(ms.id)}
@@ -239,15 +261,23 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                                 <span className="text-xs text-secondary truncate flex-1">
                                   {tech.name}
                                 </span>
-                                <span className="text-[10px] text-neutral-50 shrink-0">{tech.version}</span>
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${
-                                  tech.supportStatus === 'eol'
-                                    ? 'bg-red-500/10 text-red-500 border-red-500/20'
-                                    : tech.supportStatus === 'extended'
-                                      ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                      : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                }`}>
-                                  {tech.supportStatus === 'active' ? '✓' : tech.supportStatus === 'eol' ? '!' : '~'}
+                                <span className="text-[10px] text-neutral-50 shrink-0">
+                                  {tech.version}
+                                </span>
+                                <span
+                                  className={`text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${
+                                    tech.supportStatus === 'eol'
+                                      ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                                      : tech.supportStatus === 'extended'
+                                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                  }`}
+                                >
+                                  {tech.supportStatus === 'active'
+                                    ? '✓'
+                                    : tech.supportStatus === 'eol'
+                                      ? '!'
+                                      : '~'}
                                 </span>
                               </div>
                             ))
@@ -263,7 +293,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                 <div className="flex flex-col items-center justify-center py-12 text-neutral-50">
                   <Box size={40} className="mb-3 opacity-40" />
                   <p className="text-sm">No hay microservicios registrados</p>
-                  <p className="text-xs mt-1">Agrega microservicios desde la pestaña Microservicios</p>
+                  <p className="text-xs mt-1">
+                    Agrega microservicios desde la pestaña Microservicios
+                  </p>
                 </div>
               )}
             </div>
@@ -276,7 +308,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
               <div className="flex items-center justify-center gap-2 mb-4 text-neutral-40 dark:text-neutral-50">
                 <div className="h-px flex-1 max-w-[100px] bg-neutral-30 dark:bg-neutral-60" />
                 <ArrowRight size={16} />
-                <span className="text-xs font-medium tracking-wider uppercase">Dependencias externas</span>
+                <span className="text-xs font-medium tracking-wider uppercase">
+                  Dependencias externas
+                </span>
                 <ArrowRight size={16} />
                 <div className="h-px flex-1 max-w-[100px] bg-neutral-30 dark:bg-neutral-60" />
               </div>
@@ -293,9 +327,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       className={`
                         relative rounded-xl border-2 bg-neutral-50/50 dark:bg-neutral-75 shadow-sm
                         transition-all duration-200 cursor-default
-                        ${isHovered
-                          ? 'border-neutral-400 shadow-lg shadow-neutral-500/10 scale-[1.02]'
-                          : 'border-neutral-20 dark:border-neutral-60'
+                        ${
+                          isHovered
+                            ? 'border-neutral-400 shadow-lg shadow-neutral-500/10 scale-[1.02]'
+                            : 'border-neutral-20 dark:border-neutral-60'
                         }
                       `}
                       onMouseEnter={() => setHoveredElement(dep.id)}
@@ -319,19 +354,23 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       {/* External system body */}
                       <div className="p-3 space-y-1.5">
                         {depInfo?.description && (
-                          <p className="text-xs text-muted line-clamp-2">
-                            {depInfo.description}
-                          </p>
+                          <p className="text-xs text-muted line-clamp-2">{depInfo.description}</p>
                         )}
                         <div className="flex items-center gap-2 text-[10px] text-neutral-50">
                           <Shield size={12} />
-                          <span>{dep.architecture} · {appStatusLabel[dep.status]}</span>
+                          <span>
+                            {dep.architecture} · {appStatusLabel[dep.status]}
+                          </span>
                           {dep.criticality && (
-                            <span className={`ml-auto px-1.5 py-0.5 rounded-full ${
-                              dep.criticality === 'critical' ? 'bg-red-500/10 text-red-500' :
-                              dep.criticality === 'high' ? 'bg-amber-500/10 text-amber-500' :
-                              'bg-emerald-500/10 text-emerald-500'
-                            }`}>
+                            <span
+                              className={`ml-auto px-1.5 py-0.5 rounded-full ${
+                                dep.criticality === 'critical'
+                                  ? 'bg-red-500/10 text-red-500'
+                                  : dep.criticality === 'high'
+                                    ? 'bg-amber-500/10 text-amber-500'
+                                    : 'bg-emerald-500/10 text-emerald-500'
+                              }`}
+                            >
                               {criticalityLabel[dep.criticality]}
                             </span>
                           )}
@@ -352,7 +391,8 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                 No hay datos para generar el diagrama de arquitectura
               </p>
               <p className="text-xs mt-1">
-                Registra microservicios y dependencias para visualizar la arquitectura C4 de {application.name}
+                Registra microservicios y dependencias para visualizar la arquitectura C4 de{' '}
+                {application.name}
               </p>
             </div>
           )}
@@ -382,9 +422,14 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
           <div className="p-6 border-b border-boundary bg-neutral-10/50 dark:bg-neutral-70/30">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-secondary mb-1.5">Aplicación destino *</label>
+                <label className="block text-xs font-medium text-secondary mb-1.5">
+                  Aplicación destino *
+                </label>
                 <div className="relative">
-                  <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+                  <Link
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+                  />
                   <input
                     type="text"
                     placeholder="Buscar aplicación..."
@@ -402,7 +447,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                         className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
                       >
                         <span className="text-neutral-90 dark:text-white">{app.name}</span>
-                        <span className="text-xs text-neutral-50">{app.architecture} · {appStatusLabel[app.status]}</span>
+                        <span className="text-xs text-neutral-50">
+                          {app.architecture} · {appStatusLabel[app.status]}
+                        </span>
                       </Button>
                     ))}
                   </div>
@@ -414,17 +461,27 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
 
               <div>
                 <label className="block text-xs font-medium text-secondary mb-1.5">Tipo</label>
-                <Select value={depType} onChange={(v) => setDepType(v as DependencyType)} options={dependencyTypes.map((t) => ({ value: t.value, label: t.label }))} />
+                <Select
+                  value={depType}
+                  onChange={(v) => setDepType(v as DependencyType)}
+                  options={dependencyTypes.map((t) => ({ value: t.value, label: t.label }))}
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1.5">Criticidad</label>
-                <Select value={depCriticality} onChange={(v) => setDepCriticality(v as Criticality)} options={[
-                  { value: 'low', label: 'Baja' },
-                  { value: 'medium', label: 'Media' },
-                  { value: 'high', label: 'Alta' },
-                  { value: 'critical', label: 'Crítica' },
-                ]} />
+                <label className="block text-xs font-medium text-secondary mb-1.5">
+                  Criticidad
+                </label>
+                <Select
+                  value={depCriticality}
+                  onChange={(v) => setDepCriticality(v as Criticality)}
+                  options={[
+                    { value: 'low', label: 'Baja' },
+                    { value: 'medium', label: 'Media' },
+                    { value: 'high', label: 'Alta' },
+                    { value: 'critical', label: 'Crítica' },
+                  ]}
+                />
               </div>
             </div>
 
@@ -440,7 +497,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </div>
 
             {depSearch && availableApps.length > 0 && (
-              <p className="text-xs text-neutral-50">Selecciona una aplicación de la lista de resultados para agregar la dependencia</p>
+              <p className="text-xs text-neutral-50">
+                Selecciona una aplicación de la lista de resultados para agregar la dependencia
+              </p>
             )}
           </div>
         )}
@@ -462,19 +521,26 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-neutral-90 dark:text-white truncate">{dep.name}</span>
+                          <span className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                            {dep.name}
+                          </span>
                           {depRel?.dependencyType && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-60 text-neutral-600 dark:text-neutral-400 uppercase font-mono">
                               {depRel.dependencyType}
                             </span>
                           )}
                           {depRel?.criticality && (
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                              depRel.criticality === 'critical' ? 'bg-red-500/10 text-red-500' :
-                              depRel.criticality === 'high' ? 'bg-amber-500/10 text-amber-500' :
-                              depRel.criticality === 'medium' ? 'bg-info/10 text-info' :
-                              'bg-emerald-500/10 text-emerald-500'
-                            }`}>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                depRel.criticality === 'critical'
+                                  ? 'bg-red-500/10 text-red-500'
+                                  : depRel.criticality === 'high'
+                                    ? 'bg-amber-500/10 text-amber-500'
+                                    : depRel.criticality === 'medium'
+                                      ? 'bg-info/10 text-info'
+                                      : 'bg-emerald-500/10 text-emerald-500'
+                              }`}
+                            >
                               {criticalityLabel[depRel.criticality]}
                             </span>
                           )}
@@ -499,7 +565,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             <div className="text-center py-8 text-neutral-50">
               <Unlink size={32} className="mx-auto mb-2 opacity-40" />
               <p className="text-sm">Sin dependencias registradas</p>
-              <p className="text-xs mt-1">Las dependencias aparecerán como sistemas externos en el diagrama C4</p>
+              <p className="text-xs mt-1">
+                Las dependencias aparecerán como sistemas externos en el diagrama C4
+              </p>
             </div>
           )}
         </div>
@@ -517,7 +585,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </div>
             <div>
               <p className="font-medium text-neutral-90 dark:text-white">Nivel 2: Contenedor</p>
-              <p className="text-neutral-50 mt-0.5">Microservicios que componen la aplicación. Cada uno muestra su stack tecnológico y estado de soporte.</p>
+              <p className="text-neutral-50 mt-0.5">
+                Microservicios que componen la aplicación. Cada uno muestra su stack tecnológico y
+                estado de soporte.
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -526,7 +597,10 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </div>
             <div>
               <p className="font-medium text-neutral-90 dark:text-white">Nivel 1: Contexto</p>
-              <p className="text-neutral-50 mt-0.5">Sistemas externos con los que la aplicación se comunica (APIs, bases de datos, servicios).</p>
+              <p className="text-neutral-50 mt-0.5">
+                Sistemas externos con los que la aplicación se comunica (APIs, bases de datos,
+                servicios).
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -535,7 +609,11 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
             </div>
             <div>
               <p className="font-medium text-neutral-90 dark:text-white">Tecnologías</p>
-              <p className="text-neutral-50 mt-0.5"><span className="text-emerald-500">✓</span> Activa · <span className="text-amber-500">~</span> Soporte extendido · <span className="text-red-500">!</span> EOL</p>
+              <p className="text-neutral-50 mt-0.5">
+                <span className="text-emerald-500">✓</span> Activa ·{' '}
+                <span className="text-amber-500">~</span> Soporte extendido ·{' '}
+                <span className="text-red-500">!</span> EOL
+              </p>
             </div>
           </div>
         </div>

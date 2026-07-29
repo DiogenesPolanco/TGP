@@ -9,9 +9,21 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import {
-  Plus, Search, Filter, Upload, X, Pencil, Trash2,
-  Target, TrendingUp, AlertCircle, CheckCircle2,
-  Users, Calendar, Crosshair, HelpCircle,
+  Plus,
+  Search,
+  Filter,
+  Upload,
+  X,
+  Pencil,
+  Trash2,
+  Target,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle2,
+  Users,
+  Calendar,
+  Crosshair,
+  HelpCircle,
 } from 'lucide-react'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -23,7 +35,8 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  not_started: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
+  not_started:
+    'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   on_track: 'bg-success/10 text-success border-success/20',
   at_risk: 'bg-warning/10 text-warning border-warning/20',
   behind: 'bg-danger/10 text-danger border-danger/20',
@@ -58,21 +71,32 @@ export function ObjectivesPage() {
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
-  const stats = useMemo(() => ({
-    total: objectives.length,
-    onTrack: objectives.filter((o) => o.status === 'on_track').length,
-    atRisk: objectives.filter((o) => o.status === 'at_risk').length,
-    behind: objectives.filter((o) => o.status === 'behind').length,
-    notStarted: objectives.filter((o) => o.status === 'not_started').length,
-    achieved: objectives.filter((o) => o.status === 'achieved').length,
-  }), [objectives])
-
-  const filteredObjectives = objectives.filter((o) =>
-    o.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (statusFilter === 'all' || o.status === statusFilter)
+  const stats = useMemo(
+    () => ({
+      total: objectives.length,
+      onTrack: objectives.filter((o) => o.status === 'on_track').length,
+      atRisk: objectives.filter((o) => o.status === 'at_risk').length,
+      behind: objectives.filter((o) => o.status === 'behind').length,
+      notStarted: objectives.filter((o) => o.status === 'not_started').length,
+      achieved: objectives.filter((o) => o.status === 'achieved').length,
+    }),
+    [objectives],
   )
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedObjectives } = usePagination(filteredObjectives, 5)
+  const filteredObjectives = objectives.filter(
+    (o) =>
+      o.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === 'all' || o.status === statusFilter),
+  )
+
+  const {
+    page,
+    setPage,
+    totalPages,
+    pageSize,
+    setPageSize,
+    paginatedItems: paginatedObjectives,
+  } = usePagination(filteredObjectives, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar objetivo?')) {
@@ -82,9 +106,19 @@ export function ObjectivesPage() {
   }
 
   const StatCard = ({
-    icon, label, value, color, active, onClick,
+    icon,
+    label,
+    value,
+    color,
+    active,
+    onClick,
   }: {
-    icon: React.ReactNode; label: string; value: number; color: string; active?: boolean; onClick?: () => void
+    icon: React.ReactNode
+    label: string
+    value: number
+    color: string
+    active?: boolean
+    onClick?: () => void
   }) => {
     const iconClasses: Record<string, string> = {
       'text-primary': 'bg-primary/10 text-primary',
@@ -103,7 +137,9 @@ export function ObjectivesPage() {
             : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
-        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+          {icon}
+        </div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
         <p className="text-xs text-muted">{label}</p>
       </Comp>
@@ -132,19 +168,64 @@ export function ObjectivesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard icon={<Target size={20} />} label="Total Objetivos" value={stats.total} color="text-primary" active={statusFilter === 'all'} onClick={() => setStatusFilter('all')} />
-        <StatCard icon={<TrendingUp size={20} />} label="Encaminados" value={stats.onTrack} color="text-success" active={statusFilter === 'on_track'} onClick={() => setStatusFilter(statusFilter === 'on_track' ? 'all' : 'on_track')} />
-        <StatCard icon={<AlertCircle size={20} />} label="En Riesgo" value={stats.atRisk} color="text-warning" active={statusFilter === 'at_risk'} onClick={() => setStatusFilter(statusFilter === 'at_risk' ? 'all' : 'at_risk')} />
-        <StatCard icon={<AlertCircle size={20} />} label="Atrasados" value={stats.behind} color="text-danger" active={statusFilter === 'behind'} onClick={() => setStatusFilter(statusFilter === 'behind' ? 'all' : 'behind')} />
-        <StatCard icon={<HelpCircle size={20} />} label="No Iniciados" value={stats.notStarted} color="text-neutral-50" active={statusFilter === 'not_started'} onClick={() => setStatusFilter(statusFilter === 'not_started' ? 'all' : 'not_started')} />
-        <StatCard icon={<CheckCircle2 size={20} />} label="Logrados" value={stats.achieved} color="text-success" active={statusFilter === 'achieved'} onClick={() => setStatusFilter(statusFilter === 'achieved' ? 'all' : 'achieved')} />
+        <StatCard
+          icon={<Target size={20} />}
+          label="Total Objetivos"
+          value={stats.total}
+          color="text-primary"
+          active={statusFilter === 'all'}
+          onClick={() => setStatusFilter('all')}
+        />
+        <StatCard
+          icon={<TrendingUp size={20} />}
+          label="Encaminados"
+          value={stats.onTrack}
+          color="text-success"
+          active={statusFilter === 'on_track'}
+          onClick={() => setStatusFilter(statusFilter === 'on_track' ? 'all' : 'on_track')}
+        />
+        <StatCard
+          icon={<AlertCircle size={20} />}
+          label="En Riesgo"
+          value={stats.atRisk}
+          color="text-warning"
+          active={statusFilter === 'at_risk'}
+          onClick={() => setStatusFilter(statusFilter === 'at_risk' ? 'all' : 'at_risk')}
+        />
+        <StatCard
+          icon={<AlertCircle size={20} />}
+          label="Atrasados"
+          value={stats.behind}
+          color="text-danger"
+          active={statusFilter === 'behind'}
+          onClick={() => setStatusFilter(statusFilter === 'behind' ? 'all' : 'behind')}
+        />
+        <StatCard
+          icon={<HelpCircle size={20} />}
+          label="No Iniciados"
+          value={stats.notStarted}
+          color="text-neutral-50"
+          active={statusFilter === 'not_started'}
+          onClick={() => setStatusFilter(statusFilter === 'not_started' ? 'all' : 'not_started')}
+        />
+        <StatCard
+          icon={<CheckCircle2 size={20} />}
+          label="Logrados"
+          value={stats.achieved}
+          color="text-success"
+          active={statusFilter === 'achieved'}
+          onClick={() => setStatusFilter(statusFilter === 'achieved' ? 'all' : 'achieved')}
+        />
       </div>
 
       {/* Search + Filters */}
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar objetivos..."
@@ -164,17 +245,25 @@ export function ObjectivesPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'not_started', label: 'No Iniciado' },
-                { value: 'on_track', label: 'Encaminado' },
-                { value: 'at_risk', label: 'En Riesgo' },
-                { value: 'behind', label: 'Atrasado' },
-                { value: 'achieved', label: 'Logrado' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todos' },
+                  { value: 'not_started', label: 'No Iniciado' },
+                  { value: 'on_track', label: 'Encaminado' },
+                  { value: 'at_risk', label: 'En Riesgo' },
+                  { value: 'behind', label: 'Atrasado' },
+                  { value: 'achieved', label: 'Logrado' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             {statusFilter !== 'all' && (
-              <Button onClick={() => setStatusFilter('all')} className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors">
+              <Button
+                onClick={() => setStatusFilter('all')}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
+              >
                 <X size={14} />
                 Limpiar filtros
               </Button>
@@ -189,8 +278,12 @@ export function ObjectivesPage() {
           const team = teams.find((t) => t.id === objective.teamId)
           const bu = businessUnits.find((b) => b.id === objective.businessUnitId)
 
-          const barColor = objective.status === 'achieved' || objective.status === 'on_track'
-            ? 'bg-success' : objective.status === 'at_risk' ? 'bg-warning' : 'bg-danger'
+          const barColor =
+            objective.status === 'achieved' || objective.status === 'on_track'
+              ? 'bg-success'
+              : objective.status === 'at_risk'
+                ? 'bg-warning'
+                : 'bg-danger'
 
           return (
             <div
@@ -199,13 +292,17 @@ export function ObjectivesPage() {
               onClick={() => navigate(`${objective.id}/edit`)}
             >
               {/* Colored top accent */}
-              <div className={`h-1 w-full ${objective.status === 'achieved' ? 'bg-success' : objective.status === 'on_track' ? 'bg-success' : objective.status === 'at_risk' ? 'bg-warning' : objective.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`} />
+              <div
+                className={`h-1 w-full ${objective.status === 'achieved' ? 'bg-success' : objective.status === 'on_track' ? 'bg-success' : objective.status === 'at_risk' ? 'bg-warning' : objective.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`}
+              />
 
               <div className="p-5">
                 {/* Top row: badges + progress */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLE[objective.status]}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLE[objective.status]}`}
+                    >
                       {STATUS_ICON[objective.status] || <Target size={14} />}
                       {STATUS_LABELS[objective.status] ?? objective.status}
                     </span>
@@ -214,19 +311,29 @@ export function ObjectivesPage() {
                     </span>
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{Math.round(objective.progress)}<span className="text-sm font-normal text-neutral-50">%</span></p>
+                    <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">
+                      {Math.round(objective.progress)}
+                      <span className="text-sm font-normal text-neutral-50">%</span>
+                    </p>
                   </div>
                 </div>
 
                 {/* Title + Description */}
-                <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-1">{objective.title}</h3>
+                <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-1">
+                  {objective.title}
+                </h3>
                 {objective.description && (
-                  <p className="text-sm text-muted line-clamp-2 mb-3">{objective.description.replace(/<[^>]*>/g, '').slice(0, 150)}</p>
+                  <p className="text-sm text-muted line-clamp-2 mb-3">
+                    {objective.description.replace(/<[^>]*>/g, '').slice(0, 150)}
+                  </p>
                 )}
 
                 {/* Progress bar */}
                 <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 mb-4 overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${Math.min(100, objective.progress)}%` }} />
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                    style={{ width: `${Math.min(100, objective.progress)}%` }}
+                  />
                 </div>
 
                 {/* Meta info */}
@@ -239,7 +346,16 @@ export function ObjectivesPage() {
                   )}
                   <span className="inline-flex items-center gap-1">
                     <Calendar size={12} />
-                    {new Date(objective.periodStart).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} — {new Date(objective.periodEnd).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {new Date(objective.periodStart).toLocaleDateString('es-ES', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}{' '}
+                    —{' '}
+                    {new Date(objective.periodEnd).toLocaleDateString('es-ES', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
                   </span>
                 </div>
 
@@ -248,30 +364,56 @@ export function ObjectivesPage() {
                   <div className="border-t border-boundary pt-4">
                     <div className="flex items-center gap-1.5 mb-3">
                       <Crosshair size={14} className="text-neutral-50" />
-                      <h4 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider">Key Results ({objective.keyResults.length})</h4>
+                      <h4 className="text-xs font-semibold text-neutral-50 uppercase tracking-wider">
+                        Key Results ({objective.keyResults.length})
+                      </h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {objective.keyResults.map((kr) => {
-                        const pct = kr.target > kr.baseline
-                          ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
-                          : 0
-                        const krBarColor = kr.status === 'achieved' ? 'bg-success' : kr.status === 'on_track' ? 'bg-success' : kr.status === 'at_risk' ? 'bg-warning' : kr.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'
+                        const pct =
+                          kr.target > kr.baseline
+                            ? Math.round(
+                                ((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100,
+                              )
+                            : 0
+                        const krBarColor =
+                          kr.status === 'achieved'
+                            ? 'bg-success'
+                            : kr.status === 'on_track'
+                              ? 'bg-success'
+                              : kr.status === 'at_risk'
+                                ? 'bg-warning'
+                                : kr.status === 'behind'
+                                  ? 'bg-danger'
+                                  : 'bg-neutral-40'
                         return (
-                          <div key={kr.id} className="bg-neutral-10 dark:bg-neutral-70/50 rounded-lg border border-boundary p-3">
+                          <div
+                            key={kr.id}
+                            className="bg-neutral-10 dark:bg-neutral-70/50 rounded-lg border border-boundary p-3"
+                          >
                             <div className="flex items-center justify-between mb-1.5">
-                              <span className="text-sm font-medium text-neutral-90 dark:text-white truncate min-w-0 flex-1">{kr.title}</span>
-                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border shrink-0 ml-2 ${KR_STATUS_STYLE[kr.status]}`}>
+                              <span className="text-sm font-medium text-neutral-90 dark:text-white truncate min-w-0 flex-1">
+                                {kr.title}
+                              </span>
+                              <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border shrink-0 ml-2 ${KR_STATUS_STYLE[kr.status]}`}
+                              >
                                 {STATUS_LABELS[kr.status]}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-[11px] text-neutral-50 mb-2">
-                              <span className="tabular-nums font-medium text-neutral-90 dark:text-white">{kr.current}</span>
+                              <span className="tabular-nums font-medium text-neutral-90 dark:text-white">
+                                {kr.current}
+                              </span>
                               <span>/</span>
                               <span>{kr.target}</span>
                               {kr.measure && <span className="text-neutral-50">{kr.measure}</span>}
                             </div>
                             <div className="w-full h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-                              <div className={`h-full rounded-full ${krBarColor} transition-all duration-300`} style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+                              <div
+                                className={`h-full rounded-full ${krBarColor} transition-all duration-300`}
+                                style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                              />
                             </div>
                           </div>
                         )
@@ -282,10 +424,20 @@ export function ObjectivesPage() {
 
                 {/* Actions */}
                 <div className="flex items-center justify-end gap-1 mt-4 pt-3 border-t border-boundary">
-                  <Button onClick={(e) => { e.stopPropagation(); navigate(`${objective.id}/edit`) }}>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`${objective.id}/edit`)
+                    }}
+                  >
                     <Pencil size={15} />
                   </Button>
-                  <Button onClick={(e) => { e.stopPropagation(); handleDelete(objective.id) }}>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(objective.id)
+                    }}
+                  >
                     <Trash2 size={15} />
                   </Button>
                 </div>
@@ -308,7 +460,9 @@ export function ObjectivesPage() {
         <div className="text-center py-16 bg-card rounded-xl border border-boundary">
           <Target size={32} className="mx-auto text-neutral-40 mb-3" />
           <p className="text-muted font-medium">No se encontraron objetivos</p>
-          <p className="text-sm text-neutral-50 mt-1">Intenta con otros filtros o términos de búsqueda</p>
+          <p className="text-sm text-neutral-50 mt-1">
+            Intenta con otros filtros o términos de búsqueda
+          </p>
         </div>
       )}
     </div>

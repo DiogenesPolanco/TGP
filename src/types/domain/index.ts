@@ -1,4 +1,38 @@
-import type { Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus, DependencyType, Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus, AuditCategory, AuditStatus, PlanStatus, SourceSystem, ObjectiveType, ObjectiveStatus, KrStatus, TrendDirection, DeliverableStatus, UserRole, TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus, DependencyRelation, ProjectStatus, ProjectHealth, BusinessUnitStatus, MemberRole, MemberStatus, EnvironmentType } from '@/constants/enums'
+import type {
+  Criticality,
+  ArchitectureType,
+  ApplicationStatus,
+  TechCategory,
+  SupportStatus,
+  DependencyType,
+  Severity,
+  VulnSource,
+  VulnStatus,
+  IncidentStatus,
+  RiskCategory,
+  RiskStatus,
+  AuditCategory,
+  AuditStatus,
+  PlanStatus,
+  SourceSystem,
+  ObjectiveType,
+  ObjectiveStatus,
+  KrStatus,
+  TrendDirection,
+  DeliverableStatus,
+  UserRole,
+  TaskStatus,
+  CommitmentStatus,
+  BlockerSeverity,
+  BlockerStatus,
+  DependencyRelation,
+  ProjectStatus,
+  ProjectHealth,
+  BusinessUnitStatus,
+  MemberRole,
+  MemberStatus,
+  EnvironmentType,
+} from '@/constants/enums'
 
 export type {
   Criticality,
@@ -341,7 +375,8 @@ export interface MicroserviceFeature {
   name: string
   description: string
   status: 'planned' | 'in_progress' | 'active' | 'deprecated'
-  category: 'api' | 'integration' | 'performance' | 'security' | 'observability' | 'business' | 'other'
+  category:
+    'api' | 'integration' | 'performance' | 'security' | 'observability' | 'business' | 'other'
 }
 
 export interface MicroserviceRoadmapItem {
@@ -354,7 +389,8 @@ export interface MicroserviceRoadmapItem {
   priority: 'critical' | 'high' | 'medium' | 'low'
 }
 
-export type MicroserviceLifecycleStatus = 'active' | 'evolving' | 'deprecated' | 'decommissioned' | 'planned'
+export type MicroserviceLifecycleStatus =
+  'active' | 'evolving' | 'deprecated' | 'decommissioned' | 'planned'
 
 export type ServiceLevel = 'critical' | 'high' | 'medium' | 'low'
 
@@ -376,7 +412,17 @@ export interface Microservice {
   updatedAt: Date
 }
 
-export type DatabaseType = 'relational' | 'document' | 'key-value' | 'graph' | 'time-series' | 'search' | 'cache' | 'message_queue' | 'vector' | 'other'
+export type DatabaseType =
+  | 'relational'
+  | 'document'
+  | 'key-value'
+  | 'graph'
+  | 'time-series'
+  | 'search'
+  | 'cache'
+  | 'message_queue'
+  | 'vector'
+  | 'other'
 
 export interface AppDatabase {
   id: string
@@ -541,7 +587,8 @@ export interface Candidate {
   position: string
   interviewDate: Date | null
   comments: string
-  status: 'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'
+  status:
+    'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'
   teamId: string | null
   totalScore: number
   createdAt: Date
@@ -555,7 +602,14 @@ export interface CandidateTechnology {
   points: number
 }
 
-export type EvalCategory = 'technical_knowledge' | 'experience' | 'communication' | 'attitude' | 'problem_solving' | 'teamwork' | 'leadership'
+export type EvalCategory =
+  | 'technical_knowledge'
+  | 'experience'
+  | 'communication'
+  | 'attitude'
+  | 'problem_solving'
+  | 'teamwork'
+  | 'leadership'
 
 export interface CandidateEvaluation {
   id: string
@@ -566,7 +620,16 @@ export interface CandidateEvaluation {
 
 /* ─── Equipamiento ─── */
 
-export type EquipmentType = 'laptop' | 'monitor' | 'phone' | 'mouse' | 'headphones' | 'chair' | 'keyboard' | 'desk_stand' | 'other'
+export type EquipmentType =
+  | 'laptop'
+  | 'monitor'
+  | 'phone'
+  | 'mouse'
+  | 'headphones'
+  | 'chair'
+  | 'keyboard'
+  | 'desk_stand'
+  | 'other'
 export type EquipmentStatus = 'available' | 'assigned' | 'maintenance' | 'retired' | 'obsolete'
 export type EquipmentCondition = 'excellent' | 'good' | 'fair' | 'poor'
 export type TicketType = 'replacement' | 'repair' | 'new'

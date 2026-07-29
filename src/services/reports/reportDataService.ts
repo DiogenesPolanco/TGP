@@ -4,18 +4,37 @@ import type { ReportSection } from './pdfService'
 function statusBadge(s: string): string {
   const map: Record<string, string> = {
     // Estados generales
-    open: 'Abierto', in_progress: 'En Progreso', fixed: 'Solucionado',
-    accepted: 'Aceptado', resolved: 'Resuelto', active: 'Activo',
-    completed: 'Completado', cancelled: 'Cancelado', pending: 'Pendiente',
-    on_track: 'Encaminado', at_risk: 'En Riesgo', behind: 'Atrasado',
-    achieved: 'Logrado', fulfilled: 'Cumplido', breached: 'Incumplido',
-    closed: 'Cerrado', escalated: 'Escalado',
-    detected: 'Detectado', acknowledged: 'Reconocido',
-    mitigated: 'Mitigado', overdue: 'Vencido',
+    open: 'Abierto',
+    in_progress: 'En Progreso',
+    fixed: 'Solucionado',
+    accepted: 'Aceptado',
+    resolved: 'Resuelto',
+    active: 'Activo',
+    completed: 'Completado',
+    cancelled: 'Cancelado',
+    pending: 'Pendiente',
+    on_track: 'Encaminado',
+    at_risk: 'En Riesgo',
+    behind: 'Atrasado',
+    achieved: 'Logrado',
+    fulfilled: 'Cumplido',
+    breached: 'Incumplido',
+    closed: 'Cerrado',
+    escalated: 'Escalado',
+    detected: 'Detectado',
+    acknowledged: 'Reconocido',
+    mitigated: 'Mitigado',
+    overdue: 'Vencido',
     // Soporte tecnológico
-    eol: 'EOL', extended: 'S. Extendido', unknown: '?',
+    eol: 'EOL',
+    extended: 'S. Extendido',
+    unknown: '?',
     // Severidad
-    critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja', info: 'Info',
+    critical: 'Crítica',
+    high: 'Alta',
+    medium: 'Media',
+    low: 'Baja',
+    info: 'Info',
     // Roles
     developer: 'Desarrollador',
     senior_developer: 'Desarrollador Senior',
@@ -119,8 +138,16 @@ export async function getObsolescenceReport() {
     filename: `obsolescencia-${Date.now()}.pdf`,
     summary: [
       { label: 'Total Aplicaciones', value: String(totalApps), color: '#2563eb' },
-      { label: 'Apps con EOL', value: String(appsWithEol), color: appsWithEol > 0 ? '#dc2626' : '#16a34a' },
-      { label: 'Tecnologías EOL', value: String(eolIds.size), color: eolIds.size > 0 ? '#dc2626' : '#16a34a' },
+      {
+        label: 'Apps con EOL',
+        value: String(appsWithEol),
+        color: appsWithEol > 0 ? '#dc2626' : '#16a34a',
+      },
+      {
+        label: 'Tecnologías EOL',
+        value: String(eolIds.size),
+        color: eolIds.size > 0 ? '#dc2626' : '#16a34a',
+      },
       { label: 'Total Tecnologías', value: String(techs.length), color: '#6366f1' },
     ],
     sections,
@@ -190,10 +217,7 @@ export async function getPerformanceReport() {
 /* ─── 3. Incidentes por Aplicación ─── */
 
 export async function getIncidentsReport() {
-  const [incidents, apps] = await Promise.all([
-    db.incidents.toArray(),
-    db.applications.toArray(),
-  ])
+  const [incidents, apps] = await Promise.all([db.incidents.toArray(), db.applications.toArray()])
 
   const appMap = new Map(apps.map((a) => [a.id, a.name]))
   const byStatus: Record<string, number> = { open: 0, in_progress: 0, resolved: 0, closed: 0 }
@@ -248,10 +272,7 @@ export async function getIncidentsReport() {
 /* ─── 4. Vulnerabilidades por Aplicación ─── */
 
 export async function getVulnerabilitiesReport() {
-  const [vulns, apps] = await Promise.all([
-    db.vulnerabilities.toArray(),
-    db.applications.toArray(),
-  ])
+  const [vulns, apps] = await Promise.all([db.vulnerabilities.toArray(), db.applications.toArray()])
 
   const appMap = new Map(apps.map((a) => [a.id, a.name]))
   const bySeverity = { critical: 0, high: 0, medium: 0, low: 0, info: 0 }
@@ -305,17 +326,12 @@ export async function getVulnerabilitiesReport() {
 /* ─── 5. Predictibilidad de Sprints ─── */
 
 export async function getSprintPredictabilityReport() {
-  const [teamSprints, teams] = await Promise.all([
-    db.teamSprints.toArray(),
-    db.teams.toArray(),
-  ])
+  const [teamSprints, teams] = await Promise.all([db.teamSprints.toArray(), db.teams.toArray()])
 
   const teamMap = new Map(teams.map((t) => [t.id, t.name]))
 
   const rows = teamSprints.map((ts) => {
-    const predictability = ts.plannedSP > 0
-      ? Math.round((ts.completedSP / ts.plannedSP) * 100)
-      : 0
+    const predictability = ts.plannedSP > 0 ? Math.round((ts.completedSP / ts.plannedSP) * 100) : 0
     return {
       equipo: teamMap.get(ts.teamId) || '-',
       sprint: ts.sprintName,
@@ -328,12 +344,15 @@ export async function getSprintPredictabilityReport() {
     }
   })
 
-  const avgPredictability = teamSprints.length > 0
-    ? Math.round(teamSprints.reduce((s, ts) => {
-      const pct = ts.plannedSP > 0 ? (ts.completedSP / ts.plannedSP) * 100 : 0
-      return s + pct
-    }, 0) / teamSprints.length)
-    : 0
+  const avgPredictability =
+    teamSprints.length > 0
+      ? Math.round(
+          teamSprints.reduce((s, ts) => {
+            const pct = ts.plannedSP > 0 ? (ts.completedSP / ts.plannedSP) * 100 : 0
+            return s + pct
+          }, 0) / teamSprints.length,
+        )
+      : 0
 
   const sections: ReportSection[] = [
     {
@@ -362,7 +381,12 @@ export async function getSprintPredictabilityReport() {
       { label: 'Total Sprints', value: String(teamSprints.length), color: '#2563eb' },
       { label: 'SP Planif.', value: String(totalPlanned), color: '#6366f1' },
       { label: 'SP Compl.', value: String(totalCompleted), color: '#16a34a' },
-      { label: 'Predict. Prom.', value: `${avgPredictability}%`, color: avgPredictability >= 80 ? '#16a34a' : avgPredictability >= 60 ? '#ca8a04' : '#dc2626' },
+      {
+        label: 'Predict. Prom.',
+        value: `${avgPredictability}%`,
+        color:
+          avgPredictability >= 80 ? '#16a34a' : avgPredictability >= 60 ? '#ca8a04' : '#dc2626',
+      },
     ],
     sections,
   }
@@ -371,10 +395,7 @@ export async function getSprintPredictabilityReport() {
 /* ─── 6. Riesgos ─── */
 
 export async function getRisksReport() {
-  const [risks, apps] = await Promise.all([
-    db.risks.toArray(),
-    db.applications.toArray(),
-  ])
+  const [risks, apps] = await Promise.all([db.risks.toArray(), db.applications.toArray()])
 
   const appMap = new Map(apps.map((a) => [a.id, a.name]))
 
@@ -390,7 +411,9 @@ export async function getRisksReport() {
   }))
 
   const byStatus: Record<string, number> = { open: 0, in_progress: 0, mitigated: 0, closed: 0 }
-  risks.forEach((r) => { byStatus[r.status] = (byStatus[r.status] || 0) + 1 })
+  risks.forEach((r) => {
+    byStatus[r.status] = (byStatus[r.status] || 0) + 1
+  })
 
   const sections: ReportSection[] = [
     {
@@ -416,7 +439,11 @@ export async function getRisksReport() {
     filename: `riesgos-${Date.now()}.pdf`,
     summary: [
       { label: 'Total Riesgos', value: String(risks.length), color: '#2563eb' },
-      { label: 'Riesgo Alto (15+)', value: String(highRiskCount), color: highRiskCount > 0 ? '#dc2626' : '#16a34a' },
+      {
+        label: 'Riesgo Alto (15+)',
+        value: String(highRiskCount),
+        color: highRiskCount > 0 ? '#dc2626' : '#16a34a',
+      },
       { label: 'Abiertos', value: String(byStatus.open || 0), color: '#ca8a04' },
       { label: 'Mitigados', value: String(byStatus.mitigated || 0), color: '#16a34a' },
     ],
@@ -467,9 +494,21 @@ export async function getAuditReport() {
     filename: `auditoria-${Date.now()}.pdf`,
     summary: [
       { label: 'Total Hallazgos', value: String(findings.length), color: '#2563eb' },
-      { label: 'Vencidos', value: String(overdue.length), color: overdue.length > 0 ? '#dc2626' : '#16a34a' },
-      { label: 'Abiertos', value: String(findings.filter((f) => f.status !== 'closed').length), color: '#ca8a04' },
-      { label: 'Con Plan de Acción', value: String(findings.filter((f) => f.actionPlan).length), color: '#6366f1' },
+      {
+        label: 'Vencidos',
+        value: String(overdue.length),
+        color: overdue.length > 0 ? '#dc2626' : '#16a34a',
+      },
+      {
+        label: 'Abiertos',
+        value: String(findings.filter((f) => f.status !== 'closed').length),
+        color: '#ca8a04',
+      },
+      {
+        label: 'Con Plan de Acción',
+        value: String(findings.filter((f) => f.actionPlan).length),
+        color: '#6366f1',
+      },
     ],
     sections,
   }
@@ -486,7 +525,8 @@ export async function getDeliverablesReport() {
   const appMap = new Map(apps.map((a) => [a.id, a.name]))
 
   const overdueCount = deliverables.filter(
-    (d) => d.status !== 'completed' && d.status !== 'cancelled' && d.dueDate && d.dueDate < new Date(),
+    (d) =>
+      d.status !== 'completed' && d.status !== 'cancelled' && d.dueDate && d.dueDate < new Date(),
   ).length
 
   const rows = deliverables.map((d) => ({
@@ -514,9 +554,23 @@ export async function getDeliverablesReport() {
     filename: `entregables-${Date.now()}.pdf`,
     summary: [
       { label: 'Total Entregables', value: String(deliverables.length), color: '#2563eb' },
-      { label: 'Completados', value: String(deliverables.filter((d) => d.status === 'completed').length), color: '#16a34a' },
-      { label: 'Pendientes', value: String(deliverables.filter((d) => d.status !== 'completed' && d.status !== 'cancelled').length), color: '#ca8a04' },
-      { label: 'Vencidos', value: String(overdueCount), color: overdueCount > 0 ? '#dc2626' : '#16a34a' },
+      {
+        label: 'Completados',
+        value: String(deliverables.filter((d) => d.status === 'completed').length),
+        color: '#16a34a',
+      },
+      {
+        label: 'Pendientes',
+        value: String(
+          deliverables.filter((d) => d.status !== 'completed' && d.status !== 'cancelled').length,
+        ),
+        color: '#ca8a04',
+      },
+      {
+        label: 'Vencidos',
+        value: String(overdueCount),
+        color: overdueCount > 0 ? '#dc2626' : '#16a34a',
+      },
     ],
     sections,
   }

@@ -11,7 +11,12 @@ import type { Task, Criticality } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
-const priorityLabel: Record<Criticality, string> = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' }
+const priorityLabel: Record<Criticality, string> = {
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  critical: 'Crítica',
+}
 const priorityColor: Record<Criticality, string> = {
   critical: 'bg-danger/10 text-danger',
   high: 'bg-warning/10 text-warning',
@@ -103,9 +108,7 @@ export function TasksPage() {
       key: 'estimatedHours',
       label: 'Horas',
       sortable: true,
-      render: (t) => (
-        <span className="text-sm text-secondary">{t.estimatedHours ?? '-'}</span>
-      ),
+      render: (t) => <span className="text-sm text-secondary">{t.estimatedHours ?? '-'}</span>,
     },
     {
       key: 'dueDate',
@@ -116,7 +119,9 @@ export function TasksPage() {
         const d = new Date(t.dueDate)
         const diff = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
         return (
-          <span className={`text-sm ${diff < 0 ? 'text-danger font-medium' : diff <= 3 ? 'text-warning' : 'text-secondary'}`}>
+          <span
+            className={`text-sm ${diff < 0 ? 'text-danger font-medium' : diff <= 3 ? 'text-warning' : 'text-secondary'}`}
+          >
             {d.toLocaleDateString('es-ES')}
           </span>
         )
@@ -126,7 +131,10 @@ export function TasksPage() {
       key: 'actions',
       label: '',
       render: (t) => (
-        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button
             onClick={() => navigate(`/execution/tasks/${t.id}/edit`)}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
@@ -171,16 +179,39 @@ export function TasksPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={<ListTodo size={18} />} label="Total" value={stats.total} color="text-primary" />
-        <StatCard icon={<Clock size={18} />} label="Por Hacer" value={stats.todo} color="text-neutral-60" />
-        <StatCard icon={<Play size={18} />} label="En Progreso" value={stats.inProgress} color="text-info" />
-        <StatCard icon={<CheckCircle2 size={18} />} label="Completadas" value={stats.done} color="text-success" />
+        <StatCard
+          icon={<ListTodo size={18} />}
+          label="Total"
+          value={stats.total}
+          color="text-primary"
+        />
+        <StatCard
+          icon={<Clock size={18} />}
+          label="Por Hacer"
+          value={stats.todo}
+          color="text-neutral-60"
+        />
+        <StatCard
+          icon={<Play size={18} />}
+          label="En Progreso"
+          value={stats.inProgress}
+          color="text-info"
+        />
+        <StatCard
+          icon={<CheckCircle2 size={18} />}
+          label="Completadas"
+          value={stats.done}
+          color="text-success"
+        />
       </div>
 
       <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar tareas..."
@@ -190,13 +221,17 @@ export function TasksPage() {
             />
           </div>
           <div className="min-w-[150px]">
-            <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-              { value: 'all', label: 'Todos' },
-              { value: 'todo', label: 'Por Hacer' },
-              { value: 'in_progress', label: 'En Progreso' },
-              { value: 'review', label: 'Revisión' },
-              { value: 'done', label: 'Completada' },
-            ]} />
+            <Select
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v)}
+              options={[
+                { value: 'all', label: 'Todos' },
+                { value: 'todo', label: 'Por Hacer' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'review', label: 'Revisión' },
+                { value: 'done', label: 'Completada' },
+              ]}
+            />
           </div>
         </div>
       </div>
@@ -211,7 +246,17 @@ export function TasksPage() {
   )
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+}) {
   const iconClasses: Record<string, string> = {
     'text-primary': 'bg-primary/10 text-primary',
     'text-neutral-60': 'bg-neutral-60/10 text-neutral-60',
@@ -220,11 +265,11 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
   }
   return (
     <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3">
-      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </div>
   )
 }
-
-

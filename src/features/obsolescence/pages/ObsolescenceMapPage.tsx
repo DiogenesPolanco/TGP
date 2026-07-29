@@ -21,9 +21,22 @@ import {
 
 type StatusFilter = SupportStatus | 'all' | 'mixed'
 
-function StatCard({ icon, value, label, iconBg, valueColor, active, onClick }: {
-  icon: ReactNode; value: number; label: string; iconBg: string
-  valueColor?: string; active: boolean; onClick: () => void
+function StatCard({
+  icon,
+  value,
+  label,
+  iconBg,
+  valueColor,
+  active,
+  onClick,
+}: {
+  icon: ReactNode
+  value: number
+  label: string
+  iconBg: string
+  valueColor?: string
+  active: boolean
+  onClick: () => void
 }) {
   return (
     <Button
@@ -37,7 +50,9 @@ function StatCard({ icon, value, label, iconBg, valueColor, active, onClick }: {
     >
       <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>{icon}</div>
       <div className="min-w-0">
-        <p className={`text-lg font-bold ${valueColor ?? 'text-neutral-90 dark:text-white'}`}>{value}</p>
+        <p className={`text-lg font-bold ${valueColor ?? 'text-neutral-90 dark:text-white'}`}>
+          {value}
+        </p>
         <p className="text-xs text-neutral-50 truncate">{label}</p>
       </div>
     </Button>
@@ -101,10 +116,7 @@ export function ObsolescenceMapPage() {
   }, [technologies])
 
   // Precompute: appId → merged tech IDs (direct + inherited from microservices)
-  const appTechMap = useMemo(
-    () => computeAppTechMap(apps, microservices),
-    [apps, microservices],
-  )
+  const appTechMap = useMemo(() => computeAppTechMap(apps, microservices), [apps, microservices])
 
   // Precompute: microserviceId → its own tech IDs
   const msTechMap = useMemo(() => {
@@ -171,7 +183,12 @@ export function ObsolescenceMapPage() {
   // Filter nodes by search and status
   const filteredNodeIds = useMemo(() => {
     const filtered = allNodes.filter((n) => {
-      if (search && !n.label.toLowerCase().includes(search.toLowerCase()) && !n.appName.toLowerCase().includes(search.toLowerCase())) return false
+      if (
+        search &&
+        !n.label.toLowerCase().includes(search.toLowerCase()) &&
+        !n.appName.toLowerCase().includes(search.toLowerCase())
+      )
+        return false
       if (statusFilter !== 'all' && n.status !== statusFilter) return false
       if (!showMicroservices && n.type === 'microservice') return false
       return true
@@ -236,7 +253,9 @@ export function ObsolescenceMapPage() {
             <ArrowLeft size={20} className="text-neutral-60" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">Mapa de Obsolescencias</h1>
+            <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
+              Mapa de Obsolescencias
+            </h1>
             <p className="text-sm text-muted">
               Apps y microservicios coloreados por estado de soporte de sus tecnologías
             </p>
@@ -252,7 +271,11 @@ export function ObsolescenceMapPage() {
           label="Aplicaciones"
           iconBg="bg-primary/10 text-primary"
           active={statusFilter === 'all' && showMicroservices && !search}
-          onClick={() => { setStatusFilter('all'); setShowMicroservices(true); setSearch('') }}
+          onClick={() => {
+            setStatusFilter('all')
+            setShowMicroservices(true)
+            setSearch('')
+          }}
         />
         <StatCard
           icon={<Network size={18} />}
@@ -305,7 +328,9 @@ export function ObsolescenceMapPage() {
         {/* Graph — 3/4 */}
         <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
           <div className="p-3 border-b border-boundary flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Obsolescencias</h2>
+            <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">
+              Grafo de Obsolescencias
+            </h2>
             <span className="text-xs text-neutral-50">
               {filteredNodes.length} nodos · {filteredEdges.length} conexiones
             </span>
@@ -325,7 +350,9 @@ export function ObsolescenceMapPage() {
               <div className="text-center py-16 text-neutral-50">
                 <Network size={48} className="mx-auto mb-4 opacity-30" />
                 <p>No hay aplicaciones registradas</p>
-                <p className="text-sm mt-1">Registra aplicaciones y asigna tecnologías para ver el mapa</p>
+                <p className="text-sm mt-1">
+                  Registra aplicaciones y asigna tecnologías para ver el mapa
+                </p>
               </div>
             )}
           </div>
@@ -360,7 +387,9 @@ export function ObsolescenceMapPage() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-boundary">
-              <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">Nodos</h4>
+              <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">
+                Nodos
+              </h4>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-5 h-5 rounded-full border-2 border-neutral-50 flex items-center justify-center" />
                 <span className="text-xs text-secondary">App</span>
@@ -372,9 +401,12 @@ export function ObsolescenceMapPage() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-boundary">
-              <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">Interacción</h4>
+              <h4 className="text-xs font-semibold text-neutral-70 dark:text-neutral-40 uppercase tracking-wider mb-2">
+                Interacción
+              </h4>
               <p className="text-xs text-neutral-60 leading-relaxed">
-                Click en un nodo para ir al detalle de la aplicación. Las flechas punteadas indican relación app → microservicio.
+                Click en un nodo para ir al detalle de la aplicación. Las flechas punteadas indican
+                relación app → microservicio.
               </p>
             </div>
           </div>
@@ -385,7 +417,10 @@ export function ObsolescenceMapPage() {
 
             {/* Search */}
             <div className="relative mb-3">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+              <Search
+                size={15}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+              />
               <input
                 type="text"
                 placeholder="Buscar por nombre..."
@@ -397,7 +432,9 @@ export function ObsolescenceMapPage() {
 
             {/* Status filter */}
             <div className="mb-3">
-              <label className="text-xs font-medium text-muted mb-1.5 block">Estado de soporte</label>
+              <label className="text-xs font-medium text-muted mb-1.5 block">
+                Estado de soporte
+              </label>
               <div className="flex flex-wrap gap-1.5">
                 {STATUS_FILTER_OPTIONS.map((opt) => (
                   <Button
@@ -408,7 +445,11 @@ export function ObsolescenceMapPage() {
                         ? 'border-current bg-current/10'
                         : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                     }`}
-                    style={statusFilter === opt.value ? { borderColor: opt.color, color: opt.color } : undefined}
+                    style={
+                      statusFilter === opt.value
+                        ? { borderColor: opt.color, color: opt.color }
+                        : undefined
+                    }
                   >
                     {opt.label}
                   </Button>
@@ -419,7 +460,11 @@ export function ObsolescenceMapPage() {
             {/* Microservices toggle */}
             <div className="flex items-center justify-between pt-2 border-t border-boundary">
               <div className="flex items-center gap-2">
-                {showMicroservices ? <Eye size={15} className="text-primary" /> : <EyeOff size={15} className="text-neutral-50" />}
+                {showMicroservices ? (
+                  <Eye size={15} className="text-primary" />
+                ) : (
+                  <EyeOff size={15} className="text-neutral-50" />
+                )}
                 <span className="text-xs text-secondary">Microservicios</span>
               </div>
               <Button
@@ -439,7 +484,11 @@ export function ObsolescenceMapPage() {
             {/* Clear filters */}
             {(search || statusFilter !== 'all' || !showMicroservices) && (
               <Button
-                onClick={() => { setSearch(''); setStatusFilter('all'); setShowMicroservices(true) }}
+                onClick={() => {
+                  setSearch('')
+                  setStatusFilter('all')
+                  setShowMicroservices(true)
+                }}
                 className="mt-3 w-full text-xs text-center text-primary hover:text-primary-dark py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
               >
                 Limpiar filtros
@@ -450,9 +499,12 @@ export function ObsolescenceMapPage() {
           {/* Summary */}
           {statusFilter !== 'all' && (
             <div className="bg-card rounded-xl border border-boundary p-4">
-              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-2">Resultados</h3>
+              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-2">
+                Resultados
+              </h3>
               <p className="text-xs text-neutral-60">
-                {filteredNodes.filter((n) => n.type === 'app').length} apps · {filteredNodes.filter((n) => n.type === 'microservice').length} microservicios
+                {filteredNodes.filter((n) => n.type === 'app').length} apps ·{' '}
+                {filteredNodes.filter((n) => n.type === 'microservice').length} microservicios
               </p>
             </div>
           )}

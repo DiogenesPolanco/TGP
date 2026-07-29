@@ -75,15 +75,19 @@ export function JobSchedulerConfig() {
   }
 
   const { config } = state
-  const cardClass = 'p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg border border-neutral-20 dark:border-neutral-60'
-  const btnClass = 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors'
+  const cardClass =
+    'p-4 bg-neutral-10 dark:bg-neutral-70 rounded-lg border border-neutral-20 dark:border-neutral-60'
+  const btnClass =
+    'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors'
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock size={20} className="text-primary" />
-          <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">Programador Automático</h3>
+          <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
+            Programador Automático
+          </h3>
         </div>
         {config.enabled && (
           <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
@@ -146,10 +150,14 @@ export function JobSchedulerConfig() {
             <span className="text-neutral-60">Estado</span>
             <span className="flex items-center gap-1">
               {state.isRunning ? (
-                <><Loader2 size={12} className="animate-spin text-primary" /> Ejecutando...</>
+                <>
+                  <Loader2 size={12} className="animate-spin text-primary" /> Ejecutando...
+                </>
               ) : (
                 <span className="flex items-center gap-1 text-neutral-90 dark:text-white">
-                  <span className={`inline-block w-2 h-2 rounded-full ${config.enabled ? 'bg-success' : 'bg-neutral-40'}`} />
+                  <span
+                    className={`inline-block w-2 h-2 rounded-full ${config.enabled ? 'bg-success' : 'bg-neutral-40'}`}
+                  />
                   {config.enabled ? 'Activo' : 'Inactivo'}
                 </span>
               )}
@@ -158,12 +166,16 @@ export function JobSchedulerConfig() {
         </div>
 
         {state.lastResult && (
-          <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
-            state.lastResult.success
-              ? 'bg-success/5 text-success'
-              : 'bg-danger/5 text-danger'
-          }`}>
-            {state.lastResult.success ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" /> : <XCircle size={16} className="mt-0.5 shrink-0" />}
+          <div
+            className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+              state.lastResult.success ? 'bg-success/5 text-success' : 'bg-danger/5 text-danger'
+            }`}
+          >
+            {state.lastResult.success ? (
+              <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+            ) : (
+              <XCircle size={16} className="mt-0.5 shrink-0" />
+            )}
             <div>
               <span>{state.lastResult.message}</span>
               <span className="block text-xs opacity-70 mt-1">
@@ -179,11 +191,7 @@ export function JobSchedulerConfig() {
             disabled={state.isRunning}
             className={`${btnClass} bg-primary text-white hover:bg-primary-dark disabled:opacity-50`}
           >
-            {state.isRunning ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Play size={14} />
-            )}
+            {state.isRunning ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
             {state.isRunning ? 'Ejecutando...' : 'Ejecutar Ahora'}
           </Button>
           <Button

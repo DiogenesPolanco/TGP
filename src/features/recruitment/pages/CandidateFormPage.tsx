@@ -3,7 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
-import { createCandidate, updateCandidate, preSelectCandidate, getCandidate, getCandidateTechnologies, getCandidateEvaluations } from '@/services/recruitment/candidateService'
+import {
+  createCandidate,
+  updateCandidate,
+  preSelectCandidate,
+  getCandidate,
+  getCandidateTechnologies,
+  getCandidateEvaluations,
+} from '@/services/recruitment/candidateService'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
@@ -30,7 +37,9 @@ export function CandidateFormPage() {
   const [position, setPosition] = useState('')
   const [interviewDate, setInterviewDate] = useState('')
   const [comments, setComments] = useState('')
-  const [status, setStatus] = useState<'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'>('pending')
+  const [status, setStatus] = useState<
+    'pending' | 'interviewed' | 'pre_selected' | 'selected' | 'onboarding' | 'rejected' | 'no_show'
+  >('pending')
   const [teamId, setTeamId] = useState('')
   const [saving, setSaving] = useState(false)
   const [preSelecting, setPreSelecting] = useState(false)
@@ -38,8 +47,12 @@ export function CandidateFormPage() {
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([])
   const [techScores, setTechScores] = useState<Record<string, number>>({})
 
-  const [evalScores, setEvalScores] = useState<Record<EvalCategory, number>>(() =>
-    Object.fromEntries(EVALUATION_CATEGORIES.map((c) => [c.key, 50])) as Record<EvalCategory, number>,
+  const [evalScores, setEvalScores] = useState<Record<EvalCategory, number>>(
+    () =>
+      Object.fromEntries(EVALUATION_CATEGORIES.map((c) => [c.key, 50])) as Record<
+        EvalCategory,
+        number
+      >,
   )
 
   useEffect(() => {
@@ -152,59 +165,96 @@ export function CandidateFormPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Button onClick={() => navigate('/teams/recruitment')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/teams/recruitment')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
-        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">{isEdit ? 'Editar Candidato' : 'Nuevo Candidato'}</h2>
+        <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          {isEdit ? 'Editar Candidato' : 'Nuevo Candidato'}
+        </h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 space-y-5"
+      >
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Nombre *</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Posición *</label>
-            <Select value={position} onChange={(v) => setPosition(v)} required options={[
-              { value: '', label: 'Seleccionar rol...' },
-              ...roleOptions.map((r) => ({ value: r.value, label: r.label })),
-            ]} />
+            <Select
+              value={position}
+              onChange={(v) => setPosition(v)}
+              required
+              options={[
+                { value: '', label: 'Seleccionar rol...' },
+                ...roleOptions.map((r) => ({ value: r.value, label: r.label })),
+              ]}
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Teléfono</label>
-            <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Fecha de Entrevista</label>
-            <DatePicker value={interviewDate} onChange={setInterviewDate}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <DatePicker
+              value={interviewDate}
+              onChange={setInterviewDate}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Estado</label>
-            <Select value={status} onChange={(v) => setStatus(v as any)} options={[
-              { value: 'pending', label: 'Pendiente' },
-              { value: 'interviewed', label: 'Entrevistado' },
-              { value: 'pre_selected', label: 'Pre-Seleccionado' },
-              { value: 'selected', label: 'Seleccionado' },
-              { value: 'onboarding', label: 'En Onboarding' },
-              { value: 'rejected', label: 'Rechazado' },
-              { value: 'no_show', label: 'No Asistió' },
-            ]} />
+            <Select
+              value={status}
+              onChange={(v) => setStatus(v as any)}
+              options={[
+                { value: 'pending', label: 'Pendiente' },
+                { value: 'interviewed', label: 'Entrevistado' },
+                { value: 'pre_selected', label: 'Pre-Seleccionado' },
+                { value: 'selected', label: 'Seleccionado' },
+                { value: 'onboarding', label: 'En Onboarding' },
+                { value: 'rejected', label: 'Rechazado' },
+                { value: 'no_show', label: 'No Asistió' },
+              ]}
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-secondary">Equipo (opcional)</label>
-            <Select value={teamId} onChange={(v) => setTeamId(v)} options={[
-              { value: '', label: 'Sin equipo' },
-              ...teams.map((t) => ({ value: t.id, label: t.name })),
-            ]} />
+            <Select
+              value={teamId}
+              onChange={(v) => setTeamId(v)}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
         </div>
 
@@ -220,15 +270,18 @@ export function CandidateFormPage() {
 
         <div className="space-y-3">
           <label className="block text-sm font-medium text-secondary">
-            Tecnologías y Puntuación <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
+            Tecnologías y Puntuación{' '}
+            <span className="text-neutral-50 font-normal">
+              ({selectedTechIds.length} seleccionadas)
+            </span>
           </label>
           <TechSearch
             selectedIds={selectedTechIds}
             onChange={(ids) => {
               // Initialize score for newly added technologies
-              const added = ids.filter(id => !selectedTechIds.includes(id))
+              const added = ids.filter((id) => !selectedTechIds.includes(id))
               if (added.length > 0) {
-                setTechScores(prev => {
+                setTechScores((prev) => {
                   const next = { ...prev }
                   for (const id of added) next[id] = 50
                   return next
@@ -241,14 +294,23 @@ export function CandidateFormPage() {
 
           {selectedTechs.length > 0 && (
             <div className="space-y-3 pt-2">
-              <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider">Puntuar conocimientos</p>
+              <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider">
+                Puntuar conocimientos
+              </p>
               {selectedTechs.map((tech) => (
                 <div key={tech.id} className="flex items-center gap-3">
                   <span className="text-sm text-secondary w-32 truncate shrink-0">{tech.name}</span>
-                  <input type="range" min={0} max={100} value={techScores[tech.id] ?? 50}
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={techScores[tech.id] ?? 50}
                     onChange={(e) => updateScore(tech.id, parseInt(e.target.value))}
-                    className="flex-1 accent-primary" />
-                  <span className="text-sm font-semibold text-primary w-10 text-right">{techScores[tech.id] ?? 50}</span>
+                    className="flex-1 accent-primary"
+                  />
+                  <span className="text-sm font-semibold text-primary w-10 text-right">
+                    {techScores[tech.id] ?? 50}
+                  </span>
                 </div>
               ))}
             </div>
@@ -266,31 +328,54 @@ export function CandidateFormPage() {
           <label className="block text-sm font-semibold text-secondary">
             Evaluación del Candidato
           </label>
-          <p className="text-xs text-neutral-50">Puntúa cada dimensión del 0 al 100 para calcular el score final</p>
+          <p className="text-xs text-neutral-50">
+            Puntúa cada dimensión del 0 al 100 para calcular el score final
+          </p>
           <div className="space-y-3">
             {EVALUATION_CATEGORIES.map((cat) => (
               <div key={cat.key} className="flex items-center gap-3">
                 <span className="text-sm text-secondary w-44 shrink-0">{cat.label}</span>
-                <input type="range" min={0} max={100} value={evalScores[cat.key]}
-                  onChange={(e) => setEvalScores({ ...evalScores, [cat.key]: parseInt(e.target.value) })}
-                  className="flex-1 accent-primary" />
-                <span className="text-sm font-semibold text-primary w-10 text-right">{evalScores[cat.key]}</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={evalScores[cat.key]}
+                  onChange={(e) =>
+                    setEvalScores({ ...evalScores, [cat.key]: parseInt(e.target.value) })
+                  }
+                  className="flex-1 accent-primary"
+                />
+                <span className="text-sm font-semibold text-primary w-10 text-right">
+                  {evalScores[cat.key]}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-3">
-          <Button type="button" onClick={() => navigate('/teams/recruitment')} className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors">
+          <Button
+            type="button"
+            onClick={() => navigate('/teams/recruitment')}
+            className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors"
+          >
             Cancelar
           </Button>
           {isEdit && status === 'interviewed' && (
-            <Button type="button" onClick={handlePreSelect} disabled={preSelecting}
-              className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
+            <Button
+              type="button"
+              onClick={handlePreSelect}
+              disabled={preSelecting}
+              className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50"
+            >
               {preSelecting ? 'Procesando...' : 'Pre-Seleccionar'}
             </Button>
           )}
-          <Button type="submit" disabled={saving || !name.trim() || !position} className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
+          <Button
+            type="submit"
+            disabled={saving || !name.trim() || !position}
+            className="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors disabled:opacity-50"
+          >
             {saving ? 'Guardando...' : isEdit ? 'Actualizar Candidato' : 'Registrar Candidato'}
           </Button>
         </div>

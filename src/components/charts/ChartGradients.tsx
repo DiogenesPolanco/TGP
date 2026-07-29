@@ -57,5 +57,3 @@ export function ChartGradients({ id = 'chart-gradients' }: ChartGradientsProps) 
     </defs>
   )
 }
-
-

@@ -14,7 +14,12 @@ interface HtmlDescriptionProps {
  * NOTA: Usamos inline style para line-clamp porque Tailwind JIT no genera
  * clases dinámicas como `line-clamp-${lines}`.
  */
-export function HtmlDescription({ html, lines = 1, className = '', full = false }: HtmlDescriptionProps) {
+export function HtmlDescription({
+  html,
+  lines = 1,
+  className = '',
+  full = false,
+}: HtmlDescriptionProps) {
   if (!html) return null
   const trimmed = html.trim()
   if (!trimmed) return null
@@ -22,12 +27,16 @@ export function HtmlDescription({ html, lines = 1, className = '', full = false 
   return (
     <div
       className={`prose prose-sm dark:prose-invert max-w-none text-neutral-70 dark:text-neutral-40 ${className}`}
-      style={full ? undefined : {
-        display: '-webkit-box',
-        WebkitLineClamp: lines,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-      }}
+      style={
+        full
+          ? undefined
+          : {
+              display: '-webkit-box',
+              WebkitLineClamp: lines,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }
+      }
       dangerouslySetInnerHTML={{ __html: trimmed }}
     />
   )

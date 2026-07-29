@@ -3,16 +3,13 @@ import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 
 const variantMap = {
-  primary:
-    'text-white hover:bg-secondary/90 active:bg-primary/80 active:text-white',
+  primary: 'text-white hover:bg-secondary/90 active:bg-primary/80 active:text-white',
   secondary:
     'bg-neutral-10 dark:bg-neutral-75 text-secondary hover:bg-neutral-20 dark:hover:bg-neutral-70 border border-neutral-30 dark:border-neutral-60',
   ghost:
     'text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70 hover:text-neutral-90 dark:hover:text-white',
-  danger:
-    'bg-danger text-white hover:bg-danger/90 active:bg-danger/80',
-  'outline-primary':
-    'border border-primary/30 text-primary hover:bg-primary/5',
+  danger: 'bg-danger text-white hover:bg-danger/90 active:bg-danger/80',
+  'outline-primary': 'border border-primary/30 text-primary hover:bg-primary/5',
 }
 
 const sizeMap = {
@@ -42,7 +39,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <button
@@ -53,7 +50,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variantMap[variant],
           sizeMap[size],
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          className
+          className,
         )}
         {...props}
       >
@@ -66,7 +63,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {!isLoading && rightIcon}
       </button>
     )
-  }
+  },
 )
 
 Button.displayName = 'Button'

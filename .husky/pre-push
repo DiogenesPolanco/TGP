@@ -1,0 +1,38 @@
+#!/bin/sh
+echo "🔍 Running pre-push quality & security checks..."
+echo ""
+
+# ── 1. Secret scanning ──
+echo "🔒 [1/5] Secret scanning (all tracked files)..."
+bash scripts/detect-secrets.sh --all || exit 1
+echo ""
+
+# ── 2. ESLint (includes security rules) ──
+echo "📝 [2/5] ESLint security linting..."
+npx eslint . --quiet || {
+  echo "  ⚠️  Lint errors found. Fix before pushing."
+  exit 1
+}
+echo ""
+
+# ── 3. TypeScript check ──
+echo "📦 [3/5] TypeScript check..."
+npx tsc --noEmit || exit 1
+echo ""
+
+# ── 4. Tests ──
+echo "🧪 [4/5] Running tests..."
+npx vitest run --reporter=verbose || exit 1
+echo ""
+
+# ── 5. Dependency audit ──
+echo "📋 [5/5] Dependency vulnerability audit..."
+# Note: pre-existing high vulns (electron-builder build deps, react-router RSC-only CSRF).
+# This SPA is client-side only — these are not exploitable at runtime.
+npm audit --audit-level=critical || {
+  echo "  ⚠️  Vulnerabilities found. Review with 'npm audit'."
+  exit 1
+}
+
+echo ""
+echo "✅ All pre-push checks passed!"

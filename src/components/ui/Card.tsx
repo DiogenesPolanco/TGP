@@ -15,14 +15,14 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
           'bg-card border border-boundary shadow-sm overflow-hidden',
           padding && 'p-5',
           hoverable && 'hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5',
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </div>
     )
-  }
+  },
 )
 
 Card.displayName = 'Card'

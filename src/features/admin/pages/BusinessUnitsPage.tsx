@@ -25,12 +25,20 @@ export function BusinessUnitsPage() {
 
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
-  const filteredBus = businessUnits.filter((bu) =>
-    bu.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (statusFilter === 'all' || bu.status === statusFilter)
+  const filteredBus = businessUnits.filter(
+    (bu) =>
+      bu.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === 'all' || bu.status === statusFilter),
   )
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedBUs } = usePagination(filteredBus, 10)
+  const {
+    page,
+    setPage,
+    totalPages,
+    pageSize,
+    setPageSize,
+    paginatedItems: paginatedBUs,
+  } = usePagination(filteredBus, 10)
 
   const resetForm = () => {
     setFormName('')
@@ -47,7 +55,7 @@ export function BusinessUnitsPage() {
     }
 
     const exists = businessUnits.some(
-      (bu) => bu.name.toLowerCase() === name.toLowerCase() && bu.id !== editingId
+      (bu) => bu.name.toLowerCase() === name.toLowerCase() && bu.id !== editingId,
     )
     if (exists) {
       addNotification({ type: 'error', message: 'Ya existe una unidad de negocio con ese nombre' })
@@ -98,7 +106,9 @@ export function BusinessUnitsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Unidades de Negocio</h2>
+          <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">
+            Unidades de Negocio
+          </h2>
           <p className="text-sm text-muted mt-1">
             Gestiona las unidades de negocio para organizar aplicaciones y equipos
           </p>
@@ -112,7 +122,10 @@ export function BusinessUnitsPage() {
             Importar
           </Button>
           <Button
-            onClick={() => { resetForm(); setShowForm(true) }}
+            onClick={() => {
+              resetForm()
+              setShowForm(true)
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Plus size={18} />
@@ -124,7 +137,10 @@ export function BusinessUnitsPage() {
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar unidades de negocio..."
@@ -143,9 +159,7 @@ export function BusinessUnitsPage() {
           >
             <Filter size={16} />
             Filtros
-            {statusFilter !== 'all' && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
+            {statusFilter !== 'all' && <span className="w-2 h-2 rounded-full bg-primary" />}
           </Button>
         </div>
 
@@ -153,11 +167,16 @@ export function BusinessUnitsPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'active', label: 'Activo' },
-                { value: 'inactive', label: 'Inactivo' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todos' },
+                  { value: 'active', label: 'Activo' },
+                  { value: 'inactive', label: 'Inactivo' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             {statusFilter !== 'all' && (
               <Button
@@ -179,27 +198,30 @@ export function BusinessUnitsPage() {
           </h3>
           <div className="flex items-end gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-muted mb-1">
-                Nombre
-              </label>
+              <label className="block text-sm font-medium text-muted mb-1">Nombre</label>
               <input
                 type="text"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') resetForm() }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSave()
+                  if (e.key === 'Escape') resetForm()
+                }}
                 placeholder="Ej: Digital, Core, Legacy..."
                 className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 autoFocus
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-muted mb-1">
-                Estado
-              </label>
-              <Select value={formStatus} onChange={(v) => setFormStatus(v as BusinessUnitStatus)} options={[
-                { value: 'active', label: 'Activo' },
-                { value: 'inactive', label: 'Inactivo' },
-              ]} />
+              <label className="block text-sm font-medium text-muted mb-1">Estado</label>
+              <Select
+                value={formStatus}
+                onChange={(v) => setFormStatus(v as BusinessUnitStatus)}
+                options={[
+                  { value: 'active', label: 'Activo' },
+                  { value: 'inactive', label: 'Inactivo' },
+                ]}
+              />
             </div>
             <Button
               onClick={handleSave}
@@ -289,12 +311,12 @@ function BusinessUnitRow({
   const appCount = useLiveQuery(
     () => db.applications.where('businessUnitId').equals(bu.id).count(),
     [bu.id],
-    0
+    0,
   )
   const teamCount = useLiveQuery(
     () => db.teams.where('businessUnitId').equals(bu.id).count(),
     [bu.id],
-    0
+    0,
   )
 
   return (
@@ -306,11 +328,13 @@ function BusinessUnitRow({
         <span className="text-sm font-medium text-neutral-90 dark:text-white">{bu.name}</span>
       </td>
       <td className="px-6 py-4">
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          bu.status === 'active'
-            ? 'bg-success/10 text-success'
-            : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50 dark:text-neutral-40'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            bu.status === 'active'
+              ? 'bg-success/10 text-success'
+              : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50 dark:text-neutral-40'
+          }`}
+        >
           {bu.status === 'active' ? 'Activo' : 'Inactivo'}
         </span>
       </td>
@@ -321,21 +345,25 @@ function BusinessUnitRow({
         <span className="text-sm text-muted">{teamCount}</span>
       </td>
       <td className="px-6 py-4">
-        <span className="text-sm text-muted">
-          {new Date(bu.createdAt).toLocaleDateString()}
-        </span>
+        <span className="text-sm text-muted">{new Date(bu.createdAt).toLocaleDateString()}</span>
       </td>
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
           <Button
-            onClick={(e) => { e.stopPropagation(); onEdit(bu.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit(bu.id)
+            }}
             className="p-2 rounded-lg text-neutral-50 hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); onDelete(bu.id, bu.name) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(bu.id, bu.name)
+            }}
             className="p-2 rounded-lg text-danger/60 hover:bg-danger/10 transition-colors"
             title="Eliminar"
           >

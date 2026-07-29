@@ -6,9 +6,24 @@ const ACCESS_LOG_KEY = 'tgp-share-access-log'
 
 // ─── Types ──────────────────────────────────────────────────────────
 
-export type ShareType = 'dashboard' | 'performance' | 'member' | 'members' | 'recruitment' | 'daily'
-  | 'plan' | 'timeline' | 'predictability' | 'vulnerabilities' | 'incidents' | 'risks'
-  | 'audit' | 'objectives' | 'obsolescence' | 'dependencies' | 'equipment'
+export type ShareType =
+  | 'dashboard'
+  | 'performance'
+  | 'member'
+  | 'members'
+  | 'recruitment'
+  | 'daily'
+  | 'plan'
+  | 'timeline'
+  | 'predictability'
+  | 'vulnerabilities'
+  | 'incidents'
+  | 'risks'
+  | 'audit'
+  | 'objectives'
+  | 'obsolescence'
+  | 'dependencies'
+  | 'equipment'
 
 interface SharedLink {
   hash: string
@@ -52,7 +67,9 @@ const PUBLIC_ROUTES: Record<ShareType, string> = {
 function generateHash(): string {
   const buf = new Uint8Array(8) // 8 bytes → 16 hex chars
   crypto.getRandomValues(buf)
-  return Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('')
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 // ─── Local link store ───────────────────────────────────────────────
@@ -112,7 +129,8 @@ export async function createShareLink(
   // Upload to Azure if data provided
   let manifestStr = ''
   if (data) {
-    const { uploadShareToAzure, buildManifestString, getShareAzureConfig } = await import('@/services/share/azureShareService')
+    const { uploadShareToAzure, buildManifestString, getShareAzureConfig } =
+      await import('@/services/share/azureShareService')
     const config = getShareAzureConfig()
     const backupConfig = (await import('@/services/backup/azureBackupService')).getAzureConfig()
 
@@ -194,7 +212,9 @@ export async function isShareValid(hash: string): Promise<boolean> {
       logShareAccess(hash, 'unknown')
       return true
     }
-  } catch { /* empty */ }
+  } catch {
+    /* empty */
+  }
 
   return false
 }
@@ -213,7 +233,9 @@ export function logShareAccess(hash: string, type: ShareType | string): void {
     // Keep last 100 entries
     if (logs.length > 100) logs.splice(0, logs.length - 100)
     localStorage.setItem(ACCESS_LOG_KEY, JSON.stringify(logs))
-  } catch { /* empty */ }
+  } catch {
+    /* empty */
+  }
 }
 
 export function getShareAccessLog(hash?: string): AccessLogEntry[] {
@@ -273,18 +295,38 @@ export async function loadPublicEntities(entities: string[]): Promise<Record<str
 
 export async function getPublicDashboardData() {
   const data = await loadPublicEntities([
-    'businessUnits', 'applications', 'vulnerabilities', 'incidents', 'risks',
-    'technologies', 'teams', 'auditFindings', 'healthHistory',
+    'businessUnits',
+    'applications',
+    'vulnerabilities',
+    'incidents',
+    'risks',
+    'technologies',
+    'teams',
+    'auditFindings',
+    'healthHistory',
   ])
   return data as {
     businessUnits: any[]
     applications: any[]
-    vulnerabilities: { id: string; title: string; severity: string; status: string; cvssScore?: number; applicationId?: string }[]
+    vulnerabilities: {
+      id: string
+      title: string
+      severity: string
+      status: string
+      cvssScore?: number
+      applicationId?: string
+    }[]
     incidents: { id: string; title: string; severity: string; status: string }[]
     risks: { id: string; title: string; riskScore?: number; status: string }[]
     technologies: { id: string; name: string; version: string; supportStatus: string }[]
     teams: { id: string; name: string; currentMetrics?: any }[]
-    auditFindings: { id: string; title: string; severity: string; status: string; dueDate?: string }[]
+    auditFindings: {
+      id: string
+      title: string
+      severity: string
+      status: string
+      dueDate?: string
+    }[]
     healthHistory: { date: string; score: number }[]
   }
 }
@@ -292,7 +334,13 @@ export async function getPublicDashboardData() {
 export type PublicDashboardData = Awaited<ReturnType<typeof getPublicDashboardData>>
 
 export async function getPublicPerformanceData() {
-  const data = await loadPublicEntities(['teams', 'members', 'sprints', 'oneOnOnes', 'achievements'])
+  const data = await loadPublicEntities([
+    'teams',
+    'members',
+    'sprints',
+    'oneOnOnes',
+    'achievements',
+  ])
   return data as {
     teams: any[]
     members: any[]
@@ -314,7 +362,9 @@ export async function getPublicMemberData(memberId: string) {
   ])
   if (!member) return null
   const memberTeam = teams.find((t) => t.id === member.teamId)
-  const displayName = memberTeam?.members?.find((tm) => tm.id === memberId)?.displayName ?? member.email.split('@')[0] ?? 'Miembro'
+  const teamDisplayName = memberTeam?.members?.find((tm) => tm.id === memberId)?.displayName
+  const emailPrefix = member.email?.split('@')[0]
+  const displayName = teamDisplayName ?? (emailPrefix || 'Miembro')
   return { member, displayName, team: memberTeam ?? null, sprints, oneOnOnes, achievements }
 }
 
@@ -334,7 +384,7 @@ export type PublicRecruitmentData = Awaited<ReturnType<typeof getPublicRecruitme
 export async function fetchAzureShareData<T = unknown>(hash: string): Promise<T | null> {
   try {
     const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
-    return await downloadShareFromAzure(hash) as T | null
+    return (await downloadShareFromAzure(hash)) as T | null
   } catch {
     return null
   }
@@ -365,9 +415,7 @@ export async function getPublicPlanData(planId: string) {
     db.tasks.where('planId').equals(planId).toArray(),
     db.blockers.toArray(),
   ])
-  const blockersForPlan = blockers.filter(
-    (b) => b.sourceType === 'plan' && b.sourceId === planId
-  )
+  const blockersForPlan = blockers.filter((b) => b.sourceType === 'plan' && b.sourceId === planId)
   const teams = await db.teams.toArray()
   const applications = await db.applications.toArray()
   return { plan, activities, tasks, blockers: blockersForPlan, teams, applications }
@@ -378,7 +426,15 @@ export type PublicPlanData = Awaited<ReturnType<typeof getPublicPlanData>>
 // ─── Public Timeline Data ──
 
 export async function getPublicTimelineData() {
-  const data = await loadPublicEntities(['plans', 'activities', 'tasks', 'blockers', 'commitments', 'teams', 'businessUnits'])
+  const data = await loadPublicEntities([
+    'plans',
+    'activities',
+    'tasks',
+    'blockers',
+    'commitments',
+    'teams',
+    'businessUnits',
+  ])
   return data as {
     plans: any[]
     activities: any[]

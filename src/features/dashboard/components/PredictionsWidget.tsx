@@ -42,19 +42,31 @@ export function PredictionsWidget() {
 }
 
 function PredictionMini({ prediction }: { prediction: Prediction }) {
-  const TrendIcon = prediction.trend === 'up' ? TrendingUp : prediction.trend === 'down' ? TrendingDown : Minus
-  const trendColor = prediction.trend === 'up' ? 'text-danger' : prediction.trend === 'down' ? 'text-success' : 'text-neutral-50'
+  const TrendIcon =
+    prediction.trend === 'up' ? TrendingUp : prediction.trend === 'down' ? TrendingDown : Minus
+  const trendColor =
+    prediction.trend === 'up'
+      ? 'text-danger'
+      : prediction.trend === 'down'
+        ? 'text-success'
+        : 'text-neutral-50'
 
   return (
     <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-5 border border-boundary">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-neutral-80 dark:text-neutral-20">{prediction.metric}</span>
+        <span className="text-sm font-semibold text-neutral-80 dark:text-neutral-20">
+          {prediction.metric}
+        </span>
         <TrendIcon size={18} className={trendColor} />
       </div>
       <div className="flex items-baseline gap-3 mb-2">
-        <span className="text-2xl font-bold text-neutral-90 dark:text-white">{prediction.current}</span>
+        <span className="text-2xl font-bold text-neutral-90 dark:text-white">
+          {prediction.current}
+        </span>
         <span className="text-sm text-neutral-50 font-medium">→</span>
-        <span className="text-xl font-bold text-purple-600 dark:text-purple-400">{prediction.predicted}</span>
+        <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
+          {prediction.predicted}
+        </span>
       </div>
       <p className="text-sm text-muted leading-relaxed">{prediction.detail}</p>
     </div>

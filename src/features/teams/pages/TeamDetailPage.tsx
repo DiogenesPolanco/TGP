@@ -5,7 +5,16 @@ import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import { TeamSprintsSection } from '@/features/teams/components/TeamSprintsSection'
-import { ArrowLeft, Users, TrendingUp, Clock, Zap, AlertTriangle, Trash2, BarChart3 } from 'lucide-react'
+import {
+  ArrowLeft,
+  Users,
+  TrendingUp,
+  Clock,
+  Zap,
+  AlertTriangle,
+  Trash2,
+  BarChart3,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 type Tab = 'dora' | 'sprints'
@@ -32,13 +41,28 @@ export function TeamDetailPage() {
 
   const getDoraLevel = () => {
     if (!metrics) return { label: 'N/A', color: 'text-neutral-60', bg: 'bg-neutral-10' }
-    if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 1 && metrics.changeFailureRate <= 5 && metrics.mttrHours <= 1) {
+    if (
+      metrics.deploymentFrequency >= 1 &&
+      metrics.leadTimeHours <= 1 &&
+      metrics.changeFailureRate <= 5 &&
+      metrics.mttrHours <= 1
+    ) {
       return { label: 'Elite', color: 'text-success', bg: 'bg-success/10' }
     }
-    if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 168 && metrics.changeFailureRate <= 10 && metrics.mttrHours <= 24) {
+    if (
+      metrics.deploymentFrequency >= 1 &&
+      metrics.leadTimeHours <= 168 &&
+      metrics.changeFailureRate <= 10 &&
+      metrics.mttrHours <= 24
+    ) {
       return { label: 'Alto', color: 'text-info', bg: 'bg-info/10' }
     }
-    if (metrics.deploymentFrequency >= 0.25 && metrics.leadTimeHours <= 720 && metrics.changeFailureRate <= 15 && metrics.mttrHours <= 168) {
+    if (
+      metrics.deploymentFrequency >= 0.25 &&
+      metrics.leadTimeHours <= 720 &&
+      metrics.changeFailureRate <= 15 &&
+      metrics.mttrHours <= 168
+    ) {
       return { label: 'Medio', color: 'text-warning', bg: 'bg-warning/10' }
     }
     return { label: 'Bajo', color: 'text-danger', bg: 'bg-danger/10' }
@@ -68,7 +92,9 @@ export function TeamDetailPage() {
         </Button>
         <div>
           <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">{team.name}</h2>
-          <p className="text-sm text-muted">{bu?.name} • {team.sourceSystem} • {team.members.length} miembros</p>
+          <p className="text-sm text-muted">
+            {bu?.name} • {team.sourceSystem} • {team.members.length} miembros
+          </p>
         </div>
       </div>
 
@@ -102,53 +128,108 @@ export function TeamDetailPage() {
                 icon={<Zap size={24} />}
                 label="Frecuencia de Despliegue"
                 value={`${metrics.deploymentFrequency}/día`}
-                benchmark={metrics.deploymentFrequency >= 1 ? 'Elite' : metrics.deploymentFrequency >= 0.25 ? 'Alto' : 'Bajo'}
-                color={metrics.deploymentFrequency >= 1 ? 'text-success' : metrics.deploymentFrequency >= 0.25 ? 'text-info' : 'text-danger'}
+                benchmark={
+                  metrics.deploymentFrequency >= 1
+                    ? 'Elite'
+                    : metrics.deploymentFrequency >= 0.25
+                      ? 'Alto'
+                      : 'Bajo'
+                }
+                color={
+                  metrics.deploymentFrequency >= 1
+                    ? 'text-success'
+                    : metrics.deploymentFrequency >= 0.25
+                      ? 'text-info'
+                      : 'text-danger'
+                }
               />
               <DoraCard
                 icon={<Clock size={24} />}
                 label="Tiempo de Entrega"
                 value={`${metrics.leadTimeHours}h`}
-                benchmark={metrics.leadTimeHours <= 1 ? 'Elite' : metrics.leadTimeHours <= 168 ? 'Alto' : 'Bajo'}
-                color={metrics.leadTimeHours <= 1 ? 'text-success' : metrics.leadTimeHours <= 168 ? 'text-info' : 'text-danger'}
+                benchmark={
+                  metrics.leadTimeHours <= 1
+                    ? 'Elite'
+                    : metrics.leadTimeHours <= 168
+                      ? 'Alto'
+                      : 'Bajo'
+                }
+                color={
+                  metrics.leadTimeHours <= 1
+                    ? 'text-success'
+                    : metrics.leadTimeHours <= 168
+                      ? 'text-info'
+                      : 'text-danger'
+                }
               />
               <DoraCard
                 icon={<AlertTriangle size={24} />}
                 label="Tasa de Fallos"
                 value={`${metrics.changeFailureRate}%`}
-                benchmark={metrics.changeFailureRate <= 5 ? 'Elite' : metrics.changeFailureRate <= 10 ? 'Alto' : 'Bajo'}
-                color={metrics.changeFailureRate <= 5 ? 'text-success' : metrics.changeFailureRate <= 10 ? 'text-info' : 'text-danger'}
+                benchmark={
+                  metrics.changeFailureRate <= 5
+                    ? 'Elite'
+                    : metrics.changeFailureRate <= 10
+                      ? 'Alto'
+                      : 'Bajo'
+                }
+                color={
+                  metrics.changeFailureRate <= 5
+                    ? 'text-success'
+                    : metrics.changeFailureRate <= 10
+                      ? 'text-info'
+                      : 'text-danger'
+                }
               />
               <DoraCard
                 icon={<TrendingUp size={24} />}
                 label="MTTR"
                 value={`${metrics.mttrHours}h`}
-                benchmark={metrics.mttrHours <= 1 ? 'Elite' : metrics.mttrHours <= 24 ? 'Alto' : 'Bajo'}
-                color={metrics.mttrHours <= 1 ? 'text-success' : metrics.mttrHours <= 24 ? 'text-info' : 'text-danger'}
+                benchmark={
+                  metrics.mttrHours <= 1 ? 'Elite' : metrics.mttrHours <= 24 ? 'Alto' : 'Bajo'
+                }
+                color={
+                  metrics.mttrHours <= 1
+                    ? 'text-success'
+                    : metrics.mttrHours <= 24
+                      ? 'text-info'
+                      : 'text-danger'
+                }
               />
             </div>
           )}
 
           <div className="bg-card rounded-2xl border border-boundary p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">Miembros del Equipo</h3>
+            <h3 className="text-lg font-semibold text-neutral-90 dark:text-white mb-4">
+              Miembros del Equipo
+            </h3>
             <div className="space-y-2">
               {team.members.map((member) => (
-                <div key={member.id}
+                <div
+                  key={member.id}
                   onClick={() => navigate(`/teams/${team.id}/performance/${member.id}`)}
-                  className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group cursor-pointer hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+                  className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group cursor-pointer hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                       <Users size={14} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white">{member.displayName}</p>
-                      <p className="text-xs text-muted">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</p>
+                      <p className="text-sm font-medium text-neutral-90 dark:text-white">
+                        {member.displayName}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {MEMBER_ROLE_LABELS[member.role] ?? member.role}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted">{member.allocationPct}%</span>
                     <Button
-                      onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id) }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRemoveMember(member.id)
+                      }}
                       className="p-1 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors opacity-0 group-hover:opacity-100"
                       title="Eliminar miembro"
                     >
@@ -172,7 +253,13 @@ export function TeamDetailPage() {
   )
 }
 
-function DoraCard({ icon, label, value, benchmark, color }: {
+function DoraCard({
+  icon,
+  label,
+  value,
+  benchmark,
+  color,
+}: {
   icon: React.ReactNode
   label: string
   value: string
@@ -183,7 +270,9 @@ function DoraCard({ icon, label, value, benchmark, color }: {
     <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div className={`${color}`}>{icon}</div>
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${color.replace('text-', 'bg-')}/10 ${color}`}>
+        <span
+          className={`text-xs font-medium px-2 py-1 rounded-full ${color.replace('text-', 'bg-')}/10 ${color}`}
+        >
           {benchmark}
         </span>
       </div>

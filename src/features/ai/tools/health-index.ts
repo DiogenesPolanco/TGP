@@ -4,7 +4,8 @@ import { type AiToolDefinition } from '../types'
 
 export const consultarHealthIndexTool: AiToolDefinition = {
   name: 'consultar_health_index',
-  description: 'Histórico del Technology Health Index (THI): evolución de la puntuación a lo largo del tiempo, por BU o dimensión. Mostrá tendencias, mejoras y deterioros.',
+  description:
+    'Histórico del Technology Health Index (THI): evolución de la puntuación a lo largo del tiempo, por BU o dimensión. Mostrá tendencias, mejoras y deterioros.',
   parameters: {
     type: 'object',
     properties: {
@@ -30,7 +31,13 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     const output: string[] = []
 
     const ahora = new Date()
-    const limites: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90, '1y': 365, 'all': Infinity }
+    const limites: Record<string, number> = {
+      '7d': 7,
+      '30d': 30,
+      '90d': 90,
+      '1y': 365,
+      all: Infinity,
+    }
     const dias = limites[periodo] ?? 90
     const corte = new Date(ahora.getTime() - dias * 24 * 60 * 60 * 1000)
 
@@ -54,7 +61,9 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     const diffPct = scoreInicial > 0 ? ((diff / scoreInicial) * 100).toFixed(1) : '0'
 
     output.push(`📈 **Technology Health Index — Histórico**`)
-    output.push(`_${periodo === 'all' ? 'Todo el histórico' : `Últimos ${periodo}`} · ${records.length} registro(s) de ${new Date(first.calculatedAt).toLocaleDateString('es-ES')} a ${new Date(last.calculatedAt).toLocaleDateString('es-ES')}_`)
+    output.push(
+      `_${periodo === 'all' ? 'Todo el histórico' : `Últimos ${periodo}`} · ${records.length} registro(s) de ${new Date(first.calculatedAt).toLocaleDateString('es-ES')} a ${new Date(last.calculatedAt).toLocaleDateString('es-ES')}_`,
+    )
     output.push('')
 
     output.push(`**Evolución general:**`)
@@ -64,11 +73,21 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     output.push(`  ${icon} (${diff >= 0 ? '+' : ''}${diff.toFixed(1)} · ${diffPct}%)`)
     output.push('')
 
-    const maxRecord = records.reduce((best, r) => getScore(r) > getScore(best) ? r : best, records[0])
-    const minRecord = records.reduce((worst, r) => getScore(r) < getScore(worst) ? r : worst, records[0])
+    const maxRecord = records.reduce(
+      (best, r) => (getScore(r) > getScore(best) ? r : best),
+      records[0],
+    )
+    const minRecord = records.reduce(
+      (worst, r) => (getScore(r) < getScore(worst) ? r : worst),
+      records[0],
+    )
     output.push(`**Puntos extremos:**`)
-    output.push(`  🟢 Máximo: ${getScore(maxRecord).toFixed(1)} (${new Date(maxRecord.calculatedAt).toLocaleDateString('es-ES')})`)
-    output.push(`  🔴 Mínimo: ${getScore(minRecord).toFixed(1)} (${new Date(minRecord.calculatedAt).toLocaleDateString('es-ES')})`)
+    output.push(
+      `  🟢 Máximo: ${getScore(maxRecord).toFixed(1)} (${new Date(maxRecord.calculatedAt).toLocaleDateString('es-ES')})`,
+    )
+    output.push(
+      `  🔴 Mínimo: ${getScore(minRecord).toFixed(1)} (${new Date(minRecord.calculatedAt).toLocaleDateString('es-ES')})`,
+    )
     output.push('')
 
     const DIMENSION_LABELS: Record<string, keyof HealthIndex> = {
@@ -101,7 +120,9 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     } else {
       const dimKey = DIMENSION_LABELS[dimension.toLowerCase()]
       if (!dimKey) {
-        output.push(`Dimensión "${dimension}" no reconocida. Opciones: Entrega, Calidad, Seguridad, Disponibilidad, Obsolescencia, Riesgo, Compliance`)
+        output.push(
+          `Dimensión "${dimension}" no reconocida. Opciones: Entrega, Calidad, Seguridad, Disponibilidad, Obsolescencia, Riesgo, Compliance`,
+        )
         output.push('')
       } else {
         const dimensionValues = records
@@ -113,7 +134,9 @@ export const consultarHealthIndexTool: AiToolDefinition = {
           const dimDiff = dimLast - dimFirst
           output.push(`**Dimensión: ${dimension}**`)
           output.push(`  📍 Inicio: ${dimFirst.toFixed(1)}/10 → Actual: ${dimLast.toFixed(1)}/10`)
-          output.push(`  ${dimDiff >= 0 ? '📈' : '📉'} ${dimDiff >= 0 ? '+' : ''}${dimDiff.toFixed(1)}`)
+          output.push(
+            `  ${dimDiff >= 0 ? '📈' : '📉'} ${dimDiff >= 0 ? '+' : ''}${dimDiff.toFixed(1)}`,
+          )
           output.push('')
         } else {
           output.push(`Dimensión "${dimension}" no encontrada en los registros.`)
@@ -127,14 +150,18 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     for (const r of ultimos5) {
       const s = getScore(r)
       const ic = s >= 7 ? '🟢' : s >= 4 ? '🟡' : '🔴'
-      output.push(`  ${ic} ${new Date(r.calculatedAt).toLocaleDateString('es-ES')}: ${s.toFixed(1)}/10`)
+      output.push(
+        `  ${ic} ${new Date(r.calculatedAt).toLocaleDateString('es-ES')}: ${s.toFixed(1)}/10`,
+      )
     }
     output.push('')
 
     if (!buId) {
       output.push('💡 Usá buId para ver el THI de una unidad de negocio específica.')
     }
-    output.push('💡 Usá dimension="Seguridad" (o el nombre que corresponda) para ver la evolución de un componente específico.')
+    output.push(
+      '💡 Usá dimension="Seguridad" (o el nombre que corresponda) para ver la evolución de un componente específico.',
+    )
 
     return output.join('\n')
   },

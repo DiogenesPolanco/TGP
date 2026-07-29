@@ -67,7 +67,9 @@ export function ActivityFormPage() {
         setStatus(activity.status ?? 'pending')
         setPlannedPoints(activity.plannedPoints?.toString() ?? '')
         setCompletedPoints(activity.completedPoints?.toString() ?? '')
-        setStartDate(activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '')
+        setStartDate(
+          activity.startDate ? new Date(activity.startDate).toISOString().split('T')[0] : '',
+        )
         setDueDate(activity.dueDate ? new Date(activity.dueDate).toISOString().split('T')[0] : '')
       })
     }
@@ -129,7 +131,11 @@ export function ActivityFormPage() {
         actualHours: activity?.actualHours ?? null,
         plannedPoints: plannedPoints ? Number(plannedPoints) : null,
         completedPoints: completedPoints ? Number(completedPoints) : null,
-        sortOrder: activity?.sortOrder ?? (activities.length > 0 ? Math.max(...activities.map((a: Activity) => a.sortOrder ?? 0)) + 1 : 0),
+        sortOrder:
+          activity?.sortOrder ??
+          (activities.length > 0
+            ? Math.max(...activities.map((a: Activity) => a.sortOrder ?? 0)) + 1
+            : 0),
         startDate: startDate ? parseLocalDate(startDate) : null,
         dueDate: dueDate ? parseLocalDate(dueDate) : null,
         completedAt: activity?.completedAt ?? null,
@@ -223,7 +229,9 @@ export function ActivityFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1.5">Actividad Padre</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">
+              Actividad Padre
+            </label>
             <Select
               value={parentActivityId}
               onChange={setParentActivityId}
@@ -277,11 +285,7 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <MemberSelector
-              label="Asignado a"
-              value={assigneeId}
-              onChange={setAssigneeId}
-            />
+            <MemberSelector label="Asignado a" value={assigneeId} onChange={setAssigneeId} />
           </div>
 
           <div>
@@ -297,7 +301,9 @@ export function ActivityFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1.5">Puntos Planif.</label>
+            <label className="block text-sm font-medium text-secondary mb-1.5">
+              Puntos Planif.
+            </label>
             <input
               type="number"
               value={plannedPoints}
@@ -338,41 +344,43 @@ export function ActivityFormPage() {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-secondary mb-1.5">Tareas rápidas</label>
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="text"
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') addTask() }}
-                placeholder="Agregar tarea y presionar Enter"
-                className="flex-1 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-              <Button
-                onClick={addTask}
-                className="p-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
-              >
-                <Plus size={16} />
-              </Button>
-            </div>
-            {tasks.length > 0 && (
-              <div className="space-y-1">
-                {tasks.map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between px-3 py-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg"
+          <label className="block text-sm font-medium text-secondary mb-1.5">Tareas rápidas</label>
+          <div className="flex items-center gap-2 mb-2">
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') addTask()
+              }}
+              placeholder="Agregar tarea y presionar Enter"
+              className="flex-1 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            <Button
+              onClick={addTask}
+              className="p-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
+            >
+              <Plus size={16} />
+            </Button>
+          </div>
+          {tasks.length > 0 && (
+            <div className="space-y-1">
+              {tasks.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center justify-between px-3 py-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg"
+                >
+                  <span className="text-sm text-neutral-90 dark:text-white">{t.title}</span>
+                  <Button
+                    onClick={() => removeTask(t.id)}
+                    className="p-0.5 text-neutral-50 hover:text-danger transition-colors"
                   >
-                    <span className="text-sm text-neutral-90 dark:text-white">{t.title}</span>
-                    <Button
-                      onClick={() => removeTask(t.id)}
-                      className="p-0.5 text-neutral-50 hover:text-danger transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-4">

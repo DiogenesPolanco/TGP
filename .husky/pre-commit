@@ -1,0 +1,6 @@
+#!/bin/sh
+echo "🔒 Security check: scanning staged files for secrets..."
+bash scripts/detect-secrets.sh || exit 1
+
+echo "🎨 Running lint-staged..."
+npx lint-staged

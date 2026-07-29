@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import {
-  Database, Pencil, Trash2, ChevronDown, ChevronUp,
-  Server, Box,
-} from 'lucide-react'
-import type { DatabaseType, EnvironmentType, SupportStatus, AppDatabase, Technology } from '@/types/domain'
+import { Database, Pencil, Trash2, ChevronDown, ChevronUp, Server, Box } from 'lucide-react'
+import type {
+  DatabaseType,
+  EnvironmentType,
+  SupportStatus,
+  AppDatabase,
+  Technology,
+} from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
@@ -67,10 +70,11 @@ interface DatabasesTabProps {
 
 export function DatabasesTab({ applicationId, databases }: DatabasesTabProps) {
   const navigate = useNavigate()
-  const microservices = useLiveQuery(
-    () => db.microservices.where('applicationId').equals(applicationId).toArray(),
-    [applicationId],
-  ) ?? []
+  const microservices =
+    useLiveQuery(
+      () => db.microservices.where('applicationId').equals(applicationId).toArray(),
+      [applicationId],
+    ) ?? []
   const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
   const { confirm } = useConfirm()
 
@@ -83,8 +87,11 @@ export function DatabasesTab({ applicationId, databases }: DatabasesTabProps) {
     <div>
       <div className="flex items-start justify-between mb-4">
         <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
-          Bases de Datos <span className="text-neutral-50 text-base font-normal">({databases.length})</span>
-          <p className="text-sm font-normal text-neutral-50 mt-0.5">Bases de datos heredadas de los microservicios de la aplicación.</p>
+          Bases de Datos{' '}
+          <span className="text-neutral-50 text-base font-normal">({databases.length})</span>
+          <p className="text-sm font-normal text-neutral-50 mt-0.5">
+            Bases de datos heredadas de los microservicios de la aplicación.
+          </p>
         </h4>
       </div>
 
@@ -101,7 +108,9 @@ export function DatabasesTab({ applicationId, databases }: DatabasesTabProps) {
             database={db_}
             microservices={microservices}
             allTechnologies={allTechnologies}
-            onEdit={() => navigate(`/catalog/applications/${applicationId}/databases/${db_.id}/edit`)}
+            onEdit={() =>
+              navigate(`/catalog/applications/${applicationId}/databases/${db_.id}/edit`)
+            }
             onDelete={() => handleDelete(db_.id)}
           />
         ))}
@@ -152,12 +161,12 @@ function DatabaseCard({
               )}
             </div>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${environmentColor[db_.environment]}`}>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${environmentColor[db_.environment]}`}
+              >
                 {environmentLabel[db_.environment]}
               </span>
-              <span className="text-xs text-muted">
-                {dbTypeLabel[db_.dbType]}
-              </span>
+              <span className="text-xs text-muted">{dbTypeLabel[db_.dbType]}</span>
               {db_.isManaged && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-info/10 text-info">
                   Managed
@@ -165,7 +174,8 @@ function DatabaseCard({
               )}
               {db_.host && (
                 <span className="text-[10px] text-neutral-50 truncate max-w-[200px]">
-                  {db_.host}{db_.port ? `:${db_.port}` : ''}
+                  {db_.host}
+                  {db_.port ? `:${db_.port}` : ''}
                 </span>
               )}
             </div>
@@ -200,9 +210,7 @@ function DatabaseCard({
 
       {expanded && (
         <div className="border-t border-boundary p-3 space-y-3">
-          {db_.description && (
-            <HtmlDescription html={db_.description} lines={2} />
-          )}
+          {db_.description && <HtmlDescription html={db_.description} lines={2} />}
 
           {relatedMs.length > 0 && (
             <div>
@@ -238,7 +246,9 @@ function DatabaseCard({
                       </span>
                       <span className="text-xs text-neutral-50 shrink-0">{tech.version}</span>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${statusColors[tech.supportStatus]}`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${statusColors[tech.supportStatus]}`}
+                    >
                       {statusLabel[tech.supportStatus]}
                     </span>
                   </div>
@@ -248,7 +258,9 @@ function DatabaseCard({
           )}
 
           {techs.length === 0 && relatedMs.length === 0 && (
-            <p className="text-xs text-neutral-50 italic">Sin microservicios o tecnologías asociadas</p>
+            <p className="text-xs text-neutral-50 italic">
+              Sin microservicios o tecnologías asociadas
+            </p>
           )}
         </div>
       )}

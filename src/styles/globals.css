@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -14,56 +14,56 @@
   --color-subtle: #eaeaef;
 
   /* Primary colors */
-  --color-primary: #0052CC;
-  --color-primary-dark: #0747A6;
-  --color-primary-light: #4C9AFF;
+  --color-primary: #0052cc;
+  --color-primary-dark: #0747a6;
+  --color-primary-light: #4c9aff;
 
   /* Editorial accent */
-  --color-accent: #C85A48;
-  --color-accent-dark: #A84738;
-  --color-accent-light: #E87A68;
+  --color-accent: #c85a48;
+  --color-accent-dark: #a84738;
+  --color-accent-light: #e87a68;
 
   /* Semantic colors */
-  --color-success: #36B37E;
-  --color-success-dark: #1F8B5E;
-  --color-warning: #FFAB00;
-  --color-danger: #FF5630;
-  --color-info: #00B8D9;
-  --color-info-dark: #008DA8;
+  --color-success: #36b37e;
+  --color-success-dark: #1f8b5e;
+  --color-warning: #ffab00;
+  --color-danger: #ff5630;
+  --color-info: #00b8d9;
+  --color-info-dark: #008da8;
 
   /* Severity colors */
-  --color-severity-critical: #FF5630;
-  --color-severity-high: #FF8B00;
-  --color-severity-medium: #FFAB00;
-  --color-severity-low: #36B37E;
-  --color-severity-info: #00B8D9;
+  --color-severity-critical: #ff5630;
+  --color-severity-high: #ff8b00;
+  --color-severity-medium: #ffab00;
+  --color-severity-low: #36b37e;
+  --color-severity-info: #00b8d9;
 
   /* Health colors */
-  --color-health-excellent: #36B37E;
-  --color-health-healthy: #57D9A3;
-  --color-health-regular: #FFAB00;
-  --color-health-at-risk: #FF8B00;
-  --color-health-critical: #FF5630;
+  --color-health-excellent: #36b37e;
+  --color-health-healthy: #57d9a3;
+  --color-health-regular: #ffab00;
+  --color-health-at-risk: #ff8b00;
+  --color-health-critical: #ff5630;
 
   /* Neutral colors */
-  --color-neutral-0: #FFFFFF;
-  --color-neutral-10: #F4F5F7;
-  --color-neutral-20: #EBECF0;
-  --color-neutral-30: #DFE1E6;
-  --color-neutral-40: #C1C7CD;
-  --color-neutral-50: #A5ADBA;
-  --color-neutral-60: #6B778C;
-  --color-neutral-70: #42526E;
+  --color-neutral-0: #ffffff;
+  --color-neutral-10: #f4f5f7;
+  --color-neutral-20: #ebecf0;
+  --color-neutral-30: #dfe1e6;
+  --color-neutral-40: #c1c7cd;
+  --color-neutral-50: #a5adba;
+  --color-neutral-60: #6b778c;
+  --color-neutral-70: #42526e;
   --color-neutral-75: #2a2a2a;
   --color-neutral-80: #1a1a1a;
   --color-neutral-85: #141414;
   --color-neutral-90: #0d0d0d;
 
   /* Editorial warm tones */
-  --color-warm-50: #FAF9F6;
-  --color-warm-100: #F5F2ED;
-  --color-warm-150: #EDE8E0;
-  --color-warm-200: #E0D9CE;
+  --color-warm-50: #faf9f6;
+  --color-warm-100: #f5f2ed;
+  --color-warm-150: #ede8e0;
+  --color-warm-200: #e0d9ce;
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

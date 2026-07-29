@@ -6,18 +6,49 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Upload, Target, AlertCircle, CheckCircle, PauseCircle, XCircle, Pencil, Trash2 } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Upload,
+  Target,
+  AlertCircle,
+  CheckCircle,
+  PauseCircle,
+  XCircle,
+  Pencil,
+  Trash2,
+} from 'lucide-react'
 import type { ProjectStatus } from '@/constants/enums'
 import type { Plan } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  planned: { label: 'Planificado', color: 'bg-info/10 text-info border-info/30', icon: <Target size={16} /> },
-  in_progress: { label: 'En Progreso', color: 'bg-success/10 text-success border-success/30', icon: <AlertCircle size={16} /> },
-  on_hold: { label: 'En Pausa', color: 'bg-warning/10 text-warning border-warning/30', icon: <PauseCircle size={16} /> },
-  completed: { label: 'Completado', color: 'bg-success/10 text-success border-success/30', icon: <CheckCircle size={16} /> },
-  cancelled: { label: 'Cancelado', color: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30', icon: <XCircle size={16} /> },
+  planned: {
+    label: 'Planificado',
+    color: 'bg-info/10 text-info border-info/30',
+    icon: <Target size={16} />,
+  },
+  in_progress: {
+    label: 'En Progreso',
+    color: 'bg-success/10 text-success border-success/30',
+    icon: <AlertCircle size={16} />,
+  },
+  on_hold: {
+    label: 'En Pausa',
+    color: 'bg-warning/10 text-warning border-warning/30',
+    icon: <PauseCircle size={16} />,
+  },
+  completed: {
+    label: 'Completado',
+    color: 'bg-success/10 text-success border-success/30',
+    icon: <CheckCircle size={16} />,
+  },
+  cancelled: {
+    label: 'Cancelado',
+    color: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30',
+    icon: <XCircle size={16} />,
+  },
 }
 
 const healthColor: Record<string, string> = {
@@ -53,7 +84,14 @@ export function PlansPage() {
     return true
   })
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedPlans } = usePagination(filteredPlans, 5)
+  const {
+    page,
+    setPage,
+    totalPages,
+    pageSize,
+    setPageSize,
+    paginatedItems: paginatedPlans,
+  } = usePagination(filteredPlans, 5)
 
   const getActivityStats = (planId: string) => {
     const planActivities = activities.filter((a) => a.planId === planId)
@@ -66,9 +104,10 @@ export function PlansPage() {
 
   const handleDelete = async (plan: Plan) => {
     const actCount = activities.filter((a) => a.planId === plan.id).length
-    const msg = actCount > 0
-      ? `"${plan.title}" tiene ${actCount} actividad(es). Eliminar todo?`
-      : `Eliminar "${plan.title}"?`
+    const msg =
+      actCount > 0
+        ? `"${plan.title}" tiene ${actCount} actividad(es). Eliminar todo?`
+        : `Eliminar "${plan.title}"?`
     if (!(await confirm(msg))) return
     const planActivities = activities.filter((a) => a.planId === plan.id)
     for (const act of planActivities) {
@@ -82,10 +121,10 @@ export function PlansPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Planes de Trabajo</h2>
-          <p className="text-sm text-muted mt-1">
-            Gestiona sprints, trimestres e iniciativas
-          </p>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+            Planes de Trabajo
+          </h2>
+          <p className="text-sm text-muted mt-1">Gestiona sprints, trimestres e iniciativas</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -109,7 +148,10 @@ export function PlansPage() {
       <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar planes..."
@@ -119,14 +161,18 @@ export function PlansPage() {
             />
           </div>
           <div className="min-w-[170px]">
-            <Select value={statusFilter} onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')} options={[
-              { value: 'all', label: 'Todos los estados' },
-              { value: 'planned', label: 'Planificado' },
-              { value: 'in_progress', label: 'En Progreso' },
-              { value: 'on_hold', label: 'En Pausa' },
-              { value: 'completed', label: 'Completado' },
-              { value: 'cancelled', label: 'Cancelado' },
-            ]} />
+            <Select
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v as ProjectStatus | 'all')}
+              options={[
+                { value: 'all', label: 'Todos los estados' },
+                { value: 'planned', label: 'Planificado' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'on_hold', label: 'En Pausa' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' },
+              ]}
+            />
           </div>
         </div>
       </div>
@@ -135,10 +181,16 @@ export function PlansPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {paginatedPlans.map((plan) => {
           const stats = getActivityStats(plan.id)
-          const daysTotal = Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))
-          // eslint-disable-next-line react-hooks/purity
-          const daysLeft = Math.ceil((new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-          const progress = daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
+          const daysTotal = Math.ceil(
+            (new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          )
+
+          const daysLeft = Math.ceil(
+            (new Date(plan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+          )
+          const progress =
+            daysTotal > 0 ? Math.round(((daysTotal - Math.max(0, daysLeft)) / daysTotal) * 100) : 0
           const cfg = statusConfig[plan.status]
 
           return (
@@ -149,14 +201,20 @@ export function PlansPage() {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${cfg.color}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${cfg.color}`}
+                  >
                     {cfg.icon}
                     {cfg.label}
                   </span>
                   <span className={`w-2.5 h-2.5 rounded-full ${healthColor[plan.health]}`} />
                 </div>
                 <span className="text-xs text-neutral-50">
-                  {daysLeft > 0 ? `${daysLeft}d restantes` : daysLeft === 0 ? 'Hoy vence' : `${Math.abs(daysLeft)}d vencido`}
+                  {daysLeft > 0
+                    ? `${daysLeft}d restantes`
+                    : daysLeft === 0
+                      ? 'Hoy vence'
+                      : `${Math.abs(daysLeft)}d vencido`}
                 </span>
               </div>
 
@@ -171,7 +229,11 @@ export function PlansPage() {
               <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-1.5 mb-3">
                 <div
                   className={`h-1.5 rounded-full transition-all ${
-                    plan.health === 'red' ? 'bg-danger' : plan.health === 'yellow' ? 'bg-warning' : 'bg-success'
+                    plan.health === 'red'
+                      ? 'bg-danger'
+                      : plan.health === 'yellow'
+                        ? 'bg-warning'
+                        : 'bg-success'
                   }`}
                   style={{ width: `${Math.min(100, progress)}%` }}
                 />
@@ -179,19 +241,31 @@ export function PlansPage() {
 
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3 text-muted">
-                  <span>{teamMap.get(plan.teamId ?? '')?.name ?? buMap.get(plan.businessUnitId ?? '')?.name ?? 'Sin asignar'}</span>
-                  <span>{stats.completed}/{stats.total} acts</span>
+                  <span>
+                    {teamMap.get(plan.teamId ?? '')?.name ??
+                      buMap.get(plan.businessUnitId ?? '')?.name ??
+                      'Sin asignar'}
+                  </span>
+                  <span>
+                    {stats.completed}/{stats.total} acts
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
-                    onClick={(e) => { e.stopPropagation(); navigate(`/execution/plans/${plan.id}/edit`) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/execution/plans/${plan.id}/edit`)
+                    }}
                     className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
                     title="Editar"
                   >
                     <Pencil size={14} />
                   </Button>
                   <Button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(plan) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(plan)
+                    }}
                     className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
                     title="Eliminar"
                   >
@@ -217,11 +291,12 @@ export function PlansPage() {
         <div className="text-center py-12 bg-card rounded-2xl border border-boundary">
           <Target size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
           <p className="text-sm text-neutral-50">
-            {plans.length === 0 ? 'No hay planes. Crea tu primer plan de trabajo.' : 'No se encontraron planes con los filtros seleccionados.'}
+            {plans.length === 0
+              ? 'No hay planes. Crea tu primer plan de trabajo.'
+              : 'No se encontraron planes con los filtros seleccionados.'}
           </p>
         </div>
       )}
-
     </div>
   )
 }

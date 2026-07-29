@@ -68,7 +68,10 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {blocker ? 'Editar Bloqueo' : 'Reportar Bloqueo'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+          >
             <X size={20} className="text-neutral-50" />
           </Button>
         </div>
@@ -124,16 +127,14 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
           </div>
 
           <div className="col-span-2">
-            <MemberSelector
-              label="Asignado a"
-              value={assigneeId}
-              onChange={setAssigneeId}
-            />
+            <MemberSelector label="Asignado a" value={assigneeId} onChange={setAssigneeId} />
           </div>
 
           {blocker && status === 'resolved' && (
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-secondary mb-1.5">Notas de resolucion</label>
+              <label className="block text-sm font-medium text-secondary mb-1.5">
+                Notas de resolucion
+              </label>
               <RichTextEditor
                 value={resolutionNotes}
                 onChange={(html) => setResolutionNotes(html)}
@@ -144,7 +145,10 @@ export function BlockerForm({ blocker, sourceType, sourceId, onClose, onSave }: 
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors"
+          >
             Cancelar
           </Button>
           <Button

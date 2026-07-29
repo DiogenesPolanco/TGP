@@ -14,11 +14,7 @@ export async function createConversation(title?: string): Promise<AiConversation
 }
 
 export async function listConversations(limit = 50): Promise<AiConversation[]> {
-  return db.aiConversations
-    .orderBy('updatedAt')
-    .reverse()
-    .limit(limit)
-    .toArray()
+  return db.aiConversations.orderBy('updatedAt').reverse().limit(limit).toArray()
 }
 
 export async function getConversation(id: string): Promise<AiConversation | undefined> {
@@ -45,10 +41,7 @@ export function generateTitle(content: string): string {
 }
 
 export async function loadMessages(conversationId: string): Promise<AiChatMessage[]> {
-  return db.aiMessages
-    .where('conversationId')
-    .equals(conversationId)
-    .sortBy('timestamp')
+  return db.aiMessages.where('conversationId').equals(conversationId).sortBy('timestamp')
 }
 
 export async function saveMessage(msg: AiChatMessage, conversationId: string): Promise<void> {
@@ -57,11 +50,15 @@ export async function saveMessage(msg: AiChatMessage, conversationId: string): P
   await db.aiMessages.put(toStore)
   await db.aiConversations.update(conversationId, {
     updatedAt: new Date(),
-    messageCount: (await db.aiMessages.where('conversationId').equals(conversationId).count()),
+    messageCount: await db.aiMessages.where('conversationId').equals(conversationId).count(),
   })
 }
 
-export async function saveMessages(messages: AiChatMessage[], conversationId: string, title?: string): Promise<void> {
+export async function saveMessages(
+  messages: AiChatMessage[],
+  conversationId: string,
+  title?: string,
+): Promise<void> {
   // Offset timestamps by index to guarantee deterministic ordering via sortBy('timestamp').
   // Without this, multiple messages created in the same millisecond get arbitrary order.
   const now = Date.now()
@@ -79,11 +76,7 @@ export async function saveMessages(messages: AiChatMessage[], conversationId: st
 }
 
 export async function getOrCreateActiveConversation(): Promise<AiConversation> {
-  const recent = await db.aiConversations
-    .orderBy('updatedAt')
-    .reverse()
-    .limit(1)
-    .toArray()
+  const recent = await db.aiConversations.orderBy('updatedAt').reverse().limit(1).toArray()
 
   if (recent.length > 0) {
     return recent[0]
@@ -102,9 +95,14 @@ export async function titleUntitledConversations(): Promise<void> {
 
   for (const conv of untitled) {
     const msgCount = await db.aiMessages.where('conversationId').equals(conv.id).count()
-    const firstUserMsg = msgCount > 0
-      ? await db.aiMessages.where('conversationId').equals(conv.id).filter((m) => m.role === 'user').first()
-      : null
+    const firstUserMsg =
+      msgCount > 0
+        ? await db.aiMessages
+            .where('conversationId')
+            .equals(conv.id)
+            .filter((m) => m.role === 'user')
+            .first()
+        : null
 
     const update: Record<string, unknown> = { messageCount: msgCount, updatedAt: new Date() }
     if (firstUserMsg?.content) {

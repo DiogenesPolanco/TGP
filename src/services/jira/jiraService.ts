@@ -34,9 +34,7 @@ async function jiraFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const baseUrl = config.baseUrl.replace(/\/+$/, '')
 
   // En desarrollo usamos el proxy de Vite para evitar CORS
-  const url = import.meta.env.DEV
-    ? `/jira-proxy${path}`
-    : `${baseUrl}${path}`
+  const url = import.meta.env.DEV ? `/jira-proxy${path}` : `${baseUrl}${path}`
 
   const res = await fetch(url, {
     ...init,
@@ -71,7 +69,9 @@ async function jiraFetchAll<T>(
     )
     const values = page[resultKey] as T[] | undefined
     if (!values) {
-      throw new Error(`Respuesta de Jira no contiene "${resultKey}" (keys: ${Object.keys(page).join(', ')})`)
+      throw new Error(
+        `Respuesta de Jira no contiene "${resultKey}" (keys: ${Object.keys(page).join(', ')})`,
+      )
     }
     items.push(...values)
     total = page.total
@@ -87,19 +87,13 @@ export async function getBoards(): Promise<JiraBoard[]> {
 
 /** Obtener los sprints cerrados de un board */
 export async function getSprints(boardId: number): Promise<JiraSprint[]> {
-  const all = await jiraFetchAll<JiraSprint>(
-    `/rest/agile/1.0/board/${boardId}/sprint`,
-  )
+  const all = await jiraFetchAll<JiraSprint>(`/rest/agile/1.0/board/${boardId}/sprint`)
   return all.filter((s) => s.state === 'closed')
 }
 
 /** Obtener issues de un sprint */
 export async function getSprintIssues(sprintId: number): Promise<JiraIssue[]> {
-  return jiraFetchAll<JiraIssue>(
-    `/rest/agile/1.0/sprint/${sprintId}/issue`,
-    100,
-    'issues',
-  )
+  return jiraFetchAll<JiraIssue>(`/rest/agile/1.0/sprint/${sprintId}/issue`, 100, 'issues')
 }
 
 /** Calcular métricas de un sprint a partir de sus issues */
@@ -107,10 +101,7 @@ export function calcSprintMetrics(issues: JiraIssue[]): {
   plannedSP: number
   completedSP: number
   notCompletedSP: number
-  perAssignee: Record<
-    string,
-    { displayName: string; completedSP: number; notCompletedSP: number }
-  >
+  perAssignee: Record<string, { displayName: string; completedSP: number; notCompletedSP: number }>
 } {
   const DONE_STATUSES = new Set([
     'done',

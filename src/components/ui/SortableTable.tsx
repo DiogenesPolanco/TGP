@@ -49,16 +49,24 @@ export function SortableTable<T extends { id: string }>({
       const bVal = (b as Record<string, unknown>)[sortKey]
       if (aVal == null) return 1
       if (bVal == null) return -1
-      const cmp = typeof aVal === 'string' && typeof bVal === 'string'
-        ? aVal.localeCompare(bVal)
-        : typeof aVal === 'number' && typeof bVal === 'number'
-        ? aVal - bVal
-        : String(aVal).localeCompare(String(bVal))
+      const cmp =
+        typeof aVal === 'string' && typeof bVal === 'string'
+          ? aVal.localeCompare(bVal)
+          : typeof aVal === 'number' && typeof bVal === 'number'
+            ? aVal - bVal
+            : String(aVal).localeCompare(String(bVal))
       return sortDir === 'asc' ? cmp : -cmp
     })
   }, [data, sortKey, sortDir])
 
-  const { page, setPage, totalPages, paginatedItems, pageSize: currentPageSize, setPageSize } = usePagination(sorted, pageSize)
+  const {
+    page,
+    setPage,
+    totalPages,
+    paginatedItems,
+    pageSize: currentPageSize,
+    setPageSize,
+  } = usePagination(sorted, pageSize)
 
   if (data.length === 0) {
     return (
@@ -79,7 +87,9 @@ export function SortableTable<T extends { id: string }>({
                   key={col.key}
                   onClick={() => handleSort(col)}
                   className={`text-left px-4 py-3 text-xs font-semibold text-muted uppercase ${
-                    col.sortable ? 'cursor-pointer select-none hover:text-neutral-90 dark:hover:text-white transition-colors' : ''
+                    col.sortable
+                      ? 'cursor-pointer select-none hover:text-neutral-90 dark:hover:text-white transition-colors'
+                      : ''
                   } ${col.headerClassName ?? ''}`}
                 >
                   <div className="flex items-center gap-1.5">
@@ -110,7 +120,10 @@ export function SortableTable<T extends { id: string }>({
                 className={`${onRowClick ? 'cursor-pointer' : ''} hover:bg-neutral-10 dark:hover:bg-neutral-70/50 transition-colors group ${rowClassName?.(item) ?? ''}`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className={`px-4 py-3 text-sm break-words ${col.className ?? ''}`}>
+                  <td
+                    key={col.key}
+                    className={`px-4 py-3 text-sm break-words ${col.className ?? ''}`}
+                  >
                     {col.render(item)}
                   </td>
                 ))}

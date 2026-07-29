@@ -31,7 +31,11 @@ export function SkillsSection({ memberId }: Props) {
   const [newLevel, setNewLevel] = useState<Skill['level']>('intermediate')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editData, setEditData] = useState<{ name: string; category: string; level: Skill['level'] }>({ name: '', category: '', level: 'intermediate' })
+  const [editData, setEditData] = useState<{
+    name: string
+    category: string
+    level: Skill['level']
+  }>({ name: '', category: '', level: 'intermediate' })
 
   useEffect(() => {
     db.memberProfiles.get(memberId).then((p) => {
@@ -56,9 +60,9 @@ export function SkillsSection({ memberId }: Props) {
 
   const suggestions = useMemo(() => {
     if (!newName.trim()) return []
-    return allExistingSkills.filter((n) =>
-      n.toLowerCase().includes(newName.toLowerCase())
-    ).slice(0, 8)
+    return allExistingSkills
+      .filter((n) => n.toLowerCase().includes(newName.toLowerCase()))
+      .slice(0, 8)
   }, [allExistingSkills, newName])
 
   const saveSkills = async (updated: Skill[]) => {
@@ -118,7 +122,7 @@ export function SkillsSection({ memberId }: Props) {
     const updated = skills.map((s) =>
       s.id === editingId
         ? { ...s, name: editData.name.trim(), category: editData.category, level: editData.level }
-        : s
+        : s,
     )
     setSkills(updated)
     await saveSkills(updated)
@@ -142,7 +146,10 @@ export function SkillsSection({ memberId }: Props) {
           <input
             type="text"
             value={newName}
-            onChange={(e) => { setNewName(e.target.value); setShowSuggestions(true) }}
+            onChange={(e) => {
+              setNewName(e.target.value)
+              setShowSuggestions(true)
+            }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder="Buscar o escribir habilidad..."
@@ -197,18 +204,26 @@ export function SkillsSection({ memberId }: Props) {
       ) : (
         Object.entries(grouped).map(([category, catskills]) => (
           <div key={category} className="mb-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{category}</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">
+              {category}
+            </h3>
             <div className="flex flex-wrap gap-2">
               {catskills.map((s) =>
                 editingId === s.id ? (
-                  <div key={s.id} className="flex items-center gap-2 p-2 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60 w-full max-w-md">
+                  <div
+                    key={s.id}
+                    className="flex items-center gap-2 p-2 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60 w-full max-w-md"
+                  >
                     <input
                       type="text"
                       value={editData.name}
                       onChange={(e) => setEditData({ ...editData, name: e.target.value })}
                       className="flex-1 rounded border border-neutral-30 dark:border-neutral-60 px-2 py-1 text-xs bg-transparent"
                       autoFocus
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null) }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit()
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
                     />
                     <input
                       type="text"
@@ -228,8 +243,18 @@ export function SkillsSection({ memberId }: Props) {
                       ]}
                       className="w-28"
                     />
-                    <Button onClick={saveEdit} className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">OK</Button>
-                    <button onClick={() => setEditingId(null)} className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">X</button>
+                    <Button
+                      onClick={saveEdit}
+                      className="px-2 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark"
+                    >
+                      OK
+                    </Button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="px-2 py-1 text-xs text-neutral-60 hover:text-neutral-90 hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors"
+                    >
+                      X
+                    </button>
                   </div>
                 ) : (
                   <span
@@ -238,14 +263,20 @@ export function SkillsSection({ memberId }: Props) {
                   >
                     {s.name}
                     <span className="text-[10px] opacity-70 ml-1">{levelLabels[s.level]}</span>
-                    <button onClick={() => startEdit(s)} className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 opacity-0 group-hover/skill:opacity-100 transition-all ml-0.5">
+                    <button
+                      onClick={() => startEdit(s)}
+                      className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 opacity-0 group-hover/skill:opacity-100 transition-all ml-0.5"
+                    >
                       <Edit3 size={10} />
                     </button>
-                    <button onClick={() => removeSkill(s.id)} className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-0.5">
+                    <button
+                      onClick={() => removeSkill(s.id)}
+                      className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-0.5"
+                    >
                       <X size={12} />
                     </button>
                   </span>
-                )
+                ),
               )}
             </div>
           </div>

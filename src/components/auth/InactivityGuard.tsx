@@ -115,15 +115,10 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
           <div className="text-center space-y-4">
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
-                isUrgent
-                  ? 'bg-danger/10 animate-pulse'
-                  : 'bg-warning/10'
+                isUrgent ? 'bg-danger/10 animate-pulse' : 'bg-warning/10'
               }`}
             >
-              <Clock
-                size={32}
-                className={isUrgent ? 'text-danger' : 'text-warning'}
-              />
+              <Clock size={32} className={isUrgent ? 'text-danger' : 'text-warning'} />
             </div>
 
             <h2 className="text-xl font-semibold text-neutral-90 dark:text-white">
@@ -131,7 +126,8 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
             </h2>
 
             <p className="text-sm text-muted">
-              Tu sesión se cerrará automáticamente por inactividad. Mueve el mouse o presiona una tecla para continuar.
+              Tu sesión se cerrará automáticamente por inactividad. Mueve el mouse o presiona una
+              tecla para continuar.
             </p>
 
             <div className="flex items-center justify-center gap-3">
@@ -148,9 +144,7 @@ export function InactivityGuard({ onExpired }: InactivityGuardProps) {
             <div className="h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-                  isUrgent
-                    ? 'bg-danger'
-                    : 'bg-primary'
+                  isUrgent ? 'bg-danger' : 'bg-primary'
                 }`}
                 style={{
                   width: `${(remaining / WARNING_DURATION_MS) * 100}%`,

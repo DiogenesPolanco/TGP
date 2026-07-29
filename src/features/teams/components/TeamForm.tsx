@@ -40,17 +40,19 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
     name: team?.name ?? '',
     businessUnitId: team?.businessUnitId ?? '',
     sourceSystem: team?.sourceSystem ?? 'manual',
-    members: team?.members ?? [] as TeamMember[],
-    metrics: team?.currentMetrics ?? {
-      velocity: 0,
-      leadTimeHours: 0,
-      cycleTimeHours: 0,
-      throughput: 0,
-      deploymentFrequency: 0,
-      changeFailureRate: 0,
-      mttrHours: 0,
-      measuredAt: new Date(),
-    } as TeamMetrics,
+    members: team?.members ?? ([] as TeamMember[]),
+    metrics:
+      team?.currentMetrics ??
+      ({
+        velocity: 0,
+        leadTimeHours: 0,
+        cycleTimeHours: 0,
+        throughput: 0,
+        deploymentFrequency: 0,
+        changeFailureRate: 0,
+        mttrHours: 0,
+        measuredAt: new Date(),
+      } as TeamMetrics),
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +71,11 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
       for (const m of formData.members) {
         const profile = await db.memberProfiles.get(m.id)
         if (profile && profile.role !== m.role) {
-          await db.memberProfiles.put({ ...profile, role: m.role as MemberRole, updatedAt: new Date() })
+          await db.memberProfiles.put({
+            ...profile,
+            role: m.role as MemberRole,
+            updatedAt: new Date(),
+          })
         }
       }
     } else {
@@ -101,7 +107,11 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
     setFormData({ ...formData, members: updated })
   }
 
-  const updateMember = (index: number, field: keyof TeamMember, value: string | number | boolean) => {
+  const updateMember = (
+    index: number,
+    field: keyof TeamMember,
+    value: string | number | boolean,
+  ) => {
     const updated = [...formData.members]
     updated[index] = { ...updated[index], [field]: value }
     setFormData({ ...formData, members: updated })
@@ -119,7 +129,10 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {team ? 'Editar Equipo' : 'Nuevo Equipo'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <X size={20} />
           </Button>
         </div>
@@ -137,21 +150,34 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
               />
             </div>
             <div>
-              <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-                { value: '', label: 'Seleccionar...' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} />
+              <Select
+                label="Business Unit *"
+                required
+                value={formData.businessUnitId}
+                onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+                options={[
+                  { value: '', label: 'Seleccionar...' },
+                  ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                ]}
+              />
             </div>
           </div>
 
           <div>
-            <Select label="Sistema Fuente" value={formData.sourceSystem} onChange={(v) => setFormData({ ...formData, sourceSystem: v as typeof formData.sourceSystem })} options={[
-              { value: 'manual', label: 'Manual' },
-              { value: 'jira', label: 'Jira' },
-              { value: 'azure_devops', label: 'Azure DevOps' },
-              { value: 'github', label: 'GitHub' },
-              { value: 'gitlab', label: 'GitLab' },
-            ]} />
+            <Select
+              label="Sistema Fuente"
+              value={formData.sourceSystem}
+              onChange={(v) =>
+                setFormData({ ...formData, sourceSystem: v as typeof formData.sourceSystem })
+              }
+              options={[
+                { value: 'manual', label: 'Manual' },
+                { value: 'jira', label: 'Jira' },
+                { value: 'azure_devops', label: 'Azure DevOps' },
+                { value: 'github', label: 'GitHub' },
+                { value: 'gitlab', label: 'GitLab' },
+              ]}
+            />
           </div>
 
           <div>
@@ -167,7 +193,10 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
             </div>
             <div className="space-y-2">
               {formData.members.map((member, index) => (
-                <div key={member.id || index} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+                <div
+                  key={member.id || index}
+                  className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg"
+                >
                   <div className="flex-1 min-w-[180px]">
                     <MemberSelector
                       value={member.id}
@@ -210,7 +239,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 <input
                   type="number"
                   value={formData.metrics.velocity}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, velocity: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: { ...formData.metrics, velocity: parseFloat(e.target.value) },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -219,7 +253,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 <input
                   type="number"
                   value={formData.metrics.leadTimeHours}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, leadTimeHours: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: { ...formData.metrics, leadTimeHours: parseFloat(e.target.value) },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -228,7 +267,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 <input
                   type="number"
                   value={formData.metrics.cycleTimeHours}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, cycleTimeHours: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: { ...formData.metrics, cycleTimeHours: parseFloat(e.target.value) },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -237,7 +281,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                 <input
                   type="number"
                   value={formData.metrics.throughput}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, throughput: parseInt(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: { ...formData.metrics, throughput: parseInt(e.target.value) },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -247,7 +296,15 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                   type="number"
                   step="0.1"
                   value={formData.metrics.deploymentFrequency}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, deploymentFrequency: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: {
+                        ...formData.metrics,
+                        deploymentFrequency: parseFloat(e.target.value),
+                      },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -257,7 +314,15 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                   type="number"
                   step="0.1"
                   value={formData.metrics.changeFailureRate}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, changeFailureRate: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: {
+                        ...formData.metrics,
+                        changeFailureRate: parseFloat(e.target.value),
+                      },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>
@@ -267,7 +332,12 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                   type="number"
                   step="0.1"
                   value={formData.metrics.mttrHours}
-                  onChange={(e) => setFormData({ ...formData, metrics: { ...formData.metrics, mttrHours: parseFloat(e.target.value) } })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      metrics: { ...formData.metrics, mttrHours: parseFloat(e.target.value) },
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm"
                 />
               </div>

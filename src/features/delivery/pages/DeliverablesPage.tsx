@@ -6,13 +6,7 @@ import { cn } from '@/lib/utils'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import {
-  Filter,
-  ArrowRight,
-  Search,
-  Upload,
-  Trash2,
-} from 'lucide-react'
+import { Filter, ArrowRight, Search, Upload, Trash2 } from 'lucide-react'
 import type { DeliverableStatus, Deliverable } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
@@ -54,8 +48,9 @@ export function DeliverablesPage() {
       if (
         !d.title.toLowerCase().includes(q) &&
         !d.description.toLowerCase().includes(q) &&
-        !(app?.name.toLowerCase().includes(q))
-      ) return false
+        !app?.name.toLowerCase().includes(q)
+      )
+        return false
     }
     return true
   })
@@ -85,9 +80,7 @@ export function DeliverablesPage() {
       render: (del) => {
         const app = del.applicationId ? appMap.get(del.applicationId) : null
         return app ? (
-          <span className="flex items-center gap-1 text-sm text-primary">
-            {app.name}
-          </span>
+          <span className="flex items-center gap-1 text-sm text-primary">{app.name}</span>
         ) : (
           <span className="text-sm text-neutral-50">—</span>
         )
@@ -110,7 +103,11 @@ export function DeliverablesPage() {
       render: (del) => (
         <span className="text-sm text-secondary">
           {del.dueDate
-            ? new Date(del.dueDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
+            ? new Date(del.dueDate).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
             : '—'}
         </span>
       ),
@@ -136,7 +133,10 @@ export function DeliverablesPage() {
         <div className="flex items-center justify-end gap-1">
           {del.applicationId && (
             <Button
-              onClick={(e) => { e.stopPropagation(); navigate(`/catalog/applications/${del.applicationId}`) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                navigate(`/catalog/applications/${del.applicationId}`)
+              }}
               className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
               title="Ver aplicación"
             >
@@ -182,7 +182,10 @@ export function DeliverablesPage() {
           return (
             <Button
               key={st}
-              onClick={() => { setStatusFilter(st); setShowFilters(true) }}
+              onClick={() => {
+                setStatusFilter(st)
+                setShowFilters(true)
+              }}
               className={cn(
                 'p-4 rounded-xl border text-left shadow-sm transition-all',
                 statusFilter === st
@@ -201,7 +204,10 @@ export function DeliverablesPage() {
       <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar por título, descripción o aplicación..."
@@ -228,20 +234,28 @@ export function DeliverablesPage() {
           <div className="flex gap-3 mt-3 pt-3 border-t border-boundary">
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v as DeliverableStatus | 'all')} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'pending', label: 'Pendiente' },
-                { value: 'in_progress', label: 'En Progreso' },
-                { value: 'completed', label: 'Completado' },
-                { value: 'cancelled', label: 'Cancelado' },
-              ]} />
+              <Select
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v as DeliverableStatus | 'all')}
+                options={[
+                  { value: 'all', label: 'Todos' },
+                  { value: 'pending', label: 'Pendiente' },
+                  { value: 'in_progress', label: 'En Progreso' },
+                  { value: 'completed', label: 'Completado' },
+                  { value: 'cancelled', label: 'Cancelado' },
+                ]}
+              />
             </div>
             <div className="flex-1">
               <label className="block text-xs text-neutral-50 mb-1">Aplicación</label>
-              <Select value={appFilter} onChange={(v) => setAppFilter(v)} options={[
-                { value: '', label: 'Todas' },
-                ...allApplications.map((app) => ({ value: app.id, label: app.name })),
-              ]} />
+              <Select
+                value={appFilter}
+                onChange={(v) => setAppFilter(v)}
+                options={[
+                  { value: '', label: 'Todas' },
+                  ...allApplications.map((app) => ({ value: app.id, label: app.name })),
+                ]}
+              />
             </div>
           </div>
         )}

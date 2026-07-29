@@ -1,5 +1,11 @@
 import { db } from '@/services/db/database'
-import type { EquipmentItem, EquipmentAssignmentLog, EquipmentTicket, EquipmentType, EquipmentCondition } from '@/types/domain'
+import type {
+  EquipmentItem,
+  EquipmentAssignmentLog,
+  EquipmentTicket,
+  EquipmentType,
+  EquipmentCondition,
+} from '@/types/domain'
 
 function generateId(): string {
   return crypto.randomUUID()
@@ -44,11 +50,17 @@ export async function updateEquipment(
 }
 
 export async function deleteEquipment(id: string): Promise<void> {
-  await db.transaction('rw', db.equipment, db.equipmentAssignments, db.equipmentTickets, async () => {
-    await db.equipmentAssignments.where('equipmentId').equals(id).delete()
-    await db.equipmentTickets.where('equipmentId').equals(id).delete()
-    await db.equipment.delete(id)
-  })
+  await db.transaction(
+    'rw',
+    db.equipment,
+    db.equipmentAssignments,
+    db.equipmentTickets,
+    async () => {
+      await db.equipmentAssignments.where('equipmentId').equals(id).delete()
+      await db.equipmentTickets.where('equipmentId').equals(id).delete()
+      await db.equipment.delete(id)
+    },
+  )
 }
 
 // ─── Assignment ───
@@ -93,7 +105,8 @@ export async function returnEquipment(
 ): Promise<void> {
   await db.transaction('rw', db.equipment, db.equipmentAssignments, async () => {
     const active = await db.equipmentAssignments
-      .where('equipmentId').equals(equipmentId)
+      .where('equipmentId')
+      .equals(equipmentId)
       .filter((a) => a.returnedAt === null)
       .first()
 
@@ -117,14 +130,18 @@ export async function returnEquipment(
 
 export async function getAssignmentHistory(equipmentId: string): Promise<EquipmentAssignmentLog[]> {
   return db.equipmentAssignments
-    .where('equipmentId').equals(equipmentId)
+    .where('equipmentId')
+    .equals(equipmentId)
     .reverse()
     .sortBy('assignedAt')
 }
 
-export async function getActiveAssignments(memberId: string): Promise<(EquipmentAssignmentLog & { equipment: EquipmentItem })[]> {
+export async function getActiveAssignments(
+  memberId: string,
+): Promise<(EquipmentAssignmentLog & { equipment: EquipmentItem })[]> {
   const logs = await db.equipmentAssignments
-    .where('assignedTo').equals(memberId)
+    .where('assignedTo')
+    .equals(memberId)
     .filter((a) => a.returnedAt === null)
     .toArray()
 
@@ -140,7 +157,11 @@ export async function getActiveAssignments(memberId: string): Promise<(Equipment
 
 export async function getEquipmentTickets(equipmentId?: string): Promise<EquipmentTicket[]> {
   if (equipmentId) {
-    return db.equipmentTickets.where('equipmentId').equals(equipmentId).reverse().sortBy('createdAt')
+    return db.equipmentTickets
+      .where('equipmentId')
+      .equals(equipmentId)
+      .reverse()
+      .sortBy('createdAt')
   }
   return db.equipmentTickets.orderBy('createdAt').reverse().toArray()
 }
@@ -180,7 +201,11 @@ export async function getEquipmentMetrics() {
     obsolete: all.filter((e) => e.status === 'obsolete').length,
     openTickets: openTickets.length,
     warrantyExpiring: all.filter(
-      (e) => e.warrantyExpiry && new Date(e.warrantyExpiry) <= threeMonths && e.status !== 'retired' && e.status !== 'obsolete',
+      (e) =>
+        e.warrantyExpiry &&
+        new Date(e.warrantyExpiry) <= threeMonths &&
+        e.status !== 'retired' &&
+        e.status !== 'obsolete',
     ).length,
     byType: all.reduce<Record<string, number>>((acc, e) => {
       acc[e.type] = (acc[e.type] ?? 0) + 1

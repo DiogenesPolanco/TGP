@@ -83,11 +83,16 @@ function mapStatus(val: string | undefined): VulnStatus {
 
 function severityToScore(severity: Severity): number {
   switch (severity) {
-    case 'critical': return 9.0
-    case 'high': return 7.5
-    case 'medium': return 5.5
-    case 'low': return 3.0
-    case 'info': return 0
+    case 'critical':
+      return 9.0
+    case 'high':
+      return 7.5
+    case 'medium':
+      return 5.5
+    case 'low':
+      return 3.0
+    case 'info':
+      return 0
   }
 }
 
@@ -105,7 +110,6 @@ function normalizeLocation(location: string): string[] {
     .filter(Boolean)
 }
 
-
 function calcSla(severity: Severity, detectedAt: Date): Date {
   const days = severity === 'critical' || severity === 'high' ? 30 : 90
   const sla = new Date(detectedAt)
@@ -117,7 +121,8 @@ function calcSla(severity: Severity, detectedAt: Date): Date {
 
 export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
   const lines = content.split(/\r?\n/).filter(Boolean)
-  if (lines.length < 2) throw new Error('El archivo debe tener un header y al menos una fila de datos.')
+  if (lines.length < 2)
+    throw new Error('El archivo debe tener un header y al menos una fila de datos.')
 
   const headerLine = lines[0]
   const separator = headerLine.includes(';') ? ';' : ','
@@ -144,7 +149,10 @@ export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
   const headers = parseLine(lines[0]).map((h) => h.trim())
 
   function norm(key: string): string {
-    return key.toLowerCase().replace(/[\s_.-]+/g, '_').replace(/^_|_$/g, '')
+    return key
+      .toLowerCase()
+      .replace(/[\s_.-]+/g, '_')
+      .replace(/^_|_$/g, '')
   }
 
   function getValue(row: Record<string, string>, normalizedKey: string): string | undefined {
@@ -176,9 +184,7 @@ export function parseFluidAttackCSV(content: string): FluidAttackRow[] {
 
 /* ─── Location → Microservice matching ─── */
 
-export async function matchLocations(
-  rows: FluidAttackRow[],
-): Promise<FluidAttackMatch[]> {
+export async function matchLocations(rows: FluidAttackRow[]): Promise<FluidAttackMatch[]> {
   const allMicroservices = await db.microservices.toArray()
   const allApplications = await db.applications.toArray()
   const appMap = new Map(allApplications.map((a) => [a.id, a.name]))
@@ -238,7 +244,11 @@ export async function matchLocations(
       for (const segment of row.locationSegments) {
         for (const app of allApplications) {
           const appNameLower = app.name.toLowerCase().trim()
-          if (segment === appNameLower || appNameLower.includes(segment) || segment.includes(appNameLower)) {
+          if (
+            segment === appNameLower ||
+            appNameLower.includes(segment) ||
+            segment.includes(appNameLower)
+          ) {
             bestMatch = {
               appId: app.id,
               appName: app.name,
@@ -285,7 +295,11 @@ export async function matchLocations(
         if (!bestMatch) {
           for (const app of allApplications) {
             const appNameLower = app.name.toLowerCase().trim()
-            if (nickname === appNameLower || appNameLower.includes(nickname) || nickname.includes(appNameLower)) {
+            if (
+              nickname === appNameLower ||
+              appNameLower.includes(nickname) ||
+              nickname.includes(appNameLower)
+            ) {
               bestMatch = {
                 appId: app.id,
                 appName: app.name,
@@ -348,10 +362,7 @@ export async function importFluidAttackVulnerabilities(
       const fixedAt = closingDate ? parseDate(closingDate) : null
       const slaDeadline = calcSla(severity, detectedAt)
 
-      const existing = await db.vulnerabilities
-        .where('externalId')
-        .equals(vulnId)
-        .first()
+      const existing = await db.vulnerabilities.where('externalId').equals(vulnId).first()
 
       const now = new Date()
       const vuln = {
@@ -359,7 +370,9 @@ export async function importFluidAttackVulnerabilities(
         applicationId: match.applicationId,
         externalId: vulnId,
         title: weakness,
-        description: description || `Vulnerabilidad encontrada por FluidAttack en ${match.matchedBy}.${recommendation ? `\n\nRecomendación: ${recommendation}` : ''}`,
+        description:
+          description ||
+          `Vulnerabilidad encontrada por FluidAttack en ${match.matchedBy}.${recommendation ? `\n\nRecomendación: ${recommendation}` : ''}`,
         cvssScore: severityToScore(severity),
         severity,
         source: 'fluid_attacks' as const,

@@ -28,7 +28,8 @@ export function DashboardConfigModal({ onClose }: Props) {
 
           <div className="flex-1 overflow-y-auto p-5 space-y-1">
             <p className="text-sm text-muted mb-4">
-              Selecciona los widgets que quieres ver en el dashboard. Los cambios se guardan automáticamente.
+              Selecciona los widgets que quieres ver en el dashboard. Los cambios se guardan
+              automáticamente.
             </p>
 
             {DASHBOARD_WIDGETS.map((widget) => (

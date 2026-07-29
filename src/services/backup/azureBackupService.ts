@@ -1,9 +1,5 @@
 import { ContainerClient } from '@azure/storage-blob'
-import {
-  exportDatabase,
-  dateReviver,
-  importBackup,
-} from '@/services/export/exportService'
+import { exportDatabase, dateReviver, importBackup } from '@/services/export/exportService'
 import type { DatabaseBackup } from '@/services/export/exportService'
 
 const CONFIG_KEY = 'tgp-azure-backup'
@@ -57,7 +53,8 @@ export function getAzureBackupInfo(): AzureBackupInfo {
       const parsed = JSON.parse(lastRaw) as { date: string; name: string }
       lastBackup = parsed.date
       lastBackupName = parsed.name
-    } catch { /* empty */
+    } catch {
+      /* empty */
     }
   }
   return {
@@ -142,14 +139,14 @@ export async function listAzureBackups(): Promise<BackupBlobInfo[]> {
         lastModified: blob.properties.lastModified?.toISOString() ?? '',
       })
     }
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 
   return blobs.sort((a, b) => b.lastModified.localeCompare(a.lastModified))
 }
 
-export async function downloadBackupFromAzure(
-  blobName: string,
-): Promise<DatabaseBackup> {
+export async function downloadBackupFromAzure(blobName: string): Promise<DatabaseBackup> {
   const client = getClient()
   const blockBlobClient = client.getBlockBlobClient(blobName)
 
@@ -161,9 +158,7 @@ export async function downloadBackupFromAzure(
   return JSON.parse(text) as DatabaseBackup
 }
 
-export async function restoreFromAzure(
-  blobName: string,
-): Promise<{
+export async function restoreFromAzure(blobName: string): Promise<{
   success: boolean
   tablesRestored: string[]
   tablesWithErrors: string[]

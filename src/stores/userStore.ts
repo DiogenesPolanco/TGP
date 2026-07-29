@@ -30,6 +30,6 @@ export const useUserStore = create<UserState>()(
         currentUser: state.currentUser,
         isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 )

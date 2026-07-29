@@ -13,9 +13,7 @@ function TrendBadge({ trend }: { trend: 'up' | 'down' | 'neutral' }) {
   return (
     <span
       className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
-        trend === 'up'
-          ? 'bg-success/10 text-success'
-          : 'bg-danger/10 text-danger'
+        trend === 'up' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
       }`}
     >
       <span className="text-base leading-none">{trend === 'up' ? '↑' : '↓'}</span>
@@ -50,57 +48,60 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {enabledWidgets['thi-gauge'] !== false && (
-      <div className="lg:col-span-1 relative overflow-hidden bg-card rounded-2xl border border-boundary p-6 shadow-sm">
-        {/* Subtle background gradient mesh */}
-        <div
-          className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-[0.04] dark:opacity-[0.08]"
-          style={{
-            background: `radial-gradient(circle, ${
-              score >= 70 ? '#36B37E' : score >= 50 ? '#FFAB00' : '#FF5630'
-            } 0%, transparent 70%)`,
-          }}
-        />
+        <div className="lg:col-span-1 relative overflow-hidden bg-card rounded-2xl border border-boundary p-6 shadow-sm">
+          {/* Subtle background gradient mesh */}
+          <div
+            className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-[0.04] dark:opacity-[0.08]"
+            style={{
+              background: `radial-gradient(circle, ${
+                score >= 70 ? '#36B37E' : score >= 50 ? '#FFAB00' : '#FF5630'
+              } 0%, transparent 70%)`,
+            }}
+          />
 
-        <div className="relative">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-secondary tracking-wide uppercase">
-              Technology Health Index
-            </h2>
-            <TrendBadge trend={thiTrend} />
-          </div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-semibold text-secondary tracking-wide uppercase">
+                Technology Health Index
+              </h2>
+              <TrendBadge trend={thiTrend} />
+            </div>
 
-          <div className="flex flex-col items-center">
-            <ThiGauge value={score} size={220} showLabel />
-          </div>
+            <div className="flex flex-col items-center">
+              <ThiGauge value={score} size={220} showLabel />
+            </div>
 
-          {/* Sparkline + narrative */}
-          {thiHistory.length >= 2 && (
-            <div className="mt-4 pt-4 border-t border-boundary">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-medium text-neutral-50 dark:text-neutral-40 uppercase tracking-wider">
-                  Tendencia
-                </span>
-                <span className="text-[11px] text-neutral-40 dark:text-neutral-50">
-                  Últimos {thiHistory.length} registros
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <ThiSparkline data={thiHistory} width={160} height={36} color={
-                    score >= 70 ? '#36B37E' : score >= 50 ? '#FFAB00' : '#FF5630'
-                  } />
+            {/* Sparkline + narrative */}
+            {thiHistory.length >= 2 && (
+              <div className="mt-4 pt-4 border-t border-boundary">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-medium text-neutral-50 dark:text-neutral-40 uppercase tracking-wider">
+                    Tendencia
+                  </span>
+                  <span className="text-[11px] text-neutral-40 dark:text-neutral-50">
+                    Últimos {thiHistory.length} registros
+                  </span>
                 </div>
-                <div className="text-right">
-                  <div className="text-[10px] text-neutral-50">Anterior</div>
-                  <div className="text-sm font-semibold tabular-nums text-secondary">
-                    {Math.round(thiHistory[thiHistory.length - 2]?.score ?? 0)}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <ThiSparkline
+                      data={thiHistory}
+                      width={160}
+                      height={36}
+                      color={score >= 70 ? '#36B37E' : score >= 50 ? '#FFAB00' : '#FF5630'}
+                    />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-neutral-50">Anterior</div>
+                    <div className="text-sm font-semibold tabular-nums text-secondary">
+                      {Math.round(thiHistory[thiHistory.length - 2]?.score ?? 0)}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
       )}
 
       <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-2 gap-4">
@@ -109,9 +110,19 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
             title="Vulnerabilidades Críticas"
             value={metrics.criticalVulns}
             trend={metrics.vulnTrend}
-            trendLabel={metrics.vulnTrend === 'up' ? 'Aumentando' : metrics.vulnTrend === 'down' ? 'Disminuyendo' : 'Estable'}
+            trendLabel={
+              metrics.vulnTrend === 'up'
+                ? 'Aumentando'
+                : metrics.vulnTrend === 'down'
+                  ? 'Disminuyendo'
+                  : 'Estable'
+            }
             color={metrics.criticalVulns > 0 ? 'danger' : 'success'}
-            subtitle={metrics.vulnTrend === 'up' && metrics.criticalVulns > 0 ? 'Requiere atención inmediata' : undefined}
+            subtitle={
+              metrics.vulnTrend === 'up' && metrics.criticalVulns > 0
+                ? 'Requiere atención inmediata'
+                : undefined
+            }
             onClick={navigateToVulns}
           />
         )}
@@ -120,9 +131,17 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
             title="Incidentes P1"
             value={metrics.openIncidents}
             trend={metrics.incidentTrend}
-            trendLabel={metrics.incidentTrend === 'up' ? 'Aumentando' : metrics.incidentTrend === 'down' ? 'Disminuyendo' : 'Estable'}
+            trendLabel={
+              metrics.incidentTrend === 'up'
+                ? 'Aumentando'
+                : metrics.incidentTrend === 'down'
+                  ? 'Disminuyendo'
+                  : 'Estable'
+            }
             color={metrics.openIncidents > 0 ? 'warning' : 'success'}
-            subtitle={metrics.openIncidents > 0 ? `${metrics.openIncidents} sin resolver` : undefined}
+            subtitle={
+              metrics.openIncidents > 0 ? `${metrics.openIncidents} sin resolver` : undefined
+            }
             onClick={navigateToIncidents}
           />
         )}
@@ -130,7 +149,13 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
           <KpiHeroCard
             title="Total Aplicaciones"
             value={metrics.applications.length}
-            trend={metrics.applications.length > 10 ? 'up' : metrics.applications.length > 5 ? 'neutral' : 'down'}
+            trend={
+              metrics.applications.length > 10
+                ? 'up'
+                : metrics.applications.length > 5
+                  ? 'neutral'
+                  : 'down'
+            }
             trendLabel={`${metrics.businessUnits.length} BU`}
             color="primary"
             onClick={navigateToApps}
@@ -141,7 +166,9 @@ export function DashboardHero({ metrics, enabledWidgets = {} }: DashboardHeroPro
             title="Tecnologías EOL"
             value={metrics.eolTechs}
             trend={metrics.eolTechs > 5 ? 'up' : metrics.eolTechs > 0 ? 'neutral' : 'down'}
-            trendLabel={metrics.eolTechs > 5 ? 'Crítico' : metrics.eolTechs > 0 ? 'Atención' : 'Sin riesgo'}
+            trendLabel={
+              metrics.eolTechs > 5 ? 'Crítico' : metrics.eolTechs > 0 ? 'Atención' : 'Sin riesgo'
+            }
             color={metrics.eolTechs > 5 ? 'danger' : metrics.eolTechs > 0 ? 'warning' : 'success'}
             subtitle={`${metrics.extendedTechs} en soporte extendido`}
             onClick={navigateToObsolescence}
@@ -209,7 +236,16 @@ function colorMap(color: string) {
   return map[color as keyof typeof map] ?? map.primary
 }
 
-function KpiHeroCard({ title, value, trend, trendLabel, color, subtitle, valueSuffix, onClick }: KpiHeroCardProps) {
+function KpiHeroCard({
+  title,
+  value,
+  trend,
+  trendLabel,
+  color,
+  subtitle,
+  valueSuffix,
+  onClick,
+}: KpiHeroCardProps) {
   const styles = colorMap(color)
   const TrendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'
 
@@ -219,16 +255,16 @@ function KpiHeroCard({ title, value, trend, trendLabel, color, subtitle, valueSu
       className="group relative bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden cursor-pointer"
     >
       {/* Gradient overlay on hover */}
-      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${styles.gradient}`} />
+      <div
+        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${styles.gradient}`}
+      />
 
       {/* Accent bar */}
       <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${styles.dot}`} />
 
       <div className="relative">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
-            {title}
-          </h3>
+          <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">{title}</h3>
           {trend && (
             <span className={`flex items-center gap-1 text-xs font-medium ${styles.text}`}>
               <span className="text-base leading-none">{TrendIcon}</span>

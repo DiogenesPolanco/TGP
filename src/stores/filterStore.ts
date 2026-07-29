@@ -22,6 +22,6 @@ export const useFilterStore = create<FilterState>()(
     }),
     {
       name: 'tgp-filter-storage',
-    }
-  )
+    },
+  ),
 )

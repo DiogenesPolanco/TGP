@@ -13,19 +13,44 @@ const statusColors: Record<string, string> = {
   cancelled: 'text-neutral-50 bg-neutral-10 dark:bg-neutral-70 border-neutral-30',
 }
 
-type ObjRow = Record<string, unknown> & { id: string; title: string; status: string; progress: number; teamId?: string; businessUnitId?: string; description?: string; periodStart: string; periodEnd: string; keyResults?: Array<Record<string, unknown>> }
+type ObjRow = Record<string, unknown> & {
+  id: string
+  title: string
+  status: string
+  progress: number
+  teamId?: string
+  businessUnitId?: string
+  description?: string
+  periodStart: string
+  periodEnd: string
+  keyResults?: Array<Record<string, unknown>>
+}
 
 export function PublicObjectivesPage() {
   const { hash } = useParams<{ hash: string }>()
-  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(
-    hash,
-    () => getPublicObjectivesData(),
+  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(hash, () =>
+    getPublicObjectivesData(),
   )
 
-  const teamMap = new Map((data?.teams as Array<Record<string, unknown>>)?.map((t) => [t.id as string, t.name as string]) ?? [])
-  const buMap = new Map((data?.businessUnits as Array<Record<string, unknown>>)?.map((b) => [b.id as string, b.name as string]) ?? [])
+  const teamMap = new Map(
+    (data?.teams as Array<Record<string, unknown>>)?.map((t) => [
+      t.id as string,
+      t.name as string,
+    ]) ?? [],
+  )
+  const buMap = new Map(
+    (data?.businessUnits as Array<Record<string, unknown>>)?.map((b) => [
+      b.id as string,
+      b.name as string,
+    ]) ?? [],
+  )
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -65,25 +90,38 @@ export function PublicObjectivesPage() {
 
       <main className="px-6 py-8 max-w-screen-2xl mx-auto space-y-4">
         {objectives.length === 0 ? (
-          <div className="text-center py-16 text-neutral-50">
-            No hay objetivos compartidos.
-          </div>
+          <div className="text-center py-16 text-neutral-50">No hay objetivos compartidos.</div>
         ) : (
           objectives.map((obj) => {
-            const owner = obj.teamId ? teamMap.get(obj.teamId) : obj.businessUnitId ? buMap.get(obj.businessUnitId) : null
+            const owner = obj.teamId
+              ? teamMap.get(obj.teamId)
+              : obj.businessUnitId
+                ? buMap.get(obj.businessUnitId)
+                : null
             return (
-              <div key={obj.id} className="bg-card rounded-2xl border border-boundary p-5 shadow-sm">
+              <div
+                key={obj.id}
+                className="bg-card rounded-2xl border border-boundary p-5 shadow-sm"
+              >
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       <Target size={18} className="text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-neutral-90 dark:text-white truncate">{obj.title}</h3>
-                      {obj.description && <p className="text-xs text-neutral-50 mt-0.5 line-clamp-2">{obj.description}</p>}
+                      <h3 className="font-semibold text-neutral-90 dark:text-white truncate">
+                        {obj.title}
+                      </h3>
+                      {obj.description && (
+                        <p className="text-xs text-neutral-50 mt-0.5 line-clamp-2">
+                          {obj.description}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <span className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[obj.status] ?? 'text-neutral-50 bg-neutral-10'}`}>
+                  <span
+                    className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[obj.status] ?? 'text-neutral-50 bg-neutral-10'}`}
+                  >
                     {obj.status.replace(/_/g, ' ')}
                   </span>
                 </div>
@@ -91,14 +129,21 @@ export function PublicObjectivesPage() {
                 <div className="mb-3">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-muted">Progreso</span>
-                    <span className="font-semibold text-neutral-90 dark:text-white">{Math.round(obj.progress)}%</span>
+                    <span className="font-semibold text-neutral-90 dark:text-white">
+                      {Math.round(obj.progress)}%
+                    </span>
                   </div>
                   <div className="w-full h-2 bg-neutral-10 dark:bg-neutral-70 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
                         width: `${Math.min(100, Math.max(0, obj.progress))}%`,
-                        backgroundColor: obj.progress >= 80 ? '#36B37E' : obj.progress >= 50 ? '#FF8B00' : '#FF5630',
+                        backgroundColor:
+                          obj.progress >= 80
+                            ? '#36B37E'
+                            : obj.progress >= 50
+                              ? '#FF8B00'
+                              : '#FF5630',
                       }}
                     />
                   </div>
@@ -114,11 +159,21 @@ export function PublicObjectivesPage() {
                       const baseline = Number(kr.baseline ?? 0)
                       const target = Number(kr.target ?? 1)
                       const current = Number(kr.current ?? 0)
-                      const pct = target > baseline ? Math.round(((current - baseline) / (target - baseline)) * 100) : 0
+                      const pct =
+                        target > baseline
+                          ? Math.round(((current - baseline) / (target - baseline)) * 100)
+                          : 0
                       return (
-                        <div key={kr.id as string} className="flex items-center justify-between text-xs py-1">
-                          <span className="text-secondary truncate flex-1">{kr.title as string}</span>
-                          <span className={`ml-3 shrink-0 font-medium ${kr.status === 'achieved' ? 'text-success' : kr.status === 'at_risk' ? 'text-warning' : kr.status === 'behind' ? 'text-danger' : 'text-neutral-60'}`}>
+                        <div
+                          key={kr.id as string}
+                          className="flex items-center justify-between text-xs py-1"
+                        >
+                          <span className="text-secondary truncate flex-1">
+                            {kr.title as string}
+                          </span>
+                          <span
+                            className={`ml-3 shrink-0 font-medium ${kr.status === 'achieved' ? 'text-success' : kr.status === 'at_risk' ? 'text-warning' : kr.status === 'behind' ? 'text-danger' : 'text-neutral-60'}`}
+                          >
                             {current}/{target} ({Math.max(0, Math.min(100, pct))}%)
                           </span>
                         </div>
@@ -129,7 +184,10 @@ export function PublicObjectivesPage() {
 
                 <div className="flex items-center gap-4 mt-3 pt-3 border-t border-boundary text-xs text-neutral-50">
                   {owner && <span>Dueño: {owner}</span>}
-                  <span>{new Date(obj.periodStart).toLocaleDateString()} — {new Date(obj.periodEnd).toLocaleDateString()}</span>
+                  <span>
+                    {new Date(obj.periodStart).toLocaleDateString()} —{' '}
+                    {new Date(obj.periodEnd).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             )

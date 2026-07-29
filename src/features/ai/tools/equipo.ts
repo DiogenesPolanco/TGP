@@ -30,9 +30,11 @@ export const equiposTool: AiToolDefinition = {
     teams = teams.slice(0, limit)
 
     const lines = teams.map((t) => {
-      const memberLines = incluirMiembros && t.members.length > 0
-        ? '\n    Miembros:\n' + t.members.map((m) => `    · ${m.displayName} (${m.role})`).join('\n')
-        : ''
+      const memberLines =
+        incluirMiembros && t.members.length > 0
+          ? '\n    Miembros:\n' +
+            t.members.map((m) => `    · ${m.displayName} (${m.role})`).join('\n')
+          : ''
 
       return `- ${t.name}${memberLines}`
     })
@@ -44,7 +46,10 @@ export const equiposTool: AiToolDefinition = {
 // ─── buscar_persona ─────────────────────────────────────────────────
 
 function normalizeDiacritics(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
 }
 
 interface PersonaResult {
@@ -59,7 +64,8 @@ interface PersonaResult {
 
 export const buscarPersonaTool: AiToolDefinition = {
   name: 'buscar_persona',
-  description: 'Buscá personas por nombre, email o parcial en TODAS las tablas de personas (memberProfiles, users, teams) simultáneamente. Incluye acentos. Ideal cuando no sabés exactamente cómo está registrada la persona.',
+  description:
+    'Buscá personas por nombre, email o parcial en TODAS las tablas de personas (memberProfiles, users, teams) simultáneamente. Incluye acentos. Ideal cuando no sabés exactamente cómo está registrada la persona.',
   parameters: {
     type: 'object',
     properties: {
@@ -75,7 +81,7 @@ export const buscarPersonaTool: AiToolDefinition = {
     required: ['q'],
   },
   execute: async (params) => {
-    const query = (params.q as string ?? '').trim()
+    const query = ((params.q as string) ?? '').trim()
     const limit = Math.min(Math.max(1, (params.limit as number) ?? 20), 100)
     if (!query) return 'Error: parámetro "q" requerido.'
 
@@ -92,7 +98,7 @@ export const buscarPersonaTool: AiToolDefinition = {
         const displayName = (m as any).displayName ?? m.email
         const phone = m.phoneCell || m.phoneHome || ''
         const haystack = normalizeDiacritics(
-          [displayName, m.email, phone, m.role].filter(Boolean).join(' ')
+          [displayName, m.email, phone, m.role].filter(Boolean).join(' '),
         )
         if (!haystack.includes(term)) continue
 
@@ -107,18 +113,27 @@ export const buscarPersonaTool: AiToolDefinition = {
           teamId: m.teamId ?? null,
         })
       }
-    } catch { /* tabla no disponible */ }
+    } catch {
+      /* tabla no disponible */
+    }
 
     // 2. Buscar en users (solapa con memberProfiles, pero puede tener datos distintos)
     try {
       const users = await db.users.toArray()
       for (const u of users) {
-        const haystack = normalizeDiacritics(
-          [u.displayName, u.email].filter(Boolean).join(' ')
-        )
+        const haystack = normalizeDiacritics([u.displayName, u.email].filter(Boolean).join(' '))
         if (!haystack.includes(term)) continue
         // Evitar duplicados exactos
-        if (results.some((r) => r.fuente === 'memberProfiles' && r.email && u.email && r.email.toLowerCase() === u.email.toLowerCase())) continue
+        if (
+          results.some(
+            (r) =>
+              r.fuente === 'memberProfiles' &&
+              r.email &&
+              u.email &&
+              r.email.toLowerCase() === u.email.toLowerCase(),
+          )
+        )
+          continue
 
         results.push({
           nombre: u.displayName,
@@ -130,18 +145,28 @@ export const buscarPersonaTool: AiToolDefinition = {
           teamId: null,
         })
       }
-    } catch { /* tabla no disponible */ }
+    } catch {
+      /* tabla no disponible */
+    }
 
     // 3. Buscar en teams (por nombre de miembro dentro del array members[])
     try {
       const teams = await db.teams.toArray()
       for (const t of teams) {
-        for (const m of (t.members ?? [])) {
+        for (const m of t.members ?? []) {
           const displayName = (m as any).displayName ?? ''
           const haystack = normalizeDiacritics(displayName)
           if (!haystack.includes(term)) continue
           // Evitar duplicados con memberProfiles
-          if (results.some((r) => r.fuente === 'memberProfiles' && r.equipo === t.name && normalizeDiacritics(r.nombre) === haystack)) continue
+          if (
+            results.some(
+              (r) =>
+                r.fuente === 'memberProfiles' &&
+                r.equipo === t.name &&
+                normalizeDiacritics(r.nombre) === haystack,
+            )
+          )
+            continue
 
           results.push({
             nombre: displayName,
@@ -154,7 +179,9 @@ export const buscarPersonaTool: AiToolDefinition = {
           })
         }
       }
-    } catch { /* tabla no disponible */ }
+    } catch {
+      /* tabla no disponible */
+    }
 
     if (results.length === 0) {
       return `No se encontraron personas que coincidan con "${query}". Probá con otra variante del nombre.`

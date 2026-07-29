@@ -38,22 +38,30 @@ export function AiSetupPage() {
           <div className="w-16 h-16 rounded-2xl bg-neutral-10 dark:bg-neutral-75 flex items-center justify-center mx-auto">
             <Sparkles size={32} className="text-neutral-90 dark:text-white" />
           </div>
-          <h1 className="text-xl font-bold text-neutral-90 dark:text-white">Asistente configurado</h1>
+          <h1 className="text-xl font-bold text-neutral-90 dark:text-white">
+            Asistente configurado
+          </h1>
           <p className="text-sm text-neutral-50">
             Ya tienes un asistente activo con {existingConfig.provider} ({existingConfig.model}).
           </p>
           <div className="bg-card border border-boundary rounded-xl p-4 text-left text-sm space-y-2">
             <div className="flex justify-between">
               <span className="text-neutral-50">Proveedor</span>
-              <span className="text-neutral-90 dark:text-white font-medium">{existingConfig.provider}</span>
+              <span className="text-neutral-90 dark:text-white font-medium">
+                {existingConfig.provider}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-50">Modelo</span>
-              <span className="text-neutral-90 dark:text-white font-medium">{existingConfig.model}</span>
+              <span className="text-neutral-90 dark:text-white font-medium">
+                {existingConfig.model}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-50">Endpoint</span>
-              <span className="text-neutral-90 dark:text-white font-mono text-xs">{existingConfig.baseUrl}</span>
+              <span className="text-neutral-90 dark:text-white font-mono text-xs">
+                {existingConfig.baseUrl}
+              </span>
             </div>
           </div>
           <div className="flex gap-3 justify-center">
@@ -64,7 +72,10 @@ export function AiSetupPage() {
               Ir a ajustes
             </button>
             <button
-              onClick={() => { selectProvider(existingConfig.provider); nextStep() }}
+              onClick={() => {
+                selectProvider(existingConfig.provider)
+                nextStep()
+              }}
               className="px-4 py-2 rounded-lg border border-boundary text-neutral-60 hover:text-neutral-90 dark:hover:text-white transition-colors text-sm"
             >
               Reconfigurar
@@ -78,7 +89,7 @@ export function AiSetupPage() {
   return (
     <div className="max-w-lg mx-auto py-8">
       <button
-        onClick={() => wizard.step === 0 ? navigate(-1) : prevStep()}
+        onClick={() => (wizard.step === 0 ? navigate(-1) : prevStep())}
         className="flex items-center gap-1 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors mb-6"
       >
         <ArrowLeft size={14} />
@@ -89,7 +100,9 @@ export function AiSetupPage() {
         <div className="w-12 h-12 rounded-xl bg-neutral-10 dark:bg-neutral-75 flex items-center justify-center mx-auto mb-3">
           <Sparkles size={24} className="text-neutral-90 dark:text-white" />
         </div>
-        <h1 className="text-lg font-bold text-neutral-90 dark:text-white">Configurar asistente AI</h1>
+        <h1 className="text-lg font-bold text-neutral-90 dark:text-white">
+          Configurar asistente AI
+        </h1>
         <p className="text-sm text-neutral-50 mt-1">
           Conecta un modelo de lenguaje para consultar datos de TGP en lenguaje natural.
         </p>
@@ -102,7 +115,10 @@ export function AiSetupPage() {
         onTestConnection={testConnection}
         onNext={nextStep}
         onPrev={prevStep}
-        onComplete={() => { completeSetup(); navigate('/ai/settings') }}
+        onComplete={() => {
+          completeSetup()
+          navigate('/ai/settings')
+        }}
         isStepValid={isStepValid}
       />
     </div>

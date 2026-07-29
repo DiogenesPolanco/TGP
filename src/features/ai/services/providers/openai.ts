@@ -1,4 +1,10 @@
-import type { AiProviderConfig, AiChatMessage, AiToolDefinition, AiChatResponse, AiProviderInterface } from '../../types'
+import type {
+  AiProviderConfig,
+  AiChatMessage,
+  AiToolDefinition,
+  AiChatResponse,
+  AiProviderInterface,
+} from '../../types'
 import { buildToolDefinitions } from '../AiProvider'
 
 /**
@@ -35,7 +41,7 @@ export function createOpenAiProvider(config: AiProviderConfig): AiProviderInterf
 
   async function chat(
     messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
+    tools?: AiToolDefinition[],
   ): Promise<AiChatResponse> {
     const paired = pairToolMessages(messages)
     const body: Record<string, unknown> = {
@@ -74,7 +80,9 @@ export function createOpenAiProvider(config: AiProviderConfig): AiProviderInterf
 
     if (!res.ok) {
       const text = await res.text()
-      throw new Error(`${config.provider === 'anthropic' ? 'Anthropic' : 'OpenAI'} error (${res.status}): ${text}`)
+      throw new Error(
+        `${config.provider === 'anthropic' ? 'Anthropic' : 'OpenAI'} error (${res.status}): ${text}`,
+      )
     }
 
     const data = await res.json()
@@ -82,11 +90,13 @@ export function createOpenAiProvider(config: AiProviderConfig): AiProviderInterf
     const output: AiChatResponse = { content: choice?.message?.content ?? '' }
 
     if (choice?.message?.tool_calls?.length > 0) {
-      output.toolCalls = choice.message.tool_calls.map((tc: { id: string; function: { name: string; arguments: string } }) => ({
-        id: tc.id,
-        name: tc.function.name,
-        arguments: JSON.parse(tc.function.arguments),
-      }))
+      output.toolCalls = choice.message.tool_calls.map(
+        (tc: { id: string; function: { name: string; arguments: string } }) => ({
+          id: tc.id,
+          name: tc.function.name,
+          arguments: JSON.parse(tc.function.arguments),
+        }),
+      )
     }
 
     return output

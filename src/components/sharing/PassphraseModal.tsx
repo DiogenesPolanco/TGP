@@ -46,31 +46,49 @@ export function PassphraseModal({
           <div className="flex flex-col sm:flex-row min-h-[360px]">
             {/* Left: branding */}
             <div className="sm:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-6 sm:p-8 text-white flex flex-col relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10" style={{
-                background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
-              }} />
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  background:
+                    'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
+                }}
+              />
               <div className="relative flex items-center gap-2.5 mb-5">
                 <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-1 shadow-sm">
                   <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
                 </div>
                 <div>
                   <p className="text-base font-bold">TGP</p>
-                  <p className="text-[10px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                  <p className="text-[10px] font-medium opacity-60 tracking-wide">
+                    Technology Governance Platform
+                  </p>
                 </div>
               </div>
               <div className="relative flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-2 mb-3">
                   <Shield size={14} />
-                  <span className="text-[10px] font-medium uppercase tracking-widest opacity-60">Datos protegidos</span>
+                  <span className="text-[10px] font-medium uppercase tracking-widest opacity-60">
+                    Datos protegidos
+                  </span>
                 </div>
                 <h3 className="text-xl font-bold leading-tight mb-3">Compartir datos</h3>
                 <p className="text-sm leading-relaxed opacity-85 mb-3">
-                  {description || 'Opcional: agrega una contraseña para cifrar los datos de extremo a extremo.'}
+                  {description ||
+                    'Opcional: agrega una contraseña para cifrar los datos de extremo a extremo.'}
                 </p>
                 <ul className="space-y-1.5 text-sm">
-                  <li className="flex items-start gap-2"><Check size={14} className="mt-0.5 shrink-0 opacity-70" /><span className="opacity-85">AES-GCM 256 bits</span></li>
-                  <li className="flex items-start gap-2"><Check size={14} className="mt-0.5 shrink-0 opacity-70" /><span className="opacity-85">Enlace caduca automáticamente</span></li>
-                  <li className="flex items-start gap-2"><Check size={14} className="mt-0.5 shrink-0 opacity-70" /><span className="opacity-85">Datos cifrados en reposo</span></li>
+                  <li className="flex items-start gap-2">
+                    <Check size={14} className="mt-0.5 shrink-0 opacity-70" />
+                    <span className="opacity-85">AES-GCM 256 bits</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={14} className="mt-0.5 shrink-0 opacity-70" />
+                    <span className="opacity-85">Enlace caduca automáticamente</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={14} className="mt-0.5 shrink-0 opacity-70" />
+                    <span className="opacity-85">Datos cifrados en reposo</span>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -118,18 +136,30 @@ export function PassphraseModal({
                       autoFocus
                       onKeyDown={(e) => e.key === 'Enter' && pass && onSubmit(pass, hours)}
                     />
-                    <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => setShow(!show)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors"
+                    >
                       {show ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => onSkip?.(hours)} className="flex items-center gap-1.5 px-4 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary-dark transition-colors shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onSkip?.(hours)}
+                    className="flex items-center gap-1.5 px-4 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary-dark transition-colors shrink-0"
+                  >
                     {buttonLabel} {pass ? <ArrowRight size={18} /> : null}
                   </button>
                   {onSkip && (
-                    <button type="button" onClick={() => onSkip(hours)} className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => onSkip(hours)}
+                      className="px-4 py-3 text-sm text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors shrink-0"
+                    >
                       Sin clave
                     </button>
                   )}

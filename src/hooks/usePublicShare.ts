@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { isValidShareHash, getShareType, logShareAccess } from '@/services/share/publicShareService'
-import { decryptData, isEncryptedPayload, type EncryptedPayload } from '@/services/share/encryptionService'
+import {
+  decryptData,
+  isEncryptedPayload,
+  type EncryptedPayload,
+} from '@/services/share/encryptionService'
 
 interface UsePublicShareResult<T> {
   loading: boolean
@@ -20,7 +24,11 @@ export function usePublicShare<T>(
   const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
+    if (!hash) {
+      setValid(false)
+      setLoading(false)
+      return
+    }
 
     ;(async () => {
       const tryLoad = (raw: unknown) => {
@@ -46,7 +54,9 @@ export function usePublicShare<T>(
             tryLoad(azureData)
             return
           }
-        } catch { /* continue to next source */ }
+        } catch {
+          /* continue to next source */
+        }
       }
 
       // 2. Try Azure direct download (viewer's own config)
@@ -58,7 +68,9 @@ export function usePublicShare<T>(
           tryLoad(viewerData)
           return
         }
-      } catch { /* continue to next source */ }
+      } catch {
+        /* continue to next source */
+      }
 
       // 3. Try local IndexedDB (same browser that created the link)
       if (isValidShareHash(hash)) {

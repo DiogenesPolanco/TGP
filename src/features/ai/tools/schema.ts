@@ -14,7 +14,9 @@ function serialize(val: unknown): string {
     try {
       const str = JSON.stringify(val)
       return str.length > 200 ? str.slice(0, 200) + '…' : str
-    } catch { return '<objeto>' }
+    } catch {
+      return '<objeto>'
+    }
   }
   return String(val)
 }
@@ -77,7 +79,8 @@ const TABLE_LABELS: Record<string, string> = {
 
 export const explorarEsquemaTool: AiToolDefinition = {
   name: 'explorar_esquema',
-  description: 'Descubrí la estructura completa de cualquier tabla: campos, tipos, y valores de ejemplo. Llamá esto ANTES de consultar_datos si no sabés los campos exactos.',
+  description:
+    'Descubrí la estructura completa de cualquier tabla: campos, tipos, y valores de ejemplo. Llamá esto ANTES de consultar_datos si no sabés los campos exactos.',
   parameters: {
     type: 'object',
     properties: {
@@ -108,7 +111,7 @@ export const explorarEsquemaTool: AiToolDefinition = {
       const sample = records.sort(
         (a: Record<string, unknown>, b: Record<string, unknown>) =>
           Object.values(b).filter((v) => v !== null && v !== undefined).length -
-          Object.values(a).filter((v) => v !== null && v !== undefined).length
+          Object.values(a).filter((v) => v !== null && v !== undefined).length,
       )[0]
 
       const fields = Object.entries(sample as Record<string, unknown>).map(([key, val]) => {
@@ -118,10 +121,12 @@ export const explorarEsquemaTool: AiToolDefinition = {
       })
 
       const label = TABLE_LABELS[tableName] ?? tableName
-      return `📋 **${label}** (\`${tableName}\`)\n` +
+      return (
+        `📋 **${label}** (\`${tableName}\`)\n` +
         `Registros disponibles: ${records.length >= 3 ? '3+' : records.length}\n\n` +
         `Campos:\n${fields.join('\n')}\n\n` +
         `Usá \`consultar_datos({ table: "${tableName}", limit: N })\` para consultar datos.`
+      )
     } catch (err) {
       return `Error explorando "${tableName}": ${err instanceof Error ? err.message : String(err)}`
     }
@@ -137,7 +142,13 @@ interface Relation {
   /** When set, use this field on the source entity instead of the provided `id` */
   localKey?: string
   /** If set, also fetch records from this junction table and resolve the target */
-  junction?: { table: string; sourceFk: string; targetFk: string; targetTable: string; targetLabel: string }
+  junction?: {
+    table: string
+    sourceFk: string
+    targetFk: string
+    targetTable: string
+    targetLabel: string
+  }
 }
 
 const RELATIONS: Record<string, Relation[]> = {
@@ -149,34 +160,146 @@ const RELATIONS: Record<string, Relation[]> = {
     { table: 'risks', foreignKey: 'applicationId', label: 'Riesgos' },
     { table: 'auditFindings', foreignKey: 'applicationId', label: 'Hallazgos de auditoría' },
     { table: 'appDatabases', foreignKey: 'applicationId', label: 'Bases de datos' },
-    { table: 'applicationDependencies', foreignKey: 'applicationId', label: 'Dependencias como origen' },
-    { table: 'applicationDependencies', foreignKey: 'dependsOnAppId', label: 'Dependencias como destino' },
+    {
+      table: 'applicationDependencies',
+      foreignKey: 'applicationId',
+      label: 'Dependencias como origen',
+    },
+    {
+      table: 'applicationDependencies',
+      foreignKey: 'dependsOnAppId',
+      label: 'Dependencias como destino',
+    },
     { table: 'deliverables', foreignKey: 'applicationId', label: 'Entregables' },
     { table: 'commitments', foreignKey: 'applicationId', label: 'Compromisos' },
   ],
   microservices: [
-    { table: 'applications', foreignKey: 'id', label: 'Aplicación padre', localKey: 'applicationId' },
-    { junction: { table: 'vulnerabilityMicroservices', sourceFk: 'microserviceId', targetFk: 'vulnerabilityId', targetTable: 'vulnerabilities', targetLabel: 'Vulnerabilidades' }, table: '', foreignKey: '', label: '' },
-    { junction: { table: 'incidentMicroservices', sourceFk: 'microserviceId', targetFk: 'incidentId', targetTable: 'incidents', targetLabel: 'Incidentes' }, table: '', foreignKey: '', label: '' },
-    { junction: { table: 'auditFindingMicroservices', sourceFk: 'microserviceId', targetFk: 'auditFindingId', targetTable: 'auditFindings', targetLabel: 'Hallazgos' }, table: '', foreignKey: '', label: '' },
-    { junction: { table: 'riskMicroservices', sourceFk: 'microserviceId', targetFk: 'riskId', targetTable: 'risks', targetLabel: 'Riesgos' }, table: '', foreignKey: '', label: '' },
-    { junction: { table: 'appDatabaseMicroservices', sourceFk: 'microserviceId', targetFk: 'appDatabaseId', targetTable: 'appDatabases', targetLabel: 'Bases de datos' }, table: '', foreignKey: '', label: '' },
+    {
+      table: 'applications',
+      foreignKey: 'id',
+      label: 'Aplicación padre',
+      localKey: 'applicationId',
+    },
+    {
+      junction: {
+        table: 'vulnerabilityMicroservices',
+        sourceFk: 'microserviceId',
+        targetFk: 'vulnerabilityId',
+        targetTable: 'vulnerabilities',
+        targetLabel: 'Vulnerabilidades',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
+    {
+      junction: {
+        table: 'incidentMicroservices',
+        sourceFk: 'microserviceId',
+        targetFk: 'incidentId',
+        targetTable: 'incidents',
+        targetLabel: 'Incidentes',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
+    {
+      junction: {
+        table: 'auditFindingMicroservices',
+        sourceFk: 'microserviceId',
+        targetFk: 'auditFindingId',
+        targetTable: 'auditFindings',
+        targetLabel: 'Hallazgos',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
+    {
+      junction: {
+        table: 'riskMicroservices',
+        sourceFk: 'microserviceId',
+        targetFk: 'riskId',
+        targetTable: 'risks',
+        targetLabel: 'Riesgos',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
+    {
+      junction: {
+        table: 'appDatabaseMicroservices',
+        sourceFk: 'microserviceId',
+        targetFk: 'appDatabaseId',
+        targetTable: 'appDatabases',
+        targetLabel: 'Bases de datos',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
   ],
 
   // ── Seguridad (con M:N inversas a microservicios) ──────────────
   vulnerabilities: [
-    { junction: { table: 'vulnerabilityMicroservices', sourceFk: 'vulnerabilityId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios afectados' }, table: '', foreignKey: '', label: '' },
+    {
+      junction: {
+        table: 'vulnerabilityMicroservices',
+        sourceFk: 'vulnerabilityId',
+        targetFk: 'microserviceId',
+        targetTable: 'microservices',
+        targetLabel: 'Microservicios afectados',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
   ],
   incidents: [
-    { junction: { table: 'incidentMicroservices', sourceFk: 'incidentId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios afectados' }, table: '', foreignKey: '', label: '' },
+    {
+      junction: {
+        table: 'incidentMicroservices',
+        sourceFk: 'incidentId',
+        targetFk: 'microserviceId',
+        targetTable: 'microservices',
+        targetLabel: 'Microservicios afectados',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
   ],
 
   // ── Gobierno (con M:N inversas a microservicios) ───────────────
   risks: [
-    { junction: { table: 'riskMicroservices', sourceFk: 'riskId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios asociados' }, table: '', foreignKey: '', label: '' },
+    {
+      junction: {
+        table: 'riskMicroservices',
+        sourceFk: 'riskId',
+        targetFk: 'microserviceId',
+        targetTable: 'microservices',
+        targetLabel: 'Microservicios asociados',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
   ],
   auditFindings: [
-    { junction: { table: 'auditFindingMicroservices', sourceFk: 'auditFindingId', targetFk: 'microserviceId', targetTable: 'microservices', targetLabel: 'Microservicios asociados' }, table: '', foreignKey: '', label: '' },
+    {
+      junction: {
+        table: 'auditFindingMicroservices',
+        sourceFk: 'auditFindingId',
+        targetFk: 'microserviceId',
+        targetTable: 'microservices',
+        targetLabel: 'Microservicios asociados',
+      },
+      table: '',
+      foreignKey: '',
+      label: '',
+    },
   ],
 
   // ── Personas ────────────────────────────────────────────────────
@@ -211,9 +334,7 @@ const RELATIONS: Record<string, Relation[]> = {
     { table: 'activities', foreignKey: 'planId', label: 'Actividades' },
     { table: 'tasks', foreignKey: 'planId', label: 'Tareas' },
   ],
-  activities: [
-    { table: 'tasks', foreignKey: 'activityId', label: 'Tareas' },
-  ],
+  activities: [{ table: 'tasks', foreignKey: 'activityId', label: 'Tareas' }],
 
   // ── Unidades de negocio ─────────────────────────────────────────
   businessUnits: [
@@ -227,7 +348,11 @@ const RELATIONS: Record<string, Relation[]> = {
 
   // ── Equipamiento ────────────────────────────────────────────────
   equipment: [
-    { table: 'equipmentAssignments', foreignKey: 'equipmentId', label: 'Historial de asignaciones' },
+    {
+      table: 'equipmentAssignments',
+      foreignKey: 'equipmentId',
+      label: 'Historial de asignaciones',
+    },
     { table: 'equipmentTickets', foreignKey: 'equipmentId', label: 'Tickets de soporte' },
   ],
 }
@@ -236,7 +361,8 @@ const RELATIONS: Record<string, Relation[]> = {
 
 export const consultarRelacionesTool: AiToolDefinition = {
   name: 'consultar_relaciones',
-  description: 'Obtené una entidad completa con TODOS sus datos relacionados en una sola llamada. Soporta: applications (microservicios, vulns, incidents, riesgos, hallazgos, BBDD, dependencias, entregables, compromisos), microservices (aplicación padre + M:N a vulns/incidents/riesgos/hallazgos/BBDD), vulnerabilities/incidents (M:N a microservicios), risks/auditFindings (M:N a microservicios), teams (miembros, planes, objetivos, compromisos, sprints), memberProfiles (1:1, logros, vacaciones, sprints), users (tareas, compromisos, bloqueos, actividades, 1:1, logros, vacaciones, sprints), plans (actividades, tareas), activities (tareas), businessUnits (aplicaciones, equipos, objetivos, riesgos, healthIndex, planes), equipment (asignaciones, tickets).',
+  description:
+    'Obtené una entidad completa con TODOS sus datos relacionados en una sola llamada. Soporta: applications (microservicios, vulns, incidents, riesgos, hallazgos, BBDD, dependencias, entregables, compromisos), microservices (aplicación padre + M:N a vulns/incidents/riesgos/hallazgos/BBDD), vulnerabilities/incidents (M:N a microservicios), risks/auditFindings (M:N a microservicios), teams (miembros, planes, objetivos, compromisos, sprints), memberProfiles (1:1, logros, vacaciones, sprints), users (tareas, compromisos, bloqueos, actividades, 1:1, logros, vacaciones, sprints), plans (actividades, tareas), activities (tareas), businessUnits (aplicaciones, equipos, objetivos, riesgos, healthIndex, planes), equipment (asignaciones, tickets).',
   parameters: {
     type: 'object',
     properties: {
@@ -319,7 +445,9 @@ export const consultarRelacionesTool: AiToolDefinition = {
                 output.push(`  - ${fields}`)
               }
             }
-          } catch { /* tabla junction no disponible, continuar */ }
+          } catch {
+            /* tabla junction no disponible, continuar */
+          }
           continue
         }
 
@@ -350,7 +478,9 @@ export const consultarRelacionesTool: AiToolDefinition = {
               output.push(`  - ${fields}`)
             }
           }
-        } catch { /* tabla relacion no disponible, continuar */ }
+        } catch {
+          /* tabla relacion no disponible, continuar */
+        }
       }
 
       return output.join('\n')

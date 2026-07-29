@@ -2,7 +2,17 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { Plus, ArrowLeft, Trash2, Target, Crosshair, TrendingUp, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react'
+import {
+  Plus,
+  ArrowLeft,
+  Trash2,
+  Target,
+  Crosshair,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle2,
+  HelpCircle,
+} from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
@@ -66,8 +76,14 @@ export function ObjectiveFormPage() {
           type: objective.type ?? 'okr',
           teamId: objective.teamId ?? '',
           businessUnitId: objective.businessUnitId ?? '',
-          periodStart: objective.periodStart && !isNaN(new Date(objective.periodStart).getTime()) ? new Date(objective.periodStart).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          periodEnd: objective.periodEnd && !isNaN(new Date(objective.periodEnd).getTime()) ? new Date(objective.periodEnd).toISOString().split('T')[0] : '',
+          periodStart:
+            objective.periodStart && !isNaN(new Date(objective.periodStart).getTime())
+              ? new Date(objective.periodStart).toISOString().split('T')[0]
+              : new Date().toISOString().split('T')[0],
+          periodEnd:
+            objective.periodEnd && !isNaN(new Date(objective.periodEnd).getTime())
+              ? new Date(objective.periodEnd).toISOString().split('T')[0]
+              : '',
           status: objective.status ?? 'not_started',
           keyResults: objective.keyResults ?? [],
         })
@@ -77,22 +93,33 @@ export function ObjectiveFormPage() {
 
   const liveProgress = useMemo(() => {
     if (formData.keyResults.length === 0) return 0
-    return Math.min(100, formData.keyResults.reduce((sum, kr) => {
-      if (kr.target <= kr.baseline) return sum
-      return sum + Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
-    }, 0) / formData.keyResults.length)
+    return Math.min(
+      100,
+      formData.keyResults.reduce((sum, kr) => {
+        if (kr.target <= kr.baseline) return sum
+        return sum + Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
+      }, 0) / formData.keyResults.length,
+    )
   }, [formData.keyResults])
 
-  const progressColor = liveProgress >= 100 ? 'bg-success' : liveProgress >= 60 ? 'bg-success' : liveProgress >= 30 ? 'bg-warning' : 'bg-danger'
+  const progressColor =
+    liveProgress >= 100
+      ? 'bg-success'
+      : liveProgress >= 60
+        ? 'bg-success'
+        : liveProgress >= 30
+          ? 'bg-warning'
+          : 'bg-danger'
 
-  if (id && !objective) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="flex items-center gap-3 text-neutral-50">
-        <div className="w-5 h-5 rounded-full border-2 border-neutral-30 border-t-primary animate-spin" />
-        Cargando...
+  if (id && !objective)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3 text-neutral-50">
+          <div className="w-5 h-5 rounded-full border-2 border-neutral-30 border-t-primary animate-spin" />
+          Cargando...
+        </div>
       </div>
-    </div>
-  )
+    )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -120,15 +147,18 @@ export function ObjectiveFormPage() {
   const addKeyResult = () => {
     setFormData({
       ...formData,
-      keyResults: [...formData.keyResults, {
-        id: crypto.randomUUID(),
-        title: '',
-        measure: '',
-        baseline: 0,
-        target: 100,
-        current: 0,
-        status: 'not_started',
-      }],
+      keyResults: [
+        ...formData.keyResults,
+        {
+          id: crypto.randomUUID(),
+          title: '',
+          measure: '',
+          baseline: 0,
+          target: 100,
+          current: 0,
+          status: 'not_started',
+        },
+      ],
     })
     // Scroll to new KR after render
     setTimeout(() => {
@@ -153,7 +183,10 @@ export function ObjectiveFormPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/strategy/objectives')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/strategy/objectives')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <div className="flex-1">
@@ -161,12 +194,16 @@ export function ObjectiveFormPage() {
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
           </h1>
           <p className="text-sm text-muted mt-0.5">
-            {objective ? 'Modifica los datos del objetivo y sus resultados clave' : 'Define un nuevo objetivo y sus resultados clave'}
+            {objective
+              ? 'Modifica los datos del objetivo y sus resultados clave'
+              : 'Define un nuevo objetivo y sus resultados clave'}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-neutral-50">
           <span className="hidden sm:inline">Estado:</span>
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLE[formData.status]}`}>
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLE[formData.status]}`}
+          >
             {STATUS_ICON[formData.status]}
             {STATUS_OPTIONS.find((o) => o.value === formData.status)?.label}
           </span>
@@ -184,7 +221,9 @@ export function ObjectiveFormPage() {
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5">Título del Objetivo *</label>
+                <label className="block text-xs font-medium text-muted mb-1.5">
+                  Título del Objetivo *
+                </label>
                 <input
                   type="text"
                   required
@@ -212,22 +251,42 @@ export function ObjectiveFormPage() {
               Asignación y Período
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Select label="Tipo" value={formData.type} onChange={(v) => setFormData({ ...formData, type: v as Objective['type'] })} options={[
-                { value: 'okr', label: 'OKR' },
-                { value: 'kpi', label: 'KPI' },
-                { value: 'balanced_scorecard', label: 'Balanced Scorecard' },
-              ]} />
-              <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
-                { value: '', label: 'Sin equipo' },
-                ...teams.map((team) => ({ value: team.id, label: team.name })),
-              ]} />
-              <Select label="Unidad de Negocio" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-                { value: '', label: 'Sin BU' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} />
+              <Select
+                label="Tipo"
+                value={formData.type}
+                onChange={(v) => setFormData({ ...formData, type: v as Objective['type'] })}
+                options={[
+                  { value: 'okr', label: 'OKR' },
+                  { value: 'kpi', label: 'KPI' },
+                  { value: 'balanced_scorecard', label: 'Balanced Scorecard' },
+                ]}
+              />
+              <Select
+                label="Equipo"
+                value={formData.teamId}
+                onChange={(v) => setFormData({ ...formData, teamId: v })}
+                options={[
+                  { value: '', label: 'Sin equipo' },
+                  ...teams.map((team) => ({ value: team.id, label: team.name })),
+                ]}
+              />
+              <Select
+                label="Unidad de Negocio"
+                value={formData.businessUnitId}
+                onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+                options={[
+                  { value: '', label: 'Sin BU' },
+                  ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                ]}
+              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })} options={STATUS_OPTIONS} />
+              <Select
+                label="Estado"
+                value={formData.status}
+                onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })}
+                options={STATUS_OPTIONS}
+              />
               <div>
                 <label className="block text-xs font-medium text-muted mb-1.5">Inicio *</label>
                 <DatePicker
@@ -256,7 +315,9 @@ export function ObjectiveFormPage() {
                 <Crosshair size={16} className="text-primary" />
                 Key Results
                 {formData.keyResults.length > 0 && (
-                  <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">{formData.keyResults.length}</span>
+                  <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">
+                    {formData.keyResults.length}
+                  </span>
                 )}
               </h3>
               <Button
@@ -273,7 +334,9 @@ export function ObjectiveFormPage() {
               <div className="border-2 border-dashed border-neutral-30 dark:border-neutral-60 rounded-xl p-8 text-center hover:border-primary/40 transition-colors">
                 <Crosshair size={28} className="mx-auto text-neutral-40 mb-2" />
                 <p className="text-sm font-medium text-muted">Sin Key Results</p>
-                <p className="text-xs text-neutral-50 mt-1">Agrega resultados clave medibles para este objetivo</p>
+                <p className="text-xs text-neutral-50 mt-1">
+                  Agrega resultados clave medibles para este objetivo
+                </p>
                 <Button
                   type="button"
                   onClick={addKeyResult}
@@ -286,9 +349,10 @@ export function ObjectiveFormPage() {
             ) : (
               <div className="space-y-3">
                 {formData.keyResults.map((kr, index) => {
-                  const krPct = kr.target > kr.baseline
-                    ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
-                    : 0
+                  const krPct =
+                    kr.target > kr.baseline
+                      ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
+                      : 0
                   const krClamped = Math.min(100, Math.max(0, krPct))
                   return (
                     <div
@@ -310,7 +374,10 @@ export function ObjectiveFormPage() {
                           <Select
                             value={kr.status}
                             onChange={(v) => updateKeyResult(index, 'status', v)}
-                            options={STATUS_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
+                            options={STATUS_OPTIONS.map((opt) => ({
+                              value: opt.value,
+                              label: opt.label,
+                            }))}
                             className="w-36"
                           />
                           <Button
@@ -326,7 +393,9 @@ export function ObjectiveFormPage() {
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
                         <div>
-                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Medida</label>
+                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">
+                            Medida
+                          </label>
                           <input
                             type="text"
                             placeholder="Ej: %"
@@ -336,32 +405,44 @@ export function ObjectiveFormPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Línea Base</label>
+                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">
+                            Línea Base
+                          </label>
                           <input
                             type="number"
                             placeholder="0"
                             value={kr.baseline}
-                            onChange={(e) => updateKeyResult(index, 'baseline', parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              updateKeyResult(index, 'baseline', parseFloat(e.target.value) || 0)
+                            }
                             className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Actual</label>
+                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">
+                            Actual
+                          </label>
                           <input
                             type="number"
                             placeholder="0"
                             value={kr.current}
-                            onChange={(e) => updateKeyResult(index, 'current', parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              updateKeyResult(index, 'current', parseFloat(e.target.value) || 0)
+                            }
                             className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">Meta</label>
+                          <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">
+                            Meta
+                          </label>
                           <input
                             type="number"
                             placeholder="100"
                             value={kr.target}
-                            onChange={(e) => updateKeyResult(index, 'target', parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              updateKeyResult(index, 'target', parseFloat(e.target.value) || 0)
+                            }
                             className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           />
                         </div>
@@ -369,16 +450,26 @@ export function ObjectiveFormPage() {
 
                       {/* KR mini progress bar */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-medium text-neutral-50 w-10">Progreso</span>
+                        <span className="text-[10px] font-medium text-neutral-50 w-10">
+                          Progreso
+                        </span>
                         <div className="flex-1 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-300 ${
-                              krClamped >= 100 ? 'bg-success' : krClamped >= 60 ? 'bg-success' : krClamped >= 30 ? 'bg-warning' : 'bg-danger'
+                              krClamped >= 100
+                                ? 'bg-success'
+                                : krClamped >= 60
+                                  ? 'bg-success'
+                                  : krClamped >= 30
+                                    ? 'bg-warning'
+                                    : 'bg-danger'
                             }`}
                             style={{ width: `${krClamped}%` }}
                           />
                         </div>
-                        <span className="text-xs font-semibold text-neutral-90 dark:text-white tabular-nums w-8 text-right">{krClamped}%</span>
+                        <span className="text-xs font-semibold text-neutral-90 dark:text-white tabular-nums w-8 text-right">
+                          {krClamped}%
+                        </span>
                       </div>
                     </div>
                   )
@@ -398,10 +489,14 @@ export function ObjectiveFormPage() {
 
             {/* Live preview card */}
             <div className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-boundary overflow-hidden">
-              <div className={`h-1 w-full ${formData.status === 'achieved' || formData.status === 'on_track' ? 'bg-success' : formData.status === 'at_risk' ? 'bg-warning' : formData.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`} />
+              <div
+                className={`h-1 w-full ${formData.status === 'achieved' || formData.status === 'on_track' ? 'bg-success' : formData.status === 'at_risk' ? 'bg-warning' : formData.status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`}
+              />
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${STATUS_STYLE[formData.status]}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${STATUS_STYLE[formData.status]}`}
+                  >
                     {STATUS_ICON[formData.status]}
                     {STATUS_OPTIONS.find((o) => o.value === formData.status)?.label}
                   </span>
@@ -416,16 +511,23 @@ export function ObjectiveFormPage() {
 
                 <div className="flex items-center justify-between mt-3 mb-1.5">
                   <span className="text-[11px] text-neutral-50">Progreso general</span>
-                  <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">{Math.round(liveProgress)}%</span>
+                  <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">
+                    {Math.round(liveProgress)}%
+                  </span>
                 </div>
                 <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-500 ${progressColor}`} style={{ width: `${liveProgress}%` }} />
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+                    style={{ width: `${liveProgress}%` }}
+                  />
                 </div>
 
                 <div className="mt-3 pt-3 border-t border-boundary">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-50">Key Results</span>
-                    <span className="font-semibold text-neutral-90 dark:text-white">{formData.keyResults.length}</span>
+                    <span className="font-semibold text-neutral-90 dark:text-white">
+                      {formData.keyResults.length}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs mt-1">
                     <span className="text-neutral-50">Equipo</span>

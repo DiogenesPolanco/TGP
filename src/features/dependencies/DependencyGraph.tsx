@@ -34,7 +34,7 @@ const ITERATIONS = 120
 
 function forceLayout(
   nodeList: { id: string; label: string; criticality?: string }[],
-  edgeList: { source: string; target: string }[]
+  edgeList: { source: string; target: string }[],
 ) {
   const nodes = nodeList.map((n, i) => {
     const angle = (2 * Math.PI * i) / nodeList.length
@@ -105,11 +105,14 @@ function forceLayout(
   return nodes
 }
 
-export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000, height = 700, onNodeClick }: Props) {
-  const laidOut = useMemo(
-    () => forceLayout(rawNodes, rawEdges),
-    [rawNodes, rawEdges]
-  )
+export function DependencyGraph({
+  nodes: rawNodes,
+  edges: rawEdges,
+  width = 1000,
+  height = 700,
+  onNodeClick,
+}: Props) {
+  const laidOut = useMemo(() => forceLayout(rawNodes, rawEdges), [rawNodes, rawEdges])
 
   if (laidOut.length === 0) {
     return (
@@ -119,31 +122,33 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
     )
   }
 
-  const edgePaths = rawEdges.map((edge) => {
-    const source = laidOut.find((n) => n.id === edge.source)
-    const target = laidOut.find((n) => n.id === edge.target)
-    if (!source || !target) return null
+  const edgePaths = rawEdges
+    .map((edge) => {
+      const source = laidOut.find((n) => n.id === edge.source)
+      const target = laidOut.find((n) => n.id === edge.target)
+      if (!source || !target) return null
 
-    const dx = target.x - source.x
-    const dy = target.y - source.y
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1
-    const nx = -dy / dist
-    const ny = dx / dist
+      const dx = target.x - source.x
+      const dy = target.y - source.y
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1
+      const nx = -dy / dist
+      const ny = dx / dist
 
-    const sx = source.x + nx * source.radius
-    const sy = source.y + ny * source.radius
-    const tx = target.x + nx * target.radius
-    const ty = target.y + ny * target.radius
+      const sx = source.x + nx * source.radius
+      const sy = source.y + ny * source.radius
+      const tx = target.x + nx * target.radius
+      const ty = target.y + ny * target.radius
 
-    const midX = (sx + tx) / 2
-    const midY = (sy + ty) / 2
+      const midX = (sx + tx) / 2
+      const midY = (sy + ty) / 2
 
-    const angle = Math.atan2(ty - sy, tx - sx)
-    const ax = tx - Math.cos(angle) * (target.radius + 4)
-    const ay = ty - Math.sin(angle) * (target.radius + 4)
+      const angle = Math.atan2(ty - sy, tx - sx)
+      const ax = tx - Math.cos(angle) * (target.radius + 4)
+      const ay = ty - Math.sin(angle) * (target.radius + 4)
 
-    return { sx, sy, ax, ay, midX, midY, edge }
-  }).filter(Boolean)
+      return { sx, sy, ax, ay, midX, midY, edge }
+    })
+    .filter(Boolean)
 
   return (
     <svg width={width} height={height} className="w-full h-full">
@@ -168,19 +173,39 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
         ep ? (
           <g key={i}>
             <line
-              x1={ep.sx} y1={ep.sy} x2={ep.ax} y2={ep.ay}
+              x1={ep.sx}
+              y1={ep.sy}
+              x2={ep.ax}
+              y2={ep.ay}
               stroke={EDGE_COLORS[ep.edge.type] ?? '#DFE1E6'}
               strokeWidth={ep.edge.criticality === 'critical' ? 2.5 : 1.5}
               strokeDasharray={ep.edge.type === 'external' ? '6,3' : undefined}
               markerEnd={`url(#arrow-${ep.edge.type})`}
               className="dark:opacity-60"
             />
-            <rect x={ep.midX - 18} y={ep.midY - 10} width={36} height={16} rx={4} fill="white" className="dark:fill-neutral-80" opacity={0.85} />
-            <text x={ep.midX} y={ep.midY + 2} textAnchor="middle" fontSize="10" fontWeight="600" fill="#505F79" className="dark:fill-neutral-40 capitalize">
+            <rect
+              x={ep.midX - 18}
+              y={ep.midY - 10}
+              width={36}
+              height={16}
+              rx={4}
+              fill="white"
+              className="dark:fill-neutral-80"
+              opacity={0.85}
+            />
+            <text
+              x={ep.midX}
+              y={ep.midY + 2}
+              textAnchor="middle"
+              fontSize="10"
+              fontWeight="600"
+              fill="#505F79"
+              className="dark:fill-neutral-40 capitalize"
+            >
               {ep.edge.type}
             </text>
           </g>
-        ) : null
+        ) : null,
       )}
 
       {laidOut.map((node) => (
@@ -201,10 +226,25 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
             strokeWidth={2.5}
             className="hover:stroke-[4px] transition-all"
           />
-          <text x={node.x} y={node.y - 8} textAnchor="middle" fontSize="13" fontWeight="700" fill="#172B4D" className="dark:fill-neutral-10 pointer-events-none">
+          <text
+            x={node.x}
+            y={node.y - 8}
+            textAnchor="middle"
+            fontSize="13"
+            fontWeight="700"
+            fill="#172B4D"
+            className="dark:fill-neutral-10 pointer-events-none"
+          >
             {node.label.length > 14 ? node.label.slice(0, 13) + '…' : node.label}
           </text>
-          <text x={node.x} y={node.y + 10} textAnchor="middle" fontSize="10" fill="#6B778C" className="dark:fill-neutral-50 pointer-events-none capitalize">
+          <text
+            x={node.x}
+            y={node.y + 10}
+            textAnchor="middle"
+            fontSize="10"
+            fill="#6B778C"
+            className="dark:fill-neutral-50 pointer-events-none capitalize"
+          >
             {node.criticality}
           </text>
         </g>
@@ -212,5 +252,3 @@ export function DependencyGraph({ nodes: rawNodes, edges: rawEdges, width = 1000
     </svg>
   )
 }
-
-

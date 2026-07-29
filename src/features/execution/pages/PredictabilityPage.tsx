@@ -1,12 +1,21 @@
 import { useState, useMemo } from 'react'
-import { usePredictability, getPredictabilityColor, getPredictabilityBg } from '../hooks/usePredictability'
+import {
+  usePredictability,
+  getPredictabilityColor,
+  getPredictabilityBg,
+} from '../hooks/usePredictability'
 import type { PeriodGranularity, PredictabilityPeriod } from '../hooks/usePredictability'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts'
-import {
-  Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar,
-} from 'lucide-react'
+import { Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
@@ -39,7 +48,15 @@ const gradientOverlaySummary = {
   primary: 'from-primary/5',
 }
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: Record<string, unknown> }>; label?: string }) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: Array<{ payload: Record<string, unknown> }>
+  label?: string
+}) {
   if (!active || !payload?.length) return null
   const data = payload[0].payload
   return (
@@ -50,19 +67,27 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Predictibilidad</span>
-          <span className="font-semibold text-neutral-90 dark:text-white">{data.predictabilidad as string}%</span>
+          <span className="font-semibold text-neutral-90 dark:text-white">
+            {data.predictabilidad as string}%
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Planificados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.estimado as string} pts</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.estimado as string} pts
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-muted">Completados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.real as string} pts</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.real as string} pts
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4 pt-1 border-t border-boundary">
           <span className="text-muted">Planes</span>
-          <span className="font-medium text-neutral-90 dark:text-white">{data.planes as string}</span>
+          <span className="font-medium text-neutral-90 dark:text-white">
+            {data.planes as string}
+          </span>
         </div>
       </div>
     </div>
@@ -70,13 +95,22 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
-  { key: 'label', label: 'Período', sortable: true, render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span> },
+  {
+    key: 'label',
+    label: 'Período',
+    sortable: true,
+    render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>,
+  },
   {
     key: 'avgPredictability',
     label: 'Predictibilidad',
     sortable: true,
     className: 'text-right',
-    render: (p) => <span className={`font-semibold ${getPredictabilityColor(p.avgPredictability)}`}>{p.avgPredictability}%</span>,
+    render: (p) => (
+      <span className={`font-semibold ${getPredictabilityColor(p.avgPredictability)}`}>
+        {p.avgPredictability}%
+      </span>
+    ),
   },
   {
     key: 'totalEstimated',
@@ -105,13 +139,21 @@ const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
     sortable: true,
     className: 'text-right',
     render: (p) => (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPredictabilityBg(p.avgPredictability)} ${getPredictabilityColor(p.avgPredictability)}`}>
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPredictabilityBg(p.avgPredictability)} ${getPredictabilityColor(p.avgPredictability)}`}
+      >
         {p.avgPredictability >= 80 && p.avgPredictability <= 120 ? (
-          <><Minus size={12} /> Consistente</>
+          <>
+            <Minus size={12} /> Consistente
+          </>
         ) : p.avgPredictability < 80 ? (
-          <><TrendingDown size={12} /> Subestima</>
+          <>
+            <TrendingDown size={12} /> Subestima
+          </>
         ) : (
-          <><TrendingUp size={12} /> Sobreestima</>
+          <>
+            <TrendingUp size={12} /> Sobreestima
+          </>
         )}
       </span>
     ),
@@ -122,9 +164,7 @@ export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
   const [granularity, setGranularity] = useState<PeriodGranularity>('monthly')
 
-  const { periods, teamOptions } = usePredictability(
-    selectedTeamId || null,
-  )
+  const { periods, teamOptions } = usePredictability(selectedTeamId || null)
 
   const currentPeriods = periods[granularity]
 
@@ -176,7 +216,8 @@ export function PredictabilityPage() {
             Predictibilidad de Sprints
           </h2>
           <p className="text-sm text-muted mt-1">
-            Mide qué tan preciso es un equipo al estimar y cumplir sus compromisos. Rango ideal: 80-120%
+            Mide qué tan preciso es un equipo al estimar y cumplir sus compromisos. Rango ideal:
+            80-120%
           </p>
         </div>
       </div>
@@ -186,10 +227,14 @@ export function PredictabilityPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-neutral-50" />
-            <Select value={selectedTeamId} onChange={setSelectedTeamId} options={[
-              { value: '', label: 'Todos los equipos' },
-              ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
-            ]} />
+            <Select
+              value={selectedTeamId}
+              onChange={setSelectedTeamId}
+              options={[
+                { value: '', label: 'Todos los equipos' },
+                ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
 
           <div className="flex items-center gap-1 bg-neutral-10 dark:bg-neutral-70 rounded-lg p-1">
@@ -216,7 +261,13 @@ export function PredictabilityPage() {
           title="Predictibilidad Promedio"
           value={`${summary.avg}%`}
           icon={<Target size={20} />}
-          color={summary.avg >= 80 && summary.avg <= 120 ? 'success' : summary.avg >= 50 ? 'warning' : 'danger'}
+          color={
+            summary.avg >= 80 && summary.avg <= 120
+              ? 'success'
+              : summary.avg >= 50
+                ? 'warning'
+                : 'danger'
+          }
         />
         <SummaryCard
           title="Mejor Período"
@@ -322,12 +373,13 @@ export function PredictabilityPage() {
                 shape={(props: { x?: number; y?: number; width?: number; height?: number }) => {
                   const { x, y, width, height } = props
                   const payload = (props as any).payload
-                  const fill = payload.color === 'success' ? 'url(#pred-chart-success)'
-                    : payload.color === 'warning' ? 'url(#pred-chart-warning)'
-                    : 'url(#pred-chart-danger)'
-                  return (
-                    <rect x={x} y={y} width={width} height={height} rx={6} fill={fill} />
-                  )
+                  const fill =
+                    payload.color === 'success'
+                      ? 'url(#pred-chart-success)'
+                      : payload.color === 'warning'
+                        ? 'url(#pred-chart-warning)'
+                        : 'url(#pred-chart-danger)'
+                  return <rect x={x} y={y} width={width} height={height} rx={6} fill={fill} />
                 }}
               />
             </BarChart>
@@ -336,7 +388,8 @@ export function PredictabilityPage() {
           <div className="py-16 text-center">
             <BarChart3 size={40} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-3" />
             <p className="text-sm text-neutral-50">
-          No se encontraron sprints de equipo para el filtro seleccionado. Registra sprints en el detalle del equipo para ver el gráfico.
+              No se encontraron sprints de equipo para el filtro seleccionado. Registra sprints en
+              el detalle del equipo para ver el gráfico.
             </p>
           </div>
         )}
@@ -352,7 +405,9 @@ export function PredictabilityPage() {
           </div>
           <SortableTable
             columns={periodColumns}
-            data={currentPeriods.map((p) => ({ ...p, id: p.periodKey } as PredictabilityPeriod & { id: string }))}
+            data={currentPeriods.map(
+              (p) => ({ ...p, id: p.periodKey }) as PredictabilityPeriod & { id: string },
+            )}
             pageSize={10}
           />
         </div>
@@ -362,7 +417,11 @@ export function PredictabilityPage() {
 }
 
 function SummaryCard({
-  title, value, subtitle, icon, color,
+  title,
+  value,
+  subtitle,
+  icon,
+  color,
 }: {
   title: string
   value: string
@@ -375,14 +434,20 @@ function SummaryCard({
       <div
         className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
       />
-      <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`} />
+      <div
+        className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`}
+      />
       <div className="relative">
-        <div className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}>
+        <div
+          className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}
+        >
           {icon}
         </div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
         <p className="text-xs text-muted mt-0.5">{title}</p>
-        {subtitle && <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>
+        )}
       </div>
     </div>
   )

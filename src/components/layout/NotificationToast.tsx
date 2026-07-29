@@ -28,11 +28,7 @@ export function NotificationToast() {
   return (
     <div className="fixed bottom-4 right-4 z-[100] flex flex-col-reverse items-end gap-2 pointer-events-none max-w-sm">
       {visible.map((n) => (
-        <ToastItem
-          key={n.id}
-          notification={n}
-          onRemove={() => removeNotification(n.id)}
-        />
+        <ToastItem key={n.id} notification={n} onRemove={() => removeNotification(n.id)} />
       ))}
     </div>
   )
@@ -91,7 +87,11 @@ function ToastItem({
           />
         </div>
       </div>
-      <Button onClick={handleClose} className="shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors" aria-label="Cerrar">
+      <Button
+        onClick={handleClose}
+        className="shrink-0 p-0.5 rounded hover:bg-white/20 transition-colors"
+        aria-label="Cerrar"
+      >
         <X size={14} />
       </Button>
     </div>

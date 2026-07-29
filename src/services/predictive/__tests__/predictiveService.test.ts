@@ -53,7 +53,10 @@ describe('linearRegression', () => {
   })
 })
 
-function predictNext(values: number[], steps = 30): { prediction: number; confidence: 'high' | 'medium' | 'low' } {
+function predictNext(
+  values: number[],
+  steps = 30,
+): { prediction: number; confidence: 'high' | 'medium' | 'low' } {
   const { slope, intercept, r2 } = linearRegression(values)
   const nextIndex = values.length + steps - 1
   const prediction = Math.max(0, Math.min(100, slope * nextIndex + intercept))

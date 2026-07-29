@@ -91,7 +91,7 @@ export function useAiChat({ config }: UseAiChatOptions): UseAiChatReturn {
   const isSendingRef = useRef(false)
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
         await titleUntitledConversations()
       } catch (e) {
@@ -114,7 +114,7 @@ export function useAiChat({ config }: UseAiChatOptions): UseAiChatReturn {
 
   const switchConversation = useCallback(async (id: string) => {
     const all = await listConversations(100)
-    const target = all.find(c => c.id === id)
+    const target = all.find((c) => c.id === id)
     if (!target) return
     setActiveConversation(target)
     const msgs = await loadMessages(id)
@@ -132,186 +132,195 @@ export function useAiChat({ config }: UseAiChatOptions): UseAiChatReturn {
     await refreshConversations()
   }, [refreshConversations])
 
-  const deleteConv = useCallback(async (id: string) => {
-    await deleteConversation(id)
-    const all = await listConversations()
-    if (all.length === 0) {
-      const conv = await createConversation()
-      setActiveConversation(conv)
-      setMessages([])
-      loadedConvRef.current = conv.id
-    } else {
-      // If we deleted the active one, switch to the most recent
-      if (activeConversation?.id === id) {
-        setActiveConversation(all[0])
-        const msgs = await loadMessages(all[0].id)
-        setMessages(msgs)
-        loadedConvRef.current = all[0].id
-      }
-    }
-    await refreshConversations()
-  }, [activeConversation, refreshConversations])
-
-  const sendMessage = useCallback(async (content: string) => {
-    if (!config.enabled || isSendingRef.current) {
-      if (!config.enabled) setError('El asistente no está habilitado. Actívalo en configuración.')
-      return
-    }
-
-    isSendingRef.current = true
-    setIsLoading(true)
-    setError(null)
-
-    // Ensure we have an active conversation
-    let conv = activeConversation
-    if (!conv) {
-      conv = await createConversation()
-      setActiveConversation(conv)
-      loadedConvRef.current = conv.id
-      await refreshConversations()
-    }
-    const convId = conv.id
-
-    const userMsg: AiChatMessage = {
-      id: crypto.randomUUID(),
-      conversationId: convId,
-      role: 'user',
-      content,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMsg])
-    await saveMessage(userMsg, convId)
-
-    if (conv.title === 'Nueva conversación') {
-      const title = generateTitle(content)
-      await updateConversationTitle(convId, title)
-      setActiveConversation((prev) => prev?.id === convId ? { ...prev, title } : prev)
-    }
-
-    try {
-      const provider = createProvider(config)
-      const systemPrompt = buildSystemPrompt(config.dataPermissions)
-      const tools = getEnabledTools(config.dataPermissions)
-
-      const systemMsg: AiChatMessage = {
-        id: crypto.randomUUID(),
-        role: 'system',
-        content: systemPrompt,
-        timestamp: new Date(),
-      }
-
-      let currentMsgs = [systemMsg, ...messages, userMsg]
-      let iteration = 0
-
-      while (iteration < MAX_ITERATIONS) {
-        // Podar historial para no exceder ventana de contexto del modelo
-        currentMsgs = pruneMessages(currentMsgs)
-        const response = await provider.chat(currentMsgs, tools)
-
-        if (response.toolCalls && response.toolCalls.length > 0 && tools.length > 0) {
-          const assistantMsg: AiChatMessage = {
-            id: crypto.randomUUID(),
-            conversationId: convId,
-            role: 'assistant',
-            content: stripToolCallJson(response.content) || `Ejecutando ${response.toolCalls.length} consulta(s)...`,
-            toolCalls: response.toolCalls,
-            timestamp: new Date(),
-          }
-          currentMsgs = [...currentMsgs, assistantMsg]
-
-          for (const toolCall of response.toolCalls) {
-            const tool = tools.find((t) => t.name === toolCall.name)
-            if (!tool) {
-              const errorMsg: AiChatMessage = {
-                id: crypto.randomUUID(),
-                conversationId: convId,
-                role: 'tool',
-                content: `Error: Tool "${toolCall.name}" no encontrada`,
-                toolCallId: toolCall.id,
-                toolName: toolCall.name,
-                timestamp: new Date(),
-              }
-              currentMsgs = [...currentMsgs, errorMsg]
-              continue
-            }
-
-            try {
-              const result = await tool.execute(normalizeParams(toolCall.arguments))
-              const toolMsg: AiChatMessage = {
-                id: crypto.randomUUID(),
-                conversationId: convId,
-                role: 'tool',
-                content: result,
-                toolCallId: toolCall.id,
-                toolName: toolCall.name,
-                timestamp: new Date(),
-              }
-              currentMsgs = [...currentMsgs, toolMsg]
-            } catch (err) {
-              const errorMsg: AiChatMessage = {
-                id: crypto.randomUUID(),
-                conversationId: convId,
-                role: 'tool',
-                content: `Error ejecutando ${toolCall.name}: ${err instanceof Error ? err.message : String(err)}`,
-                toolCallId: toolCall.id,
-                toolName: toolCall.name,
-                timestamp: new Date(),
-              }
-              currentMsgs = [...currentMsgs, errorMsg]
-            }
-          }
-
-          iteration++
-        } else {
-          const finalMsg: AiChatMessage = {
-            id: crypto.randomUUID(),
-            conversationId: convId,
-            role: 'assistant',
-            content: stripToolCallJson(response.content) || 'Listo.',
-            timestamp: new Date(),
-          }
-          currentMsgs = [...currentMsgs, finalMsg]
-          const displayMsgs = currentMsgs.filter((m) => m.role !== 'system')
-          setMessages(displayMsgs)
-          await saveMessages(displayMsgs, convId)
-          await refreshConversations()
-          setIsLoading(false)
-          isSendingRef.current = false
-          return
+  const deleteConv = useCallback(
+    async (id: string) => {
+      await deleteConversation(id)
+      const all = await listConversations()
+      if (all.length === 0) {
+        const conv = await createConversation()
+        setActiveConversation(conv)
+        setMessages([])
+        loadedConvRef.current = conv.id
+      } else {
+        // If we deleted the active one, switch to the most recent
+        if (activeConversation?.id === id) {
+          setActiveConversation(all[0])
+          const msgs = await loadMessages(all[0].id)
+          setMessages(msgs)
+          loadedConvRef.current = all[0].id
         }
       }
-
-      // Max iterations
-      const timeoutMsg: AiChatMessage = {
-        id: crypto.randomUUID(),
-        conversationId: convId,
-        role: 'assistant',
-        content: 'La consulta requirió demasiados pasos. Por favor, sé más específico o prueba con una pregunta más simple.',
-        timestamp: new Date(),
-      }
-      currentMsgs = [...currentMsgs, timeoutMsg]
-      const displayMsgs = currentMsgs.filter((m) => m.role !== 'system')
-      setMessages(displayMsgs)
-      await saveMessages(displayMsgs, convId)
       await refreshConversations()
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err)
-      setError(errorMessage)
-      const errorMsg: AiChatMessage = {
+    },
+    [activeConversation, refreshConversations],
+  )
+
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!config.enabled || isSendingRef.current) {
+        if (!config.enabled) setError('El asistente no está habilitado. Actívalo en configuración.')
+        return
+      }
+
+      isSendingRef.current = true
+      setIsLoading(true)
+      setError(null)
+
+      // Ensure we have an active conversation
+      let conv = activeConversation
+      if (!conv) {
+        conv = await createConversation()
+        setActiveConversation(conv)
+        loadedConvRef.current = conv.id
+        await refreshConversations()
+      }
+      const convId = conv.id
+
+      const userMsg: AiChatMessage = {
         id: crypto.randomUUID(),
         conversationId: convId,
-        role: 'assistant',
-        content: `⚠️ Error: ${errorMessage}`,
+        role: 'user',
+        content,
         timestamp: new Date(),
       }
-      setMessages((prev) => [...prev, errorMsg])
-      await saveMessage(errorMsg, convId)
-    } finally {
-      setIsLoading(false)
-      isSendingRef.current = false
-    }
-  }, [config, messages, activeConversation, refreshConversations])
+
+      setMessages((prev) => [...prev, userMsg])
+      await saveMessage(userMsg, convId)
+
+      if (conv.title === 'Nueva conversación') {
+        const title = generateTitle(content)
+        await updateConversationTitle(convId, title)
+        setActiveConversation((prev) => (prev?.id === convId ? { ...prev, title } : prev))
+      }
+
+      try {
+        const provider = createProvider(config)
+        const systemPrompt = buildSystemPrompt(config.dataPermissions)
+        const tools = getEnabledTools(config.dataPermissions)
+
+        const systemMsg: AiChatMessage = {
+          id: crypto.randomUUID(),
+          role: 'system',
+          content: systemPrompt,
+          timestamp: new Date(),
+        }
+
+        let currentMsgs = [systemMsg, ...messages, userMsg]
+        let iteration = 0
+
+        while (iteration < MAX_ITERATIONS) {
+          // Podar historial para no exceder ventana de contexto del modelo
+          currentMsgs = pruneMessages(currentMsgs)
+          const response = await provider.chat(currentMsgs, tools)
+
+          if (response.toolCalls && response.toolCalls.length > 0 && tools.length > 0) {
+            const assistantMsg: AiChatMessage = {
+              id: crypto.randomUUID(),
+              conversationId: convId,
+              role: 'assistant',
+              content:
+                stripToolCallJson(response.content) ||
+                `Ejecutando ${response.toolCalls.length} consulta(s)...`,
+              toolCalls: response.toolCalls,
+              timestamp: new Date(),
+            }
+            currentMsgs = [...currentMsgs, assistantMsg]
+
+            for (const toolCall of response.toolCalls) {
+              const tool = tools.find((t) => t.name === toolCall.name)
+              if (!tool) {
+                const errorMsg: AiChatMessage = {
+                  id: crypto.randomUUID(),
+                  conversationId: convId,
+                  role: 'tool',
+                  content: `Error: Tool "${toolCall.name}" no encontrada`,
+                  toolCallId: toolCall.id,
+                  toolName: toolCall.name,
+                  timestamp: new Date(),
+                }
+                currentMsgs = [...currentMsgs, errorMsg]
+                continue
+              }
+
+              try {
+                const result = await tool.execute(normalizeParams(toolCall.arguments))
+                const toolMsg: AiChatMessage = {
+                  id: crypto.randomUUID(),
+                  conversationId: convId,
+                  role: 'tool',
+                  content: result,
+                  toolCallId: toolCall.id,
+                  toolName: toolCall.name,
+                  timestamp: new Date(),
+                }
+                currentMsgs = [...currentMsgs, toolMsg]
+              } catch (err) {
+                const errorMsg: AiChatMessage = {
+                  id: crypto.randomUUID(),
+                  conversationId: convId,
+                  role: 'tool',
+                  content: `Error ejecutando ${toolCall.name}: ${err instanceof Error ? err.message : String(err)}`,
+                  toolCallId: toolCall.id,
+                  toolName: toolCall.name,
+                  timestamp: new Date(),
+                }
+                currentMsgs = [...currentMsgs, errorMsg]
+              }
+            }
+
+            iteration++
+          } else {
+            const finalMsg: AiChatMessage = {
+              id: crypto.randomUUID(),
+              conversationId: convId,
+              role: 'assistant',
+              content: stripToolCallJson(response.content) || 'Listo.',
+              timestamp: new Date(),
+            }
+            currentMsgs = [...currentMsgs, finalMsg]
+            const displayMsgs = currentMsgs.filter((m) => m.role !== 'system')
+            setMessages(displayMsgs)
+            await saveMessages(displayMsgs, convId)
+            await refreshConversations()
+            setIsLoading(false)
+            isSendingRef.current = false
+            return
+          }
+        }
+
+        // Max iterations
+        const timeoutMsg: AiChatMessage = {
+          id: crypto.randomUUID(),
+          conversationId: convId,
+          role: 'assistant',
+          content:
+            'La consulta requirió demasiados pasos. Por favor, sé más específico o prueba con una pregunta más simple.',
+          timestamp: new Date(),
+        }
+        currentMsgs = [...currentMsgs, timeoutMsg]
+        const displayMsgs = currentMsgs.filter((m) => m.role !== 'system')
+        setMessages(displayMsgs)
+        await saveMessages(displayMsgs, convId)
+        await refreshConversations()
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : String(err)
+        setError(errorMessage)
+        const errorMsg: AiChatMessage = {
+          id: crypto.randomUUID(),
+          conversationId: convId,
+          role: 'assistant',
+          content: `⚠️ Error: ${errorMessage}`,
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, errorMsg])
+        await saveMessage(errorMsg, convId)
+      } finally {
+        setIsLoading(false)
+        isSendingRef.current = false
+      }
+    },
+    [config, messages, activeConversation, refreshConversations],
+  )
 
   const clearMessages = useCallback(async () => {
     if (activeConversation) {

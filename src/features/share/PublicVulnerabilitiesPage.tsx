@@ -1,6 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { usePublicShare } from '@/hooks/usePublicShare'
-import { getPublicVulnerabilitiesData, type PublicVulnerabilitiesData } from '@/services/share/publicShareService'
+import {
+  getPublicVulnerabilitiesData,
+  type PublicVulnerabilitiesData,
+} from '@/services/share/publicShareService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
@@ -23,18 +26,31 @@ export function PublicVulnerabilitiesPage() {
   const appMap = new Map(data?.applications.map((a) => [a.id, a.name]) ?? [])
 
   const columns: Column<PublicVulnerabilitiesData['vulnerabilities'][number] & { id: string }>[] = [
-    { key: 'title', label: 'Vulnerabilidad', sortable: true, render: (v) => <span className="font-medium text-neutral-90 dark:text-white">{v.title}</span> },
+    {
+      key: 'title',
+      label: 'Vulnerabilidad',
+      sortable: true,
+      render: (v) => <span className="font-medium text-neutral-90 dark:text-white">{v.title}</span>,
+    },
     {
       key: 'severity',
       label: 'Severidad',
       sortable: true,
       render: (v) => (
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sevColors[v.severity] ?? sevColors.low}`}>
+        <span
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sevColors[v.severity] ?? sevColors.low}`}
+        >
           {v.severity.toUpperCase()}
         </span>
       ),
     },
-    { key: 'cvssScore', label: 'CVSS', sortable: true, className: 'text-right', render: (v) => <span className="text-muted">{v.cvssScore?.toFixed(1) ?? '—'}</span> },
+    {
+      key: 'cvssScore',
+      label: 'CVSS',
+      sortable: true,
+      className: 'text-right',
+      render: (v) => <span className="text-muted">{v.cvssScore?.toFixed(1) ?? '—'}</span>,
+    },
     {
       key: 'applicationId',
       label: 'Aplicación',
@@ -46,13 +62,31 @@ export function PublicVulnerabilitiesPage() {
       label: 'Estado',
       sortable: true,
       render: (v) => {
-        const c = v.status === 'fixed' ? 'text-success bg-success/10' : v.status === 'in_progress' ? 'text-warning bg-warning/10' : v.status === 'accepted' ? 'text-info bg-info/10' : 'text-danger bg-danger/10'
-        return <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${c}`}>{v.status.replace(/_/g, ' ')}</span>
+        const c =
+          v.status === 'fixed'
+            ? 'text-success bg-success/10'
+            : v.status === 'in_progress'
+              ? 'text-warning bg-warning/10'
+              : v.status === 'accepted'
+                ? 'text-info bg-info/10'
+                : 'text-danger bg-danger/10'
+        return (
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${c}`}
+          >
+            {v.status.replace(/_/g, ' ')}
+          </span>
+        )
       },
     },
   ]
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -81,7 +115,9 @@ export function PublicVulnerabilitiesPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Vulnerabilidades</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Vulnerabilidades
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -92,7 +128,9 @@ export function PublicVulnerabilitiesPage() {
         <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-boundary flex items-center gap-2">
             <Shield size={18} className="text-danger" />
-            <span className="font-semibold text-neutral-90 dark:text-white">{data.vulnerabilities.length} vulnerabilidades compartidas</span>
+            <span className="font-semibold text-neutral-90 dark:text-white">
+              {data.vulnerabilities.length} vulnerabilidades compartidas
+            </span>
           </div>
           <SortableTable
             columns={columns}

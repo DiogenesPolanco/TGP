@@ -56,7 +56,9 @@ export function DependencyList({ planId }: DependencyListProps) {
   const getEntityOptions = () => {
     switch (targetType) {
       case 'plan':
-        return plans?.filter((p) => p.id !== planId).map((p) => ({ value: p.id, label: p.title })) ?? []
+        return (
+          plans?.filter((p) => p.id !== planId).map((p) => ({ value: p.id, label: p.title })) ?? []
+        )
       case 'activity':
         return activities?.map((act) => ({ value: act.id, label: act.title })) ?? []
       case 'task':
@@ -72,12 +74,18 @@ export function DependencyList({ planId }: DependencyListProps) {
 
   const getEntityName = (type: string, id: string): string => {
     switch (type) {
-      case 'plan': return plans?.find((p) => p.id === id)?.title ?? id
-      case 'activity': return activities?.find((a) => a.id === id)?.title ?? id
-      case 'task': return tasks?.find((t) => t.id === id)?.title ?? id
-      case 'deliverable': return deliverables?.find((d) => d.id === id)?.title ?? id
-      case 'commitment': return commitments?.find((c) => c.id === id)?.title ?? id
-      default: return id
+      case 'plan':
+        return plans?.find((p) => p.id === id)?.title ?? id
+      case 'activity':
+        return activities?.find((a) => a.id === id)?.title ?? id
+      case 'task':
+        return tasks?.find((t) => t.id === id)?.title ?? id
+      case 'deliverable':
+        return deliverables?.find((d) => d.id === id)?.title ?? id
+      case 'commitment':
+        return commitments?.find((c) => c.id === id)?.title ?? id
+      default:
+        return id
     }
   }
 
@@ -115,12 +123,14 @@ export function DependencyList({ planId }: DependencyListProps) {
       label: relationLabels[d.relationType],
       isIncoming: false,
     })) ?? []),
-    ...(reverseDeps?.filter((d) => d.sourceId !== planId).map((d) => ({
-      dep: d,
-      relatedName: getEntityName(d.sourceType, d.sourceId),
-      label: `Depende de este plan`,
-      isIncoming: true,
-    })) ?? []),
+    ...(reverseDeps
+      ?.filter((d) => d.sourceId !== planId)
+      .map((d) => ({
+        dep: d,
+        relatedName: getEntityName(d.sourceType, d.sourceId),
+        label: `Depende de este plan`,
+        isIncoming: true,
+      })) ?? []),
   ]
 
   return (
@@ -142,13 +152,20 @@ export function DependencyList({ planId }: DependencyListProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); setShowForm(!showForm) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowForm(!showForm)
+            }}
             className="p-1 rounded-md hover:bg-neutral-30 dark:hover:bg-neutral-60 transition-colors"
             title="Agregar dependencia"
           >
             <Plus size={16} className="text-neutral-50" />
           </button>
-          {collapsed ? <ChevronRight size={16} className="text-neutral-50" /> : <ChevronDown size={16} className="text-neutral-50" />}
+          {collapsed ? (
+            <ChevronRight size={16} className="text-neutral-50" />
+          ) : (
+            <ChevronDown size={16} className="text-neutral-50" />
+          )}
         </div>
       </button>
 
@@ -157,10 +174,15 @@ export function DependencyList({ planId }: DependencyListProps) {
           {showForm && (
             <div className="p-4 space-y-3 bg-neutral-10 dark:bg-neutral-80">
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1">Tipo destino</label>
+                <label className="block text-xs font-medium text-secondary mb-1">
+                  Tipo destino
+                </label>
                 <Select
                   value={targetType}
-                  onChange={(v) => { setTargetType(v as EntityType); setTargetId('') }}
+                  onChange={(v) => {
+                    setTargetType(v as EntityType)
+                    setTargetId('')
+                  }}
                   options={(Object.keys(entityTypeLabels) as EntityType[]).map((key) => ({
                     value: key,
                     label: entityTypeLabels[key],
@@ -168,16 +190,20 @@ export function DependencyList({ planId }: DependencyListProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-secondary mb-1">Entidad destino</label>
+                <label className="block text-xs font-medium text-secondary mb-1">
+                  Entidad destino
+                </label>
                 <Select
                   value={targetId}
                   onChange={(v) => setTargetId(v)}
                   options={[
                     { value: '', label: 'Seleccionar...' },
-                    ...getEntityOptions().filter((opt) => opt.value !== planId).map((opt) => ({
-                      value: opt.value,
-                      label: opt.label,
-                    })),
+                    ...getEntityOptions()
+                      .filter((opt) => opt.value !== planId)
+                      .map((opt) => ({
+                        value: opt.value,
+                        label: opt.label,
+                      })),
                   ]}
                 />
               </div>
@@ -224,18 +250,28 @@ export function DependencyList({ planId }: DependencyListProps) {
           )}
 
           {allDeps.length === 0 && !showForm && (
-            <div className="p-4 text-center text-xs text-neutral-50">Sin dependencias registradas</div>
+            <div className="p-4 text-center text-xs text-neutral-50">
+              Sin dependencias registradas
+            </div>
           )}
 
           {dependencies?.map((dep) => (
             <div key={dep.id} className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
-                <span className={`text-nowrap px-2 py-0.5 text-[10px] font-semibold rounded-full border ${relationColors[dep.relationType]}`}>
+                <span
+                  className={`text-nowrap px-2 py-0.5 text-[10px] font-semibold rounded-full border ${relationColors[dep.relationType]}`}
+                >
                   {relationLabels[dep.relationType]}
                 </span>
                 <ArrowRight size={12} className="text-neutral-50 shrink-0" />
-                <span className="text-sm text-neutral-80 dark:text-white truncate">{getEntityName(dep.targetType, dep.targetId)}</span>
-                {dep.description && <span className="text-xs text-neutral-50 hidden sm:inline truncate">- {dep.description}</span>}
+                <span className="text-sm text-neutral-80 dark:text-white truncate">
+                  {getEntityName(dep.targetType, dep.targetId)}
+                </span>
+                {dep.description && (
+                  <span className="text-xs text-neutral-50 hidden sm:inline truncate">
+                    - {dep.description}
+                  </span>
+                )}
               </div>
               <button
                 type="button"
@@ -247,17 +283,24 @@ export function DependencyList({ planId }: DependencyListProps) {
             </div>
           ))}
 
-          {reverseDeps?.filter((d) => d.sourceId !== planId).map((dep) => (
-            <div key={`rev-${dep.id}`} className="flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-nowrap px-2 py-0.5 text-[10px] font-semibold rounded-full border border-neutral-30 bg-neutral-10 text-neutral-60">
-                  Depende de este plan
-                </span>
-                <ArrowRight size={12} className="text-neutral-50 shrink-0" />
-                <span className="text-sm text-neutral-80 dark:text-white truncate">{getEntityName(dep.sourceType, dep.sourceId)}</span>
+          {reverseDeps
+            ?.filter((d) => d.sourceId !== planId)
+            .map((dep) => (
+              <div
+                key={`rev-${dep.id}`}
+                className="flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-nowrap px-2 py-0.5 text-[10px] font-semibold rounded-full border border-neutral-30 bg-neutral-10 text-neutral-60">
+                    Depende de este plan
+                  </span>
+                  <ArrowRight size={12} className="text-neutral-50 shrink-0" />
+                  <span className="text-sm text-neutral-80 dark:text-white truncate">
+                    {getEntityName(dep.sourceType, dep.sourceId)}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
     </div>

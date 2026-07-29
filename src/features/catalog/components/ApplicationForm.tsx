@@ -31,7 +31,9 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
     criticality: application?.criticality ?? 'medium',
     architecture: application?.architecture ?? 'monolith',
     status: application?.status ?? 'active',
-    supportEndDate: application?.supportEndDate ? new Date(application.supportEndDate).toISOString().split('T')[0] : '',
+    supportEndDate: application?.supportEndDate
+      ? new Date(application.supportEndDate).toISOString().split('T')[0]
+      : '',
   })
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>(application?.technologies ?? [])
 
@@ -76,7 +78,10 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {application ? 'Editar Aplicación' : 'Nueva Aplicación'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <X size={20} />
           </Button>
         </div>
@@ -110,46 +115,75 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           />
 
           <div>
-            <Select label="Business Unit *" required value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-              { value: '', label: 'Seleccionar...' },
-              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-            ]} />
+            <Select
+              label="Business Unit *"
+              required
+              value={formData.businessUnitId}
+              onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+              options={[
+                { value: '', label: 'Seleccionar...' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Criticidad *" required value={formData.criticality} onChange={(v) => setFormData({ ...formData, criticality: v as typeof formData.criticality })} options={[
-                { value: 'low', label: 'Baja' },
-                { value: 'medium', label: 'Media' },
-                { value: 'high', label: 'Alta' },
-                { value: 'critical', label: 'Crítica' },
-              ]} />
+              <Select
+                label="Criticidad *"
+                required
+                value={formData.criticality}
+                onChange={(v) =>
+                  setFormData({ ...formData, criticality: v as typeof formData.criticality })
+                }
+                options={[
+                  { value: 'low', label: 'Baja' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'critical', label: 'Crítica' },
+                ]}
+              />
             </div>
 
             <div>
-              <Select label="Arquitectura" value={formData.architecture} onChange={(v) => setFormData({ ...formData, architecture: v as typeof formData.architecture })} options={[
-                { value: 'monolith', label: 'Monolito' },
-                { value: 'microservices', label: 'Microservicios' },
-                { value: 'serverless', label: 'Serverless' },
-                { value: 'soa', label: 'SOA' },
-                { value: 'event_driven', label: 'Event Driven' },
-                { value: 'hybrid', label: 'Híbrida' },
-              ]} />
+              <Select
+                label="Arquitectura"
+                value={formData.architecture}
+                onChange={(v) =>
+                  setFormData({ ...formData, architecture: v as typeof formData.architecture })
+                }
+                options={[
+                  { value: 'monolith', label: 'Monolito' },
+                  { value: 'microservices', label: 'Microservicios' },
+                  { value: 'serverless', label: 'Serverless' },
+                  { value: 'soa', label: 'SOA' },
+                  { value: 'event_driven', label: 'Event Driven' },
+                  { value: 'hybrid', label: 'Híbrida' },
+                ]}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Estado *" required value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })} options={[
-                { value: 'active', label: 'Activa' },
-                { value: 'deprecated', label: 'Deprecada' },
-                { value: 'retired', label: 'Retirada' },
-                { value: 'planned', label: 'Planificada' },
-              ]} />
+              <Select
+                label="Estado *"
+                required
+                value={formData.status}
+                onChange={(v) => setFormData({ ...formData, status: v as typeof formData.status })}
+                options={[
+                  { value: 'active', label: 'Activa' },
+                  { value: 'deprecated', label: 'Deprecada' },
+                  { value: 'retired', label: 'Retirada' },
+                  { value: 'planned', label: 'Planificada' },
+                ]}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-secondary mb-1">Fecha fin soporte</label>
+              <label className="block text-sm font-medium text-secondary mb-1">
+                Fecha fin soporte
+              </label>
               <DatePicker
                 value={formData.supportEndDate}
                 onChange={(v) => setFormData({ ...formData, supportEndDate: v })}
@@ -160,7 +194,10 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-2">
-              Tecnologías <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
+              Tecnologías{' '}
+              <span className="text-neutral-50 font-normal">
+                ({selectedTechIds.length} seleccionadas)
+              </span>
             </label>
             <TechSearch
               selectedIds={selectedTechIds}
@@ -170,11 +207,17 @@ export function ApplicationForm({ application, onClose, onSave }: ApplicationFor
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button"
-              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <Button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            >
               Cancelar
             </Button>
-            <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
+            <Button
+              type="submit"
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+            >
               {application ? 'Actualizar' : 'Crear'}
             </Button>
           </div>

@@ -3,12 +3,32 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { DetailLayout } from '@/components/ui/DetailLayout'
-import { Pencil, Server, Search, AlertTriangle, Target, CheckCircle, XCircle, Clock } from 'lucide-react'
+import {
+  Pencil,
+  Server,
+  Search,
+  AlertTriangle,
+  Target,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from 'lucide-react'
 import { RelatedEntitiesView } from '@/features/shared/components/RelatedEntitiesView'
 import { Button } from '@/components/ui/Button'
 
-const statusLabel: Record<string, string> = { open: 'Abierto', mitigated: 'Mitigado', accepted: 'Aceptado', closed: 'Cerrado' }
-const categoryLabel: Record<string, string> = { technical: 'Técnico', security: 'Seguridad', operational: 'Operacional', regulatory: 'Regulatorio', financial: 'Financiero' }
+const statusLabel: Record<string, string> = {
+  open: 'Abierto',
+  mitigated: 'Mitigado',
+  accepted: 'Aceptado',
+  closed: 'Cerrado',
+}
+const categoryLabel: Record<string, string> = {
+  technical: 'Técnico',
+  security: 'Seguridad',
+  operational: 'Operacional',
+  regulatory: 'Regulatorio',
+  financial: 'Financiero',
+}
 
 export function RiskDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -16,17 +36,29 @@ export function RiskDetailPage() {
   const [activeTab, setActiveTab] = useState<'info' | 'relations'>('info')
 
   const risk = useLiveQuery(() => db.risks.get(id!), [id])
-  const app = useLiveQuery(() => risk?.applicationId ? db.applications.get(risk.applicationId) : undefined, [risk])
-  const bu = useLiveQuery(() => risk?.businessUnitId ? db.businessUnits.get(risk.businessUnitId) : undefined, [risk])
+  const app = useLiveQuery(
+    () => (risk?.applicationId ? db.applications.get(risk.applicationId) : undefined),
+    [risk],
+  )
+  const bu = useLiveQuery(
+    () => (risk?.businessUnitId ? db.businessUnits.get(risk.businessUnitId) : undefined),
+    [risk],
+  )
 
   // ── Related entities ──
-  const rawMsJunction = useLiveQuery(() => db.riskMicroservices.where('riskId').equals(id!).toArray(), [id])
+  const rawMsJunction = useLiveQuery(
+    () => db.riskMicroservices.where('riskId').equals(id!).toArray(),
+    [id],
+  )
   const msJunction = useMemo(() => rawMsJunction ?? [], [rawMsJunction])
   const msIds = useMemo(() => new Set(msJunction.map((j) => j.microserviceId)), [msJunction])
 
   const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
   const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
-  const linkedMs = useMemo(() => microservices.filter((ms) => msIds.has(ms.id)), [microservices, msIds])
+  const linkedMs = useMemo(
+    () => microservices.filter((ms) => msIds.has(ms.id)),
+    [microservices, msIds],
+  )
 
   const rawAllVulns = useLiveQuery(() => db.vulnerabilities.toArray())
   const allVulns = useMemo(() => rawAllVulns ?? [], [rawAllVulns])
@@ -50,14 +82,55 @@ export function RiskDetailPage() {
   }, [risk, app, linkedMs, allVulns, allIncidents, allAudit])
 
   if (!risk) {
-    return <DetailLayout title="Riesgo no encontrado" onBack={() => navigate('/governance/risks')}><p className="text-neutral-50">El riesgo no existe o ha sido eliminado.</p></DetailLayout>
+    return (
+      <DetailLayout title="Riesgo no encontrado" onBack={() => navigate('/governance/risks')}>
+        <p className="text-neutral-50">El riesgo no existe o ha sido eliminado.</p>
+      </DetailLayout>
+    )
   }
 
-  const riskLevel = risk.riskScore >= 15 ? 'Crítico' : risk.riskScore >= 10 ? 'Alto' : risk.riskScore >= 5 ? 'Medio' : 'Bajo'
-  const riskColor = risk.riskScore >= 15 ? 'bg-danger text-white' : risk.riskScore >= 10 ? 'bg-warning text-white' : risk.riskScore >= 5 ? 'bg-info text-white' : 'bg-success text-white'
-  const riskBg = risk.riskScore >= 15 ? 'bg-danger/5 border-danger/20' : risk.riskScore >= 10 ? 'bg-warning/5 border-warning/20' : risk.riskScore >= 5 ? 'bg-info/5 border-info/20' : 'bg-success/5 border-success/20'
-  const riskIcon = risk.riskScore >= 15 ? <XCircle size={24} className="text-white" /> : risk.riskScore >= 10 ? <AlertTriangle size={24} className="text-white" /> : risk.riskScore >= 5 ? <Clock size={24} className="text-white" /> : <CheckCircle size={24} className="text-white" />
-  const riskIconBg = risk.riskScore >= 15 ? 'bg-danger' : risk.riskScore >= 10 ? 'bg-warning' : risk.riskScore >= 5 ? 'bg-info' : 'bg-success'
+  const riskLevel =
+    risk.riskScore >= 15
+      ? 'Crítico'
+      : risk.riskScore >= 10
+        ? 'Alto'
+        : risk.riskScore >= 5
+          ? 'Medio'
+          : 'Bajo'
+  const riskColor =
+    risk.riskScore >= 15
+      ? 'bg-danger text-white'
+      : risk.riskScore >= 10
+        ? 'bg-warning text-white'
+        : risk.riskScore >= 5
+          ? 'bg-info text-white'
+          : 'bg-success text-white'
+  const riskBg =
+    risk.riskScore >= 15
+      ? 'bg-danger/5 border-danger/20'
+      : risk.riskScore >= 10
+        ? 'bg-warning/5 border-warning/20'
+        : risk.riskScore >= 5
+          ? 'bg-info/5 border-info/20'
+          : 'bg-success/5 border-success/20'
+  const riskIcon =
+    risk.riskScore >= 15 ? (
+      <XCircle size={24} className="text-white" />
+    ) : risk.riskScore >= 10 ? (
+      <AlertTriangle size={24} className="text-white" />
+    ) : risk.riskScore >= 5 ? (
+      <Clock size={24} className="text-white" />
+    ) : (
+      <CheckCircle size={24} className="text-white" />
+    )
+  const riskIconBg =
+    risk.riskScore >= 15
+      ? 'bg-danger'
+      : risk.riskScore >= 10
+        ? 'bg-warning'
+        : risk.riskScore >= 5
+          ? 'bg-info'
+          : 'bg-success'
 
   const tabs = [
     { id: 'info' as const, label: 'Información General', icon: Server },
@@ -108,14 +181,19 @@ export function RiskDetailPage() {
           <div className={`rounded-xl border p-5 ${riskBg}`}>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl ${riskIconBg} flex items-center justify-center shadow-sm`}>
+                <div
+                  className={`w-12 h-12 rounded-xl ${riskIconBg} flex items-center justify-center shadow-sm`}
+                >
                   {riskIcon}
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-neutral-50 dark:text-neutral-40">Nivel de Riesgo</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-neutral-50 dark:text-neutral-40">
+                    Nivel de Riesgo
+                  </p>
                   <p className="text-xl font-bold text-neutral-90 dark:text-white">{riskLevel}</p>
                   <p className="text-sm text-muted mt-0.5">
-                    Score: <span className="font-bold">{risk.riskScore}</span> · Probabilidad {risk.probability}/5 · Impacto {risk.impact}/5
+                    Score: <span className="font-bold">{risk.riskScore}</span> · Probabilidad{' '}
+                    {risk.probability}/5 · Impacto {risk.impact}/5
                   </p>
                 </div>
               </div>
@@ -126,7 +204,9 @@ export function RiskDetailPage() {
             </div>
             {risk.mitigationPlan && (
               <div className="mt-4 pt-4 border-t border-current/10">
-                <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-1">Plan de Mitigación</p>
+                <p className="text-xs font-medium text-neutral-50 uppercase tracking-wider mb-1">
+                  Plan de Mitigación
+                </p>
                 <p className="text-sm text-secondary whitespace-pre-wrap">{risk.mitigationPlan}</p>
               </div>
             )}
@@ -137,7 +217,10 @@ export function RiskDetailPage() {
             <Section title="Información General" icon={<Server size={18} />}>
               <div className="grid grid-cols-2 gap-3">
                 <MiniField label="Título" value={risk.title} />
-                <MiniField label="Categoría" value={categoryLabel[risk.category] ?? risk.category} />
+                <MiniField
+                  label="Categoría"
+                  value={categoryLabel[risk.category] ?? risk.category}
+                />
                 <MiniField label="Aplicación" value={app?.name ?? 'Sin asignar'} />
                 <MiniField label="Unidad de Negocio" value={bu?.name ?? 'Sin asignar'} />
               </div>
@@ -150,18 +233,30 @@ export function RiskDetailPage() {
                 <MiniField
                   label="Estado"
                   value={
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
-                      risk.status === 'open' ? 'bg-danger/10 text-danger' :
-                      risk.status === 'mitigated' ? 'bg-warning/10 text-warning' :
-                      risk.status === 'accepted' ? 'bg-info/10 text-info' :
-                      'bg-success/10 text-success'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+                        risk.status === 'open'
+                          ? 'bg-danger/10 text-danger'
+                          : risk.status === 'mitigated'
+                            ? 'bg-warning/10 text-warning'
+                            : risk.status === 'accepted'
+                              ? 'bg-info/10 text-info'
+                              : 'bg-success/10 text-success'
+                      }`}
+                    >
                       {statusLabel[risk.status] ?? risk.status}
                     </span>
                   }
                 />
                 {risk.targetDate && (
-                  <MiniField label="Fecha Objetivo" value={new Date(risk.targetDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })} />
+                  <MiniField
+                    label="Fecha Objetivo"
+                    value={new Date(risk.targetDate).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  />
                 )}
               </div>
             </Section>
@@ -176,7 +271,15 @@ export function RiskDetailPage() {
   )
 }
 
-function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
@@ -192,7 +295,9 @@ function MiniField({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div className="space-y-0.5">
       <dt className="text-[10px] font-medium text-neutral-40 uppercase tracking-wider">{label}</dt>
-      <dd className="text-sm text-neutral-90 dark:text-white">{typeof value === 'string' ? (value || '—') : value}</dd>
+      <dd className="text-sm text-neutral-90 dark:text-white">
+        {typeof value === 'string' ? value || '—' : value}
+      </dd>
     </div>
   )
 }

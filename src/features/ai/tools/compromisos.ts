@@ -37,23 +37,30 @@ export const compromisosTool: AiToolDefinition = {
 
     if (status) commitments = commitments.filter((c) => c.status === status)
     if (teamId) commitments = commitments.filter((c) => c.teamId === teamId)
-    if (ownerId) commitments = commitments.filter((c) => c.ownerId === ownerId || c.accountableId === ownerId)
+    if (ownerId)
+      commitments = commitments.filter((c) => c.ownerId === ownerId || c.accountableId === ownerId)
 
     const now = new Date()
     if (vencidos) {
       commitments = commitments.filter(
-        (c) => c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now
+        (c) =>
+          c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now,
       )
     }
     if (estaSemana) {
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
       commitments = commitments.filter(
-        (c) => c.status !== 'fulfilled' && c.status !== 'cancelled' &&
-          new Date(c.commitmentDate) >= now && new Date(c.commitmentDate) <= weekFromNow
+        (c) =>
+          c.status !== 'fulfilled' &&
+          c.status !== 'cancelled' &&
+          new Date(c.commitmentDate) >= now &&
+          new Date(c.commitmentDate) <= weekFromNow,
       )
     }
 
-    commitments.sort((a, b) => new Date(a.commitmentDate).getTime() - new Date(b.commitmentDate).getTime())
+    commitments.sort(
+      (a, b) => new Date(a.commitmentDate).getTime() - new Date(b.commitmentDate).getTime(),
+    )
     commitments = commitments.slice(0, limit)
 
     const users = await db.users.toArray()
@@ -63,13 +70,15 @@ export const compromisosTool: AiToolDefinition = {
       const owner = userMap.get(c.ownerId) ?? c.ownerId
       const accountable = userMap.get(c.accountableId) ?? c.accountableId
       const date = new Date(c.commitmentDate).toLocaleDateString('es-ES')
-      const isOverdue = c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now
-        return `- ${c.title} | Responsable: ${owner} | Rinde: ${accountable} | Vence: ${date} | Estado: ${c.status}${isOverdue ? ' [VENCIDO]' : ''}`
+      const isOverdue =
+        c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now
+      return `- ${c.title} | Responsable: ${owner} | Rinde: ${accountable} | Vence: ${date} | Estado: ${c.status}${isOverdue ? ' [VENCIDO]' : ''}`
     })
 
     const total = commitments.length
     const overdue = commitments.filter(
-      (c) => c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now
+      (c) =>
+        c.status !== 'fulfilled' && c.status !== 'cancelled' && new Date(c.commitmentDate) < now,
     ).length
 
     let summary = `Se encontraron ${total} compromiso(s)`
@@ -122,9 +131,7 @@ export const tareasTool: AiToolDefinition = {
 
     const now = new Date()
     if (vencidas) {
-      tasks = tasks.filter(
-        (t) => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < now
-      )
+      tasks = tasks.filter((t) => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < now)
     }
 
     tasks.sort((a, b) => {

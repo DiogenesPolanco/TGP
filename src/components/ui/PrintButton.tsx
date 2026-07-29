@@ -23,23 +23,25 @@ function inlineComputedStyles(source: HTMLElement, target: HTMLElement) {
 
 async function inlineImagesAsBase64(root: HTMLElement) {
   const imgs = [...root.querySelectorAll<HTMLImageElement>('img')]
-  await Promise.all(imgs.map(async (img) => {
-    const src = img.getAttribute('src') || img.src
-    if (!src || src.startsWith('data:')) return
-    try {
-      const absUrl = new URL(src, window.location.origin).href
-      const res = await fetch(absUrl)
-      const blob = await res.blob()
-      const base64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.readAsDataURL(blob)
-      })
-      img.src = base64
-    } catch {
-      // ignore — keep original src if conversion fails
-    }
-  }))
+  await Promise.all(
+    imgs.map(async (img) => {
+      const src = img.getAttribute('src') || img.src
+      if (!src || src.startsWith('data:')) return
+      try {
+        const absUrl = new URL(src, window.location.origin).href
+        const res = await fetch(absUrl)
+        const blob = await res.blob()
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(blob)
+        })
+        img.src = base64
+      } catch {
+        // ignore — keep original src if conversion fails
+      }
+    }),
+  )
 }
 
 export function PrintButton() {
@@ -48,13 +50,16 @@ export function PrintButton() {
 
   const captureImage = async () => {
     const el = document.getElementById('printable-content')
-    if (!el) { console.warn('[PrintButton] #printable-content no encontrado'); return }
+    if (!el) {
+      console.warn('[PrintButton] #printable-content no encontrado')
+      return
+    }
 
     setCapturing(true)
     const noPrint = el.querySelectorAll<HTMLElement>('.no-print')
     const watermark = el.querySelector<HTMLElement>('.print-watermark')
     try {
-      noPrint.forEach((n) => n.style.display = 'none')
+      noPrint.forEach((n) => (n.style.display = 'none'))
       if (watermark) watermark.style.display = 'block'
 
       const clone = el.cloneNode(true) as HTMLElement
@@ -64,7 +69,7 @@ export function PrintButton() {
 
       // Hide watermark again immediately (clone already has it visible)
       if (watermark) watermark.style.display = 'none'
-      noPrint.forEach((n) => n.style.display = '')
+      noPrint.forEach((n) => (n.style.display = ''))
 
       clone.style.position = 'fixed'
       clone.style.left = '0'

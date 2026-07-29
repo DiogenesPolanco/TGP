@@ -82,7 +82,10 @@ export function PlanFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/execution/plans')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/execution/plans')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
@@ -90,72 +93,132 @@ export function PlanFormPage() {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4"
+      >
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Título *</label>
-          <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="ej. Q2 2026 — Modernización Core" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <input
+            type="text"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="ej. Q2 2026 — Modernización Core"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
-          <RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el plan..." />
+          <RichTextEditor
+            value={formData.description}
+            onChange={(html) => setFormData({ ...formData, description: html })}
+            placeholder="Describe el plan..."
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
-              { value: '', label: 'Sin equipo' },
-              ...teams.map((t) => ({ value: t.id, label: t.name })),
-            ]} />
+            <Select
+              label="Equipo"
+              value={formData.teamId}
+              onChange={(v) => setFormData({ ...formData, teamId: v })}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
           <div>
-            <Select label="Unidad de Negocio" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-              { value: '', label: 'Sin BU' },
-              ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-            ]} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Select label="OKR Asociado" value={formData.objectiveId} onChange={(v) => setFormData({ ...formData, objectiveId: v })} options={[
-              { value: '', label: 'Sin OKR' },
-              ...objectives.map((o) => ({ value: o.id, label: o.title })),
-            ]} />
-          </div>
-          <div>
-            <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ProjectStatus })} options={[
-              { value: 'planned', label: 'Planificado' },
-              { value: 'in_progress', label: 'En Progreso' },
-              { value: 'on_hold', label: 'En Pausa' },
-              { value: 'completed', label: 'Completado' },
-              { value: 'cancelled', label: 'Cancelado' },
-            ]} />
+            <Select
+              label="Unidad de Negocio"
+              value={formData.businessUnitId}
+              onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+              options={[
+                { value: '', label: 'Sin BU' },
+                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+              ]}
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Salud" value={formData.health} onChange={(v) => setFormData({ ...formData, health: v as ProjectHealth })} options={[
-              { value: 'green', label: 'Verde' },
-              { value: 'yellow', label: 'Amarillo' },
-              { value: 'red', label: 'Rojo' },
-            ]} />
+            <Select
+              label="OKR Asociado"
+              value={formData.objectiveId}
+              onChange={(v) => setFormData({ ...formData, objectiveId: v })}
+              options={[
+                { value: '', label: 'Sin OKR' },
+                ...objectives.map((o) => ({ value: o.id, label: o.title })),
+              ]}
+            />
+          </div>
+          <div>
+            <Select
+              label="Estado"
+              value={formData.status}
+              onChange={(v) => setFormData({ ...formData, status: v as ProjectStatus })}
+              options={[
+                { value: 'planned', label: 'Planificado' },
+                { value: 'in_progress', label: 'En Progreso' },
+                { value: 'on_hold', label: 'En Pausa' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Select
+              label="Salud"
+              value={formData.health}
+              onChange={(v) => setFormData({ ...formData, health: v as ProjectHealth })}
+              options={[
+                { value: 'green', label: 'Verde' },
+                { value: 'yellow', label: 'Amarillo' },
+                { value: 'red', label: 'Rojo' },
+              ]}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Fecha Inicio *</label>
-            <DatePicker required value={formData.startDate} onChange={(v) => setFormData({ ...formData, startDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <DatePicker
+              required
+              value={formData.startDate}
+              onChange={(v) => setFormData({ ...formData, startDate: v })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Fecha Fin *</label>
-            <DatePicker required value={formData.endDate} onChange={(v) => setFormData({ ...formData, endDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <DatePicker
+            required
+            value={formData.endDate}
+            onChange={(v) => setFormData({ ...formData, endDate: v })}
+            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" onClick={() => navigate('/execution/plans')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
-          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{plan ? 'Actualizar' : 'Crear'}</Button>
+          <Button
+            type="button"
+            onClick={() => navigate('/execution/plans')}
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+          >
+            {plan ? 'Actualizar' : 'Crear'}
+          </Button>
         </div>
       </form>
     </div>

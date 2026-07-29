@@ -1,5 +1,15 @@
 import { useState, useMemo } from 'react'
-import { ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle, Pencil, Trash2, Plus } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Pencil,
+  Trash2,
+  Plus,
+} from 'lucide-react'
 import type { Activity } from '@/types/domain'
 import type { DeliverableStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
@@ -7,7 +17,14 @@ import { Button } from '@/components/ui/Button'
 interface ActivityGanttProps {
   planId: string
   activities: Activity[]
-  tasks: { id: string; activityId: string | null; title: string; status: string; priority: string; dueDate: Date | null }[]
+  tasks: {
+    id: string
+    activityId: string | null
+    title: string
+    status: string
+    priority: string
+    dueDate: Date | null
+  }[]
   teamMap: Map<string, { name: string }>
   appMap: Map<string, { name: string }>
   onEditActivity: (activityId: string) => void
@@ -46,8 +63,14 @@ const priorityLabel: Record<string, string> = {
 }
 
 export function ActivityGantt({
-  activities, tasks, teamMap, appMap,
-  onEditActivity, onDeleteActivity, onTaskToggle, onNewActivity,
+  activities,
+  tasks,
+  teamMap,
+  appMap,
+  onEditActivity,
+  onDeleteActivity,
+  onTaskToggle,
+  onNewActivity,
   readOnly = false,
 }: ActivityGanttProps) {
   const [expandedActivities, setExpandedActivities] = useState<Set<string>>(new Set())
@@ -77,13 +100,9 @@ export function ActivityGantt({
     return map
   }, [activities])
 
-  const rootActivities = useMemo(
-    () => activitiesByParent.get(null) ?? [],
-    [activitiesByParent],
-  )
+  const rootActivities = useMemo(() => activitiesByParent.get(null) ?? [], [activitiesByParent])
 
-  const childActivities = (parentId: string) =>
-    activitiesByParent.get(parentId) ?? []
+  const childActivities = (parentId: string) => activitiesByParent.get(parentId) ?? []
 
   const tasksByActivity = useMemo(() => {
     const map = new Map<string, typeof tasks>()
@@ -292,21 +311,42 @@ export function ActivityGantt({
 
       {/* Legend */}
       <div className="flex items-center gap-4 px-6 py-3 border-t border-boundary bg-neutral-10/50 dark:bg-neutral-80/50">
-        <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
-        <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-pending" /> Pendiente</span>
-        <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-info" /> En Progreso</span>
-        <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-success" /> Completado</span>
-        <span className="flex items-center gap-1.5 text-xs"><span className="w-3 h-3 rounded-sm bg-danger/50" /> Vencido</span>
-        <span className="flex items-center gap-1.5 text-xs"><span className="w-0.5 h-3 bg-danger" /> Hoy</span>
+        <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">
+          Leyenda
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="w-3 h-3 rounded-sm bg-pending" /> Pendiente
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="w-3 h-3 rounded-sm bg-info" /> En Progreso
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="w-3 h-3 rounded-sm bg-success" /> Completado
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="w-3 h-3 rounded-sm bg-danger/50" /> Vencido
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="w-0.5 h-3 bg-danger" /> Hoy
+        </span>
       </div>
     </div>
   )
 }
 
 function ActivityGanttRow({
-  activity, timelineStart, totalDays, dayWidth, today,
-  teamMap, appMap, onEdit, onDelete,
-  hasChildren, isExpanded, onToggle,
+  activity,
+  timelineStart,
+  totalDays,
+  dayWidth,
+  today,
+  teamMap,
+  appMap,
+  onEdit,
+  onDelete,
+  hasChildren,
+  isExpanded,
+  onToggle,
   readOnly = false,
   depth = 0,
 }: {
@@ -326,23 +366,53 @@ function ActivityGanttRow({
   depth?: number
 }) {
   const totalPixels = totalDays * (dayWidth / 7)
-  const isOverdue = activity.dueDate && new Date(activity.dueDate) < today && activity.status !== 'completed' && activity.status !== 'cancelled'
+  const isOverdue =
+    activity.dueDate &&
+    new Date(activity.dueDate) < today &&
+    activity.status !== 'completed' &&
+    activity.status !== 'cancelled'
   const isCompleted = activity.status === 'completed'
 
   // Bar positioning
-  const startDate = activity.startDate ? new Date(activity.startDate) : activity.dueDate ? new Date(activity.dueDate) : timelineStart
-  const endDate = activity.dueDate ? new Date(activity.dueDate) : activity.startDate ? new Date(activity.startDate.getTime() + 7 * 86400000) : new Date(timelineStart.getTime() + 7 * 86400000)
+  const startDate = activity.startDate
+    ? new Date(activity.startDate)
+    : activity.dueDate
+      ? new Date(activity.dueDate)
+      : timelineStart
+  const endDate = activity.dueDate
+    ? new Date(activity.dueDate)
+    : activity.startDate
+      ? new Date(activity.startDate.getTime() + 7 * 86400000)
+      : new Date(timelineStart.getTime() + 7 * 86400000)
 
-  const barLeft = Math.max(0, ((startDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7))
-  const barWidth = Math.max(dayWidth / 7, ((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7))
+  const barLeft = Math.max(
+    0,
+    ((startDate.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7),
+  )
+  const barWidth = Math.max(
+    dayWidth / 7,
+    ((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7),
+  )
 
   return (
-    <div className={`flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group ${depth > 0 ? 'bg-neutral-10/30 dark:bg-neutral-70/10' : ''}`}>
+    <div
+      className={`flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group ${depth > 0 ? 'bg-neutral-10/30 dark:bg-neutral-70/10' : ''}`}
+    >
       {/* Label column */}
-      <div className="w-56 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2" style={{ paddingLeft: `${12 + depth * 24}px` }}>
+      <div
+        className="w-56 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2"
+        style={{ paddingLeft: `${12 + depth * 24}px` }}
+      >
         {hasChildren ? (
-          <Button onClick={onToggle} className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
-            {isExpanded ? <ChevronUp size={14} className="text-neutral-50" /> : <ChevronDown size={14} className="text-neutral-50" />}
+          <Button
+            onClick={onToggle}
+            className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+          >
+            {isExpanded ? (
+              <ChevronUp size={14} className="text-neutral-50" />
+            ) : (
+              <ChevronDown size={14} className="text-neutral-50" />
+            )}
           </Button>
         ) : (
           <div className="w-5" />
@@ -350,24 +420,48 @@ function ActivityGanttRow({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span title={statusLabel[activity.status]}>{statusIcon[activity.status]}</span>
-            <span title={activity.title} className={`text-sm font-medium truncate ${isCompleted ? 'text-neutral-50 line-through' : 'text-neutral-90 dark:text-white'}`}>
+            <span
+              title={activity.title}
+              className={`text-sm font-medium truncate ${isCompleted ? 'text-neutral-50 line-through' : 'text-neutral-90 dark:text-white'}`}
+            >
               {activity.title}
             </span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <span title={`Prioridad: ${priorityLabel[activity.priority]}`} className={`text-[10px] px-1 py-0.5 rounded ${priorityColor[activity.priority]}`}>
+            <span
+              title={`Prioridad: ${priorityLabel[activity.priority]}`}
+              className={`text-[10px] px-1 py-0.5 rounded ${priorityColor[activity.priority]}`}
+            >
               {priorityLabel[activity.priority]}
             </span>
-            <span title={`Estado: ${statusLabel[activity.status]}`} className="text-[10px] text-neutral-50">{statusLabel[activity.status]}</span>
-            {activity.assigneeId && <span title={`Asignado: ${activity.assigneeId}`} className="text-[10px] text-neutral-50">{activity.assigneeId}</span>}
+            <span
+              title={`Estado: ${statusLabel[activity.status]}`}
+              className="text-[10px] text-neutral-50"
+            >
+              {statusLabel[activity.status]}
+            </span>
+            {activity.assigneeId && (
+              <span
+                title={`Asignado: ${activity.assigneeId}`}
+                className="text-[10px] text-neutral-50"
+              >
+                {activity.assigneeId}
+              </span>
+            )}
           </div>
         </div>
         {!readOnly && (
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button onClick={onEdit} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary">
+            <Button
+              onClick={onEdit}
+              className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-primary"
+            >
               <Pencil size={12} />
             </Button>
-            <Button onClick={onDelete} className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger">
+            <Button
+              onClick={onDelete}
+              className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 text-neutral-50 hover:text-danger"
+            >
               <Trash2 size={12} />
             </Button>
           </div>
@@ -405,7 +499,13 @@ function ActivityGanttRow({
                   ? 'rgba(0, 184, 217, 0.12)'
                   : 'rgba(193, 199, 205, 0.2)',
             borderLeft: `3px solid ${
-              isCompleted ? '#36B37E' : isOverdue ? '#FF5630' : activity.status === 'in_progress' ? '#00B8D9' : '#C1C7CD'
+              isCompleted
+                ? '#36B37E'
+                : isOverdue
+                  ? '#FF5630'
+                  : activity.status === 'in_progress'
+                    ? '#00B8D9'
+                    : '#C1C7CD'
             }`,
           }}
           onClick={onEdit}
@@ -420,7 +520,13 @@ function ActivityGanttRow({
 }
 
 function GanttTaskRow({
-  task, timelineStart, totalDays, dayWidth, today, onToggle, depth = 1,
+  task,
+  timelineStart,
+  totalDays,
+  dayWidth,
+  today,
+  onToggle,
+  depth = 1,
 }: {
   task: { id: string; title: string; status: string; priority: string; dueDate: Date | null }
   timelineStart: Date
@@ -435,19 +541,24 @@ function GanttTaskRow({
   return (
     <div className="flex items-center hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors group">
       {/* Label */}
-      <div className="w-56 shrink-0 px-4 py-2 border-r border-boundary flex items-center gap-2" style={{ paddingLeft: `${28 + depth * 24}px` }}>
-        <Button
-          onClick={onToggle}
-          className="flex items-center gap-2 min-w-0 flex-1 text-left"
-        >
-          <div className={`w-3 h-3 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-            task.status === 'done'
-              ? 'bg-success border-success'
-              : 'border-neutral-40 dark:border-neutral-50 group-hover:border-primary'
-          }`}>
+      <div
+        className="w-56 shrink-0 px-4 py-2 border-r border-boundary flex items-center gap-2"
+        style={{ paddingLeft: `${28 + depth * 24}px` }}
+      >
+        <Button onClick={onToggle} className="flex items-center gap-2 min-w-0 flex-1 text-left">
+          <div
+            className={`w-3 h-3 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+              task.status === 'done'
+                ? 'bg-success border-success'
+                : 'border-neutral-40 dark:border-neutral-50 group-hover:border-primary'
+            }`}
+          >
             {task.status === 'done' && <CheckCircle2 size={8} className="text-white" />}
           </div>
-          <span title={task.title} className={`text-xs truncate ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-secondary'}`}>
+          <span
+            title={task.title}
+            className={`text-xs truncate ${task.status === 'done' ? 'line-through text-neutral-50' : 'text-secondary'}`}
+          >
             {task.title}
           </span>
         </Button>
@@ -455,23 +566,34 @@ function GanttTaskRow({
 
       {/* Gantt area (empty for tasks - they don't have date ranges) */}
       <div className="relative flex-1 h-8" style={{ minWidth: `${totalPixels}px` }}>
-        {task.dueDate && (() => {
-          const d = new Date(task.dueDate)
-          return d.getFullYear() === today.getFullYear() &&
-                 d.getMonth() === today.getMonth() &&
-                 d.getDate() === today.getDate()
-        })() && (
-          <div
-            className="absolute top-0 bottom-0 w-0.5 bg-danger/40 z-10"
-            style={{
-              left: `${((today.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7)}px`,
-            }}
-          />
-        )}
+        {task.dueDate &&
+          (() => {
+            const d = new Date(task.dueDate)
+            return (
+              d.getFullYear() === today.getFullYear() &&
+              d.getMonth() === today.getMonth() &&
+              d.getDate() === today.getDate()
+            )
+          })() && (
+            <div
+              className="absolute top-0 bottom-0 w-0.5 bg-danger/40 z-10"
+              style={{
+                left: `${((today.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24)) * (dayWidth / 7)}px`,
+              }}
+            />
+          )}
         {/* Minimal dot marker */}
-        <div className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full ${
-          task.status === 'done' ? 'bg-success' : task.priority === 'critical' ? 'bg-danger' : task.priority === 'high' ? 'bg-warning' : 'bg-neutral-40'
-        }`} />
+        <div
+          className={`absolute top-1/2 -translate-y-1/2 left-0 w-2 h-2 rounded-full ${
+            task.status === 'done'
+              ? 'bg-success'
+              : task.priority === 'critical'
+                ? 'bg-danger'
+                : task.priority === 'high'
+                  ? 'bg-warning'
+                  : 'bg-neutral-40'
+          }`}
+        />
       </div>
     </div>
   )
@@ -489,18 +611,22 @@ function buildActivityTooltip(
     `Estado: ${statusLabel[activity.status]}`,
     `Prioridad: ${priorityLabel[activity.priority]}`,
     activity.dueDate ? `Vence: ${new Date(activity.dueDate).toLocaleDateString('es-ES')}` : null,
-    activity.startDate ? `Inicio: ${new Date(activity.startDate).toLocaleDateString('es-ES')}` : null,
+    activity.startDate
+      ? `Inicio: ${new Date(activity.startDate).toLocaleDateString('es-ES')}`
+      : null,
     activity.assigneeId ? `Asignado: ${activity.assigneeId}` : null,
     teamName ? `Equipo: ${teamName}` : null,
     appName ? `App: ${appName}` : null,
     activity.estimatedHours ? `Horas est.: ${activity.estimatedHours}` : null,
     activity.plannedPoints ? `Puntos planif.: ${activity.plannedPoints}` : null,
-  ].filter(Boolean).join(' · ')
+  ]
+    .filter(Boolean)
+    .join(' · ')
 }
 
 function buildMonthSegments(start: Date, totalDays: number) {
   const segments: { label: string; days: number }[] = []
-  let current = new Date(start)
+  const current = new Date(start)
 
   while (totalDays > 0) {
     const year = current.getFullYear()

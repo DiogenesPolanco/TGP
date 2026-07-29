@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidShareHash, getPublicPlanData, type PublicPlanData } from '@/services/share/publicShareService'
+import {
+  isValidShareHash,
+  getPublicPlanData,
+  type PublicPlanData,
+} from '@/services/share/publicShareService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
@@ -29,7 +33,11 @@ export function PublicPlanPage() {
   const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
+    if (!hash) {
+      setValid(false)
+      setLoading(false)
+      return
+    }
     ;(async () => {
       const tryLoad = (raw: unknown) => {
         if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
@@ -49,20 +57,31 @@ export function PublicPlanPage() {
           const fragment = decodeURIComponent(rawHash)
           const { downloadUsingManifest } = await import('@/services/share/azureShareService')
           const azureData = await downloadUsingManifest(fragment)
-          if (azureData) { tryLoad(azureData); return }
+          if (azureData) {
+            tryLoad(azureData)
+            return
+          }
         } catch {}
       }
       try {
         const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
         const viewerData = await downloadShareFromAzure(hash)
-        if (viewerData) { tryLoad(viewerData); return }
+        if (viewerData) {
+          tryLoad(viewerData)
+          return
+        }
       } catch {}
       if (isValidShareHash(hash)) {
         const { getShareInfo } = await import('@/services/share/publicShareService')
         const info = getShareInfo(hash)
         if (info?.ref) {
           const d = await getPublicPlanData(info.ref)
-          if (d) { setData(d); setValid(true); setLoading(false); return }
+          if (d) {
+            setData(d)
+            setValid(true)
+            setLoading(false)
+            return
+          }
         }
       }
       setValid(false)
@@ -70,7 +89,12 @@ export function PublicPlanPage() {
     })()
   }, [hash])
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -81,8 +105,12 @@ export function PublicPlanPage() {
             description="Este plan fue compartido con cifrado. Ingresa la contraseña para verlo."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
-              if (decrypted) { setData(decrypted as PublicPlanData); setPendingEncrypted(null) }
-              else { alert('Contraseña incorrecta') }
+              if (decrypted) {
+                setData(decrypted as PublicPlanData)
+                setPendingEncrypted(null)
+              } else {
+                alert('Contraseña incorrecta')
+              }
             }}
           />
         </div>
@@ -132,7 +160,9 @@ export function PublicPlanPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-card rounded-2xl border border-boundary p-4">
-            <p className="text-2xl font-bold text-neutral-90 dark:text-white">{activities.length}</p>
+            <p className="text-2xl font-bold text-neutral-90 dark:text-white">
+              {activities.length}
+            </p>
             <p className="text-xs text-neutral-60">Actividades</p>
           </div>
           <div className="bg-card rounded-2xl border border-boundary p-4">
@@ -144,7 +174,11 @@ export function PublicPlanPage() {
             <p className="text-xs text-neutral-60">Tareas ({doneTasks} hechas)</p>
           </div>
           <div className="bg-card rounded-2xl border border-boundary p-4">
-            <p className={`text-2xl font-bold ${openBlockers.length > 0 ? 'text-danger' : 'text-success'}`}>{openBlockers.length}</p>
+            <p
+              className={`text-2xl font-bold ${openBlockers.length > 0 ? 'text-danger' : 'text-success'}`}
+            >
+              {openBlockers.length}
+            </p>
             <p className="text-xs text-neutral-60">Bloqueos</p>
           </div>
         </div>

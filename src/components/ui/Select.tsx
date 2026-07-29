@@ -22,9 +22,7 @@ interface SelectProps {
 }
 
 function toOptions(options: (string | SelectOption)[]): SelectOption[] {
-  return options.map((o) =>
-    typeof o === 'string' ? { value: o, label: o } : o,
-  )
+  return options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o))
 }
 
 export function Select({
@@ -59,8 +57,7 @@ export function Select({
     if (!query) return normalized
     const q = query.toLowerCase()
     return normalized.filter(
-      (o) =>
-        o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q),
+      (o) => o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q),
     )
   }, [normalized, query])
 
@@ -158,9 +155,7 @@ export function Select({
       >
         {value && selectedLabel ? (
           <>
-            <span className="flex-1 truncate text-neutral-90 dark:text-white">
-              {selectedLabel}
-            </span>
+            <span className="flex-1 truncate text-neutral-90 dark:text-white">{selectedLabel}</span>
             {clearable && !disabled && (
               <Button
                 type="button"
@@ -175,15 +170,11 @@ export function Select({
             )}
           </>
         ) : (
-          <span className="flex-1 truncate text-neutral-50">
-            {placeholder}
-          </span>
+          <span className="flex-1 truncate text-neutral-50">{placeholder}</span>
         )}
         <ChevronDown
           size={16}
-          className={`text-neutral-50 transition-transform shrink-0 ${
-            open ? 'rotate-180' : ''
-          }`}
+          className={`text-neutral-50 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}
         />
       </div>
 
@@ -241,9 +232,7 @@ export function Select({
         </div>
       )}
 
-      {error && (
-        <p className="mt-1 text-xs text-danger">{error}</p>
-      )}
+      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   )
 }

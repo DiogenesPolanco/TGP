@@ -9,7 +9,9 @@ interface Props {
 
 export function MicroservicesSection({ memberId }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [allMicroservices, setAllMicroservices] = useState<{ id: string; name: string; description: string; technologies: string[] }[]>([])
+  const [allMicroservices, setAllMicroservices] = useState<
+    { id: string; name: string; description: string; technologies: string[] }[]
+  >([])
   const [allTechnologies, setAllTechnologies] = useState<Technology[]>([])
   const [search, setSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
@@ -28,8 +30,11 @@ export function MicroservicesSection({ memberId }: Props) {
 
   const selectedMS = allMicroservices.filter((ms) => selectedIds.includes(ms.id))
   const availableMS = allMicroservices.filter(
-    (ms) => !selectedIds.includes(ms.id) &&
-      (!search || ms.name.toLowerCase().includes(search.toLowerCase()) || ms.description.toLowerCase().includes(search.toLowerCase()))
+    (ms) =>
+      !selectedIds.includes(ms.id) &&
+      (!search ||
+        ms.name.toLowerCase().includes(search.toLowerCase()) ||
+        ms.description.toLowerCase().includes(search.toLowerCase())),
   )
 
   const toggleMicroservice = async (msId: string) => {
@@ -42,11 +47,26 @@ export function MicroservicesSection({ memberId }: Props) {
 
     const profile = await db.memberProfiles.get(memberId)
     const base = profile ?? {
-      id: memberId, teamId: '', email: '', phoneCell: '', phoneHome: '',
-      address: '', role: 'developer' as const, status: 'activo' as const,
-      skills: [] as { id: string; name: string; level: 'beginner' | 'intermediate' | 'advanced' | 'expert'; category: string }[],
-      technologies: [] as string[], avgStoryPoints: 0,
-      vacationDaysPerYear: 14, vacationUsed: 0, createdAt: new Date(), updatedAt: new Date(),
+      id: memberId,
+      teamId: '',
+      email: '',
+      phoneCell: '',
+      phoneHome: '',
+      address: '',
+      role: 'developer' as const,
+      status: 'activo' as const,
+      skills: [] as {
+        id: string
+        name: string
+        level: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+        category: string
+      }[],
+      technologies: [] as string[],
+      avgStoryPoints: 0,
+      vacationDaysPerYear: 14,
+      vacationUsed: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
     await db.memberProfiles.put({ ...base, microservices: updated, updatedAt: new Date() })
   }
@@ -60,16 +80,23 @@ export function MicroservicesSection({ memberId }: Props) {
           const techs = allTechnologies.filter((t) => ms.technologies.includes(t.id))
           const eolCount = techs.filter((t) => t.supportStatus === 'eol').length
           return (
-            <div key={ms.id} className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group">
+            <div
+              key={ms.id}
+              className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group"
+            >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
                   <Server size={16} />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-neutral-90 dark:text-white truncate">{ms.name}</span>
+                    <span className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                      {ms.name}
+                    </span>
                     {eolCount > 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger shrink-0">{eolCount} EOL</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger shrink-0">
+                        {eolCount} EOL
+                      </span>
                     )}
                   </div>
                   <p className="text-xs text-muted truncate">{ms.description || '—'}</p>
@@ -88,20 +115,28 @@ export function MicroservicesSection({ memberId }: Props) {
           )
         })}
         {selectedMS.length === 0 && (
-          <p className="text-sm text-neutral-50 dark:text-neutral-50">No hay microservicios asignados</p>
+          <p className="text-sm text-neutral-50 dark:text-neutral-50">
+            No hay microservicios asignados
+          </p>
         )}
       </div>
 
       <div className="relative">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar microservicio para asignar..."
               value={search}
               onFocus={() => setShowDropdown(true)}
-              onChange={(e) => { setSearch(e.target.value); setShowDropdown(true) }}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setShowDropdown(true)
+              }}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -129,7 +164,9 @@ export function MicroservicesSection({ memberId }: Props) {
                       <span className="text-xs text-neutral-50 shrink-0">{techs.length} techs</span>
                     </div>
                     {ms.description && (
-                      <span className="text-xs text-neutral-50 truncate ml-2 max-w-[200px]">{ms.description}</span>
+                      <span className="text-xs text-neutral-50 truncate ml-2 max-w-[200px]">
+                        {ms.description}
+                      </span>
                     )}
                   </button>
                 )

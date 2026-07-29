@@ -16,10 +16,24 @@ import { Plugin } from '@tiptap/pm/state'
 import { common, createLowlight } from 'lowlight'
 import { Button } from '@/components/ui/Button'
 import {
-  Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
-  List, ListOrdered, Quote, Code, Table as TableIcon,
-  Link as LinkIcon, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight,
-  Undo, Redo,
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Table as TableIcon,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Undo,
+  Redo,
 } from 'lucide-react'
 
 const lowlight = createLowlight(common)
@@ -57,9 +71,7 @@ const MenuButton = ({
   </Button>
 )
 
-const Divider = () => (
-  <div className="w-px h-5 bg-neutral-20 dark:bg-neutral-60 mx-1" />
-)
+const Divider = () => <div className="w-px h-5 bg-neutral-20 dark:bg-neutral-60 mx-1" />
 
 const PasteMarkdown = Extension.create({
   name: 'pasteMarkdown',
@@ -91,14 +103,14 @@ const PasteMarkdown = Extension.create({
 
 function looksLikeMarkdown(text: string): boolean {
   return (
-    /^#{1,6}\s/.test(text) ||              // Headings
-    /\*\*[^*]+\*\*/.test(text) ||           // Bold
-    /__[^_]+__/.test(text) ||              // Bold (underscore)
-    /`{3}/.test(text) ||                    // Code blocks
-    /\[.+\]\(.+\)/.test(text) ||            // Links
-    /^[-*+]\s/.test(text) ||                // Unordered lists
-    /^\d+\.\s/.test(text) ||                // Ordered lists
-    /^>\s/.test(text)                       // Blockquotes
+    /^#{1,6}\s/.test(text) || // Headings
+    /\*\*[^*]+\*\*/.test(text) || // Bold
+    /__[^_]+__/.test(text) || // Bold (underscore)
+    /`{3}/.test(text) || // Code blocks
+    /\[.+\]\(.+\)/.test(text) || // Links
+    /^[-*+]\s/.test(text) || // Unordered lists
+    /^\d+\.\s/.test(text) || // Ordered lists
+    /^>\s/.test(text) // Blockquotes
   )
 }
 
@@ -176,7 +188,10 @@ export function RichTextEditor({
   if (!editor) return null
 
   return (
-    <div className="border border-neutral-30 dark:border-neutral-60 rounded-lg overflow-hidden" style={{ minWidth: 0 }}>
+    <div
+      className="border border-neutral-30 dark:border-neutral-60 rounded-lg overflow-hidden"
+      style={{ minWidth: 0 }}
+    >
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-boundary bg-neutral-5 dark:bg-neutral-80">
         <MenuButton
@@ -258,11 +273,7 @@ export function RichTextEditor({
         >
           <Code size={16} />
         </MenuButton>
-        <MenuButton
-          onClick={addTable}
-          active={editor.isActive('table')}
-          title="Tabla"
-        >
+        <MenuButton onClick={addTable} active={editor.isActive('table')} title="Tabla">
           <TableIcon size={16} />
         </MenuButton>
 
@@ -301,16 +312,10 @@ export function RichTextEditor({
 
         <Divider />
 
-        <MenuButton
-          onClick={() => editor.chain().focus().undo().run()}
-          title="Deshacer"
-        >
+        <MenuButton onClick={() => editor.chain().focus().undo().run()} title="Deshacer">
           <Undo size={16} />
         </MenuButton>
-        <MenuButton
-          onClick={() => editor.chain().focus().redo().run()}
-          title="Rehacer"
-        >
+        <MenuButton onClick={() => editor.chain().focus().redo().run()} title="Rehacer">
           <Redo size={16} />
         </MenuButton>
       </div>

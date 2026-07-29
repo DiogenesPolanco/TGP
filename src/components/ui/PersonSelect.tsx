@@ -60,7 +60,12 @@ export function PersonSelect({
 
     if (currentUser && !seen.has('__me__')) {
       seen.add('__me__')
-      options.push({ id: '__me__', label: `Yo — ${currentUser.email}`, subtitle: 'Usuario actual', source: 'current' })
+      options.push({
+        id: '__me__',
+        label: `Yo — ${currentUser.email}`,
+        subtitle: 'Usuario actual',
+        source: 'current',
+      })
     }
 
     for (const u of users) {
@@ -168,7 +173,8 @@ export function PersonSelect({
     <div data-person-select className="relative">
       {label && (
         <label className="block text-sm font-medium text-secondary mb-1.5">
-          {label}{required && <span className="text-danger ml-0.5">*</span>}
+          {label}
+          {required && <span className="text-danger ml-0.5">*</span>}
         </label>
       )}
 
@@ -190,7 +196,10 @@ export function PersonSelect({
             </span>
             <Button
               type="button"
-              onClick={(e) => { e.stopPropagation(); clear() }}
+              onClick={(e) => {
+                e.stopPropagation()
+                clear()
+              }}
               className="p-0.5 rounded hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0"
             >
               <X size={14} className="text-neutral-50" />
@@ -202,7 +211,10 @@ export function PersonSelect({
               ref={inputRef}
               type="text"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setOpen(true)
+              }}
               onFocus={handleFocus}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
@@ -247,14 +259,20 @@ export function PersonSelect({
                   <p className="font-medium truncate">{option.label}</p>
                   <p className="text-xs text-neutral-50 truncate">{option.subtitle}</p>
                 </div>
-                <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
-                  option.source === 'user'
-                    ? 'bg-info/10 text-info'
+                <span
+                  className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
+                    option.source === 'user'
+                      ? 'bg-info/10 text-info'
+                      : option.source === 'current'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50'
+                  }`}
+                >
+                  {option.source === 'user'
+                    ? 'Usuario'
                     : option.source === 'current'
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50'
-                }`}>
-                  {option.source === 'user' ? 'Usuario' : option.source === 'current' ? 'Tú' : 'Miembro'}
+                      ? 'Tú'
+                      : 'Miembro'}
                 </span>
               </Button>
             ))

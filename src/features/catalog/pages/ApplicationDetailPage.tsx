@@ -5,9 +5,22 @@ import type { Table } from 'dexie'
 import { motion, AnimatePresence } from 'framer-motion'
 import { db } from '@/services/db/database'
 import {
-  Pencil, Shield, AlertTriangle, Activity, FileWarning,
-  Search, Plus, Unlink, FileText, Building2, Layers, Server,
-  Database, Package, ChevronRight, ExternalLink,
+  Pencil,
+  Shield,
+  AlertTriangle,
+  Activity,
+  FileWarning,
+  Search,
+  Plus,
+  Unlink,
+  FileText,
+  Building2,
+  Layers,
+  Server,
+  Database,
+  Package,
+  ChevronRight,
+  ExternalLink,
 } from 'lucide-react'
 import type { Vulnerability, Risk, Incident, AuditFinding } from '@/types/domain'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
@@ -68,51 +81,96 @@ export function ApplicationDetailPage() {
   const application = useLiveQuery(() => db.applications.get(id!), [id])
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray())
   const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
-  const vulnerabilities = useLiveQuery(() => db.vulnerabilities.where('applicationId').equals(id!).toArray(), [id])
+  const vulnerabilities = useLiveQuery(
+    () => db.vulnerabilities.where('applicationId').equals(id!).toArray(),
+    [id],
+  )
   const risks = useLiveQuery(() => db.risks.where('applicationId').equals(id!).toArray(), [id])
-  const incidents = useLiveQuery(() => db.incidents.where('applicationId').equals(id!).toArray(), [id])
-  const findings = useLiveQuery(() => db.auditFindings.where('applicationId').equals(id!).toArray(), [id])
-  const deliverables = useLiveQuery(() => db.deliverables.where('applicationId').equals(id!).toArray(), [id])
-  const microservices = useLiveQuery(() => db.microservices.where('applicationId').equals(id!).toArray(), [id])
-  const microserviceIds = useMemo(() => (microservices ?? []).map(m => m.id), [microservices])
+  const incidents = useLiveQuery(
+    () => db.incidents.where('applicationId').equals(id!).toArray(),
+    [id],
+  )
+  const findings = useLiveQuery(
+    () => db.auditFindings.where('applicationId').equals(id!).toArray(),
+    [id],
+  )
+  const deliverables = useLiveQuery(
+    () => db.deliverables.where('applicationId').equals(id!).toArray(),
+    [id],
+  )
+  const microservices = useLiveQuery(
+    () => db.microservices.where('applicationId').equals(id!).toArray(),
+    [id],
+  )
+  const microserviceIds = useMemo(() => (microservices ?? []).map((m) => m.id), [microservices])
 
-  const { inheritedVulnIds, inheritedRiskIds, inheritedIncidentIds, inheritedAuditIds, inheritedDatabaseIds } =
-    useInheritedEntityIds(microserviceIds)
+  const {
+    inheritedVulnIds,
+    inheritedRiskIds,
+    inheritedIncidentIds,
+    inheritedAuditIds,
+    inheritedDatabaseIds,
+  } = useInheritedEntityIds(microserviceIds)
 
-  const inheritedVulns = useLiveQuery(
-    () => inheritedVulnIds.size > 0
-      ? db.vulnerabilities.where('id').anyOf([...inheritedVulnIds]).toArray()
-      : [],
-    [inheritedVulnIds.size],
-  ) ?? []
+  const inheritedVulns =
+    useLiveQuery(
+      () =>
+        inheritedVulnIds.size > 0
+          ? db.vulnerabilities
+              .where('id')
+              .anyOf([...inheritedVulnIds])
+              .toArray()
+          : [],
+      [inheritedVulnIds.size],
+    ) ?? []
 
-  const inheritedRisks = useLiveQuery(
-    () => inheritedRiskIds.size > 0
-      ? db.risks.where('id').anyOf([...inheritedRiskIds]).toArray()
-      : [],
-    [inheritedRiskIds.size],
-  ) ?? []
+  const inheritedRisks =
+    useLiveQuery(
+      () =>
+        inheritedRiskIds.size > 0
+          ? db.risks
+              .where('id')
+              .anyOf([...inheritedRiskIds])
+              .toArray()
+          : [],
+      [inheritedRiskIds.size],
+    ) ?? []
 
-  const inheritedIncidents = useLiveQuery(
-    () => inheritedIncidentIds.size > 0
-      ? db.incidents.where('id').anyOf([...inheritedIncidentIds]).toArray()
-      : [],
-    [inheritedIncidentIds.size],
-  ) ?? []
+  const inheritedIncidents =
+    useLiveQuery(
+      () =>
+        inheritedIncidentIds.size > 0
+          ? db.incidents
+              .where('id')
+              .anyOf([...inheritedIncidentIds])
+              .toArray()
+          : [],
+      [inheritedIncidentIds.size],
+    ) ?? []
 
-  const inheritedFindings = useLiveQuery(
-    () => inheritedAuditIds.size > 0
-      ? db.auditFindings.where('id').anyOf([...inheritedAuditIds]).toArray()
-      : [],
-    [inheritedAuditIds.size],
-  ) ?? []
+  const inheritedFindings =
+    useLiveQuery(
+      () =>
+        inheritedAuditIds.size > 0
+          ? db.auditFindings
+              .where('id')
+              .anyOf([...inheritedAuditIds])
+              .toArray()
+          : [],
+      [inheritedAuditIds.size],
+    ) ?? []
 
-  const inheritedDatabases = useLiveQuery(
-    () => inheritedDatabaseIds.size > 0
-      ? db.appDatabases.where('id').anyOf([...inheritedDatabaseIds]).toArray()
-      : [],
-    [inheritedDatabaseIds.size],
-  ) ?? []
+  const inheritedDatabases =
+    useLiveQuery(
+      () =>
+        inheritedDatabaseIds.size > 0
+          ? db.appDatabases
+              .where('id')
+              .anyOf([...inheritedDatabaseIds])
+              .toArray()
+          : [],
+      [inheritedDatabaseIds.size],
+    ) ?? []
 
   const allVulns = useMemo(() => {
     const map = new Map<string, Vulnerability>()
@@ -168,7 +226,6 @@ export function ApplicationDetailPage() {
 
   return (
     <div className="space-y-6">
-
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-neutral-50">
         <button
@@ -193,14 +250,17 @@ export function ApplicationDetailPage() {
             <HtmlDescription html={application.description} full className="max-w-2xl" />
           )}
           <div className="flex items-center gap-3 pt-1">
-            <span className={`px-3 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`}>
+            <span
+              className={`px-3 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`}
+            >
               {criticalityLabel[application.criticality]}
             </span>
             <span className="px-3 py-0.5 rounded-full text-xs font-medium bg-neutral-10 dark:bg-neutral-70 text-muted">
               {appStatusLabel[application.status]}
             </span>
             <span className="text-sm text-neutral-50">
-              {bu?.name && `${bu.name} · `}{application.ownerName} · {application.architecture}
+              {bu?.name && `${bu.name} · `}
+              {application.ownerName} · {application.architecture}
             </span>
           </div>
         </div>
@@ -233,9 +293,11 @@ export function ApplicationDetailPage() {
                 <Icon size={18} className="shrink-0" />
                 <span className="truncate">{tab.label}</span>
                 {count !== undefined && (
-                  <span className={`ml-auto text-xs font-medium ${
-                    activeTab === tab.id ? 'text-accent' : 'text-neutral-50'
-                  }`}>
+                  <span
+                    className={`ml-auto text-xs font-medium ${
+                      activeTab === tab.id ? 'text-accent' : 'text-neutral-50'
+                    }`}
+                  >
                     {count}
                   </span>
                 )}
@@ -263,17 +325,35 @@ export function ApplicationDetailPage() {
                       Resumen
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {([
+                      {[
                         ['Nombre', application.name, 'text-primary'],
                         ['Owner', application.ownerName, 'text-neutral-90 dark:text-white'],
                         ['Business Unit', bu?.name || '-', 'text-neutral-90 dark:text-white'],
-                        ['Arquitectura', application.architecture, 'text-neutral-90 dark:text-white'],
-                        ['Estado', appStatusLabel[application.status], `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor[application.status]}`],
-                        ['Criticidad', criticalityLabel[application.criticality], `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`],
+                        [
+                          'Arquitectura',
+                          application.architecture,
+                          'text-neutral-90 dark:text-white',
+                        ],
+                        [
+                          'Estado',
+                          appStatusLabel[application.status],
+                          `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor[application.status]}`,
+                        ],
+                        [
+                          'Criticidad',
+                          criticalityLabel[application.criticality],
+                          `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`,
+                        ],
                         ...(application.supportEndDate
-                          ? [['Fin de Soporte', new Date(application.supportEndDate).toLocaleDateString('es-ES'), 'text-neutral-90 dark:text-white']]
+                          ? [
+                              [
+                                'Fin de Soporte',
+                                new Date(application.supportEndDate).toLocaleDateString('es-ES'),
+                                'text-neutral-90 dark:text-white',
+                              ],
+                            ]
                           : []),
-                      ]).map(([label, value, className]) => (
+                      ].map(([label, value, className]) => (
                         <div
                           key={label}
                           className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-4"
@@ -293,10 +373,34 @@ export function ApplicationDetailPage() {
                       Métricas de Seguridad y Riesgo
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <MetricCard icon={Shield} label="Vulnerabilidades" value={activeVulnCount} color="text-danger" bg="bg-danger/5 border-danger/20" />
-                      <MetricCard icon={AlertTriangle} label="Riesgos" value={allRisks.length} color="text-warning" bg="bg-warning/5 border-warning/20" />
-                      <MetricCard icon={Activity} label="Incidentes" value={allIncidents.length} color="text-info" bg="bg-info/5 border-info/20" />
-                      <MetricCard icon={FileWarning} label="Hallazgos" value={allFindings.length} color="text-neutral-60" bg="bg-neutral-10 dark:bg-neutral-70/40 border-boundary" />
+                      <MetricCard
+                        icon={Shield}
+                        label="Vulnerabilidades"
+                        value={activeVulnCount}
+                        color="text-danger"
+                        bg="bg-danger/5 border-danger/20"
+                      />
+                      <MetricCard
+                        icon={AlertTriangle}
+                        label="Riesgos"
+                        value={allRisks.length}
+                        color="text-warning"
+                        bg="bg-warning/5 border-warning/20"
+                      />
+                      <MetricCard
+                        icon={Activity}
+                        label="Incidentes"
+                        value={allIncidents.length}
+                        color="text-info"
+                        bg="bg-info/5 border-info/20"
+                      />
+                      <MetricCard
+                        icon={FileWarning}
+                        label="Hallazgos"
+                        value={allFindings.length}
+                        color="text-neutral-60"
+                        bg="bg-neutral-10 dark:bg-neutral-70/40 border-boundary"
+                      />
                     </div>
                   </div>
 
@@ -326,13 +430,15 @@ export function ApplicationDetailPage() {
                                   : 'bg-success/5 text-success border-success/20'
                             }`}
                           >
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              tech.supportStatus === 'eol'
-                                ? 'bg-danger'
-                                : tech.supportStatus === 'extended'
-                                  ? 'bg-warning'
-                                  : 'bg-success'
-                            }`} />
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                tech.supportStatus === 'eol'
+                                  ? 'bg-danger'
+                                  : tech.supportStatus === 'extended'
+                                    ? 'bg-warning'
+                                    : 'bg-success'
+                              }`}
+                            />
                             {tech.name}
                             <span className="opacity-50 text-xs">{tech.version}</span>
                           </span>
@@ -381,9 +487,7 @@ export function ApplicationDetailPage() {
                 </div>
               )}
 
-              {activeTab === 'architecture' && (
-                <ArchitectureTab applicationId={id!} />
-              )}
+              {activeTab === 'architecture' && <ArchitectureTab applicationId={id!} />}
 
               {activeTab === 'tech' && (
                 <TechStackManager
@@ -392,19 +496,14 @@ export function ApplicationDetailPage() {
                 />
               )}
 
-              {activeTab === 'microservices' && (
-                <MicroservicesTab applicationId={id!} />
-              )}
+              {activeTab === 'microservices' && <MicroservicesTab applicationId={id!} />}
 
               {activeTab === 'databases' && (
                 <DatabasesTab applicationId={id!} databases={inheritedDatabases ?? []} />
               )}
 
               {activeTab === 'vulns' && (
-                <VulnerabilitiesTab
-                  vulnerabilities={allVulns}
-                  applicationId={id!}
-                />
+                <VulnerabilitiesTab vulnerabilities={allVulns} applicationId={id!} />
               )}
 
               {activeTab === 'risks' && (
@@ -426,7 +525,12 @@ export function ApplicationDetailPage() {
                   items={allIncidents}
                   applicationId={id!}
                   headers={['Título', 'Severidad', 'Estado', 'Downtime']}
-                  renderCells={(i: Incident) => [i.title, i.severity, i.status, `${i.downtimeMinutes ?? 0} min`]}
+                  renderCells={(i: Incident) => [
+                    i.title,
+                    i.severity,
+                    i.status,
+                    `${i.downtimeMinutes ?? 0} min`,
+                  ]}
                   severityColor={(i: Incident) => i.severity}
                 />
               )}
@@ -438,19 +542,21 @@ export function ApplicationDetailPage() {
                   items={allFindings}
                   applicationId={id!}
                   headers={['Título', 'Severidad', 'Estado', 'Vencimiento']}
-                  renderCells={(f: AuditFinding) => [f.title, f.severity, f.status, new Date(f.dueDate).toLocaleDateString('es-ES')]}
+                  renderCells={(f: AuditFinding) => [
+                    f.title,
+                    f.severity,
+                    f.status,
+                    new Date(f.dueDate).toLocaleDateString('es-ES'),
+                  ]}
                   severityColor={(f: AuditFinding) => f.severity}
                 />
               )}
 
-              {activeTab === 'deliverables' && (
-                <DeliverablesTab applicationId={id!} />
-              )}
+              {activeTab === 'deliverables' && <DeliverablesTab applicationId={id!} />}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
-
     </div>
   )
 }
@@ -488,64 +594,68 @@ function TechStackManager({
     unknown: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   }
 
-  const techColumns: Column<(typeof allTechnologies)[number]>[] = useMemo(() => [
-    {
-      key: 'name',
-      label: 'Tecnología',
-      sortable: true,
-      render: (t) => (
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-neutral-90 dark:text-white">{t.name}</span>
-          <span className="text-xs text-neutral-50">{t.version}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'vendor',
-      label: 'Vendor',
-      sortable: true,
-      render: (t) => <span className="text-sm text-secondary">{t.vendor || '—'}</span>,
-    },
-    {
-      key: 'category',
-      label: 'Categoría',
-      sortable: true,
-      render: (t) => <span className="text-sm text-secondary capitalize">{t.category}</span>,
-    },
-    {
-      key: 'supportStatus',
-      label: 'Estado',
-      sortable: true,
-      render: (t) => (
-        <span className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[t.supportStatus]}`}>
-          {supportStatusLabel[t.supportStatus]}
-        </span>
-      ),
-    },
-    {
-      key: 'eolDate',
-      label: 'Fecha EOL',
-      sortable: true,
-      render: (t) => (
-        <span className="text-sm text-secondary">
-          {t.eolDate ? new Date(t.eolDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : '—'}
-        </span>
-      ),
-    },
-  ], [])
+  const techColumns: Column<(typeof allTechnologies)[number]>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: 'Tecnología',
+        sortable: true,
+        render: (t) => (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-neutral-90 dark:text-white">{t.name}</span>
+            <span className="text-xs text-neutral-50">{t.version}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'vendor',
+        label: 'Vendor',
+        sortable: true,
+        render: (t) => <span className="text-sm text-secondary">{t.vendor || '—'}</span>,
+      },
+      {
+        key: 'category',
+        label: 'Categoría',
+        sortable: true,
+        render: (t) => <span className="text-sm text-secondary capitalize">{t.category}</span>,
+      },
+      {
+        key: 'supportStatus',
+        label: 'Estado',
+        sortable: true,
+        render: (t) => (
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[t.supportStatus]}`}
+          >
+            {supportStatusLabel[t.supportStatus]}
+          </span>
+        ),
+      },
+      {
+        key: 'eolDate',
+        label: 'Fecha EOL',
+        sortable: true,
+        render: (t) => (
+          <span className="text-sm text-secondary">
+            {t.eolDate
+              ? new Date(t.eolDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })
+              : '—'}
+          </span>
+        ),
+      },
+    ],
+    [],
+  )
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h4 className="text-xl font-bold text-neutral-90 dark:text-white">
-          Stack Tecnológico <span className="text-neutral-50 text-base font-normal">({selectedIds.length})</span>
+          Stack Tecnológico{' '}
+          <span className="text-neutral-50 text-base font-normal">({selectedIds.length})</span>
         </h4>
       </div>
-      <TechSearch
-        selectedIds={selectedIds}
-        onChange={handleChange}
-        enableDepsSearch={true}
-      />
+      <TechSearch selectedIds={selectedIds} onChange={handleChange} enableDepsSearch={true} />
       {appTechs.length > 0 && (
         <SortableTable
           columns={techColumns}
@@ -581,10 +691,8 @@ function EntityList<T extends EntityForList>({
 }) {
   const [search, setSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
-  const allItemsOfType = useLiveQuery(
-    () => (db[entityType] as Table<T, string>).toArray(),
-    [entityType]
-  ) ?? []
+  const allItemsOfType =
+    useLiveQuery(() => (db[entityType] as Table<T, string>).toArray(), [entityType]) ?? []
 
   const dissociate = async (item: T) => {
     // Only allow dissociation for directly associated entities
@@ -604,7 +712,7 @@ function EntityList<T extends EntityForList>({
   const availableItems = allItemsOfType.filter(
     (item) =>
       !alreadyAssociatedIds.has(item.id) &&
-      (!search || (renderCells(item)[0] ?? '').toLowerCase().includes(search.toLowerCase()))
+      (!search || (renderCells(item)[0] ?? '').toLowerCase().includes(search.toLowerCase())),
   ) as T[]
 
   const getSeverityColorClass = (sev: string): string => {
@@ -628,7 +736,9 @@ function EntityList<T extends EntityForList>({
         const sev = severityColor(item)
         if (idx === 1 && sev) {
           return (
-            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColorClass(sev)}`}>
+            <span
+              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColorClass(sev)}`}
+            >
               {cell}
             </span>
           )
@@ -643,7 +753,10 @@ function EntityList<T extends EntityForList>({
       headerClassName: 'text-right',
       render: (item: T) => (
         <button
-          onClick={(e) => { e.stopPropagation(); dissociate(item) }}
+          onClick={(e) => {
+            e.stopPropagation()
+            dissociate(item)
+          }}
           className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-all"
           title="Desasociar"
         >
@@ -677,7 +790,10 @@ function EntityList<T extends EntityForList>({
             placeholder={`Buscar ${title.toLowerCase()} para asociar...`}
             value={search}
             onFocus={() => setShowDropdown(true)}
-            onChange={(e) => { setSearch(e.target.value); setShowDropdown(true) }}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setShowDropdown(true)
+            }}
             className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -704,12 +820,17 @@ function EntityList<T extends EntityForList>({
                       <span className="text-neutral-90 dark:text-white truncate">{cells[0]}</span>
                     </div>
                     {sev && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-                        sev === 'critical' ? 'bg-danger/10 text-danger' :
-                        sev === 'high' ? 'bg-warning/10 text-warning' :
-                        sev === 'medium' ? 'bg-info/10 text-info' :
-                        'bg-success/10 text-success'
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                          sev === 'critical'
+                            ? 'bg-danger/10 text-danger'
+                            : sev === 'high'
+                              ? 'bg-warning/10 text-warning'
+                              : sev === 'medium'
+                                ? 'bg-info/10 text-info'
+                                : 'bg-success/10 text-success'
+                        }`}
+                      >
                         {cells[1]}
                       </span>
                     )}
@@ -726,13 +847,22 @@ function EntityList<T extends EntityForList>({
 
 /* ─── Vulnerabilities Tab ─── */
 
-function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilities: Vulnerability[]; applicationId: string }) {
+function VulnerabilitiesTab({
+  vulnerabilities,
+  applicationId,
+}: {
+  vulnerabilities: Vulnerability[]
+  applicationId: string
+}) {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
   const allVulns = useLiveQuery(() => db.vulnerabilities.toArray(), []) ?? []
 
-  const activeVulns = useMemo(() => vulnerabilities.filter((v) => v.status !== 'fixed'), [vulnerabilities])
+  const activeVulns = useMemo(
+    () => vulnerabilities.filter((v) => v.status !== 'fixed'),
+    [vulnerabilities],
+  )
 
   const dissociate = async (vuln: Vulnerability) => {
     if (vuln.applicationId !== applicationId) return
@@ -749,7 +879,7 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
   const availableVulns = allVulns.filter(
     (v) =>
       !alreadyAssociatedIds.has(v.id) &&
-      (!search || v.title.toLowerCase().includes(search.toLowerCase()))
+      (!search || v.title.toLowerCase().includes(search.toLowerCase())),
   )
 
   const severityBadge = (sev: string) => {
@@ -760,7 +890,13 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
       low: 'bg-success/10 text-success',
       info: 'bg-neutral-10 text-neutral-60',
     }
-    return <span className={`text-xs px-2 py-0.5 rounded-full ${colors[sev] || 'bg-neutral-10 text-neutral-60'}`}>{sev}</span>
+    return (
+      <span
+        className={`text-xs px-2 py-0.5 rounded-full ${colors[sev] || 'bg-neutral-10 text-neutral-60'}`}
+      >
+        {sev}
+      </span>
+    )
   }
 
   const statusLabel: Record<string, string> = {
@@ -771,7 +907,9 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
   }
 
   const getSlaStatus = (vuln: Vulnerability) => {
-    const days = Math.ceil((new Date(vuln.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    const days = Math.ceil(
+      (new Date(vuln.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+    )
     if (days < 0) return { label: 'Vencido', color: 'text-danger' }
     if (days <= 7) return { label: `${days}d`, color: 'text-warning' }
     return { label: `${days}d`, color: 'text-success' }
@@ -799,18 +937,24 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
       key: 'cvssScore',
       label: 'CVSS',
       sortable: true,
-      render: (v) => <span className="text-sm font-medium text-neutral-90 dark:text-white">{v.cvssScore}</span>,
+      render: (v) => (
+        <span className="text-sm font-medium text-neutral-90 dark:text-white">{v.cvssScore}</span>
+      ),
     },
     {
       key: 'status',
       label: 'Estado',
       sortable: true,
       render: (v) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          v.status === 'in_progress' ? 'bg-info/10 text-info' :
-          v.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
-          'bg-danger/10 text-danger'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            v.status === 'in_progress'
+              ? 'bg-info/10 text-info'
+              : v.status === 'accepted'
+                ? 'bg-neutral-10 text-neutral-60'
+                : 'bg-danger/10 text-danger'
+          }`}
+        >
           {statusLabel[v.status]}
         </span>
       ),
@@ -832,14 +976,20 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
       render: (v) => (
         <div className="flex items-center justify-end gap-1">
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/security/vulnerabilities/${v.id}`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/security/vulnerabilities/${v.id}`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver vulnerabilidad"
           >
             <ExternalLink size={14} />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); dissociate(v) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              dissociate(v)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
             title="Desasociar"
           >
@@ -857,7 +1007,8 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
           Vulnerabilidades
           {vulnerabilities.length > activeVulns.length && (
             <span className="ml-2 text-sm font-normal text-neutral-50">
-              ({activeVulns.length} activas, {vulnerabilities.length - activeVulns.length} corregidas ocultas)
+              ({activeVulns.length} activas, {vulnerabilities.length - activeVulns.length}{' '}
+              corregidas ocultas)
             </span>
           )}
         </h4>
@@ -890,7 +1041,10 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
             placeholder="Buscar vulnerabilidades para asociar..."
             value={search}
             onFocus={() => setShowDropdown(true)}
-            onChange={(e) => { setSearch(e.target.value); setShowDropdown(true) }}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setShowDropdown(true)
+            }}
             className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -913,12 +1067,17 @@ function VulnerabilitiesTab({ vulnerabilities, applicationId }: { vulnerabilitie
                     <Plus size={14} className="text-primary shrink-0" />
                     <span className="text-neutral-90 dark:text-white truncate">{v.title}</span>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-                    v.severity === 'critical' ? 'bg-danger/10 text-danger' :
-                    v.severity === 'high' ? 'bg-warning/10 text-warning' :
-                    v.severity === 'medium' ? 'bg-info/10 text-info' :
-                    'bg-success/10 text-success'
-                  }`}>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                      v.severity === 'critical'
+                        ? 'bg-danger/10 text-danger'
+                        : v.severity === 'high'
+                          ? 'bg-warning/10 text-warning'
+                          : v.severity === 'medium'
+                            ? 'bg-info/10 text-info'
+                            : 'bg-success/10 text-success'
+                    }`}
+                  >
                     {v.severity}
                   </span>
                 </button>
@@ -977,7 +1136,9 @@ function QuickLinkCard({
         <Icon size={20} />
       </div>
       <span className="text-xs text-muted">{label}</span>
-          <span className="text-xl font-bold text-neutral-90 dark:text-white leading-none">{value}</span>
+      <span className="text-xl font-bold text-neutral-90 dark:text-white leading-none">
+        {value}
+      </span>
     </button>
   )
 }

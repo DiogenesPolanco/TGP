@@ -44,7 +44,8 @@ export function BlockerFormPage() {
         setSourceId(blocker.sourceId)
       })
     } else if (isNew) {
-      const urlSourceType = searchParams.get('sourceType') as 'task' | 'activity' | 'plan' | 'commitment' | null
+      const urlSourceType = searchParams.get('sourceType') as
+        'task' | 'activity' | 'plan' | 'commitment' | null
       const urlSourceId = searchParams.get('sourceId')
       if (urlSourceType && urlSourceId) {
         queueMicrotask(() => {
@@ -134,31 +135,46 @@ export function BlockerFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Severidad" value={severity} onChange={(v) => setSeverity(v as BlockerSeverity)} options={[
-              { value: 'low', label: 'Baja' },
-              { value: 'medium', label: 'Media' },
-              { value: 'high', label: 'Alta' },
-              { value: 'critical', label: 'Crítica' },
-            ]} />
+            <Select
+              label="Severidad"
+              value={severity}
+              onChange={(v) => setSeverity(v as BlockerSeverity)}
+              options={[
+                { value: 'low', label: 'Baja' },
+                { value: 'medium', label: 'Media' },
+                { value: 'high', label: 'Alta' },
+                { value: 'critical', label: 'Crítica' },
+              ]}
+            />
           </div>
 
           <div>
-            <Select label="Estado" value={status} onChange={(v) => setStatus(v as BlockerStatus)} options={[
-              { value: 'open', label: 'Abierto' },
-              { value: 'escalated', label: 'Escalado' },
-              { value: 'resolved', label: 'Resuelto' },
-            ]} />
+            <Select
+              label="Estado"
+              value={status}
+              onChange={(v) => setStatus(v as BlockerStatus)}
+              options={[
+                { value: 'open', label: 'Abierto' },
+                { value: 'escalated', label: 'Escalado' },
+                { value: 'resolved', label: 'Resuelto' },
+              ]}
+            />
           </div>
 
           {isNew && (
             <>
               <div>
-                <Select label="Tipo de Origen" value={sourceType} onChange={(v) => setSourceType(v as 'task' | 'activity' | 'plan' | 'commitment')} options={[
-                  { value: 'plan', label: 'Plan' },
-                  { value: 'activity', label: 'Actividad' },
-                  { value: 'task', label: 'Tarea' },
-                  { value: 'commitment', label: 'Compromiso' },
-                ]} />
+                <Select
+                  label="Tipo de Origen"
+                  value={sourceType}
+                  onChange={(v) => setSourceType(v as 'task' | 'activity' | 'plan' | 'commitment')}
+                  options={[
+                    { value: 'plan', label: 'Plan' },
+                    { value: 'activity', label: 'Actividad' },
+                    { value: 'task', label: 'Tarea' },
+                    { value: 'commitment', label: 'Compromiso' },
+                  ]}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-secondary mb-1.5">
@@ -176,16 +192,14 @@ export function BlockerFormPage() {
           )}
 
           <div className="col-span-2">
-            <MemberSelector
-              label="Asignado a"
-              value={assigneeId}
-              onChange={setAssigneeId}
-            />
+            <MemberSelector label="Asignado a" value={assigneeId} onChange={setAssigneeId} />
           </div>
 
           {blocker && status === 'resolved' && (
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-secondary mb-1.5">Notas de resolución</label>
+              <label className="block text-sm font-medium text-secondary mb-1.5">
+                Notas de resolución
+              </label>
               <RichTextEditor
                 value={resolutionNotes}
                 onChange={(html) => setResolutionNotes(html)}

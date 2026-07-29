@@ -9,7 +9,15 @@ import { computeAppTechMap } from '@/utils/technologyUtils'
 import type { SupportStatus, Technology } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import {
-  Network, Layers, AlertTriangle, Clock, CheckCircle, Info, Search, Eye, EyeOff,
+  Network,
+  Layers,
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+  Info,
+  Search,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 
 type StatusFilter = SupportStatus | 'all' | 'mixed'
@@ -52,9 +60,8 @@ const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string; color: string
 
 export function PublicObsolescenceMapPage() {
   const { hash } = useParams<{ hash: string }>()
-  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(
-    hash,
-    () => getPublicObsolescenceData(),
+  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(hash, () =>
+    getPublicObsolescenceData(),
   )
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -133,7 +140,12 @@ export function PublicObsolescenceMapPage() {
 
   const filteredNodeIds = useMemo(() => {
     const filtered = allNodes.filter((n) => {
-      if (search && !n.label.toLowerCase().includes(search.toLowerCase()) && !n.appName.toLowerCase().includes(search.toLowerCase())) return false
+      if (
+        search &&
+        !n.label.toLowerCase().includes(search.toLowerCase()) &&
+        !n.appName.toLowerCase().includes(search.toLowerCase())
+      )
+        return false
       if (statusFilter !== 'all' && n.status !== statusFilter) return false
       if (!showMicroservices && n.type === 'microservice') return false
       return true
@@ -160,10 +172,23 @@ export function PublicObsolescenceMapPage() {
     const appsWithMixed = appNodes.filter((n) => n.status === 'mixed').length
     const appsActive = appNodes.filter((n) => n.status === 'active').length
     const appsUnknown = appNodes.filter((n) => n.status === 'unknown').length
-    return { totalApps, totalMs, appsWithEol, appsWithExtended, appsWithMixed, appsActive, appsUnknown }
+    return {
+      totalApps,
+      totalMs,
+      appsWithEol,
+      appsWithExtended,
+      appsWithMixed,
+      appsActive,
+      appsUnknown,
+    }
   }, [apps, microservices, allNodes])
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -192,7 +217,9 @@ export function PublicObsolescenceMapPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Mapa de Obsolescencias</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Mapa de Obsolescencias
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -201,18 +228,42 @@ export function PublicObsolescenceMapPage() {
 
       <main className="px-6 py-8 max-w-screen-2xl mx-auto space-y-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-          <StatCard icon={<Layers size={18} />} value={stats.totalApps} label="Aplicaciones" active />
-          <StatCard icon={<Network size={18} />} value={stats.totalMs} label="Microservicios" active />
-          <StatCard icon={<AlertTriangle size={18} />} value={stats.appsWithEol} label="Apps con EOL" />
-          <StatCard icon={<Clock size={18} />} value={stats.appsWithExtended} label="Soporte Extendido" />
+          <StatCard
+            icon={<Layers size={18} />}
+            value={stats.totalApps}
+            label="Aplicaciones"
+            active
+          />
+          <StatCard
+            icon={<Network size={18} />}
+            value={stats.totalMs}
+            label="Microservicios"
+            active
+          />
+          <StatCard
+            icon={<AlertTriangle size={18} />}
+            value={stats.appsWithEol}
+            label="Apps con EOL"
+          />
+          <StatCard
+            icon={<Clock size={18} />}
+            value={stats.appsWithExtended}
+            label="Soporte Extendido"
+          />
           <StatCard icon={<Info size={18} />} value={stats.appsWithMixed} label="Estado Mixto" />
-          <StatCard icon={<CheckCircle size={18} />} value={stats.appsActive} label="Apps Saludables" />
+          <StatCard
+            icon={<CheckCircle size={18} />}
+            value={stats.appsActive}
+            label="Apps Saludables"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
             <div className="p-3 border-b border-boundary flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Obsolescencias</h2>
+              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                Grafo de Obsolescencias
+              </h2>
               <span className="text-xs text-neutral-50">
                 {filteredNodes.length} nodos · {filteredEdges.length} conexiones
               </span>
@@ -238,7 +289,9 @@ export function PublicObsolescenceMapPage() {
 
           <div className="space-y-4">
             <div className="bg-card rounded-2xl border border-boundary p-4">
-              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Leyenda</h3>
+              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">
+                Leyenda
+              </h3>
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-3 h-3 rounded-full bg-[#FF5630]" />
@@ -264,9 +317,14 @@ export function PublicObsolescenceMapPage() {
             </div>
 
             <div className="bg-card rounded-2xl border border-boundary p-4">
-              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">Filtros</h3>
+              <h3 className="font-semibold text-sm text-neutral-90 dark:text-white mb-3">
+                Filtros
+              </h3>
               <div className="relative mb-3">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+                />
                 <input
                   type="text"
                   placeholder="Buscar por nombre..."
@@ -276,7 +334,9 @@ export function PublicObsolescenceMapPage() {
                 />
               </div>
               <div className="mb-3">
-                <label className="text-xs font-medium text-muted mb-1.5 block">Estado de soporte</label>
+                <label className="text-xs font-medium text-muted mb-1.5 block">
+                  Estado de soporte
+                </label>
                 <div className="flex flex-wrap gap-1.5">
                   {STATUS_FILTER_OPTIONS.map((opt) => (
                     <Button
@@ -287,7 +347,11 @@ export function PublicObsolescenceMapPage() {
                           ? 'border-current bg-current/10'
                           : 'border-neutral-30 dark:border-neutral-60 text-muted hover:bg-neutral-10 dark:hover:bg-neutral-70'
                       }`}
-                      style={statusFilter === opt.value ? { borderColor: opt.color, color: opt.color } : undefined}
+                      style={
+                        statusFilter === opt.value
+                          ? { borderColor: opt.color, color: opt.color }
+                          : undefined
+                      }
                     >
                       {opt.label}
                     </Button>
@@ -296,19 +360,29 @@ export function PublicObsolescenceMapPage() {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-boundary">
                 <div className="flex items-center gap-2">
-                  {showMicroservices ? <Eye size={15} className="text-primary" /> : <EyeOff size={15} className="text-neutral-50" />}
+                  {showMicroservices ? (
+                    <Eye size={15} className="text-primary" />
+                  ) : (
+                    <EyeOff size={15} className="text-neutral-50" />
+                  )}
                   <span className="text-xs text-secondary">Microservicios</span>
                 </div>
                 <Button
                   onClick={() => setShowMicroservices(!showMicroservices)}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showMicroservices ? 'bg-primary' : 'bg-neutral-40'}`}
                 >
-                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showMicroservices ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${showMicroservices ? 'translate-x-4' : 'translate-x-0.5'}`}
+                  />
                 </Button>
               </div>
               {(search || statusFilter !== 'all' || !showMicroservices) && (
                 <Button
-                  onClick={() => { setSearch(''); setStatusFilter('all'); setShowMicroservices(true) }}
+                  onClick={() => {
+                    setSearch('')
+                    setStatusFilter('all')
+                    setShowMicroservices(true)
+                  }}
                   className="mt-3 w-full text-xs text-center text-primary hover:text-primary-dark py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
                 >
                   Limpiar filtros
@@ -326,9 +400,21 @@ export function PublicObsolescenceMapPage() {
   )
 }
 
-function StatCard({ icon, value, label, active }: { icon: React.ReactNode; value: number; label: string; active?: boolean }) {
+function StatCard({
+  icon,
+  value,
+  label,
+  active,
+}: {
+  icon: React.ReactNode
+  value: number
+  label: string
+  active?: boolean
+}) {
   return (
-    <div className={`bg-card rounded-2xl border p-3 flex items-center gap-3 ${active ? 'border-neutral-30 dark:border-neutral-60' : 'border-boundary opacity-80'}`}>
+    <div
+      className={`bg-card rounded-2xl border p-3 flex items-center gap-3 ${active ? 'border-neutral-30 dark:border-neutral-60' : 'border-boundary opacity-80'}`}
+    >
       <div className="text-primary shrink-0">{icon}</div>
       <div>
         <p className="text-lg font-bold text-neutral-90 dark:text-white">{value}</p>

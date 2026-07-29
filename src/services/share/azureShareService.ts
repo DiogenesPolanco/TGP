@@ -1,4 +1,8 @@
-import { getAzureConfig as _getBackupConfig, saveAzureConfig as _saveBackupConfig, clearAzureConfig } from '@/services/backup/azureBackupService'
+import {
+  getAzureConfig as _getBackupConfig,
+  saveAzureConfig as _saveBackupConfig,
+  clearAzureConfig,
+} from '@/services/backup/azureBackupService'
 import { encryptData, decryptData, isEncryptedPayload } from '@/services/share/encryptionService'
 export const getAzureBackupConfig = _getBackupConfig
 export const saveAzureBackupConfig = _saveBackupConfig
@@ -52,7 +56,9 @@ function getEffectiveShareConfig(): { sasUrl: string; containerName: string } | 
 
 // ─── Base64 helpers ─────────────────────────────────────────────────
 
-function enc(t: string): string { return btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '') }
+function enc(t: string): string {
+  return btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}
 function dec(s: string): string {
   const p = s.length % 4 === 3 ? '=' : s.length % 4 === 2 ? '==' : ''
   return atob(s.replace(/-/g, '+').replace(/_/g, '/') + p)
@@ -73,7 +79,9 @@ const MANIFEST_VERSION = 2
 function generateAutoKey(): string {
   const buf = new Uint8Array(16)
   crypto.getRandomValues(buf)
-  return Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('')
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 // ─── URL builders ───────────────────────────────────────────────────
@@ -88,7 +96,10 @@ function buildBlobUrl(sasUrl: string, container: string, filename: string): stri
 
 // ─── Upload ──────────────────────────────────────────────────────────
 
-export async function uploadShareToAzure(hash: string, data: unknown): Promise<{ url: string | null; autoKey?: string }> {
+export async function uploadShareToAzure(
+  hash: string,
+  data: unknown,
+): Promise<{ url: string | null; autoKey?: string }> {
   const cfg = getEffectiveShareConfig()
   if (!cfg?.sasUrl || !cfg.containerName) return { url: null }
 
@@ -99,7 +110,7 @@ export async function uploadShareToAzure(hash: string, data: unknown): Promise<{
   const encryptedPayload = await encryptData(data, autoKey)
   const finalData = isEncryptedPayload(data)
     ? await encryptData(encryptedPayload, autoKey) // double-encrypt: passphrase + auto
-    : encryptedPayload                              // single-encrypt: auto only
+    : encryptedPayload // single-encrypt: auto only
 
   const filename = `d${hash.slice(0, 16)}.json`
   const url = buildBlobUrl(cfg.sasUrl, cfg.containerName, filename)
@@ -173,7 +184,13 @@ export function buildManifestString(hash: string, autoKey?: string): string | nu
   if (!cfg?.sasUrl || !cfg.containerName) return null
 
   if (autoKey) {
-    return JSON.stringify([MANIFEST_VERSION, enc(cfg.sasUrl), cfg.containerName, `d${hash.slice(0, 16)}.json`, autoKey])
+    return JSON.stringify([
+      MANIFEST_VERSION,
+      enc(cfg.sasUrl),
+      cfg.containerName,
+      `d${hash.slice(0, 16)}.json`,
+      autoKey,
+    ])
   }
   // v1 fallback (no autoKey — shouldn't happen after this refactor but keep for BC)
   return JSON.stringify([1, enc(cfg.sasUrl), cfg.containerName, `d${hash.slice(0, 16)}.json`])
@@ -199,7 +216,9 @@ export async function listShareContainerBlobs(): Promise<string[]> {
     for await (const blob of iter) {
       blobs.push(blob.name)
     }
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 
   return blobs
 }

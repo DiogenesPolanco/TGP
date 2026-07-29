@@ -60,10 +60,7 @@ export interface AiChatResponse {
 }
 
 export interface AiProviderInterface {
-  chat(
-    messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
-  ): Promise<AiChatResponse>
+  chat(messages: AiChatMessage[], tools?: AiToolDefinition[]): Promise<AiChatResponse>
   testConnection(): Promise<boolean>
   getModels(): Promise<string[]>
 }
@@ -97,8 +94,14 @@ export function normalizeParams(params: Record<string, unknown>): Record<string,
       if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') continue
 
       // "true" / "false" → boolean
-      if (trimmed === 'true' || trimmed === 'True') { out[key] = true; continue }
-      if (trimmed === 'false' || trimmed === 'False') { out[key] = false; continue }
+      if (trimmed === 'true' || trimmed === 'True') {
+        out[key] = true
+        continue
+      }
+      if (trimmed === 'false' || trimmed === 'False') {
+        out[key] = false
+        continue
+      }
 
       // Numérico → number (string vacío ya se filtró arriba)
       if (/^-?\d+(\.\d+)?$/.test(trimmed)) {

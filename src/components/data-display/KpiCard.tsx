@@ -47,9 +47,20 @@ const colorMap = {
   },
 }
 
-export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color = 'primary', onClick, info }: KpiCardProps) {
+export function KpiCard({
+  title,
+  value,
+  subtitle,
+  trend,
+  trendValue,
+  icon,
+  color = 'primary',
+  onClick,
+  info,
+}: KpiCardProps) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
-  const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-danger' : 'text-neutral-50'
+  const trendColor =
+    trend === 'up' ? 'text-success' : trend === 'down' ? 'text-danger' : 'text-neutral-50'
   const styles = colorMap[color]
 
   return (
@@ -79,13 +90,21 @@ export function KpiCard({ title, value, subtitle, trend, trendValue, icon, color
       {/* Content (relative to stay above gradient overlay) */}
       <div className="relative">
         <div className="flex items-start justify-between mb-3">
-          <div className={cn('p-2 rounded-lg transition-transform duration-300 group-hover:scale-110', styles.icon)}>
+          <div
+            className={cn(
+              'p-2 rounded-lg transition-transform duration-300 group-hover:scale-110',
+              styles.icon,
+            )}
+          >
             {icon}
           </div>
           <div className="flex items-center gap-2">
             {info && (
               <div className="relative group/info">
-                <Info size={14} className="text-neutral-50 cursor-help transition-colors hover:text-neutral-60" />
+                <Info
+                  size={14}
+                  className="text-neutral-50 cursor-help transition-colors hover:text-neutral-60"
+                />
                 <div className="absolute right-0 top-full mt-2 w-60 p-3 rounded-lg bg-neutral-90 dark:bg-neutral-20 text-white dark:text-neutral-90 text-xs shadow-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 z-50 pointer-events-none">
                   {info}
                   <div className="absolute right-3 bottom-full w-2 h-2 bg-neutral-90 dark:bg-neutral-20 rotate-45 translate-y-1" />

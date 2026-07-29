@@ -90,9 +90,7 @@ export function Header() {
   return (
     <header className="h-16 bg-card border-b border-boundary flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
-          {getPageTitle()}
-        </h1>
+        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">{getPageTitle()}</h1>
       </div>
 
       <div className="flex items-center gap-3">
@@ -123,9 +121,7 @@ export function Header() {
                   }}
                   className={cn(
                     'w-full text-left px-4 py-2 text-sm hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors',
-                    selectedPeriod === option.value
-                      ? 'text-primary font-medium'
-                      : 'text-secondary'
+                    selectedPeriod === option.value ? 'text-primary font-medium' : 'text-secondary',
                   )}
                 >
                   {option.label}
@@ -161,7 +157,11 @@ export function Header() {
                       ? 'bg-primary/10 text-primary'
                       : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
                   }`}
-                  title={browserNotifs ? 'Notificaciones activadas' : 'Activar notificaciones del navegador'}
+                  title={
+                    browserNotifs
+                      ? 'Notificaciones activadas'
+                      : 'Activar notificaciones del navegador'
+                  }
                 >
                   <Speaker size={14} />
                   {browserNotifs ? 'Activadas' : 'Notificar'}
@@ -176,29 +176,29 @@ export function Header() {
                         alert.type === 'critical'
                           ? 'bg-danger/10 text-danger'
                           : alert.type === 'warning'
-                          ? 'bg-warning/10 text-warning'
-                          : alert.type === 'success'
-                          ? 'bg-success/10 text-success'
-                          : 'bg-info/10 text-info'
+                            ? 'bg-warning/10 text-warning'
+                            : alert.type === 'success'
+                              ? 'bg-success/10 text-success'
+                              : 'bg-info/10 text-info'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${
-                        alert.type === 'critical'
-                          ? 'bg-danger'
-                          : alert.type === 'warning'
-                          ? 'bg-warning'
-                          : alert.type === 'success'
-                          ? 'bg-success'
-                          : 'bg-info'
-                      }`} />
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${
+                          alert.type === 'critical'
+                            ? 'bg-danger'
+                            : alert.type === 'warning'
+                              ? 'bg-warning'
+                              : alert.type === 'success'
+                                ? 'bg-success'
+                                : 'bg-info'
+                        }`}
+                      />
                       <span className="text-neutral-80 dark:text-neutral-20">{alert.message}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="p-6 text-center text-sm text-neutral-50">
-                  Sin alertas activas
-                </div>
+                <div className="p-6 text-center text-sm text-neutral-50">Sin alertas activas</div>
               )}
             </div>
           )}
@@ -217,8 +217,10 @@ export function Header() {
 
         <div className="flex items-center gap-2 pl-3 border-l border-boundary">
           {currentUser ? (
-            <Button onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
+            <Button
+              onClick={() => navigate(`/admin/users/${currentUser.id}/edit`)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity group"
+            >
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <span className="text-primary font-semibold text-sm">
                   {currentUser.displayName.charAt(0).toUpperCase()}

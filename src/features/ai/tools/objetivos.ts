@@ -36,11 +36,7 @@ export const objetivosTool: AiToolDefinition = {
 
     const now = new Date()
     if (activos) {
-      objectives = objectives.filter(
-        (o) =>
-          o.status !== 'achieved' &&
-          new Date(o.periodEnd) >= now
-      )
+      objectives = objectives.filter((o) => o.status !== 'achieved' && new Date(o.periodEnd) >= now)
     }
 
     objectives.sort((a, b) => new Date(a.periodEnd).getTime() - new Date(b.periodEnd).getTime())
@@ -52,9 +48,9 @@ export const objetivosTool: AiToolDefinition = {
     const lines = objectives.map((o) => {
       const teamName = o.teamId ? (teamMap.get(o.teamId) ?? o.teamId) : 'Sin equipo'
       const progress = o.progress ?? 0
-      const krs = (o.keyResults ?? []).map(
-        (kr) => `    · ${kr.title}: ${kr.current}/${kr.target} (${kr.status})`
-      ).join('\n')
+      const krs = (o.keyResults ?? [])
+        .map((kr) => `    · ${kr.title}: ${kr.current}/${kr.target} (${kr.status})`)
+        .join('\n')
 
       return `- ${o.title}
    Equipo: ${teamName} | Estado: ${o.status} | Progreso: ${progress}% | Período: ${new Date(o.periodStart).toLocaleDateString('es-ES')} - ${new Date(o.periodEnd).toLocaleDateString('es-ES')}

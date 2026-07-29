@@ -56,7 +56,9 @@ export function CommitmentFormPage() {
           objectiveId: commitment.objectiveId ?? '',
           deliverableId: commitment.deliverableId ?? '',
           status: (commitment.status as CommitmentStatus) ?? 'active',
-          commitmentDate: commitment.commitmentDate ? new Date(commitment.commitmentDate).toISOString().split('T')[0] : '',
+          commitmentDate: commitment.commitmentDate
+            ? new Date(commitment.commitmentDate).toISOString().split('T')[0]
+            : '',
         })
       })
     }
@@ -96,7 +98,10 @@ export function CommitmentFormPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/execution/commitments')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+        <Button
+          onClick={() => navigate('/execution/commitments')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
           <ArrowLeft size={20} className="text-neutral-60" />
         </Button>
         <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
@@ -104,15 +109,29 @@ export function CommitmentFormPage() {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4"
+      >
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Título *</label>
-          <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="ej. Entregar plan de migración antes del Q3" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <input
+            type="text"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="ej. Entregar plan de migración antes del Q3"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
-          <RichTextEditor value={formData.description} onChange={(html) => setFormData({ ...formData, description: html })} placeholder="Describe el compromiso..." />
+          <RichTextEditor
+            value={formData.description}
+            onChange={(html) => setFormData({ ...formData, description: html })}
+            placeholder="Describe el compromiso..."
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -132,47 +151,90 @@ export function CommitmentFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
-              { value: '', label: 'Sin equipo' },
-              ...teams.map((t) => ({ value: t.id, label: t.name })),
-            ]} />
+            <Select
+              label="Equipo"
+              value={formData.teamId}
+              onChange={(v) => setFormData({ ...formData, teamId: v })}
+              options={[
+                { value: '', label: 'Sin equipo' },
+                ...teams.map((t) => ({ value: t.id, label: t.name })),
+              ]}
+            />
           </div>
           <div>
-            <Select label="Aplicación" value={formData.applicationId} onChange={(v) => setFormData({ ...formData, applicationId: v })} options={[
-              { value: '', label: 'Sin app' },
-              ...applications.map((a) => ({ value: a.id, label: a.name })),
-            ]} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Select label="OKR asociado" value={formData.objectiveId} onChange={(v) => setFormData({ ...formData, objectiveId: v })} options={[
-              { value: '', label: 'Sin OKR' },
-              ...objectives.map((o) => ({ value: o.id, label: o.title })),
-            ]} />
-          </div>
-          <div>
-            <Select label="Entregable asociado" value={formData.deliverableId} onChange={(v) => setFormData({ ...formData, deliverableId: v })} options={[
-              { value: '', label: 'Sin entregable' },
-              ...deliverables.map((d) => ({ value: d.id, label: d.title })),
-            ]} />
+            <Select
+              label="Aplicación"
+              value={formData.applicationId}
+              onChange={(v) => setFormData({ ...formData, applicationId: v })}
+              options={[
+                { value: '', label: 'Sin app' },
+                ...applications.map((a) => ({ value: a.id, label: a.name })),
+              ]}
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as CommitmentStatus })} options={statusOptions} />
+            <Select
+              label="OKR asociado"
+              value={formData.objectiveId}
+              onChange={(v) => setFormData({ ...formData, objectiveId: v })}
+              options={[
+                { value: '', label: 'Sin OKR' },
+                ...objectives.map((o) => ({ value: o.id, label: o.title })),
+              ]}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Fecha compromiso *</label>
-            <DatePicker required value={formData.commitmentDate} onChange={(v) => setFormData({ ...formData, commitmentDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <Select
+              label="Entregable asociado"
+              value={formData.deliverableId}
+              onChange={(v) => setFormData({ ...formData, deliverableId: v })}
+              options={[
+                { value: '', label: 'Sin entregable' },
+                ...deliverables.map((d) => ({ value: d.id, label: d.title })),
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Select
+              label="Estado"
+              value={formData.status}
+              onChange={(v) => setFormData({ ...formData, status: v as CommitmentStatus })}
+              options={statusOptions}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">
+              Fecha compromiso *
+            </label>
+            <DatePicker
+              required
+              value={formData.commitmentDate}
+              onChange={(v) => setFormData({ ...formData, commitmentDate: v })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" onClick={() => navigate('/execution/commitments')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
-          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{commitment ? 'Actualizar' : 'Crear'}</Button>
+          <Button
+            type="button"
+            onClick={() => navigate('/execution/commitments')}
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+          >
+            {commitment ? 'Actualizar' : 'Crear'}
+          </Button>
         </div>
       </form>
     </div>

@@ -1,5 +1,13 @@
 import { useState, useRef } from 'react'
-import { Upload, FileText, AlertTriangle, CheckCircle, XCircle, ArrowRight, ShieldAlert } from 'lucide-react'
+import {
+  Upload,
+  FileText,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  ArrowRight,
+  ShieldAlert,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/stores/appStore'
 import { Button } from '@/components/ui/Button'
@@ -81,9 +89,12 @@ export function FluidAttackImportPanel() {
           <ShieldAlert size={20} />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-neutral-90 dark:text-white">FluidAttack — Importar Vulnerabilidades</h3>
+          <h3 className="text-sm font-bold text-neutral-90 dark:text-white">
+            FluidAttack — Importar Vulnerabilidades
+          </h3>
           <p className="text-xs text-neutral-50 dark:text-neutral-40">
-            Carga un CSV de FluidAttack para crear vulnerabilidades en las aplicaciones correspondientes
+            Carga un CSV de FluidAttack para crear vulnerabilidades en las aplicaciones
+            correspondientes
           </p>
         </div>
       </div>
@@ -115,9 +126,7 @@ export function FluidAttackImportPanel() {
             ) : (
               <>
                 <Upload size={28} className="text-neutral-40" />
-                <p className="text-sm font-medium text-muted">
-                  Seleccionar archivo CSV
-                </p>
+                <p className="text-sm font-medium text-muted">Seleccionar archivo CSV</p>
                 <p className="text-xs text-neutral-50 dark:text-neutral-50">
                   Columnas esperadas: Location, Weakness, Vulnerability ID, Severity Level, etc.
                 </p>
@@ -130,9 +139,7 @@ export function FluidAttackImportPanel() {
       {phase === 'preview' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted">
-              {parsedRows.length} filas detectadas
-            </p>
+            <p className="text-sm text-muted">{parsedRows.length} filas detectadas</p>
             <div className="flex gap-2">
               <Button
                 onClick={handleReset}
@@ -164,15 +171,24 @@ export function FluidAttackImportPanel() {
               </thead>
               <tbody>
                 {parsedRows.slice(0, 50).map((row) => (
-                  <tr key={row.rowIndex} className="border-t border-neutral-10 dark:border-neutral-85 hover:bg-neutral-5 dark:hover:bg-neutral-85/50">
+                  <tr
+                    key={row.rowIndex}
+                    className="border-t border-neutral-10 dark:border-neutral-85 hover:bg-neutral-5 dark:hover:bg-neutral-85/50"
+                  >
                     <td className="px-3 py-1.5 text-neutral-50">{row.rowIndex}</td>
-                    <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">{row.location || '—'}</td>
+                    <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">
+                      {row.location || '—'}
+                    </td>
                     <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 max-w-xs truncate">
                       {row.raw['weakness'] || '—'}
                     </td>
-                    <td className="px-3 py-1.5 font-mono text-neutral-60">{row.raw['vulnerability_id'] || '—'}</td>
+                    <td className="px-3 py-1.5 font-mono text-neutral-60">
+                      {row.raw['vulnerability_id'] || '—'}
+                    </td>
                     <td className="px-3 py-1.5">
-                      <SeverityBadge value={row.raw['severity_level'] || row.raw['severity'] || ''} />
+                      <SeverityBadge
+                        value={row.raw['severity_level'] || row.raw['severity'] || ''}
+                      />
                     </td>
                     <td className="px-3 py-1.5">
                       <StatusBadge value={row.raw['status'] || ''} />
@@ -248,11 +264,20 @@ export function FluidAttackImportPanel() {
                     {result.matches
                       .filter((m) => !m.applicationId)
                       .map((m) => (
-                        <tr key={m.row.rowIndex} className="border-t border-neutral-10 dark:border-neutral-85">
+                        <tr
+                          key={m.row.rowIndex}
+                          className="border-t border-neutral-10 dark:border-neutral-85"
+                        >
                           <td className="px-3 py-1.5 text-neutral-50">{m.row.rowIndex}</td>
-                          <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">{m.row.location || '—'}</td>
-                          <td className="px-3 py-1.5 font-mono text-neutral-60">{m.row.raw['vulnerability_id'] || '—'}</td>
-                          <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 truncate max-w-xs">{m.row.raw['weakness'] || '—'}</td>
+                          <td className="px-3 py-1.5 font-mono text-neutral-80 dark:text-neutral-30">
+                            {m.row.location || '—'}
+                          </td>
+                          <td className="px-3 py-1.5 font-mono text-neutral-60">
+                            {m.row.raw['vulnerability_id'] || '—'}
+                          </td>
+                          <td className="px-3 py-1.5 text-neutral-80 dark:text-neutral-30 truncate max-w-xs">
+                            {m.row.raw['weakness'] || '—'}
+                          </td>
                         </tr>
                       ))}
                   </tbody>
@@ -268,7 +293,9 @@ export function FluidAttackImportPanel() {
               </p>
               <ul className="text-xs text-danger/80 space-y-0.5">
                 {result.errors.slice(0, 5).map((e, i) => (
-                  <li key={i}>Fila {e.row}: {e.message}</li>
+                  <li key={i}>
+                    Fila {e.row}: {e.message}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -298,10 +325,13 @@ function SeverityBadge({ value }: { value: string }) {
     info: 'bg-neutral-10 text-neutral-50 border-neutral-20 dark:bg-neutral-85 dark:text-neutral-40 dark:border-neutral-70',
   }
   return (
-    <span className={cn(
-      'inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded border',
-      colorMap[v] ?? 'bg-neutral-10 text-neutral-50 border-neutral-20 dark:bg-neutral-85 dark:text-neutral-40 dark:border-neutral-70',
-    )}>
+    <span
+      className={cn(
+        'inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded border',
+        colorMap[v] ??
+          'bg-neutral-10 text-neutral-50 border-neutral-20 dark:bg-neutral-85 dark:text-neutral-40 dark:border-neutral-70',
+      )}
+    >
       {value || '—'}
     </span>
   )
@@ -317,16 +347,29 @@ function StatusBadge({ value }: { value: string }) {
     fixed: 'bg-success/10 text-success border-success/20',
   }
   return (
-    <span className={cn(
-      'inline-block px-1.5 py-0.5 text-[10px] font-medium rounded border',
-      colorMap[v] ?? 'bg-neutral-10 text-neutral-50 border-neutral-20 dark:bg-neutral-85 dark:text-neutral-40 dark:border-neutral-70',
-    )}>
+    <span
+      className={cn(
+        'inline-block px-1.5 py-0.5 text-[10px] font-medium rounded border',
+        colorMap[v] ??
+          'bg-neutral-10 text-neutral-50 border-neutral-20 dark:bg-neutral-85 dark:text-neutral-40 dark:border-neutral-70',
+      )}
+    >
       {value || '—'}
     </span>
   )
 }
 
-function StatBox({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatBox({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+}) {
   const colorMap: Record<string, string> = {
     success: 'text-success',
     danger: 'text-danger',

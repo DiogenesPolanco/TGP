@@ -6,9 +6,36 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
-import { getAssignmentHistory, getEquipmentTickets, deleteEquipment, assignEquipment, returnEquipment } from '@/services/equipment/equipmentService'
-import { EquipmentStatusBadge, EquipmentConditionBadge, EQUIPMENT_TYPE_LABELS } from '../components/EquipmentStatusBadge'
-import { Monitor, Pencil, Trash2, Package, Wrench, ExternalLink, History, ClipboardList, User, RotateCcw, Calendar, Info, CheckCircle, AlertTriangle, XCircle, HelpCircle } from 'lucide-react'
+import {
+  getAssignmentHistory,
+  getEquipmentTickets,
+  deleteEquipment,
+  assignEquipment,
+  returnEquipment,
+} from '@/services/equipment/equipmentService'
+import {
+  EquipmentStatusBadge,
+  EquipmentConditionBadge,
+  EQUIPMENT_TYPE_LABELS,
+} from '../components/EquipmentStatusBadge'
+import {
+  Monitor,
+  Pencil,
+  Trash2,
+  Package,
+  Wrench,
+  ExternalLink,
+  History,
+  ClipboardList,
+  User,
+  RotateCcw,
+  Calendar,
+  Info,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  HelpCircle,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { MemberSelector } from '@/components/ui/MemberSelector'
@@ -58,21 +85,24 @@ export function EquipmentDetailPage() {
   const [assignTarget, setAssignTarget] = useState('')
   const [returnCondition, setReturnCondition] = useState<EquipmentCondition>('good')
 
-  const equipment = useLiveQuery(() => id ? db.equipment.get(id) : undefined, [id])
-  const assignments = useLiveQuery(() => id ? getAssignmentHistory(id) : [], [id]) ?? []
-  const tickets = useLiveQuery(() => id ? getEquipmentTickets(id) : [], [id]) ?? []
+  const equipment = useLiveQuery(() => (id ? db.equipment.get(id) : undefined), [id])
+  const assignments = useLiveQuery(() => (id ? getAssignmentHistory(id) : []), [id]) ?? []
+  const tickets = useLiveQuery(() => (id ? getEquipmentTickets(id) : []), [id]) ?? []
   const members = useLiveQuery(() => db.memberProfiles.toArray(), []) ?? []
   const teams = useLiveQuery(() => db.teams.toArray(), []) ?? []
 
   if (!equipment) {
-    return <DetailLayout title="Equipo no encontrado" onBack={() => navigate('/equipment')}>
-      <p className="text-neutral-50">El equipo no existe o ha sido eliminado.</p>
-    </DetailLayout>
+    return (
+      <DetailLayout title="Equipo no encontrado" onBack={() => navigate('/equipment')}>
+        <p className="text-neutral-50">El equipo no existe o ha sido eliminado.</p>
+      </DetailLayout>
+    )
   }
 
   const activeAssignment = assignments.find((a) => a.returnedAt === null)
   const assignedMember = equipment.assignedTo
-    ? members.find((m) => m.id === equipment.assignedTo) ?? teams.flatMap((t) => t.members).find((m) => m.id === equipment.assignedTo)
+    ? (members.find((m) => m.id === equipment.assignedTo) ??
+      teams.flatMap((t) => t.members).find((m) => m.id === equipment.assignedTo))
     : null
 
   const handleDelete = async () => {
@@ -138,8 +168,10 @@ export function EquipmentDetailPage() {
             <Pencil size={16} />
             Editar
           </Button>
-          <Button onClick={handleDelete}
-            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors">
+          <Button
+            onClick={handleDelete}
+            className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 text-neutral-50 hover:text-danger transition-colors"
+          >
             <Trash2 size={18} />
           </Button>
         </div>
@@ -173,7 +205,9 @@ export function EquipmentDetailPage() {
           <div className={`rounded-xl border p-5 ${statusBg[equipment.status] || 'bg-neutral-10'}`}>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl ${statusIconBg[equipment.status] || 'bg-neutral-40'} flex items-center justify-center shadow-sm`}>
+                <div
+                  className={`w-12 h-12 rounded-xl ${statusIconBg[equipment.status] || 'bg-neutral-40'} flex items-center justify-center shadow-sm`}
+                >
                   {statusIcon[equipment.status] || <HelpCircle size={24} className="text-white" />}
                 </div>
                 <div>
@@ -185,13 +219,18 @@ export function EquipmentDetailPage() {
                     {equipment.brand} {equipment.model}
                   </p>
                   <p className="text-sm text-muted mt-0.5">
-                    {EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type} · {equipment.serialNumber}
+                    {EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type} ·{' '}
+                    {equipment.serialNumber}
                   </p>
                 </div>
               </div>
-              <div className={`px-4 py-2 rounded-lg ${statusIconBg[equipment.status] || 'bg-neutral-40'} text-white text-center shadow-sm`}>
+              <div
+                className={`px-4 py-2 rounded-lg ${statusIconBg[equipment.status] || 'bg-neutral-40'} text-white text-center shadow-sm`}
+              >
                 <Monitor size={24} className="mx-auto mb-0.5" />
-                <p className="text-[10px] uppercase tracking-wider font-medium">{EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type}</p>
+                <p className="text-[10px] uppercase tracking-wider font-medium">
+                  {EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type}
+                </p>
               </div>
             </div>
           </div>
@@ -203,17 +242,40 @@ export function EquipmentDetailPage() {
                 <MiniField label="Marca" value={equipment.brand} />
                 <MiniField label="Modelo" value={equipment.model} />
                 <MiniField label="N° Serie" value={equipment.serialNumber} />
-                <MiniField label="Condición" value={<EquipmentConditionBadge condition={equipment.condition} />} />
-                <MiniField label="Tipo" value={EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type} />
-                <MiniField label="Estado" value={<EquipmentStatusBadge status={equipment.status} />} />
+                <MiniField
+                  label="Condición"
+                  value={<EquipmentConditionBadge condition={equipment.condition} />}
+                />
+                <MiniField
+                  label="Tipo"
+                  value={EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type}
+                />
+                <MiniField
+                  label="Estado"
+                  value={<EquipmentStatusBadge status={equipment.status} />}
+                />
               </div>
             </Section>
 
             <Section title="Ciclo de Vida" icon={<Calendar size={18} />}>
               <div className="grid grid-cols-2 gap-3">
-                <MiniField label="Fecha de Compra" value={equipment.purchaseDate ? new Date(equipment.purchaseDate).toLocaleDateString('es') : 'Sin registro'} />
-                <MiniField label="Garantía" value={<span className={warrantyExpired ? 'text-danger' : ''}>{warrantyLabel}</span>} />
-                {equipment.costCenter && <MiniField label="Centro de Costo" value={equipment.costCenter} />}
+                <MiniField
+                  label="Fecha de Compra"
+                  value={
+                    equipment.purchaseDate
+                      ? new Date(equipment.purchaseDate).toLocaleDateString('es')
+                      : 'Sin registro'
+                  }
+                />
+                <MiniField
+                  label="Garantía"
+                  value={
+                    <span className={warrantyExpired ? 'text-danger' : ''}>{warrantyLabel}</span>
+                  }
+                />
+                {equipment.costCenter && (
+                  <MiniField label="Centro de Costo" value={equipment.costCenter} />
+                )}
                 {equipment.businessUnitId && (
                   <MiniField label="Unidad de Negocio" value={equipment.businessUnitId} />
                 )}
@@ -228,14 +290,31 @@ export function EquipmentDetailPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <MiniField
                       label="Asignado a"
-                      value={assignedMember && 'displayName' in assignedMember ? assignedMember.displayName : equipment.assignedTo ?? '—'}
+                      value={
+                        assignedMember && 'displayName' in assignedMember
+                          ? assignedMember.displayName
+                          : (equipment.assignedTo ?? '—')
+                      }
                     />
-                    <MiniField label="Desde" value={activeAssignment.assignedAt.toLocaleDateString('es')} />
-                    <MiniField label="Condición entrega" value={<EquipmentConditionBadge condition={activeAssignment.conditionAtAssignment} />} />
+                    <MiniField
+                      label="Desde"
+                      value={activeAssignment.assignedAt.toLocaleDateString('es')}
+                    />
+                    <MiniField
+                      label="Condición entrega"
+                      value={
+                        <EquipmentConditionBadge
+                          condition={activeAssignment.conditionAtAssignment}
+                        />
+                      }
+                    />
                   </div>
 
-                  <Button onClick={handleReturn} disabled={returning}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-warning text-white rounded-lg text-sm font-medium hover:bg-warning/90 transition-colors disabled:opacity-50">
+                  <Button
+                    onClick={handleReturn}
+                    disabled={returning}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-warning text-white rounded-lg text-sm font-medium hover:bg-warning/90 transition-colors disabled:opacity-50"
+                  >
                     <RotateCcw size={16} />
                     {returning ? 'Procesando...' : 'Registrar Devolución'}
                   </Button>
@@ -243,7 +322,11 @@ export function EquipmentDetailPage() {
                   {returning && (
                     <div className="space-y-1.5">
                       <label className="text-xs text-muted">Condición de devolución</label>
-                      <Select value={returnCondition} onChange={(v) => setReturnCondition(v as EquipmentCondition)} options={CONDITION_OPTIONS} />
+                      <Select
+                        value={returnCondition}
+                        onChange={(v) => setReturnCondition(v as EquipmentCondition)}
+                        options={CONDITION_OPTIONS}
+                      />
                     </div>
                   )}
                 </div>
@@ -260,8 +343,11 @@ export function EquipmentDetailPage() {
                       onChange={setAssignTarget}
                       placeholder="Buscar miembro o escribir nombre..."
                     />
-                    <Button onClick={handleAssign} disabled={assigning || !assignTarget.trim()}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-success text-white rounded-lg text-sm font-medium hover:bg-success-dark transition-colors disabled:opacity-50">
+                    <Button
+                      onClick={handleAssign}
+                      disabled={assigning || !assignTarget.trim()}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-success text-white rounded-lg text-sm font-medium hover:bg-success-dark transition-colors disabled:opacity-50"
+                    >
                       <Package size={16} />
                       {assigning ? 'Asignando...' : 'Asignar Equipo'}
                     </Button>
@@ -284,9 +370,14 @@ export function EquipmentDetailPage() {
       {activeTab === 'tickets' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-neutral-50">{tickets.length} ticket{tickets.length !== 1 ? 's' : ''} registrado{tickets.length !== 1 ? 's' : ''}</p>
-            <Button onClick={() => navigate(`/equipment/${equipment.id}/tickets/new`)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
+            <p className="text-sm text-neutral-50">
+              {tickets.length} ticket{tickets.length !== 1 ? 's' : ''} registrado
+              {tickets.length !== 1 ? 's' : ''}
+            </p>
+            <Button
+              onClick={() => navigate(`/equipment/${equipment.id}/tickets/new`)}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+            >
               <Wrench size={16} />
               Nuevo Ticket
             </Button>
@@ -301,65 +392,89 @@ export function EquipmentDetailPage() {
             <div className="space-y-2">
               {tickets.map((t) => {
                 const assigneeName = t.assigneeId
-                  ? members.find((m) => m.id === t.assigneeId)?.email.split('@')[0]
-                    ?? teams.flatMap((tm) => tm.members).find((m) => m.id === t.assigneeId)?.displayName
-                    ?? null
+                  ? (members.find((m) => m.id === t.assigneeId)?.email.split('@')[0] ??
+                    teams.flatMap((tm) => tm.members).find((m) => m.id === t.assigneeId)
+                      ?.displayName ??
+                    null)
                   : null
                 return (
-                <div key={t.id}
-                  className="flex items-center justify-between p-4 bg-neutral-5 dark:bg-neutral-85 rounded-xl hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <TicketTypeBadge type={t.type} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
-                        {t.description.replace(/<[^>]*>/g, '').slice(0, 80)}
-                      </p>
-                      <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
-                        {assigneeName && (
-                          <span className="text-[11px] text-neutral-50 flex items-center gap-1">
-                            <User size={10} />{assigneeName}
-                          </span>
-                        )}
-                        {t.startDate && (
-                          <span className="text-[11px] text-neutral-50">
-                            {new Date(t.startDate).toLocaleDateString('es')}
-                            {t.endDate ? ` → ${new Date(t.endDate).toLocaleDateString('es')}` : ' →'}
-                          </span>
-                        )}
-                        <TicketStatusBadge status={t.status} />
-                        {t.priority && (
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                            t.priority === 'critical' ? 'bg-danger/10 text-danger' :
-                            t.priority === 'high' ? 'bg-warning/10 text-warning' :
-                            t.priority === 'medium' ? 'bg-info/10 text-info' :
-                            'bg-neutral-20 text-neutral-60'
-                          }`}>
-                            {t.priority === 'critical' ? 'Crítica' : t.priority === 'high' ? 'Alta' : t.priority === 'medium' ? 'Media' : 'Baja'}
-                          </span>
-                        )}
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between p-4 bg-neutral-5 dark:bg-neutral-85 rounded-xl hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <TicketTypeBadge type={t.type} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                          {t.description.replace(/<[^>]*>/g, '').slice(0, 80)}
+                        </p>
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                          {assigneeName && (
+                            <span className="text-[11px] text-neutral-50 flex items-center gap-1">
+                              <User size={10} />
+                              {assigneeName}
+                            </span>
+                          )}
+                          {t.startDate && (
+                            <span className="text-[11px] text-neutral-50">
+                              {new Date(t.startDate).toLocaleDateString('es')}
+                              {t.endDate
+                                ? ` → ${new Date(t.endDate).toLocaleDateString('es')}`
+                                : ' →'}
+                            </span>
+                          )}
+                          <TicketStatusBadge status={t.status} />
+                          {t.priority && (
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                t.priority === 'critical'
+                                  ? 'bg-danger/10 text-danger'
+                                  : t.priority === 'high'
+                                    ? 'bg-warning/10 text-warning'
+                                    : t.priority === 'medium'
+                                      ? 'bg-info/10 text-info'
+                                      : 'bg-neutral-20 text-neutral-60'
+                              }`}
+                            >
+                              {t.priority === 'critical'
+                                ? 'Crítica'
+                                : t.priority === 'high'
+                                  ? 'Alta'
+                                  : t.priority === 'medium'
+                                    ? 'Media'
+                                    : 'Baja'}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {t.jiraTicketId && (
+                        <span className="text-[11px] bg-neutral-20 dark:bg-neutral-70 px-2 py-0.5 rounded text-neutral-60 font-mono">
+                          {t.jiraTicketId}
+                        </span>
+                      )}
+                      {t.jiraTicketLink && (
+                        <a
+                          href={t.jiraTicketLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 text-neutral-50 hover:text-primary transition-colors"
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
+                      <Button
+                        onClick={() => navigate(`/equipment/${equipment.id}/tickets/${t.id}/edit`)}
+                        className="p-1.5 text-neutral-50 hover:text-primary transition-colors"
+                        title="Editar ticket"
+                      >
+                        <Pencil size={14} />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {t.jiraTicketId && (
-                      <span className="text-[11px] bg-neutral-20 dark:bg-neutral-70 px-2 py-0.5 rounded text-neutral-60 font-mono">{t.jiraTicketId}</span>
-                    )}
-                    {t.jiraTicketLink && (
-                      <a href={t.jiraTicketLink} target="_blank" rel="noopener noreferrer"
-                        className="p-1.5 text-neutral-50 hover:text-primary transition-colors">
-                        <ExternalLink size={14} />
-                      </a>
-                    )}
-                    <Button
-                      onClick={() => navigate(`/equipment/${equipment.id}/tickets/${t.id}/edit`)}
-                      className="p-1.5 text-neutral-50 hover:text-primary transition-colors"
-                      title="Editar ticket"
-                    >
-                      <Pencil size={14} />
-                    </Button>
-                  </div>
-                </div>
-              )})}
+                )
+              })}
             </div>
           )}
         </div>
@@ -367,7 +482,10 @@ export function EquipmentDetailPage() {
 
       {activeTab === 'history' && (
         <div className="space-y-4">
-          <p className="text-sm text-neutral-50">{assignments.length} asignacion{assignments.length !== 1 ? 'es' : ''} registrada{assignments.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-neutral-50">
+            {assignments.length} asignacion{assignments.length !== 1 ? 'es' : ''} registrada
+            {assignments.length !== 1 ? 's' : ''}
+          </p>
 
           {assignments.length === 0 ? (
             <div className="text-center py-12 text-neutral-50">
@@ -378,19 +496,34 @@ export function EquipmentDetailPage() {
             <div className="space-y-2">
               {assignments.map((a) => {
                 const memberProfile = members.find((m) => m.id === a.assignedTo)
-                const teamMember = !memberProfile ? teams.flatMap((t) => t.members).find((m) => m.id === a.assignedTo) : null
-                const memberName = memberProfile?.email.split('@')[0] ?? teamMember?.displayName ?? a.assignedTo
-                const memberTeamId = memberProfile?.teamId ?? teams.find((t) => t.members.some((m) => m.id === a.assignedTo))?.id
+                const teamMember = !memberProfile
+                  ? teams.flatMap((t) => t.members).find((m) => m.id === a.assignedTo)
+                  : null
+                const memberName =
+                  memberProfile?.email.split('@')[0] ?? teamMember?.displayName ?? a.assignedTo
+                const memberTeamId =
+                  memberProfile?.teamId ??
+                  teams.find((t) => t.members.some((m) => m.id === a.assignedTo))?.id
                 return (
-                  <div key={a.id}
-                    onClick={() => memberTeamId && navigate(`/teams/${memberTeamId}/performance/${a.assignedTo}`)}
+                  <div
+                    key={a.id}
+                    onClick={() =>
+                      memberTeamId && navigate(`/teams/${memberTeamId}/performance/${a.assignedTo}`)
+                    }
                     className={`flex items-center justify-between p-4 bg-neutral-5 dark:bg-neutral-85 rounded-xl ${
-                      memberTeamId ? 'cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors' : ''
-                    }`}>
+                      memberTeamId
+                        ? 'cursor-pointer hover:bg-neutral-10 dark:hover:bg-neutral-75 transition-colors'
+                        : ''
+                    }`}
+                  >
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        a.returnedAt ? 'bg-neutral-20 text-neutral-60' : 'bg-primary/10 text-primary'
-                      }`}>
+                      <div
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          a.returnedAt
+                            ? 'bg-neutral-20 text-neutral-60'
+                            : 'bg-primary/10 text-primary'
+                        }`}
+                      >
                         <User size={16} />
                       </div>
                       <div>
@@ -399,7 +532,9 @@ export function EquipmentDetailPage() {
                         </p>
                         <p className="text-xs text-neutral-50">
                           {a.assignedAt.toLocaleDateString('es')}
-                          {a.returnedAt ? ` → ${a.returnedAt.toLocaleDateString('es')}` : ' (Activo)'}
+                          {a.returnedAt
+                            ? ` → ${a.returnedAt.toLocaleDateString('es')}`
+                            : ' (Activo)'}
                         </p>
                       </div>
                     </div>
@@ -426,7 +561,15 @@ export function EquipmentDetailPage() {
   )
 }
 
-function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
@@ -442,7 +585,9 @@ function MiniField({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div className="space-y-0.5">
       <dt className="text-[10px] font-medium text-neutral-40 uppercase tracking-wider">{label}</dt>
-      <dd className="text-sm text-neutral-90 dark:text-white">{typeof value === 'string' ? (value || '—') : value}</dd>
+      <dd className="text-sm text-neutral-90 dark:text-white">
+        {typeof value === 'string' ? value || '—' : value}
+      </dd>
     </div>
   )
 }
@@ -454,7 +599,9 @@ function TicketTypeBadge({ type }: { type: string }) {
     new: { label: 'Nuevo', color: 'bg-success/10 text-success' },
   }
   const c = cfg[type] ?? { label: type, color: 'bg-neutral-10 text-neutral-60' }
-  return <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${c.color}`}>{c.label}</span>
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${c.color}`}>{c.label}</span>
+  )
 }
 
 function TicketStatusBadge({ status }: { status: string }) {
@@ -465,5 +612,7 @@ function TicketStatusBadge({ status }: { status: string }) {
     closed: { label: 'Cerrado', color: 'bg-neutral-30 text-neutral-60' },
   }
   const c = cfg[status] ?? { label: status, color: 'bg-neutral-10 text-neutral-60' }
-  return <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${c.color}`}>{c.label}</span>
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${c.color}`}>{c.label}</span>
+  )
 }

@@ -2,7 +2,17 @@ import { useState } from 'react'
 import { db } from '@/services/db/database'
 import type { MemberProfile, MemberStatus } from '@/types/domain'
 import { MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
-import { Save, AtSign, Phone, Home, MapPin, Briefcase, Calendar, Umbrella, Clock } from 'lucide-react'
+import {
+  Save,
+  AtSign,
+  Phone,
+  Home,
+  MapPin,
+  Briefcase,
+  Calendar,
+  Umbrella,
+  Clock,
+} from 'lucide-react'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 
@@ -14,8 +24,14 @@ interface Props {
 
 export function ProfileSection({ memberId, memberDisplayName, profile }: Props) {
   const [form, setForm] = useState<{
-    email: string; phoneCell: string; phoneHome: string; address: string
-    role: string; status: string; vacationDaysPerYear: number; vacationUsed: number
+    email: string
+    phoneCell: string
+    phoneHome: string
+    address: string
+    role: string
+    status: string
+    vacationDaysPerYear: number
+    vacationUsed: number
   }>({
     email: profile?.email ?? '',
     phoneCell: profile?.phoneCell ?? '',
@@ -51,9 +67,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
       const member = t.members.find((m) => m.id === memberId)
       if (member) {
         const updatedMembers = t.members.map((m) =>
-          m.id === memberId
-            ? { ...m, role: data.role, status: form.status as MemberStatus }
-            : m
+          m.id === memberId ? { ...m, role: data.role, status: form.status as MemberStatus } : m,
         )
         await db.teams.update(t.id, { members: updatedMembers })
       }
@@ -64,7 +78,8 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
+  const inputClass =
+    'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
 
   return (
     <div className="bg-card rounded-xl border border-boundary p-4">
@@ -73,7 +88,9 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           {memberDisplayName.charAt(0).toUpperCase()}
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">{memberDisplayName}</h2>
+          <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+            {memberDisplayName}
+          </h2>
           <p className="text-sm text-neutral-50">Información de Perfil</p>
         </div>
       </div>
@@ -95,27 +112,35 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Briefcase size={14} /> Rol
           </label>
-          <Select value={form.role} onChange={(v) => setForm({ ...form, role: v })} options={[
-            { value: 'developer', label: 'Developer' },
-            { value: 'senior_developer', label: 'Senior Developer' },
-            { value: 'tech_lead', label: 'Tech Lead' },
-            { value: 'architect', label: 'Arquitecto' },
-            { value: 'qa', label: 'QA' },
-            { value: 'devops', label: 'DevOps' },
-            { value: 'product_owner', label: 'Product Owner' },
-            { value: 'scrum_master', label: 'Scrum Master' },
-            { value: 'ux_designer', label: 'UX Designer' },
-            { value: 'analyst', label: 'Analista' },
-            { value: 'manager', label: 'Manager' },
-            { value: 'intern', label: 'Intern' },
-            { value: 'other', label: 'Otro' },
-          ]} />
+          <Select
+            value={form.role}
+            onChange={(v) => setForm({ ...form, role: v })}
+            options={[
+              { value: 'developer', label: 'Developer' },
+              { value: 'senior_developer', label: 'Senior Developer' },
+              { value: 'tech_lead', label: 'Tech Lead' },
+              { value: 'architect', label: 'Arquitecto' },
+              { value: 'qa', label: 'QA' },
+              { value: 'devops', label: 'DevOps' },
+              { value: 'product_owner', label: 'Product Owner' },
+              { value: 'scrum_master', label: 'Scrum Master' },
+              { value: 'ux_designer', label: 'UX Designer' },
+              { value: 'analyst', label: 'Analista' },
+              { value: 'manager', label: 'Manager' },
+              { value: 'intern', label: 'Intern' },
+              { value: 'other', label: 'Otro' },
+            ]}
+          />
         </div>
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">
             <Clock size={14} /> Estado
           </label>
-          <Select value={form.status} onChange={(v) => setForm({ ...form, status: v })} options={Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v }))} />
+          <Select
+            value={form.status}
+            onChange={(v) => setForm({ ...form, status: v })}
+            options={Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v }))}
+          />
         </div>
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-secondary mb-1.5">

@@ -115,16 +115,11 @@ export function ThiGauge({ value, size = 240, showLabel = true }: ThiGaugeProps)
 
         {/* Centered label */}
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-3">
-          <span
-            className="text-4xl font-bold tracking-tight tabular-nums"
-            style={{ color }}
-          >
+          <span className="text-4xl font-bold tracking-tight tabular-nums" style={{ color }}>
             {Math.round(animatedValue)}
           </span>
           {showLabel && (
-            <span className="text-sm font-medium text-muted mt-1">
-              {getLabel(value)}
-            </span>
+            <span className="text-sm font-medium text-muted mt-1">{getLabel(value)}</span>
           )}
         </div>
       </div>

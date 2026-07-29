@@ -3,7 +3,8 @@ import { type AiToolDefinition } from '../types'
 
 export const consultarMetricasSprintTool: AiToolDefinition = {
   name: 'consultar_metricas_sprint',
-  description: 'Salud de sprints con métricas DORA y rendimiento del equipo. Mostrá velocidad, completitud, calidad y tendencias por equipo o período.',
+  description:
+    'Salud de sprints con métricas DORA y rendimiento del equipo. Mostrá velocidad, completitud, calidad y tendencias por equipo o período.',
   parameters: {
     type: 'object',
     properties: {
@@ -21,7 +22,8 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
       },
       incluirDORA: {
         type: ['boolean', 'string', 'number'],
-        description: 'Incluir métricas DORA del equipo (deploy frequency, lead time, MTTR, change failure rate)',
+        description:
+          'Incluir métricas DORA del equipo (deploy frequency, lead time, MTTR, change failure rate)',
       },
     },
   },
@@ -29,8 +31,10 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
     const teamId = params.teamId as string | undefined
     const year = params.year as number | undefined
     const quarter = params.quarter as number | undefined
-    const incluirDORA = typeof params.incluirDORA === 'boolean' ? params.incluirDORA :
-      params.incluirDORA === 'true' || params.incluirDORA === '1'
+    const incluirDORA =
+      typeof params.incluirDORA === 'boolean'
+        ? params.incluirDORA
+        : params.incluirDORA === 'true' || params.incluirDORA === '1'
 
     const output: string[] = []
     const teams = await db.teams.toArray()
@@ -65,10 +69,11 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
 
       const total = sorted.length
       const completed = sorted.filter((s) => s.completedSP > 0).length
-      const avgCompletion = sorted.reduce((sum, s) => {
-        const pct = s.plannedSP > 0 ? (s.completedSP / s.plannedSP) * 100 : 0
-        return sum + pct
-      }, 0) / total
+      const avgCompletion =
+        sorted.reduce((sum, s) => {
+          const pct = s.plannedSP > 0 ? (s.completedSP / s.plannedSP) * 100 : 0
+          return sum + pct
+        }, 0) / total
 
       const avgVelocity = sorted.reduce((sum, s) => sum + (s.completedSP ?? 0), 0) / total
 
@@ -80,9 +85,11 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
 
       if (sorted.length >= 3) {
         const last3 = sorted.slice(-3)
-        const trend = last3.map((s) => s.plannedSP > 0 ? s.completedSP / s.plannedSP : 0)
+        const trend = last3.map((s) => (s.plannedSP > 0 ? s.completedSP / s.plannedSP : 0))
         const mejora = trend[2] > trend[0]
-        output.push(`  ${mejora ? '📈' : '📉'} Tendencia (últimos 3): ${trend.map((t) => (t * 100).toFixed(0) + '%').join(' → ')}`)
+        output.push(
+          `  ${mejora ? '📈' : '📉'} Tendencia (últimos 3): ${trend.map((t) => (t * 100).toFixed(0) + '%').join(' → ')}`,
+        )
       }
 
       output.push('')
@@ -110,7 +117,9 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
             const name = teamMap.get(tid) ?? tid
             output.push(`**${name}**`)
             output.push(`  🚀 Deploy frequency: ${data.deploys} deploys`)
-            output.push(`  💥 Change failure rate: ${data.changes > 0 ? ((data.changes / (data.deploys + data.changes)) * 100).toFixed(1) : 0}%`)
+            output.push(
+              `  💥 Change failure rate: ${data.changes > 0 ? ((data.changes / (data.deploys + data.changes)) * 100).toFixed(1) : 0}%`,
+            )
             output.push('')
           }
         } else {
@@ -128,7 +137,9 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
       output.push(`**Resumen:** ${equiposConDatos} equipo(s) con datos de sprint en el período.`)
     }
 
-    output.push('💡 Usá filtros por teamId, year o quarter para acotar. Agregá incluirDORA=true para métricas de DevOps.')
+    output.push(
+      '💡 Usá filtros por teamId, year o quarter para acotar. Agregá incluirDORA=true para métricas de DevOps.',
+    )
     return output.join('\n')
   },
 }

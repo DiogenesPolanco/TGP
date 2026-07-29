@@ -6,30 +6,82 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  quality:
-    name: Quality Checks
-    runs-on: ubuntu-latest
+env:
+  NODE_VERSION: '22'
 
+jobs:
+  lint-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - run: npm ci
-
-      - name: Lint
+      - name: ESLint
         run: npm run lint
+      - name: Prettier Check
+        run: npm run format:check
 
-      - name: Type Check
+  type-check:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: tsc --noEmit
         run: npx tsc --noEmit
 
-      - name: Unit Tests
-        run: npx vitest run --config vitest.config.ts --reporter=verbose
+  tests:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Unit Tests + Coverage
+        run: npx vitest run --coverage --reporter=verbose
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
 
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: npm audit
+        run: npm audit --audit-level=high
+
+  build:
+    name: Build
+    needs: [lint-format, type-check, tests, security]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
       - name: Build
         run: npm run build
         env:

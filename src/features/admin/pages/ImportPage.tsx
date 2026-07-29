@@ -1,6 +1,21 @@
 import { useState, useRef } from 'react'
-import { Upload, FileSpreadsheet, CheckCircle, Loader, AlertTriangle, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
-import { parseExcel, importRows, getImportableEntities, ImportFileError } from '@/services/import/importService'
+import {
+  Upload,
+  FileSpreadsheet,
+  CheckCircle,
+  Loader,
+  AlertTriangle,
+  Download,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
+import {
+  parseExcel,
+  importRows,
+  getImportableEntities,
+  ImportFileError,
+} from '@/services/import/importService'
 import type { ParsedRow, ImportResult } from '@/services/import/importService'
 import { useAppStore } from '@/stores/appStore'
 import { Select } from '@/components/ui/Select'
@@ -61,7 +76,10 @@ export function ImportPage() {
       if (err instanceof ImportFileError) {
         addNotification({ type: 'error', message: err.message })
       } else {
-        addNotification({ type: 'error', message: 'Error al leer el archivo. Verifica que sea un Excel válido.' })
+        addNotification({
+          type: 'error',
+          message: 'Error al leer el archivo. Verifica que sea un Excel válido.',
+        })
       }
     }
   }
@@ -76,14 +94,21 @@ export function ImportPage() {
       const res = await importRows(selectedType, parsedRows)
       setResult(res)
       if (res.errorRows === 0) {
-        addNotification({ type: 'success', message: `${res.successRows} registros importados correctamente` })
+        addNotification({
+          type: 'success',
+          message: `${res.successRows} registros importados correctamente`,
+        })
       } else {
-        addNotification({ type: 'warning', message: `${res.successRows} importados, ${res.errorRows} con errores` })
+        addNotification({
+          type: 'warning',
+          message: `${res.successRows} importados, ${res.errorRows} con errores`,
+        })
       }
     } catch (err) {
-      const msg = err instanceof ImportFileError
-        ? err.message
-        : 'Error de importación. Revisa los datos e intenta de nuevo.'
+      const msg =
+        err instanceof ImportFileError
+          ? err.message
+          : 'Error de importación. Revisa los datos e intenta de nuevo.'
       addNotification({ type: 'error', message: msg })
     } finally {
       setImporting(false)
@@ -117,18 +142,22 @@ export function ImportPage() {
         <div className="space-y-5">
           {/* Entity type selector */}
           <div>
-            <Select label="Tipo de datos a importar" value={selectedType} onChange={(v) => handleTypeChange(v)} options={[
-              { value: '', label: 'Seleccionar...' },
-              ...entityTypes.map((et) => ({ value: et.id, label: et.label })),
-            ]} className="max-w-md" />
+            <Select
+              label="Tipo de datos a importar"
+              value={selectedType}
+              onChange={(v) => handleTypeChange(v)}
+              options={[
+                { value: '', label: 'Seleccionar...' },
+                ...entityTypes.map((et) => ({ value: et.id, label: et.label })),
+              ]}
+              className="max-w-md"
+            />
           </div>
 
           {/* File upload */}
           {selectedType && (
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">
-                Archivo Excel
-              </label>
+              <label className="block text-sm font-medium text-secondary mb-2">Archivo Excel</label>
               <div className="flex items-center gap-3">
                 <input
                   ref={fileInputRef}
@@ -154,15 +183,21 @@ export function ImportPage() {
                 Ver columnas esperadas
               </summary>
               <div className="mt-2 p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-                <p className="text-xs text-neutral-60 mb-2">El Excel debe tener estos encabezados (orden flexible):</p>
+                <p className="text-xs text-neutral-60 mb-2">
+                  El Excel debe tener estos encabezados (orden flexible):
+                </p>
                 <div className="grid grid-cols-2 gap-2">
                   {selectedConfig.columns.map((col) => (
                     <div key={col.key} className="flex items-center gap-2 text-xs">
-                      <span className="font-medium text-neutral-90 dark:text-white">{col.label}</span>
+                      <span className="font-medium text-neutral-90 dark:text-white">
+                        {col.label}
+                      </span>
                       {col.required && <span className="text-danger">*</span>}
                       {col.type === 'number' && <span className="text-info">(num)</span>}
                       {col.type === 'date' && <span className="text-warning">(fecha)</span>}
-                      {col.type === 'enum' && <span className="text-neutral-50">({col.enumValues?.join('/')})</span>}
+                      {col.type === 'enum' && (
+                        <span className="text-neutral-50">({col.enumValues?.join('/')})</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -250,7 +285,12 @@ export function ImportPage() {
                   <tr className="bg-neutral-10 dark:bg-neutral-70 border-b border-boundary">
                     <th className="px-3 py-2 text-left text-xs font-semibold text-neutral-60">#</th>
                     {selectedConfig?.columns.map((col) => (
-                      <th key={col.key} className="px-3 py-2 text-left text-xs font-semibold text-neutral-60">{col.label}</th>
+                      <th
+                        key={col.key}
+                        className="px-3 py-2 text-left text-xs font-semibold text-neutral-60"
+                      >
+                        {col.label}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -261,7 +301,10 @@ export function ImportPage() {
                       {selectedConfig?.columns.map((col) => {
                         const val = row.data[col.label]
                         return (
-                          <td key={col.key} className="px-3 py-2 text-xs text-secondary max-w-[200px] truncate">
+                          <td
+                            key={col.key}
+                            className="px-3 py-2 text-xs text-secondary max-w-[200px] truncate"
+                          >
                             {col.type === 'date' && val ? (
                               <span className="text-neutral-50">{String(val)}</span>
                             ) : (
@@ -290,11 +333,7 @@ export function ImportPage() {
                 disabled={importing}
                 className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
               >
-                {importing ? (
-                  <Loader size={16} className="animate-spin" />
-                ) : (
-                  <Download size={16} />
-                )}
+                {importing ? <Loader size={16} className="animate-spin" /> : <Download size={16} />}
                 {importing ? 'Importando...' : `Importar ${validRows.length} registros`}
               </Button>
             </div>
@@ -314,7 +353,8 @@ export function ImportPage() {
                     Importación completada
                   </p>
                   <p className="text-xs text-neutral-60">
-                    {result.successRows} registros importados{result.errorRows > 0 ? `, ${result.errorRows} con errores` : ''}
+                    {result.successRows} registros importados
+                    {result.errorRows > 0 ? `, ${result.errorRows} con errores` : ''}
                   </p>
                 </div>
               </div>
@@ -348,7 +388,9 @@ export function ImportPage() {
       {/* Template download */}
       {selectedConfig && (
         <div className="bg-card rounded-xl border border-boundary p-6 shadow-sm">
-          <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-2">¿No tienes un archivo?</h3>
+          <h3 className="text-sm font-semibold text-neutral-90 dark:text-white mb-2">
+            ¿No tienes un archivo?
+          </h3>
           <p className="text-sm text-muted mb-3">
             Puedes descargar una plantilla con las columnas necesarias para cada tipo de dato.
           </p>

@@ -9,9 +9,8 @@ import { Network, Layers, ArrowRight } from 'lucide-react'
 
 export function PublicDependencyMapPage() {
   const { hash } = useParams<{ hash: string }>()
-  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(
-    hash,
-    () => getPublicDependenciesData(),
+  const { loading, valid, data, pendingEncrypted, handleDecrypt } = usePublicShare(hash, () =>
+    getPublicDependenciesData(),
   )
 
   const appArr = (data?.applications as Array<Record<string, unknown>>) ?? []
@@ -36,10 +35,18 @@ export function PublicDependencyMapPage() {
 
   const connectedAppsCount = useMemo(() => {
     if (!depArr.length) return 0
-    return new Set([...depArr.map((d) => d.applicationId as string), ...depArr.map((d) => d.dependsOnAppId as string)]).size
+    return new Set([
+      ...depArr.map((d) => d.applicationId as string),
+      ...depArr.map((d) => d.dependsOnAppId as string),
+    ]).size
   }, [depArr])
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -68,7 +75,9 @@ export function PublicDependencyMapPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Mapa de Dependencias</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Mapa de Dependencias
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -94,7 +103,9 @@ export function PublicDependencyMapPage() {
           <div className="bg-card rounded-2xl border border-boundary p-3 flex items-center gap-3">
             <Layers size={20} className="text-emerald-500 shrink-0" />
             <div>
-              <p className="text-lg font-bold text-neutral-90 dark:text-white">{connectedAppsCount}</p>
+              <p className="text-lg font-bold text-neutral-90 dark:text-white">
+                {connectedAppsCount}
+              </p>
               <p className="text-xs text-neutral-50">Apps conectadas</p>
             </div>
           </div>
@@ -103,7 +114,9 @@ export function PublicDependencyMapPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
             <div className="p-3 border-b border-boundary">
-              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Grafo de Dependencias</h2>
+              <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                Grafo de Dependencias
+              </h2>
             </div>
             <div className="p-3">
               {nodes.length > 0 ? (
@@ -124,18 +137,26 @@ export function PublicDependencyMapPage() {
               <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-3">Leyenda</h3>
               <div className="space-y-4">
                 <div>
-                  <p className="text-[11px] font-semibold text-neutral-50 uppercase tracking-wider mb-2">Tipo</p>
+                  <p className="text-[11px] font-semibold text-neutral-50 uppercase tracking-wider mb-2">
+                    Tipo
+                  </p>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2 text-sm text-neutral-80 dark:text-neutral-20">
                       <span className="w-4 h-0.5 rounded bg-[#FF5630]" /> Hard
                     </div>
                     <div className="flex items-center gap-2 text-sm text-neutral-80 dark:text-neutral-20">
-                      <span className="w-4 block" style={{ borderTop: '2px dashed #FFAB00', height: 0 }} /> Soft
+                      <span
+                        className="w-4 block"
+                        style={{ borderTop: '2px dashed #FFAB00', height: 0 }}
+                      />{' '}
+                      Soft
                     </div>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold text-neutral-50 uppercase tracking-wider mb-2">Criticidad</p>
+                  <p className="text-[11px] font-semibold text-neutral-50 uppercase tracking-wider mb-2">
+                    Criticidad
+                  </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs">
                       <span className="w-3 h-3 rounded-full bg-[#FF5630]" />
@@ -155,9 +176,12 @@ export function PublicDependencyMapPage() {
             </div>
 
             <div className="bg-card rounded-2xl border border-boundary p-4">
-              <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-2">Acerca de esta vista</h3>
+              <h3 className="text-sm font-bold text-neutral-90 dark:text-white mb-2">
+                Acerca de esta vista
+              </h3>
               <p className="text-xs text-neutral-60 leading-relaxed">
-                Grafo de dependencias entre aplicaciones del portafolio. Las flechas indican la dirección de la dependencia.
+                Grafo de dependencias entre aplicaciones del portafolio. Las flechas indican la
+                dirección de la dependencia.
               </p>
             </div>
           </div>

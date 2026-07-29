@@ -57,7 +57,9 @@ function getCached<T>(key: string): T | null {
 function setCache<T>(key: string, data: T): void {
   try {
     localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() }))
-  } catch { /* storage full — ignore */ }
+  } catch {
+    /* storage full — ignore */
+  }
 }
 
 /* ─── API helpers ─── */
@@ -84,7 +86,10 @@ function encodePackageName(name: string): string {
 
 /* ─── Advisory helpers ─── */
 
-function computeSupportStatus(advisories: DepsAdvisory[], isDeprecated?: boolean): SupportStatus {
+export function computeSupportStatus(
+  advisories: DepsAdvisory[],
+  isDeprecated?: boolean,
+): SupportStatus {
   if (isDeprecated) return 'eol'
 
   const hasHighOrCritical = advisories.some(
@@ -100,7 +105,7 @@ function computeSupportStatus(advisories: DepsAdvisory[], isDeprecated?: boolean
   return 'unknown'
 }
 
-function severityFromScore(score?: number): string {
+export function severityFromScore(score?: number): string {
   if (score == null) return 'UNKNOWN'
   if (score >= 9.0) return 'CRITICAL'
   if (score >= 7.0) return 'HIGH'

@@ -4,7 +4,12 @@ import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { exportDatabase, saveBackupToStorage } from '@/services/export/exportService'
 import { getAzureConfig, uploadBackupToAzure } from '@/services/backup/azureBackupService'
 import { notifyAlerts } from '@/services/notifications/browserNotificationService'
-import { computeMobileSnapshot, uploadMobileSnapshot, getMobileSnapshotPassphrase, hasMobileSnapshotPassphrase } from '@/services/share/metricsSnapshotService'
+import {
+  computeMobileSnapshot,
+  uploadMobileSnapshot,
+  getMobileSnapshotPassphrase,
+  hasMobileSnapshotPassphrase,
+} from '@/services/share/metricsSnapshotService'
 import type { DashboardAlert } from '@/stores/appStore'
 
 const STORAGE_KEY = 'tgp-last-automated-check'
@@ -12,7 +17,7 @@ const SCHEDULER_CONFIG_KEY = 'tgp-scheduler-config'
 const SCHEDULER_RESULT_KEY = 'tgp-scheduler-last-result'
 
 export interface SchedulerConfig {
-  time: string   // HH:MM formato 24h, ej: "02:00"
+  time: string // HH:MM formato 24h, ej: "02:00"
   enabled: boolean
 }
 
@@ -54,17 +59,24 @@ function getLastRun(): number {
 function setLastRun() {
   try {
     localStorage.setItem(STORAGE_KEY, String(Date.now()))
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 function setLastResult(success: boolean, message: string) {
   try {
-    localStorage.setItem(SCHEDULER_RESULT_KEY, JSON.stringify({
-      success,
-      message,
-      timestamp: new Date().toISOString(),
-    }))
-  } catch { /* noop */ }
+    localStorage.setItem(
+      SCHEDULER_RESULT_KEY,
+      JSON.stringify({
+        success,
+        message,
+        timestamp: new Date().toISOString(),
+      }),
+    )
+  } catch {
+    /* noop */
+  }
 }
 
 function getLastResult(): SchedulerState['lastResult'] {
@@ -134,7 +146,10 @@ async function checkVacations(): Promise<DashboardAlert[]> {
       let memberName = ''
       for (const t of teams) {
         const m = t.members.find((m) => m.id === r.memberId)
-        if (m) { memberName = m.displayName; break }
+        if (m) {
+          memberName = m.displayName
+          break
+        }
       }
       const label = memberName || r.memberId.slice(0, 8)
       alerts.push({
@@ -218,7 +233,8 @@ async function checkOpenBlockers(): Promise<DashboardAlert[]> {
     .toArray()
 
   for (const b of items) {
-    const severityLabel = b.severity === 'critical' ? 'Crítico' : b.severity === 'high' ? 'Alto' : b.severity
+    const severityLabel =
+      b.severity === 'critical' ? 'Crítico' : b.severity === 'high' ? 'Alto' : b.severity
     alerts.push({
       type: b.severity === 'critical' || b.severity === 'high' ? 'critical' : 'warning',
       message: `Bloqueo ${severityLabel}: "${b.title}" — ${b.status === 'escalated' ? 'escalado' : 'sin resolver'}`,
@@ -317,17 +333,26 @@ async function runBackup(): Promise<DashboardAlert[]> {
         message: `Backup automático completado — ${Object.keys(backup.tables).length} tablas, ${Object.values(backup.tables).reduce((s, t) => s + t.length, 0)} registros`,
       })
     } else {
-      alerts.push({ type: 'warning', message: 'Backup automático no pudo guardarse (espacio insuficiente)' })
+      alerts.push({
+        type: 'warning',
+        message: 'Backup automático no pudo guardarse (espacio insuficiente)',
+      })
     }
   } catch (err) {
-    alerts.push({ type: 'warning', message: `Error en backup automático: ${err instanceof Error ? err.message : String(err)}` })
+    alerts.push({
+      type: 'warning',
+      message: `Error en backup automático: ${err instanceof Error ? err.message : String(err)}`,
+    })
   }
   if (getAzureConfig()) {
     try {
       const { blobName } = await uploadBackupToAzure()
       alerts.push({ type: 'success', message: `Backup subido a Azure: ${blobName}` })
     } catch (err) {
-      alerts.push({ type: 'warning', message: `Backup a Azure falló: ${err instanceof Error ? err.message : String(err)}` })
+      alerts.push({
+        type: 'warning',
+        message: `Backup a Azure falló: ${err instanceof Error ? err.message : String(err)}`,
+      })
     }
   }
   return alerts
@@ -337,7 +362,8 @@ async function runBackup(): Promise<DashboardAlert[]> {
 
 async function cleanExpiredShares(): Promise<DashboardAlert[]> {
   const alerts: DashboardAlert[] = []
-  const { getShareAzureConfig, getAzureBackupConfig } = await import('@/services/share/azureShareService')
+  const { getShareAzureConfig, getAzureBackupConfig } =
+    await import('@/services/share/azureShareService')
   // Prefer dedicated share config, fall back to backup config
   const config = getShareAzureConfig() ?? getAzureBackupConfig()
   if (!config?.sasUrl || !config.containerName) return alerts
@@ -358,7 +384,12 @@ async function cleanExpiredShares(): Promise<DashboardAlert[]> {
   try {
     const iter = client.listBlobsFlat()
     for await (const blob of iter) {
-      if (!blob.name.startsWith('tgp-share-') && !blob.name.startsWith('tgp-data-') && !blob.name.startsWith('d')) continue
+      if (
+        !blob.name.startsWith('tgp-share-') &&
+        !blob.name.startsWith('tgp-data-') &&
+        !blob.name.startsWith('d')
+      )
+        continue
       if (blob.properties.lastModified) {
         const age = now - blob.properties.lastModified.getTime()
         if (age > maxAge) {
@@ -393,20 +424,26 @@ async function syncMobileSnapshot(): Promise<DashboardAlert[]> {
     const passphrase = getMobileSnapshotPassphrase()
     const result = await uploadMobileSnapshot(snapshot, passphrase)
     if (result.success) {
-      return [{
-        type: 'success',
-        message: `Mobile snapshot subido: THI ${snapshot.thi.score}pts, ${snapshot.alerts.length} alertas`,
-      }]
+      return [
+        {
+          type: 'success',
+          message: `Mobile snapshot subido: THI ${snapshot.thi.score}pts, ${snapshot.alerts.length} alertas`,
+        },
+      ]
     }
-    return [{
-      type: 'warning',
-      message: `Mobile snapshot falló: ${result.error ?? 'error desconocido'}`,
-    }]
+    return [
+      {
+        type: 'warning',
+        message: `Mobile snapshot falló: ${result.error ?? 'error desconocido'}`,
+      },
+    ]
   } catch (err) {
-    return [{
-      type: 'warning',
-      message: `Mobile snapshot error: ${err instanceof Error ? err.message : String(err)}`,
-    }]
+    return [
+      {
+        type: 'warning',
+        message: `Mobile snapshot error: ${err instanceof Error ? err.message : String(err)}`,
+      },
+    ]
   }
 }
 
@@ -461,7 +498,7 @@ export async function runAutomatedChecks(): Promise<{
 
 // ─── Scheduler ────────────────────────────────────────────────────────
 
-const POLL_MS = 60_000  // revisar cada minuto si debe ejecutar
+const POLL_MS = 60_000 // revisar cada minuto si debe ejecutar
 const MIN_INTERVAL_MS = 30 * 60 * 1000 // mínimo 30 min entre ejecuciones
 const INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours default
 
@@ -505,7 +542,7 @@ function shouldRunNow(config: SchedulerConfig, lastRun: number): boolean {
   const now = Date.now()
 
   // No ejecutar si ya pasó muy poco tiempo
-  if (lastRun > 0 && (now - lastRun) < MIN_INTERVAL_MS) return false
+  if (lastRun > 0 && now - lastRun < MIN_INTERVAL_MS) return false
 
   const [hours, minutes] = config.time.split(':').map(Number)
   const currentDate = new Date()
@@ -534,7 +571,7 @@ function checkAndRun() {
   const lastRun = getLastRun()
 
   // Legacy: si no hay config de hora, usar el intervalo de 24h
-  if (lastRun > 0 && (Date.now() - lastRun) >= INTERVAL_MS) {
+  if (lastRun > 0 && Date.now() - lastRun >= INTERVAL_MS) {
     runAutomatedChecks().catch(console.error)
     return
   }
@@ -553,7 +590,7 @@ export function startAutomatedChecks() {
   // Legacy: ejecutar inmediatamente si está habilitado y han pasado 24h
   if (config.enabled) {
     const lastRun = getLastRun()
-    if (lastRun === 0 || (Date.now() - lastRun) >= INTERVAL_MS) {
+    if (lastRun === 0 || Date.now() - lastRun >= INTERVAL_MS) {
       runAutomatedChecks().catch(console.error)
     }
   }

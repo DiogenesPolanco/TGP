@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidShareHash, getPublicTimelineData, type PublicTimelineData } from '@/services/share/publicShareService'
+import {
+  isValidShareHash,
+  getPublicTimelineData,
+  type PublicTimelineData,
+} from '@/services/share/publicShareService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { PrintButton } from '@/components/ui/PrintButton'
-import {
-  Target, AlertTriangle, XCircle, Clock,
-  Calendar,
-} from 'lucide-react'
+import { Target, AlertTriangle, XCircle, Clock, Calendar } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   planned: { label: 'Planificado', color: 'text-info' },
@@ -32,7 +33,11 @@ export function PublicTimelinePage() {
   const [pendingEncrypted, setPendingEncrypted] = useState<EncryptedPayload | null>(null)
 
   // Always-declared hooks — moved before any early return
-  const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
+  const today = useMemo(() => {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    return d
+  }, [])
   const plans = data?.plans ?? []
   const activities = data?.activities ?? []
   const blockers = data?.blockers ?? []
@@ -47,7 +52,9 @@ export function PublicTimelinePage() {
       if (!a.dueDate || a.status === 'completed' || a.status === 'cancelled') return false
       return new Date(a.dueDate) < today
     })
-    const openBlockers = blockers.filter((b: any) => b.status === 'open' || b.status === 'escalated')
+    const openBlockers = blockers.filter(
+      (b: any) => b.status === 'open' || b.status === 'escalated',
+    )
     const atRiskCommitments = commitments.filter((c: any) => c.status === 'at_risk')
     return {
       total: plans.length,
@@ -87,7 +94,11 @@ export function PublicTimelinePage() {
   const totalWidth = totalWeeks * weekWidth
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
+    if (!hash) {
+      setValid(false)
+      setLoading(false)
+      return
+    }
     ;(async () => {
       const tryLoad = (raw: unknown) => {
         if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
@@ -107,17 +118,24 @@ export function PublicTimelinePage() {
           const fragment = decodeURIComponent(rawHash)
           const { downloadUsingManifest } = await import('@/services/share/azureShareService')
           const azureData = await downloadUsingManifest(fragment)
-          if (azureData) { tryLoad(azureData); return }
+          if (azureData) {
+            tryLoad(azureData)
+            return
+          }
         } catch {}
       }
       try {
         const { downloadShareFromAzure } = await import('@/services/share/azureShareService')
         const viewerData = await downloadShareFromAzure(hash)
-        if (viewerData) { tryLoad(viewerData); return }
+        if (viewerData) {
+          tryLoad(viewerData)
+          return
+        }
       } catch {}
       if (isValidShareHash(hash)) {
         const d = await getPublicTimelineData()
-        setData(d); setValid(true)
+        setData(d)
+        setValid(true)
       } else {
         setValid(false)
       }
@@ -125,7 +143,12 @@ export function PublicTimelinePage() {
     })()
   }, [hash])
 
-  if (loading) return <div className="min-h-screen bg-canvas flex items-center justify-center"><div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" /></div>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
   if (!valid) return <InvalidLinkPage />
   if (!data) {
     if (pendingEncrypted) {
@@ -136,8 +159,12 @@ export function PublicTimelinePage() {
             description="Este timeline fue compartido con cifrado. Ingresa la contraseña para verlo."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
-              if (decrypted) { setData(decrypted as PublicTimelineData); setPendingEncrypted(null) }
-              else { alert('Contraseña incorrecta') }
+              if (decrypted) {
+                setData(decrypted as PublicTimelineData)
+                setPendingEncrypted(null)
+              } else {
+                alert('Contraseña incorrecta')
+              }
             }}
           />
         </div>
@@ -156,7 +183,9 @@ export function PublicTimelinePage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Timeline Ejecutivo</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Timeline Ejecutivo
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -193,147 +222,193 @@ export function PublicTimelinePage() {
 
         {/* Main content: Gantt full width (no alerts sidebar) */}
         <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
-              <div className="flex items-center gap-2">
-                <Calendar size={15} className="text-primary" />
-                <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">Línea de Tiempo</h3>
-              </div>
-              <span className="text-xs text-neutral-50">
-                {timelineStart.toLocaleDateString('es-ES')} — {timelineEnd.toLocaleDateString('es-ES')}
-              </span>
+          <div className="flex items-center justify-between px-5 py-3 border-b border-boundary">
+            <div className="flex items-center gap-2">
+              <Calendar size={15} className="text-primary" />
+              <h3 className="text-sm font-semibold text-neutral-90 dark:text-white">
+                Línea de Tiempo
+              </h3>
             </div>
+            <span className="text-xs text-neutral-50">
+              {timelineStart.toLocaleDateString('es-ES')} —{' '}
+              {timelineEnd.toLocaleDateString('es-ES')}
+            </span>
+          </div>
 
-            <div className="overflow-x-auto">
-              <div style={{ minWidth: `${totalWidth + 200}px` }}>
-                {/* Week headers */}
-                <div className="flex border-b border-boundary sticky top-0 bg-card z-10">
-                  <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-boundary">
-                    Plan
-                  </div>
-                  <div className="flex">
-                    {Array.from({ length: Math.min(totalWeeks, 24) }).map((_, i) => {
-                      const weekDate = new Date(timelineStart)
-                      weekDate.setDate(weekDate.getDate() + i * 7)
-                      const isCurrent = weekDate <= today && new Date(weekDate.getTime() + 6 * 86400000) >= today
-                      return (
-                        <div
-                          key={i}
-                          className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-boundary ${
-                            isCurrent ? 'bg-primary/[0.04] text-primary' : 'text-neutral-50'
-                          }`}
-                          style={{ width: `${weekWidth}px` }}
-                        >
-                          <span>{weekDate.getDate()}/{weekDate.getMonth() + 1}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: `${totalWidth + 200}px` }}>
+              {/* Week headers */}
+              <div className="flex border-b border-boundary sticky top-0 bg-card z-10">
+                <div className="w-48 shrink-0 px-4 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider border-r border-boundary">
+                  Plan
                 </div>
-
-                {/* Plan rows */}
-                {filteredPlans.length === 0 ? (
-                  <div className="p-8 text-center text-sm text-neutral-50">
-                    No hay planes disponibles
-                  </div>
-                ) : (
-                  (filteredPlans as any[]).map((plan: any) => {
-                    const planStart = new Date(plan.startDate)
-                    const planEnd = new Date(plan.endDate)
-                    const totalSpan = timelineEnd.getTime() - timelineStart.getTime()
-                    const leftPct = totalSpan > 0
-                      ? ((planStart.getTime() - timelineStart.getTime()) / totalSpan) * 100
-                      : 0
-                    const widthPct = totalSpan > 0
-                      ? ((planEnd.getTime() - planStart.getTime()) / totalSpan) * 100
-                      : 0
-                    const isOverdue = planEnd < today && plan.status === 'in_progress'
-                    const health = healthConfig[plan.health] ?? healthConfig.green
-
-                    const planActivities = activities.filter((a: any) => a.planId === plan.id)
-                    const completedPct = planActivities.length > 0
-                      ? Math.round((planActivities.filter((a: any) => a.status === 'completed').length / planActivities.length) * 100)
-                      : 0
-
+                <div className="flex">
+                  {Array.from({ length: Math.min(totalWeeks, 24) }).map((_, i) => {
+                    const weekDate = new Date(timelineStart)
+                    weekDate.setDate(weekDate.getDate() + i * 7)
+                    const isCurrent =
+                      weekDate <= today && new Date(weekDate.getTime() + 6 * 86400000) >= today
                     return (
                       <div
-                        key={plan.id}
-                        className="flex items-center border-b border-boundary hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors"
+                        key={i}
+                        className={`shrink-0 text-center py-2 text-[10px] font-semibold uppercase tracking-wider border-r border-boundary ${
+                          isCurrent ? 'bg-primary/[0.04] text-primary' : 'text-neutral-50'
+                        }`}
+                        style={{ width: `${weekWidth}px` }}
                       >
-                        <div className="w-48 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full shrink-0 ${health.dot}`} />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{plan.title}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className={`text-[10px] font-medium ${
-                                isOverdue ? 'text-danger' : statusConfig[plan.status]?.color ?? 'text-neutral-50'
-                              }`}>
-                                {isOverdue ? 'Vencido' : statusConfig[plan.status]?.label ?? plan.status}
-                              </span>
-                              <span className="text-[10px] text-neutral-50">{completedPct}%</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="relative flex-1 h-20" style={{ minWidth: `${totalWidth}px` }}>
-                          {today >= timelineStart && today <= timelineEnd && (
-                            <div
-                              className="absolute top-0 bottom-0 w-0.5 bg-danger/60 z-20"
-                              style={{
-                                left: `${((today.getTime() - timelineStart.getTime()) / totalSpan) * 100}%`,
-                              }}
-                            >
-                              <div className="w-2 h-2 rounded-full bg-danger absolute -top-1 -left-[3px]" />
-                            </div>
-                          )}
-
-                          <div className="absolute inset-0">
-                            {Array.from({ length: Math.min(totalWeeks, 24) }).map((_, i) => (
-                              <div
-                                key={i}
-                                className="absolute top-0 bottom-0 border-l border-neutral-20/50 dark:border-neutral-70/30"
-                                style={{ left: `${(i * weekWidth / (totalWeeks * weekWidth)) * 100}%` }}
-                              />
-                            ))}
-                          </div>
-
-                          {widthPct > 0 && (
-                            <div
-                              className="absolute top-1/2 -translate-y-1/2 h-11 rounded-md flex items-center px-3 transition-shadow overflow-hidden"
-                              style={{
-                                left: `${Math.max(0, leftPct)}%`,
-                                width: `${Math.max(2, widthPct)}%`,
-                                backgroundColor: plan.health === 'red' ? 'rgba(255, 86, 48, 0.15)' : plan.health === 'yellow' ? 'rgba(255, 171, 0, 0.15)' : 'rgba(54, 179, 126, 0.12)',
-                                borderLeft: `3px solid ${plan.health === 'red' ? '#FF5630' : plan.health === 'yellow' ? '#FFAB00' : '#36B37E'}`,
-                              }}
-                            >
-                              <div
-                                className="absolute inset-0 rounded-md opacity-20"
-                                style={{
-                                  width: `${completedPct}%`,
-                                  backgroundColor: plan.health === 'red' ? '#FF5630' : plan.health === 'yellow' ? '#FFAB00' : '#36B37E',
-                                }}
-                              />
-                              <span className="relative text-[11px] font-medium text-neutral-90 dark:text-white truncate z-10">
-                                {plan.title}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        <span>
+                          {weekDate.getDate()}/{weekDate.getMonth() + 1}
+                        </span>
                       </div>
                     )
-                  })
-                )}
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* Legend */}
-            <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary">
-              <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">Leyenda</span>
-              <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" /> Saludable</span>
-              <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En Riesgo</span>
-              <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-3 h-3 rounded-sm bg-danger/30 border-l-[3px] border-danger" /> Crítico</span>
-              <span className="flex items-center gap-1.5 text-xs text-neutral-60"><span className="w-2 h-2 rounded-full bg-danger" /> Hoy</span>
+              {/* Plan rows */}
+              {filteredPlans.length === 0 ? (
+                <div className="p-8 text-center text-sm text-neutral-50">
+                  No hay planes disponibles
+                </div>
+              ) : (
+                (filteredPlans as any[]).map((plan: any) => {
+                  const planStart = new Date(plan.startDate)
+                  const planEnd = new Date(plan.endDate)
+                  const totalSpan = timelineEnd.getTime() - timelineStart.getTime()
+                  const leftPct =
+                    totalSpan > 0
+                      ? ((planStart.getTime() - timelineStart.getTime()) / totalSpan) * 100
+                      : 0
+                  const widthPct =
+                    totalSpan > 0
+                      ? ((planEnd.getTime() - planStart.getTime()) / totalSpan) * 100
+                      : 0
+                  const isOverdue = planEnd < today && plan.status === 'in_progress'
+                  const health = healthConfig[plan.health] ?? healthConfig.green
+
+                  const planActivities = activities.filter((a: any) => a.planId === plan.id)
+                  const completedPct =
+                    planActivities.length > 0
+                      ? Math.round(
+                          (planActivities.filter((a: any) => a.status === 'completed').length /
+                            planActivities.length) *
+                            100,
+                        )
+                      : 0
+
+                  return (
+                    <div
+                      key={plan.id}
+                      className="flex items-center border-b border-boundary hover:bg-neutral-10 dark:hover:bg-neutral-70/30 transition-colors"
+                    >
+                      <div className="w-48 shrink-0 px-4 py-3 border-r border-boundary flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${health.dot}`} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+                            {plan.title}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span
+                              className={`text-[10px] font-medium ${
+                                isOverdue
+                                  ? 'text-danger'
+                                  : (statusConfig[plan.status]?.color ?? 'text-neutral-50')
+                              }`}
+                            >
+                              {isOverdue
+                                ? 'Vencido'
+                                : (statusConfig[plan.status]?.label ?? plan.status)}
+                            </span>
+                            <span className="text-[10px] text-neutral-50">{completedPct}%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative flex-1 h-20" style={{ minWidth: `${totalWidth}px` }}>
+                        {today >= timelineStart && today <= timelineEnd && (
+                          <div
+                            className="absolute top-0 bottom-0 w-0.5 bg-danger/60 z-20"
+                            style={{
+                              left: `${((today.getTime() - timelineStart.getTime()) / totalSpan) * 100}%`,
+                            }}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-danger absolute -top-1 -left-[3px]" />
+                          </div>
+                        )}
+
+                        <div className="absolute inset-0">
+                          {Array.from({ length: Math.min(totalWeeks, 24) }).map((_, i) => (
+                            <div
+                              key={i}
+                              className="absolute top-0 bottom-0 border-l border-neutral-20/50 dark:border-neutral-70/30"
+                              style={{
+                                left: `${((i * weekWidth) / (totalWeeks * weekWidth)) * 100}%`,
+                              }}
+                            />
+                          ))}
+                        </div>
+
+                        {widthPct > 0 && (
+                          <div
+                            className="absolute top-1/2 -translate-y-1/2 h-11 rounded-md flex items-center px-3 transition-shadow overflow-hidden"
+                            style={{
+                              left: `${Math.max(0, leftPct)}%`,
+                              width: `${Math.max(2, widthPct)}%`,
+                              backgroundColor:
+                                plan.health === 'red'
+                                  ? 'rgba(255, 86, 48, 0.15)'
+                                  : plan.health === 'yellow'
+                                    ? 'rgba(255, 171, 0, 0.15)'
+                                    : 'rgba(54, 179, 126, 0.12)',
+                              borderLeft: `3px solid ${plan.health === 'red' ? '#FF5630' : plan.health === 'yellow' ? '#FFAB00' : '#36B37E'}`,
+                            }}
+                          >
+                            <div
+                              className="absolute inset-0 rounded-md opacity-20"
+                              style={{
+                                width: `${completedPct}%`,
+                                backgroundColor:
+                                  plan.health === 'red'
+                                    ? '#FF5630'
+                                    : plan.health === 'yellow'
+                                      ? '#FFAB00'
+                                      : '#36B37E',
+                              }}
+                            />
+                            <span className="relative text-[11px] font-medium text-neutral-90 dark:text-white truncate z-10">
+                              {plan.title}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
+          </div>
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary">
+            <span className="text-[11px] text-neutral-50 uppercase tracking-wider font-semibold">
+              Leyenda
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-success/30 border-l-[3px] border-success" />{' '}
+              Saludable
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-warning/30 border-l-[3px] border-warning" /> En
+              Riesgo
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-3 h-3 rounded-sm bg-danger/30 border-l-[3px] border-danger" />{' '}
+              Crítico
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-neutral-60">
+              <span className="w-2 h-2 rounded-full bg-danger" /> Hoy
+            </span>
+          </div>
         </div>
 
         <div className="text-center text-xs text-neutral-40 py-4 border-t border-boundary">

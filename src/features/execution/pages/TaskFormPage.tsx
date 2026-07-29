@@ -34,7 +34,15 @@ export function TaskFormPage() {
   const plans = useLiveQuery(() => db.plans.toArray()) ?? []
   const activities = useLiveQuery(() => db.activities.toArray()) ?? []
 
-  const { register, handleSubmit, reset, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<TaskFormData>()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<TaskFormData>()
 
   useEffect(() => {
     if (task) {
@@ -95,50 +103,81 @@ export function TaskFormPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
             <Label>Título</Label>
-            <input {...register('title', { required: 'El título es obligatorio' })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              {...register('title', { required: 'El título es obligatorio' })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
             {errors.title && <p className="text-xs text-danger mt-1">{errors.title.message}</p>}
           </div>
           <div className="md:col-span-2">
             <Label>Descripción</Label>
-            <textarea {...register('description')} rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <textarea
+              {...register('description')}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div>
             <Label>Plan</Label>
-            <Controller name="planId" control={control}
+            <Controller
+              name="planId"
+              control={control}
               render={({ field }) => (
-                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v || '')} options={[
-                  { value: '', label: 'Sin plan' },
-                  ...plans.map((p) => ({ value: p.id, label: p.title })),
-                ]} />
+                <Select
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v || '')}
+                  options={[
+                    { value: '', label: 'Sin plan' },
+                    ...plans.map((p) => ({ value: p.id, label: p.title })),
+                  ]}
+                />
               )}
             />
           </div>
           <div>
             <Label>Actividad</Label>
-            <Controller name="activityId" control={control}
+            <Controller
+              name="activityId"
+              control={control}
               render={({ field }) => (
-                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v || '')} options={[
-                  { value: '', label: 'Sin actividad' },
-                  ...activities.map((a) => ({ value: a.id, label: a.title })),
-                ]} />
+                <Select
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v || '')}
+                  options={[
+                    { value: '', label: 'Sin actividad' },
+                    ...activities.map((a) => ({ value: a.id, label: a.title })),
+                  ]}
+                />
               )}
             />
           </div>
           <div>
             <Label>Prioridad</Label>
-            <Controller name="priority" control={control} rules={{ required: true }}
+            <Controller
+              name="priority"
+              control={control}
+              rules={{ required: true }}
               render={({ field }) => (
-                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v)} options={criticalityOptions} />
+                <Select
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v)}
+                  options={criticalityOptions}
+                />
               )}
             />
           </div>
           <div>
             <Label>Estado</Label>
-            <Controller name="status" control={control} rules={{ required: true }}
+            <Controller
+              name="status"
+              control={control}
+              rules={{ required: true }}
               render={({ field }) => (
-                <Select value={field.value ?? ''} onChange={(v) => field.onChange(v)} options={taskStatusOptions} />
+                <Select
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v)}
+                  options={taskStatusOptions}
+                />
               )}
             />
           </div>
@@ -151,8 +190,11 @@ export function TaskFormPage() {
           </div>
           <div>
             <Label>Horas estimadas</Label>
-            <input type="number" {...register('estimatedHours', { valueAsNumber: true })}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+            <input
+              type="number"
+              {...register('estimatedHours', { valueAsNumber: true })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
           <div>
             <Label>Fecha límite</Label>
@@ -160,14 +202,21 @@ export function TaskFormPage() {
               name="dueDate"
               control={control}
               render={({ field }) => (
-                <DatePicker value={field.value} onChange={field.onChange}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                <DatePicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
               )}
             />
           </div>
         </div>
         <div className="flex items-center gap-3 pt-4 border-t border-boundary">
-          <Button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50"
+          >
             {isEdit ? 'Guardar Cambios' : 'Crear Tarea'}
           </Button>
           <Button type="button" onClick={() => navigate('/execution/tasks')}>

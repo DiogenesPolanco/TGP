@@ -124,25 +124,26 @@ export function MemberSelector({
     return opts
   }, [members, teams, users, currentUser, teamId])
 
-  const selectedMember = useMemo(
-    () => allOptions.find((m) => m.id === value),
-    [allOptions, value],
-  )
+  const selectedMember = useMemo(() => allOptions.find((m) => m.id === value), [allOptions, value])
 
   const isExternal = value !== '' && !selectedMember
 
   const filtered = useMemo(() => {
     if (!search.trim()) return allOptions.slice(0, 50)
     const q = search.toLowerCase()
-    return allOptions.filter(
-      (m) =>
-        m.displayName.toLowerCase().includes(q) ||
-        m.teamName.toLowerCase().includes(q) ||
-        m.role.toLowerCase().includes(q),
-    ).slice(0, 50)
+    return allOptions
+      .filter(
+        (m) =>
+          m.displayName.toLowerCase().includes(q) ||
+          m.teamName.toLowerCase().includes(q) ||
+          m.role.toLowerCase().includes(q),
+      )
+      .slice(0, 50)
   }, [allOptions, search])
 
-  const isTypingNewName = search.trim() && !filtered.some((m) => m.displayName.toLowerCase() === search.trim().toLowerCase())
+  const isTypingNewName =
+    search.trim() &&
+    !filtered.some((m) => m.displayName.toLowerCase() === search.trim().toLowerCase())
 
   const handleSelect = (opt: MemberOption) => {
     onChange(opt.id)
@@ -161,9 +162,18 @@ export function MemberSelector({
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); return }
-      if (e.key === 'ArrowDown') { e.preventDefault(); setHighlightIdx((i) => Math.min(i + 1, filtered.length - 1)) }
-      if (e.key === 'ArrowUp') { e.preventDefault(); setHighlightIdx((i) => Math.max(i - 1, 0)) }
+      if (e.key === 'Escape') {
+        setOpen(false)
+        return
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightIdx((i) => Math.min(i + 1, filtered.length - 1))
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightIdx((i) => Math.max(i - 1, 0))
+      }
       if (e.key === 'Enter') {
         e.preventDefault()
         if (highlightIdx >= 0 && highlightIdx < filtered.length) {
@@ -184,8 +194,12 @@ export function MemberSelector({
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
-          inputRef.current && !inputRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
         setOpen(false)
       }
     }
@@ -193,25 +207,27 @@ export function MemberSelector({
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  const inputDisplay = selectedMember
-    ? selectedMember.displayName
-    : isExternal
-      ? value
-      : search
+  const inputDisplay = selectedMember ? selectedMember.displayName : isExternal ? value : search
 
   const sourceLabel = (source: MemberOption['source']) => {
     switch (source) {
-      case 'user': return 'Usuario'
-      case 'current': return 'Tú'
-      default: return 'Miembro'
+      case 'user':
+        return 'Usuario'
+      case 'current':
+        return 'Tú'
+      default:
+        return 'Miembro'
     }
   }
 
   const sourceColor = (source: MemberOption['source']) => {
     switch (source) {
-      case 'user': return 'bg-info/10 text-info'
-      case 'current': return 'bg-primary/10 text-primary'
-      default: return 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50'
+      case 'user':
+        return 'bg-info/10 text-info'
+      case 'current':
+        return 'bg-primary/10 text-primary'
+      default:
+        return 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50'
     }
   }
 
@@ -219,18 +235,25 @@ export function MemberSelector({
     <div className={cn('relative', className)}>
       {label && (
         <label className="block text-sm font-medium text-secondary mb-1.5">
-          {label}{required && <span className="text-danger ml-0.5">*</span>}
+          {label}
+          {required && <span className="text-danger ml-0.5">*</span>}
         </label>
       )}
 
       <div className="relative">
-        <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50 pointer-events-none" />
+        <User
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50 pointer-events-none"
+        />
         <input
           ref={inputRef}
           type="text"
           value={inputDisplay}
           placeholder={placeholder}
-          onFocus={() => { setOpen(true); if (!selectedMember) setSearch('') }}
+          onFocus={() => {
+            setOpen(true)
+            if (!selectedMember) setSearch('')
+          }}
           onBlur={() => {
             if (search.trim() && !selectedMember) {
               onChange(search.trim())
@@ -276,20 +299,23 @@ export function MemberSelector({
           className="absolute z-50 mt-1 w-full bg-card border border-boundary rounded-xl shadow-xl max-h-60 overflow-y-auto"
         >
           {filtered.length === 0 && !isTypingNewName && (
-            <div className="px-3 py-4 text-center text-sm text-neutral-50">
-              Sin resultados
-            </div>
+            <div className="px-3 py-4 text-center text-sm text-neutral-50">Sin resultados</div>
           )}
 
           {filtered.map((opt, idx) => (
             <button
               key={opt.id}
               type="button"
-              onMouseDown={(e) => { e.preventDefault(); handleSelect(opt) }}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                handleSelect(opt)
+              }}
               onMouseEnter={() => setHighlightIdx(idx)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors',
-                idx === highlightIdx ? 'bg-primary/10' : 'hover:bg-neutral-10 dark:hover:bg-neutral-70',
+                idx === highlightIdx
+                  ? 'bg-primary/10'
+                  : 'hover:bg-neutral-10 dark:hover:bg-neutral-70',
                 selectedMember?.id === opt.id ? 'bg-primary/5' : '',
               )}
             >
@@ -304,10 +330,13 @@ export function MemberSelector({
                   )}
                 </p>
                 <p className="text-xs text-neutral-50 truncate">
-                  {opt.role}{opt.teamName ? ` · ${opt.teamName}` : ''}
+                  {opt.role}
+                  {opt.teamName ? ` · ${opt.teamName}` : ''}
                 </p>
               </div>
-              <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${sourceColor(opt.source)}`}>
+              <span
+                className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${sourceColor(opt.source)}`}
+              >
                 {sourceLabel(opt.source)}
               </span>
             </button>
@@ -316,7 +345,10 @@ export function MemberSelector({
           {isTypingNewName && (
             <button
               type="button"
-              onMouseDown={(e) => { e.preventDefault(); handleUseCustomName() }}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                handleUseCustomName()
+              }}
               className="w-full flex items-center gap-3 px-3 py-2.5 text-left border-t border-boundary hover:bg-warning/5 transition-colors"
             >
               <div className="w-7 h-7 rounded-full bg-warning/10 flex items-center justify-center text-xs font-bold text-warning shrink-0">

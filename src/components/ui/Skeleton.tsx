@@ -1,14 +1,7 @@
 import { cn } from '@/lib/utils'
 
 function SkeletonPulse({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        'animate-pulse rounded-lg bg-subtle',
-        className
-      )}
-    />
-  )
+  return <div className={cn('animate-pulse rounded-lg bg-subtle', className)} />
 }
 
 export function SkeletonCard() {

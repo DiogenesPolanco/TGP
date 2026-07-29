@@ -4,7 +4,10 @@ import { type AiToolDefinition } from '../types'
 // ─── Helpers ──────────────────────────────────────────────────────
 
 function n(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
 }
 
 function match(val: unknown, term: string): boolean {
@@ -19,10 +22,13 @@ async function buildMemberIdMap(): Promise<Map<string, string>> {
   try {
     const teams = await db.teams.toArray()
     for (const t of teams) {
-      for (const m of (t.members ?? [])) {
+      for (const m of t.members ?? []) {
         const id = (m as any).id ?? ''
         const name = (m as any).displayName ?? ''
-        if (id && name) { map.set(n(name), id); map.set(n(id), name) }
+        if (id && name) {
+          map.set(n(name), id)
+          map.set(n(id), name)
+        }
       }
     }
     const profiles = await db.memberProfiles.toArray()
@@ -32,7 +38,9 @@ async function buildMemberIdMap(): Promise<Map<string, string>> {
         map.set(n(p.id), p.email)
       }
     }
-  } catch { /* tablas no disponibles */ }
+  } catch {
+    /* tablas no disponibles */
+  }
   return map
 }
 
@@ -50,7 +58,7 @@ function defineBuscador(
     augment?: (rows: any[]) => Promise<string[]>
     /** Campos que almacenan IDs de miembros/usuarios (ej: assigneeId, ownerId). Se resuelven automáticamente por nombre. */
     personIdFields?: string[]
-  }
+  },
 ): AiToolDefinition {
   return {
     name,
@@ -96,7 +104,8 @@ function defineBuscador(
           if (searchFields.some((f) => match(r[f], term))) return true
           // Buscar en campos de ID de persona
           if (matchingPersonIds && matchingPersonIds.size > 0) {
-            if (personFields.some((f) => r[f] && matchingPersonIds!.has(r[f] as string))) return true
+            if (personFields.some((f) => r[f] && matchingPersonIds!.has(r[f] as string)))
+              return true
           }
           return false
         })
@@ -112,7 +121,7 @@ function defineBuscador(
       rows = rows.slice(0, limit)
 
       // Resolver nombres de personas para display (cargar una sola vez)
-      let memberNameMap = new Map<string, string>()
+      const memberNameMap = new Map<string, string>()
       const personFields = extra?.personIdFields ?? []
       if (personFields.length > 0) {
         const raw = await buildMemberIdMap()
@@ -124,7 +133,7 @@ function defineBuscador(
         try {
           const teams = await db.teams.toArray()
           for (const t of teams) {
-            for (const m of (t.members ?? [])) {
+            for (const m of t.members ?? []) {
               const id = (m as any).id ?? ''
               const name = (m as any).displayName ?? ''
               if (id && name) memberNameMap.set(id, name)
@@ -134,21 +143,25 @@ function defineBuscador(
           for (const p of profiles) {
             memberNameMap.set(p.id, p.email)
           }
-        } catch { /* ok */ }
+        } catch {
+          /* ok */
+        }
       }
 
       const lines = rows.map((r: Record<string, unknown>, i: number) => {
-        const parts = displayFields.map((f) => {
-          const v = r[f]
-          if (v == null) return null
-          // Si es un campo de persona y el valor es un ID, resolver a nombre
-          if (personFields.includes(f) && memberNameMap.has(v as string)) {
-            return memberNameMap.get(v as string)
-          }
-          const s = typeof v === 'string' ? v : String(v)
-          if (f.includes('Id') || f === 'id') return `\`${s.slice(0, 12)}…\``
-          return s.length > 60 ? s.slice(0, 60) + '…' : s
-        }).filter(Boolean)
+        const parts = displayFields
+          .map((f) => {
+            const v = r[f]
+            if (v == null) return null
+            // Si es un campo de persona y el valor es un ID, resolver a nombre
+            if (personFields.includes(f) && memberNameMap.has(v as string)) {
+              return memberNameMap.get(v as string)
+            }
+            const s = typeof v === 'string' ? v : String(v)
+            if (f.includes('Id') || f === 'id') return `\`${s.slice(0, 12)}…\``
+            return s.length > 60 ? s.slice(0, 60) + '…' : s
+          })
+          .filter(Boolean)
 
         let line = `${i + 1}. **${parts[0] ?? '(sin nombre)'}**`
         if (parts.length > 1) line += ` · ${parts.slice(1).join(' · ')}`
@@ -167,7 +180,9 @@ function defineBuscador(
 export const buscarAplicacionTool = defineBuscador(
   'buscar_aplicacion',
   'Buscá aplicaciones por nombre, owner, tecnología, criticidad o cualquier campo parcialmente. Ideal para catálogo de aplicaciones.',
-  'applications', 'aplicación', 'aplicaciones',
+  'applications',
+  'aplicación',
+  'aplicaciones',
   ['name', 'description', 'ownerName', 'technologies', 'criticality', 'status', 'architecture'],
   ['name', 'criticality', 'status', 'ownerName', 'architecture'],
   { personIdFields: ['ownerId'] },
@@ -176,7 +191,9 @@ export const buscarAplicacionTool = defineBuscador(
 export const buscarMicroservicioTool = defineBuscador(
   'buscar_microservicio',
   'Buscá microservicios por nombre, descripción, tecnologías, technical lead o estado.',
-  'microservices', 'microservicio', 'microservicios',
+  'microservices',
+  'microservicio',
+  'microservicios',
   ['name', 'description', 'technologies', 'technicalLead', 'lifecycleStatus', 'features'],
   ['name', 'lifecycleStatus', 'serviceLevel', 'technicalLead'],
 )
@@ -184,7 +201,9 @@ export const buscarMicroservicioTool = defineBuscador(
 export const buscarTecnologiaTool = defineBuscador(
   'buscar_tecnologia',
   'Buscá tecnologías por nombre, vendor, versión, categoría o estado de soporte.',
-  'technologies', 'tecnología', 'tecnologías',
+  'technologies',
+  'tecnología',
+  'tecnologías',
   ['name', 'vendor', 'version', 'category', 'supportStatus'],
   ['name', 'version', 'vendor', 'category', 'supportStatus'],
 )
@@ -192,7 +211,9 @@ export const buscarTecnologiaTool = defineBuscador(
 export const buscarBDTool = defineBuscador(
   'buscar_bd',
   'Buscá bases de datos por nombre, engine, tipo, entorno o aplicación asociada.',
-  'appDatabases', 'base de datos', 'bases de datos',
+  'appDatabases',
+  'base de datos',
+  'bases de datos',
   ['name', 'description', 'engine', 'dbType', 'environment', 'host'],
   ['name', 'engine', 'dbType', 'environment', 'host'],
 )
@@ -200,7 +221,9 @@ export const buscarBDTool = defineBuscador(
 export const buscarVulnerabilidadTool = defineBuscador(
   'buscar_vulnerabilidad',
   'Buscá vulnerabilidades por título, severidad, estado, fuente o descripción.',
-  'vulnerabilities', 'vulnerabilidad', 'vulnerabilidades',
+  'vulnerabilities',
+  'vulnerabilidad',
+  'vulnerabilidades',
   ['title', 'description', 'severity', 'status', 'source', 'cvssScore'],
   ['title', 'severity', 'status', 'cvssScore', 'source'],
 )
@@ -208,7 +231,9 @@ export const buscarVulnerabilidadTool = defineBuscador(
 export const buscarIncidenteTool = defineBuscador(
   'buscar_incidente',
   'Buscá incidentes por título, severidad, estado o descripción.',
-  'incidents', 'incidente', 'incidentes',
+  'incidents',
+  'incidente',
+  'incidentes',
   ['title', 'description', 'severity', 'status'],
   ['title', 'severity', 'status'],
 )
@@ -216,7 +241,9 @@ export const buscarIncidenteTool = defineBuscador(
 export const buscarRiesgoTool = defineBuscador(
   'buscar_riesgo',
   'Buscá riesgos por título, categoría, estado, probabilidad o impacto.',
-  'risks', 'riesgo', 'riesgos',
+  'risks',
+  'riesgo',
+  'riesgos',
   ['title', 'description', 'category', 'status', 'probability', 'impact', 'mitigationPlan'],
   ['title', 'category', 'status', 'riskScore'],
 )
@@ -224,7 +251,9 @@ export const buscarRiesgoTool = defineBuscador(
 export const buscarHallazgoTool = defineBuscador(
   'buscar_hallazgo',
   'Buscá hallazgos de auditoría por título, severidad, categoría o estado.',
-  'auditFindings', 'hallazgo', 'hallazgos',
+  'auditFindings',
+  'hallazgo',
+  'hallazgos',
   ['title', 'description', 'severity', 'category', 'status', 'auditReference'],
   ['title', 'severity', 'category', 'status'],
 )
@@ -233,13 +262,15 @@ export const buscarHallazgoTool = defineBuscador(
 
 export const buscarEquipamientoTool: AiToolDefinition = {
   name: 'buscar_equipamiento',
-  description: 'Buscá equipos (laptops, monitores, etc.) por tipo, marca, modelo, serial, estado, o persona asignada (buscá por nombre de persona aunque assignedTo guarde IDs).',
+  description:
+    'Buscá equipos (laptops, monitores, etc.) por tipo, marca, modelo, serial, estado, o persona asignada (buscá por nombre de persona aunque assignedTo guarde IDs).',
   parameters: {
     type: 'object',
     properties: {
       q: {
         type: 'string',
-        description: 'Texto a buscar: tipo, marca, modelo, serial, estado, o NOMBRE DE PERSONA asignada',
+        description:
+          'Texto a buscar: tipo, marca, modelo, serial, estado, o NOMBRE DE PERSONA asignada',
       },
       limit: { type: 'number', description: 'Máximo de resultados (default 20, max 100)' },
     },
@@ -262,7 +293,15 @@ export const buscarEquipamientoTool: AiToolDefinition = {
       }
 
       filtered = rows.filter((r) => {
-        const textFields = [r.type, r.brand, r.model, r.serialNumber, r.status, r.condition, r.notes]
+        const textFields = [
+          r.type,
+          r.brand,
+          r.model,
+          r.serialNumber,
+          r.status,
+          r.condition,
+          r.notes,
+        ]
         if (textFields.some((f) => f && n(f).includes(term))) return true
         if (r.assignedTo && matchingIds.has(r.assignedTo)) return true
         return false
@@ -282,7 +321,7 @@ export const buscarEquipamientoTool: AiToolDefinition = {
     try {
       const teams = await db.teams.toArray()
       for (const t of teams) {
-        for (const m of (t.members ?? [])) {
+        for (const m of t.members ?? []) {
           const id = (m as any).id ?? ''
           const name = (m as any).displayName ?? ''
           if (id && name) displayMap.set(id, name)
@@ -290,7 +329,9 @@ export const buscarEquipamientoTool: AiToolDefinition = {
       }
       const profiles = await db.memberProfiles.toArray()
       for (const p of profiles) displayMap.set(p.id, p.email)
-    } catch { /* ok */ }
+    } catch {
+      /* ok */
+    }
 
     const lines = sliced.map((r, i) => {
       const assignedName = r.assignedTo ? (displayMap.get(r.assignedTo) ?? r.assignedTo) : '—'
@@ -309,7 +350,9 @@ export const buscarEquipamientoTool: AiToolDefinition = {
 export const buscarCandidatoTool = defineBuscador(
   'buscar_candidato',
   'Buscá candidatos por nombre, email, posición o estado de reclutamiento.',
-  'candidates', 'candidato', 'candidatos',
+  'candidates',
+  'candidato',
+  'candidatos',
   ['name', 'email', 'phone', 'position', 'status', 'comments'],
   ['name', 'position', 'status', 'email', 'totalScore'],
 )
@@ -317,7 +360,9 @@ export const buscarCandidatoTool = defineBuscador(
 export const buscarNegocioTool = defineBuscador(
   'buscar_negocio',
   'Buscá unidades de negocio por nombre o descripción.',
-  'businessUnits', 'unidad de negocio', 'unidades de negocio',
+  'businessUnits',
+  'unidad de negocio',
+  'unidades de negocio',
   ['name', 'description'],
   ['name', 'description'],
 )

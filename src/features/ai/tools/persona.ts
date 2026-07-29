@@ -3,7 +3,8 @@ import { type AiToolDefinition } from '../types'
 
 export const consultarPersonaTool: AiToolDefinition = {
   name: 'consultar_persona',
-  description: 'Perfil completo de una persona: datos de contacto, equipos, roles, bbeneficios, riesgos asignados, compromisos, tareas, tickets de equipamiento y hallazgos. Usá buscar_persona primero para obtener el ID o email.',
+  description:
+    'Perfil completo de una persona: datos de contacto, equipos, roles, bbeneficios, riesgos asignados, compromisos, tareas, tickets de equipamiento y hallazgos. Usá buscar_persona primero para obtener el ID o email.',
   parameters: {
     type: 'object',
     properties: {
@@ -14,7 +15,7 @@ export const consultarPersonaTool: AiToolDefinition = {
     },
   },
   execute: async (params) => {
-    const idInput = (params.id as string ?? '').trim()
+    const idInput = ((params.id as string) ?? '').trim()
     if (!idInput) return 'Error: parámetro "id" requerido. Usá buscar_persona para encontrar el ID.'
 
     const output: string[] = []
@@ -24,7 +25,9 @@ export const consultarPersonaTool: AiToolDefinition = {
     output.push('')
 
     const member = idInput.includes('@')
-      ? (await db.memberProfiles.toArray()).find((m) => m.email?.toLowerCase() === idInput.toLowerCase())
+      ? (await db.memberProfiles.toArray()).find(
+          (m) => m.email?.toLowerCase() === idInput.toLowerCase(),
+        )
       : await db.memberProfiles.get(idInput)
 
     if (member) {
@@ -51,7 +54,7 @@ export const consultarPersonaTool: AiToolDefinition = {
           const matchDirect = mId === idInput
           const matchMember = member && (mId === member.id || mId === member.email)
           return matchDirect || matchMember
-        })
+        }),
       )
 
       if (equipos.length > 0) {
@@ -62,7 +65,7 @@ export const consultarPersonaTool: AiToolDefinition = {
             if (!mId) return false
             return mId === idInput || (member && (mId === member.id || mId === member.email))
           })
-          const rol = miembro ? (miembro as any).role ?? '' : ''
+          const rol = miembro ? ((miembro as any).role ?? '') : ''
           output.push(`  · **${t.name}** ${rol ? `(${rol})` : ''}`)
         }
         output.push('')
@@ -73,7 +76,7 @@ export const consultarPersonaTool: AiToolDefinition = {
       table: { toArray: () => Promise<T[]> },
       field: string,
       name: string,
-      formatter: (item: T) => string
+      formatter: (item: T) => string,
     ) {
       try {
         const items = await table.toArray()
@@ -95,23 +98,35 @@ export const consultarPersonaTool: AiToolDefinition = {
     }
 
     await findMemberItems(
-      db as any, 'assignedTo', 'Compromisos',
-      (c: any) => `${c.title ?? c.description ?? 'Sin título'}${c.commitmentDate ? ` · Vence: ${new Date(c.commitmentDate).toLocaleDateString('es-ES')}` : ''} ${c.status ? `[${c.status}]` : ''}`
+      db as any,
+      'assignedTo',
+      'Compromisos',
+      (c: any) =>
+        `${c.title ?? c.description ?? 'Sin título'}${c.commitmentDate ? ` · Vence: ${new Date(c.commitmentDate).toLocaleDateString('es-ES')}` : ''} ${c.status ? `[${c.status}]` : ''}`,
     )
 
     await findMemberItems(
-      db as any, 'assignedTo', 'Tareas',
-      (t: any) => `${t.title ?? 'Sin título'}${t.dueDate ? ` · Vence: ${new Date(t.dueDate).toLocaleDateString('es-ES')}` : ''} ${t.status ? `[${t.status}]` : ''}`
+      db as any,
+      'assignedTo',
+      'Tareas',
+      (t: any) =>
+        `${t.title ?? 'Sin título'}${t.dueDate ? ` · Vence: ${new Date(t.dueDate).toLocaleDateString('es-ES')}` : ''} ${t.status ? `[${t.status}]` : ''}`,
     )
 
     await findMemberItems(
-      db as any, 'assignedTo', 'Tickets de equipamiento',
-      (t: any) => `${t.title ?? 'Ticket #' + t.id} · ${t.type ?? ''} ${t.status ? `[${t.status}]` : ''}`
+      db as any,
+      'assignedTo',
+      'Tickets de equipamiento',
+      (t: any) =>
+        `${t.title ?? 'Ticket #' + t.id} · ${t.type ?? ''} ${t.status ? `[${t.status}]` : ''}`,
     )
 
     await findMemberItems(
-      db as any, 'assignedTo', 'Hallazgos',
-      (h: any) => `${h.title ?? 'Hallazgo #' + h.id} · ${h.severity ?? ''} ${h.status ? `[${h.status}]` : ''}`
+      db as any,
+      'assignedTo',
+      'Hallazgos',
+      (h: any) =>
+        `${h.title ?? 'Hallazgo #' + h.id} · ${h.severity ?? ''} ${h.status ? `[${h.status}]` : ''}`,
     )
 
     try {
@@ -123,14 +138,18 @@ export const consultarPersonaTool: AiToolDefinition = {
       if (relacionados.length > 0) {
         output.push(`**Riesgos asignados (${relacionados.length}):**`)
         for (const r of relacionados) {
-          output.push(`  · ${(r as any).title ?? 'Riesgo #' + r.id} · Score: ${(r as any).riskScore ?? '—'} ${r.status ? `[${r.status}]` : ''}`)
+          output.push(
+            `  · ${(r as any).title ?? 'Riesgo #' + r.id} · Score: ${(r as any).riskScore ?? '—'} ${r.status ? `[${r.status}]` : ''}`,
+          )
         }
         output.push('')
       }
     } catch {}
 
     if (!encontrada && output.length <= 1) {
-      output.push(`No se encontró una persona con ID o email "${idInput}". Usá \`buscar_persona\` primero para localizar el ID correcto.`)
+      output.push(
+        `No se encontró una persona con ID o email "${idInput}". Usá \`buscar_persona\` primero para localizar el ID correcto.`,
+      )
     }
 
     return output.join('\n')

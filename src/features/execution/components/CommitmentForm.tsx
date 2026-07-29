@@ -87,7 +87,10 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {commitment ? 'Editar Compromiso' : 'Nuevo Compromiso'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors"
+          >
             <X size={20} className="text-neutral-50" />
           </Button>
         </div>
@@ -203,7 +206,10 @@ export function CommitmentForm({ commitment, onClose, onSave }: CommitmentFormPr
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button onClick={onClose} className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors">
+          <Button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 rounded-lg transition-colors"
+          >
             Cancelar
           </Button>
           <Button

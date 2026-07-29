@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react'
 import { getPredictions, type Prediction } from '@/services/predictive/predictiveService'
-import { TrendingUp, TrendingDown, Minus, Brain, RefreshCw, AlertCircle, BarChart3 } from 'lucide-react'
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Brain,
+  RefreshCw,
+  AlertCircle,
+  BarChart3,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 export function PredictionsPage() {
@@ -15,7 +23,9 @@ export function PredictionsPage() {
     })
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -37,7 +47,9 @@ export function PredictionsPage() {
             <Brain size={24} className="text-purple-500" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Proyecciones basadas en datos históricos</h2>
+            <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+              Proyecciones basadas en datos históricos
+            </h2>
             <p className="text-sm text-neutral-50">
               Análisis estadístico con regresión lineal sobre {predictions.length} dimensiones
             </p>
@@ -47,7 +59,10 @@ export function PredictionsPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-neutral-10 dark:bg-neutral-75 rounded-xl animate-pulse" />
+              <div
+                key={i}
+                className="h-24 bg-neutral-10 dark:bg-neutral-75 rounded-xl animate-pulse"
+              />
             ))}
           </div>
         ) : predictions.length === 0 ? (
@@ -57,7 +72,8 @@ export function PredictionsPage() {
               No hay suficientes datos históricos para generar predicciones.
             </p>
             <p className="text-sm text-neutral-50 mt-1">
-              Se necesitan al menos 3 registros de THI y datos en vulnerabilidades, riesgos o tecnologías.
+              Se necesitan al menos 3 registros de THI y datos en vulnerabilidades, riesgos o
+              tecnologías.
             </p>
           </div>
         ) : (
@@ -73,12 +89,21 @@ export function PredictionsPage() {
 }
 
 function PredictionCard({ prediction }: { prediction: Prediction }) {
-  const TrendIcon = prediction.trend === 'up' ? TrendingUp : prediction.trend === 'down' ? TrendingDown : Minus
-  const trendColor = prediction.trend === 'up' ? 'text-danger' : prediction.trend === 'down' ? 'text-success' : 'text-neutral-50'
+  const TrendIcon =
+    prediction.trend === 'up' ? TrendingUp : prediction.trend === 'down' ? TrendingDown : Minus
+  const trendColor =
+    prediction.trend === 'up'
+      ? 'text-danger'
+      : prediction.trend === 'down'
+        ? 'text-success'
+        : 'text-neutral-50'
 
-  const confidenceColor = prediction.confidence === 'high' ? 'bg-success/10 text-success'
-    : prediction.confidence === 'medium' ? 'bg-warning/10 text-warning'
-    : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
+  const confidenceColor =
+    prediction.confidence === 'high'
+      ? 'bg-success/10 text-success'
+      : prediction.confidence === 'medium'
+        ? 'bg-warning/10 text-warning'
+        : 'bg-neutral-10 dark:bg-neutral-75 text-neutral-50'
 
   return (
     <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-5">
@@ -88,12 +113,18 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
           <div className="flex items-center gap-2 mt-1">
             <span className={`inline-flex items-center gap-1 text-sm font-medium ${trendColor}`}>
               <TrendIcon size={16} />
-              {prediction.trend === 'up' ? 'Al alza' : prediction.trend === 'down' ? 'A la baja' : 'Estable'}
+              {prediction.trend === 'up'
+                ? 'Al alza'
+                : prediction.trend === 'down'
+                  ? 'A la baja'
+                  : 'Estable'}
             </span>
             <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${confidenceColor}`}>
-              {prediction.confidence === 'high' ? 'Alta confianza'
-                : prediction.confidence === 'medium' ? 'Confianza media'
-                : 'Baja confianza'}
+              {prediction.confidence === 'high'
+                ? 'Alta confianza'
+                : prediction.confidence === 'medium'
+                  ? 'Confianza media'
+                  : 'Baja confianza'}
             </span>
           </div>
         </div>
@@ -101,7 +132,9 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
           <div className="flex items-center gap-3">
             <div>
               <p className="text-xs text-neutral-50">Actual</p>
-              <p className="text-xl font-bold text-neutral-90 dark:text-white">{prediction.current}</p>
+              <p className="text-xl font-bold text-neutral-90 dark:text-white">
+                {prediction.current}
+              </p>
             </div>
             <div className="text-neutral-30 dark:text-neutral-60 text-lg font-light">→</div>
             <div>

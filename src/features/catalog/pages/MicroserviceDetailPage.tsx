@@ -9,13 +9,32 @@ import { Select } from '@/components/ui/Select'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { RichTextViewer } from '@/components/rich-text/RichTextViewer'
 import {
-  ArrowLeft, Server, ExternalLink, Save, Plus,
-  Check, Trash2, BookOpen, GitBranch,
-  Calendar, AlertTriangle, Shield,
-  Activity, FileWarning, Database,
+  ArrowLeft,
+  Server,
+  ExternalLink,
+  Save,
+  Plus,
+  Check,
+  Trash2,
+  BookOpen,
+  GitBranch,
+  Calendar,
+  AlertTriangle,
+  Shield,
+  Activity,
+  FileWarning,
+  Database,
 } from 'lucide-react'
-import type { MicroserviceFeature, MicroserviceRoadmapItem, MicroserviceLifecycleStatus, ServiceLevel } from '@/types/domain'
-import { EntityAssociationList, type EntityType } from '@/features/catalog/components/EntityAssociationList'
+import type {
+  MicroserviceFeature,
+  MicroserviceRoadmapItem,
+  MicroserviceLifecycleStatus,
+  ServiceLevel,
+} from '@/types/domain'
+import {
+  EntityAssociationList,
+  type EntityType,
+} from '@/features/catalog/components/EntityAssociationList'
 import { DatabaseAssociationList } from '@/features/catalog/components/DatabaseAssociationList'
 
 const lifecycleLabel: Record<MicroserviceLifecycleStatus, string> = {
@@ -41,7 +60,15 @@ const serviceLevelLabel: Record<string, string> = {
   low: 'Bajo',
 }
 
-function EntitySection({ title, entityType, microserviceId }: { title: string; entityType: EntityType; microserviceId: string }) {
+function EntitySection({
+  title,
+  entityType,
+  microserviceId,
+}: {
+  title: string
+  entityType: EntityType
+  microserviceId: string
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-neutral-90 dark:text-white">{title}</h2>
@@ -63,7 +90,12 @@ export function MicroserviceDetailPage() {
 
   const ms = useLiveQuery(() => (id ? db.microservices.get(id) : undefined), [id])
   const app = useLiveQuery(
-    () => isNew && newAppId ? db.applications.get(newAppId) : (ms ? db.applications.get(ms.applicationId) : undefined),
+    () =>
+      isNew && newAppId
+        ? db.applications.get(newAppId)
+        : ms
+          ? db.applications.get(ms.applicationId)
+          : undefined,
     [isNew, newAppId, ms?.applicationId],
   )
   const [name, setName] = useState('')
@@ -83,29 +115,44 @@ export function MicroserviceDetailPage() {
   const [activeSection, setActiveSection] = useState<string>('info')
   const [newFeatureOpen, setNewFeatureOpen] = useState(false)
   const [newRoadmapOpen, setNewRoadmapOpen] = useState(false)
-  const [featureForm, setFeatureForm] = useState({ name: '', description: '', category: 'other' as MicroserviceFeature['category'] })
-  const [roadmapForm, setRoadmapForm] = useState({ title: '', description: '', type: 'upgrade' as MicroserviceRoadmapItem['type'], priority: 'medium' as MicroserviceRoadmapItem['priority'], targetDate: '' })
+  const [featureForm, setFeatureForm] = useState({
+    name: '',
+    description: '',
+    category: 'other' as MicroserviceFeature['category'],
+  })
+  const [roadmapForm, setRoadmapForm] = useState({
+    title: '',
+    description: '',
+    type: 'upgrade' as MicroserviceRoadmapItem['type'],
+    priority: 'medium' as MicroserviceRoadmapItem['priority'],
+    targetDate: '',
+  })
 
-  const dbJunctions = useLiveQuery(
-    () => id ? db.appDatabaseMicroservices.where('microserviceId').equals(id).toArray() : [],
-    [id],
-  ) ?? []
-  const vulnJunctions = useLiveQuery(
-    () => id ? db.vulnerabilityMicroservices.where('microserviceId').equals(id).toArray() : [],
-    [id],
-  ) ?? []
-  const incJunctions = useLiveQuery(
-    () => id ? db.incidentMicroservices.where('microserviceId').equals(id).toArray() : [],
-    [id],
-  ) ?? []
-  const riskJunctions = useLiveQuery(
-    () => id ? db.riskMicroservices.where('microserviceId').equals(id).toArray() : [],
-    [id],
-  ) ?? []
-  const auditJunctions = useLiveQuery(
-    () => id ? db.auditFindingMicroservices.where('microserviceId').equals(id).toArray() : [],
-    [id],
-  ) ?? []
+  const dbJunctions =
+    useLiveQuery(
+      () => (id ? db.appDatabaseMicroservices.where('microserviceId').equals(id).toArray() : []),
+      [id],
+    ) ?? []
+  const vulnJunctions =
+    useLiveQuery(
+      () => (id ? db.vulnerabilityMicroservices.where('microserviceId').equals(id).toArray() : []),
+      [id],
+    ) ?? []
+  const incJunctions =
+    useLiveQuery(
+      () => (id ? db.incidentMicroservices.where('microserviceId').equals(id).toArray() : []),
+      [id],
+    ) ?? []
+  const riskJunctions =
+    useLiveQuery(
+      () => (id ? db.riskMicroservices.where('microserviceId').equals(id).toArray() : []),
+      [id],
+    ) ?? []
+  const auditJunctions =
+    useLiveQuery(
+      () => (id ? db.auditFindingMicroservices.where('microserviceId').equals(id).toArray() : []),
+      [id],
+    ) ?? []
 
   const sectionCounts: Record<string, number> = {
     databases: dbJunctions.length,
@@ -132,7 +179,9 @@ export function MicroserviceDetailPage() {
     setDecommissionPlan(ms.decommissionPlan ?? '')
   }
 
-  const markDirty = () => { if (!dirty) setDirty(true) }
+  const markDirty = () => {
+    if (!dirty) setDirty(true)
+  }
 
   const handleSave = async () => {
     if (!name.trim()) return
@@ -202,12 +251,19 @@ export function MicroserviceDetailPage() {
   }
 
   const toggleFeatureStatus = (featId: string) => {
-    setFeatures(features.map((f) => {
-      if (f.id !== featId) return f
-      const cycle: MicroserviceFeature['status'][] = ['planned', 'in_progress', 'active', 'deprecated']
-      const idx = cycle.indexOf(f.status)
-      return { ...f, status: cycle[(idx + 1) % cycle.length] }
-    }))
+    setFeatures(
+      features.map((f) => {
+        if (f.id !== featId) return f
+        const cycle: MicroserviceFeature['status'][] = [
+          'planned',
+          'in_progress',
+          'active',
+          'deprecated',
+        ]
+        const idx = cycle.indexOf(f.status)
+        return { ...f, status: cycle[(idx + 1) % cycle.length] }
+      }),
+    )
     markDirty()
   }
 
@@ -223,7 +279,13 @@ export function MicroserviceDetailPage() {
       status: 'planned',
     }
     setRoadmap([...roadmap, item])
-    setRoadmapForm({ title: '', description: '', type: 'upgrade', priority: 'medium', targetDate: '' })
+    setRoadmapForm({
+      title: '',
+      description: '',
+      type: 'upgrade',
+      priority: 'medium',
+      targetDate: '',
+    })
     setNewRoadmapOpen(false)
     markDirty()
   }
@@ -234,12 +296,19 @@ export function MicroserviceDetailPage() {
   }
 
   const toggleRoadmapStatus = (itemId: string) => {
-    setRoadmap(roadmap.map((r) => {
-      if (r.id !== itemId) return r
-      const cycle: MicroserviceRoadmapItem['status'][] = ['planned', 'in_progress', 'completed', 'cancelled']
-      const idx = cycle.indexOf(r.status)
-      return { ...r, status: cycle[(idx + 1) % cycle.length] }
-    }))
+    setRoadmap(
+      roadmap.map((r) => {
+        if (r.id !== itemId) return r
+        const cycle: MicroserviceRoadmapItem['status'][] = [
+          'planned',
+          'in_progress',
+          'completed',
+          'cancelled',
+        ]
+        const idx = cycle.indexOf(r.status)
+        return { ...r, status: cycle[(idx + 1) % cycle.length] }
+      }),
+    )
     markDirty()
   }
 
@@ -291,14 +360,20 @@ export function MicroserviceDetailPage() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-neutral-50">
-        <button onClick={handleBack} className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-1 hover:text-neutral-90 dark:hover:text-white transition-colors"
+        >
           <ArrowLeft size={14} />
           Volver
         </button>
         {app && (
           <>
             <span className="text-neutral-40">/</span>
-            <button onClick={() => navigate(`/catalog/applications/${app.id}`)} className="hover:text-neutral-90 dark:hover:text-white transition-colors">
+            <button
+              onClick={() => navigate(`/catalog/applications/${app.id}`)}
+              className="hover:text-neutral-90 dark:hover:text-white transition-colors"
+            >
               {app.name}
             </button>
           </>
@@ -319,7 +394,9 @@ export function MicroserviceDetailPage() {
             <h1 className="text-2xl font-bold text-neutral-90 dark:text-white flex items-center gap-3">
               {isNew ? 'Nuevo Microservicio' : ms!.name}
               {!isNew && (
-                <span className={`text-xs px-2.5 py-0.5 rounded-full border ${lifecycleColor[lifecycleStatus]}`}>
+                <span
+                  className={`text-xs px-2.5 py-0.5 rounded-full border ${lifecycleColor[lifecycleStatus]}`}
+                >
                   {lifecycleLabel[lifecycleStatus]}
                 </span>
               )}
@@ -337,7 +414,7 @@ export function MicroserviceDetailPage() {
         </div>
         <button
           onClick={handleSave}
-          disabled={isNew ? (!name.trim() || saving) : (!dirty || saving || !name.trim())}
+          disabled={isNew ? !name.trim() || saving : !dirty || saving || !name.trim()}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm disabled:opacity-50"
         >
           <Save size={16} />
@@ -364,11 +441,13 @@ export function MicroserviceDetailPage() {
                 <Icon size={18} className="shrink-0" />
                 <span className="truncate flex-1 text-left">{s.label}</span>
                 {sectionCounts[s.id] !== undefined && (
-                  <span className={`text-xs font-medium tabular-nums shrink-0 ${
-                    activeSection === s.id
-                      ? 'text-accent'
-                      : 'text-neutral-50 dark:text-neutral-50'
-                  }`}>
+                  <span
+                    className={`text-xs font-medium tabular-nums shrink-0 ${
+                      activeSection === s.id
+                        ? 'text-accent'
+                        : 'text-neutral-50 dark:text-neutral-50'
+                    }`}
+                  >
                     {sectionCounts[s.id]}
                   </span>
                 )}
@@ -381,7 +460,9 @@ export function MicroserviceDetailPage() {
         <div className="flex-1 min-w-0 bg-card rounded-xl border border-boundary shadow-sm p-8">
           {activeSection === 'info' && (
             <div className="space-y-5">
-              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Información General</h2>
+              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
+                Información General
+              </h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -389,7 +470,10 @@ export function MicroserviceDetailPage() {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => { setName(e.target.value); markDirty() }}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      markDirty()
+                    }}
                     className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
@@ -397,7 +481,10 @@ export function MicroserviceDetailPage() {
                   <MemberSelector
                     label="Responsable Técnico"
                     value={technicalLead}
-                    onChange={(v) => { setTechnicalLead(v); markDirty() }}
+                    onChange={(v) => {
+                      setTechnicalLead(v)
+                      markDirty()
+                    }}
                     placeholder="Seleccionar responsable"
                   />
                 </div>
@@ -405,58 +492,95 @@ export function MicroserviceDetailPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary mb-1.5">Repositorio</label>
+                  <label className="block text-sm font-medium text-secondary mb-1.5">
+                    Repositorio
+                  </label>
                   <div className="relative">
-                    <GitBranch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+                    <GitBranch
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+                    />
                     <input
                       type="text"
                       value={repository}
-                      onChange={(e) => { setRepository(e.target.value); markDirty() }}
+                      onChange={(e) => {
+                        setRepository(e.target.value)
+                        markDirty()
+                      }}
                       placeholder="https://github.com/org/repo"
                       className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary mb-1.5">Nivel de Servicio</label>
+                  <label className="block text-sm font-medium text-secondary mb-1.5">
+                    Nivel de Servicio
+                  </label>
                   <Select
                     value={serviceLevel}
-                    onChange={(v) => { setServiceLevel(v as ServiceLevel); markDirty() }}
-                    options={Object.entries(serviceLevelLabel).map(([k, v]) => ({ value: k, label: v }))}
+                    onChange={(v) => {
+                      setServiceLevel(v as ServiceLevel)
+                      markDirty()
+                    }}
+                    options={Object.entries(serviceLevelLabel).map(([k, v]) => ({
+                      value: k,
+                      label: v,
+                    }))}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-1.5">Stack Tecnológico</label>
-                <TechSearch selectedIds={techIds} onChange={(ids) => { setTechIds(ids); markDirty() }} enableDepsSearch />
+                <label className="block text-sm font-medium text-secondary mb-1.5">
+                  Stack Tecnológico
+                </label>
+                <TechSearch
+                  selectedIds={techIds}
+                  onChange={(ids) => {
+                    setTechIds(ids)
+                    markDirty()
+                  }}
+                  enableDepsSearch
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-1.5">Descripción</label>
+                <label className="block text-sm font-medium text-secondary mb-1.5">
+                  Descripción
+                </label>
                 <RichTextEditor
                   value={description}
-                  onChange={(html) => { setDescription(html); markDirty() }}
+                  onChange={(html) => {
+                    setDescription(html)
+                    markDirty()
+                  }}
                   placeholder="Propósito y responsabilidades del microservicio..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">Estado del Ciclo de Vida</label>
+                <label className="block text-sm font-medium text-secondary mb-2">
+                  Estado del Ciclo de Vida
+                </label>
                 <div className="flex flex-wrap gap-2">
-                  {(Object.entries(lifecycleLabel) as [MicroserviceLifecycleStatus, string][]).map(([key, label]) => (
-                    <button
-                      key={key}
-                      onClick={() => { setLifecycleStatus(key); markDirty() }}
-                      className={`px-4 py-2 rounded-lg border text-sm transition-all ${
-                        lifecycleStatus === key
-                          ? `${lifecycleColor[key]} border-current font-medium`
-                          : 'border-neutral-30 dark:border-neutral-60 text-muted hover:border-neutral-50'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                  {(Object.entries(lifecycleLabel) as [MicroserviceLifecycleStatus, string][]).map(
+                    ([key, label]) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setLifecycleStatus(key)
+                          markDirty()
+                        }}
+                        className={`px-4 py-2 rounded-lg border text-sm transition-all ${
+                          lifecycleStatus === key
+                            ? `${lifecycleColor[key]} border-current font-medium`
+                            : 'border-neutral-30 dark:border-neutral-60 text-muted hover:border-neutral-50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ),
+                  )}
                 </div>
               </div>
 
@@ -464,18 +588,21 @@ export function MicroserviceDetailPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle size={16} className="text-warning" />
-                    <label className="text-sm font-medium text-secondary">
-                      Plan de Decomiso
-                    </label>
+                    <label className="text-sm font-medium text-secondary">Plan de Decomiso</label>
                   </div>
                   <RichTextEditor
                     value={decommissionPlan}
-                    onChange={(html) => { setDecommissionPlan(html); markDirty() }}
+                    onChange={(html) => {
+                      setDecommissionPlan(html)
+                      markDirty()
+                    }}
                     placeholder="Describe el plan de migración, datos a preservar, timelines, responsables..."
                   />
                   {decommissionPlan && (
                     <div className="mt-4 p-4 border border-warning/20 rounded-xl bg-warning/5">
-                      <p className="text-xs font-medium text-warning uppercase tracking-wider mb-2">Plan registrado</p>
+                      <p className="text-xs font-medium text-warning uppercase tracking-wider mb-2">
+                        Plan registrado
+                      </p>
                       <RichTextViewer content={decommissionPlan} />
                     </div>
                   )}
@@ -486,13 +613,19 @@ export function MicroserviceDetailPage() {
 
           {activeSection === 'docs' && (
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Documentación Técnica</h2>
+              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
+                Documentación Técnica
+              </h2>
               <p className="text-sm text-neutral-50">
-                Documentación técnica del microservicio: arquitectura, API, integraciones, decisiones técnicas.
+                Documentación técnica del microservicio: arquitectura, API, integraciones,
+                decisiones técnicas.
               </p>
               <RichTextEditor
                 value={documentation}
-                onChange={(html) => { setDocumentation(html); markDirty() }}
+                onChange={(html) => {
+                  setDocumentation(html)
+                  markDirty()
+                }}
                 placeholder="## Arquitectura&#10;&#10;Describe la arquitectura del microservicio...&#10;&#10;## API&#10;&#10;Endpoints principales...&#10;&#10;## Integraciones&#10;&#10;Sistemas con los que se comunica..."
               />
             </div>
@@ -501,7 +634,9 @@ export function MicroserviceDetailPage() {
           {activeSection === 'features' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Funcionalidades</h2>
+                <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
+                  Funcionalidades
+                </h2>
                 <button
                   onClick={() => setNewFeatureOpen(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
@@ -524,11 +659,15 @@ export function MicroserviceDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-neutral-50 mb-1">Descripción</label>
+                    <label className="block text-xs font-medium text-neutral-50 mb-1">
+                      Descripción
+                    </label>
                     <input
                       type="text"
                       value={featureForm.description}
-                      onChange={(e) => setFeatureForm({ ...featureForm, description: e.target.value })}
+                      onChange={(e) =>
+                        setFeatureForm({ ...featureForm, description: e.target.value })
+                      }
                       placeholder="Breve descripción"
                       className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
@@ -536,7 +675,12 @@ export function MicroserviceDetailPage() {
                   <div className="flex items-center gap-2">
                     <Select
                       value={featureForm.category}
-                      onChange={(v) => setFeatureForm({ ...featureForm, category: v as MicroserviceFeature['category'] })}
+                      onChange={(v) =>
+                        setFeatureForm({
+                          ...featureForm,
+                          category: v as MicroserviceFeature['category'],
+                        })
+                      }
                       options={[
                         { value: 'api', label: 'API' },
                         { value: 'integration', label: 'Integración' },
@@ -548,10 +692,16 @@ export function MicroserviceDetailPage() {
                       ]}
                       className="flex-1"
                     />
-                    <button onClick={addFeature} className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
+                    <button
+                      onClick={addFeature}
+                      className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+                    >
                       Agregar
                     </button>
-                    <button onClick={() => setNewFeatureOpen(false)} className="px-3 py-1.5 text-sm text-neutral-50 hover:text-neutral-70 transition-colors">
+                    <button
+                      onClick={() => setNewFeatureOpen(false)}
+                      className="px-3 py-1.5 text-sm text-neutral-50 hover:text-neutral-70 transition-colors"
+                    >
                       Cancelar
                     </button>
                   </div>
@@ -559,26 +709,50 @@ export function MicroserviceDetailPage() {
               )}
 
               {features.length === 0 && !newFeatureOpen && (
-                <p className="text-sm text-neutral-50">Sin funcionalidades registradas. Añade la primera para describir las capacidades de este microservicio.</p>
+                <p className="text-sm text-neutral-50">
+                  Sin funcionalidades registradas. Añade la primera para describir las capacidades
+                  de este microservicio.
+                </p>
               )}
 
               <div className="space-y-2">
                 {features.map((f) => (
-                  <div key={f.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm">
+                  <div
+                    key={f.id}
+                    className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm"
+                  >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-neutral-90 dark:text-white">{f.name}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${featureStatusColor[f.status]}`}>
-                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${
-                            f.status === 'active' ? 'bg-current' :
-                            f.status === 'in_progress' ? 'bg-current' :
-                            f.status === 'deprecated' ? 'bg-current' : 'bg-current opacity-50'
-                          }`} />
-                          {f.status === 'planned' ? 'Planificado' : f.status === 'in_progress' ? 'En Progreso' : f.status === 'active' ? 'Activo' : 'Deprecado'}
+                        <span className="text-sm font-medium text-neutral-90 dark:text-white">
+                          {f.name}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${featureStatusColor[f.status]}`}
+                        >
+                          <span
+                            className={`inline-block w-1.5 h-1.5 rounded-full ${
+                              f.status === 'active'
+                                ? 'bg-current'
+                                : f.status === 'in_progress'
+                                  ? 'bg-current'
+                                  : f.status === 'deprecated'
+                                    ? 'bg-current'
+                                    : 'bg-current opacity-50'
+                            }`}
+                          />
+                          {f.status === 'planned'
+                            ? 'Planificado'
+                            : f.status === 'in_progress'
+                              ? 'En Progreso'
+                              : f.status === 'active'
+                                ? 'Activo'
+                                : 'Deprecado'}
                         </span>
                         <span className="text-xs text-neutral-50 capitalize">{f.category}</span>
                       </div>
-                      {f.description && <p className="text-xs text-muted mt-0.5">{f.description}</p>}
+                      {f.description && (
+                        <p className="text-xs text-muted mt-0.5">{f.description}</p>
+                      )}
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <button
@@ -628,11 +802,15 @@ export function MicroserviceDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-neutral-50 mb-1">Descripción</label>
+                    <label className="block text-xs font-medium text-neutral-50 mb-1">
+                      Descripción
+                    </label>
                     <input
                       type="text"
                       value={roadmapForm.description}
-                      onChange={(e) => setRoadmapForm({ ...roadmapForm, description: e.target.value })}
+                      onChange={(e) =>
+                        setRoadmapForm({ ...roadmapForm, description: e.target.value })
+                      }
                       placeholder="Detalle del plan"
                       className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
@@ -642,7 +820,12 @@ export function MicroserviceDetailPage() {
                       <label className="block text-xs font-medium text-neutral-50 mb-1">Tipo</label>
                       <Select
                         value={roadmapForm.type}
-                        onChange={(v) => setRoadmapForm({ ...roadmapForm, type: v as MicroserviceRoadmapItem['type'] })}
+                        onChange={(v) =>
+                          setRoadmapForm({
+                            ...roadmapForm,
+                            type: v as MicroserviceRoadmapItem['type'],
+                          })
+                        }
                         options={[
                           { value: 'upgrade', label: 'Upgrade' },
                           { value: 'migration', label: 'Migración' },
@@ -654,10 +837,17 @@ export function MicroserviceDetailPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-neutral-50 mb-1">Prioridad</label>
+                      <label className="block text-xs font-medium text-neutral-50 mb-1">
+                        Prioridad
+                      </label>
                       <Select
                         value={roadmapForm.priority}
-                        onChange={(v) => setRoadmapForm({ ...roadmapForm, priority: v as MicroserviceRoadmapItem['priority'] })}
+                        onChange={(v) =>
+                          setRoadmapForm({
+                            ...roadmapForm,
+                            priority: v as MicroserviceRoadmapItem['priority'],
+                          })
+                        }
                         options={[
                           { value: 'critical', label: 'Crítica' },
                           { value: 'high', label: 'Alta' },
@@ -667,20 +857,30 @@ export function MicroserviceDetailPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-neutral-50 mb-1">Fecha Objetivo</label>
+                      <label className="block text-xs font-medium text-neutral-50 mb-1">
+                        Fecha Objetivo
+                      </label>
                       <input
                         type="date"
                         value={roadmapForm.targetDate}
-                        onChange={(e) => setRoadmapForm({ ...roadmapForm, targetDate: e.target.value })}
+                        onChange={(e) =>
+                          setRoadmapForm({ ...roadmapForm, targetDate: e.target.value })
+                        }
                         className="w-full px-3 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={addRoadmapItem} className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
+                    <button
+                      onClick={addRoadmapItem}
+                      className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+                    >
                       Agregar
                     </button>
-                    <button onClick={() => setNewRoadmapOpen(false)} className="px-3 py-1.5 text-sm text-neutral-50 hover:text-neutral-70 transition-colors">
+                    <button
+                      onClick={() => setNewRoadmapOpen(false)}
+                      className="px-3 py-1.5 text-sm text-neutral-50 hover:text-neutral-70 transition-colors"
+                    >
                       Cancelar
                     </button>
                   </div>
@@ -688,39 +888,79 @@ export function MicroserviceDetailPage() {
               )}
 
               {roadmap.length === 0 && !newRoadmapOpen && (
-                <p className="text-sm text-neutral-50">Sin items de roadmap. Planifica actualizaciones, migraciones o decomisos.</p>
+                <p className="text-sm text-neutral-50">
+                  Sin items de roadmap. Planifica actualizaciones, migraciones o decomisos.
+                </p>
               )}
 
               <div className="space-y-2">
                 {roadmap.map((item) => {
-                  const isOverdue = item.targetDate && new Date(item.targetDate) < new Date() && item.status !== 'completed' && item.status !== 'cancelled'
+                  const isOverdue =
+                    item.targetDate &&
+                    new Date(item.targetDate) < new Date() &&
+                    item.status !== 'completed' &&
+                    item.status !== 'cancelled'
                   return (
-                    <div key={item.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm">
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between px-4 py-3 rounded-xl border border-boundary bg-card shadow-sm"
+                    >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-neutral-90 dark:text-white">{item.title}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${roadmapStatusColor[item.status]}`}>
-                            <span className={`inline-block w-1.5 h-1.5 rounded-full ${
-                              item.status === 'completed' || item.status === 'in_progress' ? 'bg-current' : 'bg-current opacity-50'
-                            }`} />
-                            {item.status === 'planned' ? 'Planificado' : item.status === 'in_progress' ? 'En Progreso' : item.status === 'completed' ? 'Completado' : 'Cancelado'}
+                          <span className="text-sm font-medium text-neutral-90 dark:text-white">
+                            {item.title}
                           </span>
-                          <span className={`text-xs font-medium ${roadmapPriorityColor[item.priority]} flex items-center gap-1`}>
-                            <span className={`inline-block w-2 h-2 rounded-full ${
-                              item.priority === 'critical' ? 'bg-danger' :
-                              item.priority === 'high' ? 'bg-warning' :
-                              item.priority === 'medium' ? 'bg-info' : 'bg-neutral-40'
-                            }`} />
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${roadmapStatusColor[item.status]}`}
+                          >
+                            <span
+                              className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                item.status === 'completed' || item.status === 'in_progress'
+                                  ? 'bg-current'
+                                  : 'bg-current opacity-50'
+                              }`}
+                            />
+                            {item.status === 'planned'
+                              ? 'Planificado'
+                              : item.status === 'in_progress'
+                                ? 'En Progreso'
+                                : item.status === 'completed'
+                                  ? 'Completado'
+                                  : 'Cancelado'}
+                          </span>
+                          <span
+                            className={`text-xs font-medium ${roadmapPriorityColor[item.priority]} flex items-center gap-1`}
+                          >
+                            <span
+                              className={`inline-block w-2 h-2 rounded-full ${
+                                item.priority === 'critical'
+                                  ? 'bg-danger'
+                                  : item.priority === 'high'
+                                    ? 'bg-warning'
+                                    : item.priority === 'medium'
+                                      ? 'bg-info'
+                                      : 'bg-neutral-40'
+                              }`}
+                            />
                             {item.priority}
                           </span>
-                          <span className="text-xs text-neutral-50 capitalize bg-neutral-10 dark:bg-neutral-70 px-1.5 py-0.5 rounded">{item.type}</span>
-                          {isOverdue && <span className="text-xs text-danger font-medium">Vencido</span>}
+                          <span className="text-xs text-neutral-50 capitalize bg-neutral-10 dark:bg-neutral-70 px-1.5 py-0.5 rounded">
+                            {item.type}
+                          </span>
+                          {isOverdue && (
+                            <span className="text-xs text-danger font-medium">Vencido</span>
+                          )}
                         </div>
-                        {item.description && <p className="text-xs text-muted mt-0.5">{item.description}</p>}
+                        {item.description && (
+                          <p className="text-xs text-muted mt-0.5">{item.description}</p>
+                        )}
                         {item.targetDate && (
                           <p className="text-xs text-neutral-50 mt-0.5">
                             <Calendar size={12} className="inline mr-0.5" />
-                            {new Date(item.targetDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })}
+                            {new Date(item.targetDate).toLocaleDateString('es-ES', {
+                              year: 'numeric',
+                              month: 'short',
+                            })}
                           </p>
                         )}
                       </div>
@@ -749,7 +989,9 @@ export function MicroserviceDetailPage() {
 
           {activeSection === 'databases' && ms && (
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">Bases de Datos Asociadas</h2>
+              <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
+                Bases de Datos Asociadas
+              </h2>
               <div className="bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-xl p-5">
                 <DatabaseAssociationList microserviceId={ms.id} applicationId={ms.applicationId} />
               </div>
@@ -757,11 +999,19 @@ export function MicroserviceDetailPage() {
           )}
 
           {activeSection === 'vulns' && ms && (
-            <EntitySection title="Vulnerabilidades Asociadas" entityType="vulns" microserviceId={ms.id} />
+            <EntitySection
+              title="Vulnerabilidades Asociadas"
+              entityType="vulns"
+              microserviceId={ms.id}
+            />
           )}
 
           {activeSection === 'incidents' && ms && (
-            <EntitySection title="Incidentes Asociados" entityType="incidents" microserviceId={ms.id} />
+            <EntitySection
+              title="Incidentes Asociados"
+              entityType="incidents"
+              microserviceId={ms.id}
+            />
           )}
 
           {activeSection === 'risks' && ms && (
@@ -769,7 +1019,11 @@ export function MicroserviceDetailPage() {
           )}
 
           {activeSection === 'audit' && ms && (
-            <EntitySection title="Hallazgos de Auditoría Asociados" entityType="audit" microserviceId={ms.id} />
+            <EntitySection
+              title="Hallazgos de Auditoría Asociados"
+              entityType="audit"
+              microserviceId={ms.id}
+            />
           )}
         </div>
       </div>

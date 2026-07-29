@@ -13,7 +13,14 @@ interface PaginationProps {
   onPageSizeChange?: (pageSize: number) => void
 }
 
-export function Pagination({ page, totalPages, totalItems, pageSize, onPageChange, onPageSizeChange }: PaginationProps) {
+export function Pagination({
+  page,
+  totalPages,
+  totalItems,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: PaginationProps) {
   if (totalItems === 0) return null
 
   const startItem = (page - 1) * pageSize + 1
@@ -41,9 +48,7 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
         </span>
         {onPageSizeChange && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-neutral-50 dark:text-neutral-50">
-              Filas:
-            </label>
+            <label className="text-xs text-neutral-50 dark:text-neutral-50">Filas:</label>
             <Select
               value={String(pageSize)}
               onChange={(v) => onPageSizeChange(Number(v))}
@@ -79,7 +84,10 @@ export function Pagination({ page, totalPages, totalItems, pageSize, onPageChang
                 {p}
               </Button>
             ) : (
-              <span key={`ellipsis-${idx}`} className="px-1 text-neutral-40 dark:text-neutral-50 select-none">
+              <span
+                key={`ellipsis-${idx}`}
+                className="px-1 text-neutral-40 dark:text-neutral-50 select-none"
+              >
                 ...
               </span>
             ),

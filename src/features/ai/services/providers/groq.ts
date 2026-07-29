@@ -1,4 +1,10 @@
-import type { AiProviderConfig, AiChatMessage, AiToolDefinition, AiChatResponse, AiProviderInterface } from '../../types'
+import type {
+  AiProviderConfig,
+  AiChatMessage,
+  AiToolDefinition,
+  AiChatResponse,
+  AiProviderInterface,
+} from '../../types'
 import { buildToolDefinitions } from '../AiProvider'
 
 /**
@@ -10,7 +16,9 @@ import { buildToolDefinitions } from '../AiProvider'
  *   <function=nombre> { "key": "val" } </function>
  *   <function=nombre> , "key": "val", "key2": "val2" }</function>  ← con leading comma
  */
-function parseLegacyFunctionCall(text: string): { name: string; arguments: Record<string, unknown>; id: string } | null {
+function parseLegacyFunctionCall(
+  text: string,
+): { name: string; arguments: Record<string, unknown>; id: string } | null {
   // Groq puede devolver tanto </function> (con slash, estándar XML) como
   // <function> (sin slash, formato legacy Groq). Aceptamos ambos.
   const match = text.match(/<function=(\w+)>([\s\S]*?)<\/?function>/)
@@ -54,11 +62,13 @@ function tryRescueToolCall(text: string): AiChatResponse | null {
     if (!parsed) return null
     return {
       content: '',
-      toolCalls: [{
-        id: parsed.id,
-        name: parsed.name,
-        arguments: parsed.arguments,
-      }],
+      toolCalls: [
+        {
+          id: parsed.id,
+          name: parsed.name,
+          arguments: parsed.arguments,
+        },
+      ],
     }
   } catch {
     return null
@@ -88,7 +98,7 @@ export function createGroqProvider(config: AiProviderConfig): AiProviderInterfac
 
   async function chatOnce(
     messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
+    tools?: AiToolDefinition[],
   ): Promise<AiChatResponse> {
     const body: Record<string, unknown> = {
       model: config.model,
@@ -139,11 +149,13 @@ export function createGroqProvider(config: AiProviderConfig): AiProviderInterfac
     const output: AiChatResponse = { content: choice?.message?.content ?? '' }
 
     if (choice?.message?.tool_calls?.length > 0) {
-      output.toolCalls = choice.message.tool_calls.map((tc: { id: string; function: { name: string; arguments: string } }) => ({
-        id: tc.id,
-        name: tc.function.name,
-        arguments: JSON.parse(tc.function.arguments),
-      }))
+      output.toolCalls = choice.message.tool_calls.map(
+        (tc: { id: string; function: { name: string; arguments: string } }) => ({
+          id: tc.id,
+          name: tc.function.name,
+          arguments: JSON.parse(tc.function.arguments),
+        }),
+      )
     }
 
     return output
@@ -151,7 +163,7 @@ export function createGroqProvider(config: AiProviderConfig): AiProviderInterfac
 
   async function chat(
     messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
+    tools?: AiToolDefinition[],
   ): Promise<AiChatResponse> {
     for (let attempt = 0; ; attempt++) {
       try {

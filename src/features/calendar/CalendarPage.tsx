@@ -3,15 +3,33 @@ import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import {
-  ChevronLeft, ChevronRight, Calendar as CalendarIcon,
-  AlertTriangle, Target, AlertOctagon,
-  ArrowRight, BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+  AlertTriangle,
+  Target,
+  AlertOctagon,
+  ArrowRight,
+  BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getCalendarEvents, type CalendarEvent } from './calendarService'
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button'
 
-const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const MONTHS = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+]
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
 const TYPE_DOTS: Record<string, string> = {
@@ -109,7 +127,9 @@ export function CalendarPage() {
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const dayEvents = getEventsForDay(d)
-    const isOverdue = dayEvents.some((e) => new Date(e.date).getTime() < now && e.type !== 'blocker')
+    const isOverdue = dayEvents.some(
+      (e) => new Date(e.date).getTime() < now && e.type !== 'blocker',
+    )
     const isSelected = selectedDate?.getDate() === d && selectedDate?.getMonth() === currentMonth
     const isPast = new Date(currentYear, currentMonth, d, 23, 59, 59).getTime() < now
     days.push(
@@ -122,31 +142,35 @@ export function CalendarPage() {
           isSelected
             ? 'bg-primary/85 text-white font-semibold border-primary/60'
             : isOverdue
-            ? 'bg-danger/[0.03] border-danger/15 hover:bg-danger/[0.06]'
-            : 'border-transparent hover:bg-neutral-10 dark:hover:bg-neutral-75',
+              ? 'bg-danger/[0.03] border-danger/15 hover:bg-danger/[0.06]'
+              : 'border-transparent hover:bg-neutral-10 dark:hover:bg-neutral-75',
           !isSelected && 'text-neutral-80 dark:text-neutral-20',
-          isPast && !isSelected && !isOverdue && 'opacity-40'
+          isPast && !isSelected && !isOverdue && 'opacity-40',
         )}
       >
         <span className={cn('text-sm font-medium', isSelected && 'text-white')}>{d}</span>
         {dayEvents.length > 0 && !isSelected && (
           <div className="flex justify-center gap-0.5 mt-0.5">
-            {Array.from(new Set(dayEvents.map((e) => e.type))).slice(0, 4).map((type) => (
-              <span key={type} className={cn('w-1.5 h-1.5 rounded-full', TYPE_DOTS[type])} />
-            ))}
+            {Array.from(new Set(dayEvents.map((e) => e.type)))
+              .slice(0, 4)
+              .map((type) => (
+                <span key={type} className={cn('w-1.5 h-1.5 rounded-full', TYPE_DOTS[type])} />
+              ))}
           </div>
         )}
-      </Button>
+      </Button>,
     )
   }
 
   // ── Upcoming events (all future, sorted) ──
-  const upcomingEvents = useMemo(() =>
-    events
-      .filter((e) => new Date(e.date).getTime() >= now)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(0, 8),
-  [events, now])
+  const upcomingEvents = useMemo(
+    () =>
+      events
+        .filter((e) => new Date(e.date).getTime() >= now)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(0, 8),
+    [events, now],
+  )
 
   const selectedEvents = selectedDate ? getEventsForDay(selectedDate.getDate()) : []
 
@@ -154,7 +178,9 @@ export function CalendarPage() {
     <div className="space-y-6">
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">Calendario Ejecutivo</h1>
+        <h1 className="text-lg font-semibold text-neutral-90 dark:text-white">
+          Calendario Ejecutivo
+        </h1>
       </div>
 
       {/* ── Summary Cards ── */}
@@ -194,13 +220,27 @@ export function CalendarPage() {
         {/* ── Month Calendar ── */}
         <div className="lg:col-span-2 bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-boundary">
-            <Button onClick={() => setCurrentMonth((m) => m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1)} variant="ghost" size="sm" className="p-2">
+            <Button
+              onClick={() =>
+                setCurrentMonth((m) => (m === 0 ? (setCurrentYear((y) => y - 1), 11) : m - 1))
+              }
+              variant="ghost"
+              size="sm"
+              className="p-2"
+            >
               <ChevronLeft size={20} className="text-neutral-60" />
             </Button>
             <h2 className="text-lg font-bold text-neutral-90 dark:text-white">
               {MONTHS[currentMonth]} {currentYear}
             </h2>
-            <Button onClick={() => setCurrentMonth((m) => m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1)} variant="ghost" size="sm" className="p-2">
+            <Button
+              onClick={() =>
+                setCurrentMonth((m) => (m === 11 ? (setCurrentYear((y) => y + 1), 0) : m + 1))
+              }
+              variant="ghost"
+              size="sm"
+              className="p-2"
+            >
               <ChevronRight size={20} className="text-neutral-60" />
             </Button>
           </div>
@@ -208,8 +248,14 @@ export function CalendarPage() {
           {currentMonthSprints.length > 0 && (
             <div className="px-5 pt-3 pb-1 space-y-1">
               {currentMonthSprints.map((sprint) => {
-                const { left, width } = getSprintSpan(new Date(sprint.startDate), new Date(sprint.endDate))
-                const completion = sprint.plannedSP > 0 ? Math.round((sprint.completedSP / sprint.plannedSP) * 100) : 0
+                const { left, width } = getSprintSpan(
+                  new Date(sprint.startDate),
+                  new Date(sprint.endDate),
+                )
+                const completion =
+                  sprint.plannedSP > 0
+                    ? Math.round((sprint.completedSP / sprint.plannedSP) * 100)
+                    : 0
                 return (
                   <div key={sprint.id} className="relative h-6">
                     <div className="absolute inset-0 bg-neutral-10 dark:bg-neutral-85 rounded-md" />
@@ -230,7 +276,12 @@ export function CalendarPage() {
           {/* Calendar grid */}
           <div className="grid grid-cols-7 p-3 gap-1.5">
             {DAYS.map((d) => (
-              <div key={d} className="text-center text-xs font-semibold text-neutral-50 uppercase tracking-wider py-1.5">{d}</div>
+              <div
+                key={d}
+                className="text-center text-xs font-semibold text-neutral-50 uppercase tracking-wider py-1.5"
+              >
+                {d}
+              </div>
             ))}
             {days}
           </div>
@@ -238,7 +289,10 @@ export function CalendarPage() {
           {/* Legend */}
           <div className="flex items-center gap-4 px-5 py-3 border-t border-boundary bg-neutral-5 dark:bg-neutral-85 flex-wrap">
             {Object.entries(TYPE_LABELS).map(([type, label]) => (
-              <div key={type} className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
+              <div
+                key={type}
+                className="flex items-center gap-1.5 text-[11px] font-medium text-muted"
+              >
                 <span className={cn('w-2 h-2 rounded-full', TYPE_DOTS[type])} />
                 {label}
               </div>
@@ -261,7 +315,9 @@ export function CalendarPage() {
 
             {loading ? (
               <div className="space-y-2 animate-pulse">
-                {[1, 2, 3].map((i) => <div key={i} className="h-14 bg-neutral-10 dark:bg-neutral-75 rounded-lg" />)}
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-14 bg-neutral-10 dark:bg-neutral-75 rounded-lg" />
+                ))}
               </div>
             ) : selectedEvents.length > 0 ? (
               <div className="space-y-2">
@@ -271,36 +327,55 @@ export function CalendarPage() {
                     onClick={() => event.link !== '#' && navigate(event.link)}
                     className="flex items-start gap-3 p-3 rounded-xl hover:bg-neutral-5 dark:hover:bg-neutral-85 transition-colors cursor-pointer group"
                   >
-                    <div className={cn('w-2 h-2 rounded-full mt-1.5 shrink-0', TYPE_DOTS[event.type])} />
+                    <div
+                      className={cn('w-2 h-2 rounded-full mt-1.5 shrink-0', TYPE_DOTS[event.type])}
+                    />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-neutral-90 dark:text-white truncate">{event.title}</p>
+                      <p className="text-sm font-semibold text-neutral-90 dark:text-white truncate">
+                        {event.title}
+                      </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-50">{TYPE_LABELS[event.type]}</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-50">
+                          {TYPE_LABELS[event.type]}
+                        </span>
                         <span className="text-neutral-30 dark:text-neutral-60">·</span>
-                        <span className={cn(
-                          'text-[11px] capitalize',
-                          event.status === 'open' || event.status === 'breached' || event.status === 'overdue'
-                            ? 'text-danger/70'
-                            : event.status === 'in_progress'
-                            ? 'text-warning/70'
-                            : 'text-neutral-50'
-                        )}>
+                        <span
+                          className={cn(
+                            'text-[11px] capitalize',
+                            event.status === 'open' ||
+                              event.status === 'breached' ||
+                              event.status === 'overdue'
+                              ? 'text-danger/70'
+                              : event.status === 'in_progress'
+                                ? 'text-warning/70'
+                                : 'text-neutral-50',
+                          )}
+                        >
                           {event.status.replace(/_/g, ' ')}
                         </span>
                       </div>
                     </div>
-                    <ArrowRight size={14} className="text-neutral-40 mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ArrowRight
+                      size={14}
+                      className="text-neutral-40 mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
                   </div>
                 ))}
               </div>
             ) : selectedDate ? (
               <div className="text-center py-8">
-                <CalendarIcon size={32} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-2" />
+                <CalendarIcon
+                  size={32}
+                  className="mx-auto text-neutral-30 dark:text-neutral-60 mb-2"
+                />
                 <p className="text-sm text-neutral-50">Sin eventos este día</p>
               </div>
             ) : (
               <div className="text-center py-8">
-                <CalendarIcon size={32} className="mx-auto text-neutral-30 dark:text-neutral-60 mb-2" />
+                <CalendarIcon
+                  size={32}
+                  className="mx-auto text-neutral-30 dark:text-neutral-60 mb-2"
+                />
                 <p className="text-sm text-neutral-50">Selecciona un día para ver sus eventos</p>
               </div>
             )}
@@ -312,14 +387,23 @@ export function CalendarPage() {
             {upcomingEvents.length > 0 ? (
               <div className="space-y-2">
                 {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center gap-3 px-1 py-2 border-b border-neutral-10 dark:border-neutral-75 last:border-0">
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-3 px-1 py-2 border-b border-neutral-10 dark:border-neutral-75 last:border-0"
+                  >
                     <div className="text-right min-w-[48px]">
-                      <p className="text-xs font-bold text-neutral-90 dark:text-white">{event.date.getDate()}</p>
-                      <p className="text-[10px] text-neutral-50">{MONTHS[event.date.getMonth()].slice(0, 3)}</p>
+                      <p className="text-xs font-bold text-neutral-90 dark:text-white">
+                        {event.date.getDate()}
+                      </p>
+                      <p className="text-[10px] text-neutral-50">
+                        {MONTHS[event.date.getMonth()].slice(0, 3)}
+                      </p>
                     </div>
                     <div className={cn('w-2 h-2 rounded-full shrink-0', TYPE_DOTS[event.type])} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-neutral-90 dark:text-white truncate">{event.title}</p>
+                      <p className="text-xs font-medium text-neutral-90 dark:text-white truncate">
+                        {event.title}
+                      </p>
                       <p className="text-[10px] text-neutral-50">{TYPE_LABELS[event.type]}</p>
                     </div>
                   </div>
@@ -336,9 +420,17 @@ export function CalendarPage() {
 }
 
 function SummaryCard({
-  title, value, subtitle, icon, color,
+  title,
+  value,
+  subtitle,
+  icon,
+  color,
 }: {
-  title: string; value: number; subtitle: string; icon: React.ReactNode; color: 'danger' | 'primary' | 'info' | 'warning' | 'success'
+  title: string
+  value: number
+  subtitle: string
+  icon: React.ReactNode
+  color: 'danger' | 'primary' | 'info' | 'warning' | 'success'
 }) {
   const styles = {
     danger: { bg: 'bg-danger/[0.06]', text: 'text-danger', dot: 'bg-danger/40' },

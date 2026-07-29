@@ -12,9 +12,23 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Filter, Upload, X, Users, TrendingUp, Award, Pencil, Trash2, Share2, Check, Copy } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  Upload,
+  X,
+  Users,
+  TrendingUp,
+  Award,
+  Pencil,
+  Trash2,
+  Share2,
+  Check,
+  Copy,
+} from 'lucide-react'
 
 export function TeamsPage() {
   const navigate = useNavigate()
@@ -38,12 +52,20 @@ export function TeamsPage() {
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
 
-  const filteredTeams = teams.filter((t) =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (buFilter === 'all' || t.businessUnitId === buFilter)
+  const filteredTeams = teams.filter(
+    (t) =>
+      t.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (buFilter === 'all' || t.businessUnitId === buFilter),
   )
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems: paginatedTeams } = usePagination(filteredTeams, 5)
+  const {
+    page,
+    setPage,
+    totalPages,
+    pageSize,
+    setPageSize,
+    paginatedItems: paginatedTeams,
+  } = usePagination(filteredTeams, 5)
 
   const handleDelete = async (id: string) => {
     if (await confirm('¿Eliminar equipo?')) {
@@ -52,15 +74,37 @@ export function TeamsPage() {
     }
   }
 
-  const getDoraLevel = (metrics: { deploymentFrequency: number; leadTimeHours: number; changeFailureRate: number; mttrHours: number } | null) => {
+  const getDoraLevel = (
+    metrics: {
+      deploymentFrequency: number
+      leadTimeHours: number
+      changeFailureRate: number
+      mttrHours: number
+    } | null,
+  ) => {
     if (!metrics) return { label: 'N/A', color: 'bg-neutral-10 text-neutral-60' }
-    if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 1 && metrics.changeFailureRate <= 5 && metrics.mttrHours <= 1) {
+    if (
+      metrics.deploymentFrequency >= 1 &&
+      metrics.leadTimeHours <= 1 &&
+      metrics.changeFailureRate <= 5 &&
+      metrics.mttrHours <= 1
+    ) {
       return { label: 'Elite', color: 'bg-success/10 text-success' }
     }
-    if (metrics.deploymentFrequency >= 1 && metrics.leadTimeHours <= 168 && metrics.changeFailureRate <= 10 && metrics.mttrHours <= 24) {
+    if (
+      metrics.deploymentFrequency >= 1 &&
+      metrics.leadTimeHours <= 168 &&
+      metrics.changeFailureRate <= 10 &&
+      metrics.mttrHours <= 24
+    ) {
       return { label: 'Alto', color: 'bg-info/10 text-info' }
     }
-    if (metrics.deploymentFrequency >= 0.25 && metrics.leadTimeHours <= 720 && metrics.changeFailureRate <= 15 && metrics.mttrHours <= 168) {
+    if (
+      metrics.deploymentFrequency >= 0.25 &&
+      metrics.leadTimeHours <= 720 &&
+      metrics.changeFailureRate <= 15 &&
+      metrics.mttrHours <= 168
+    ) {
       return { label: 'Medio', color: 'bg-warning/10 text-warning' }
     }
     return { label: 'Bajo', color: 'bg-danger/10 text-danger' }
@@ -71,13 +115,13 @@ export function TeamsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Equipos</h2>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm"
-            onClick={() => navigate('/admin/import')}
-          >
+          <Button variant="secondary" size="sm" onClick={() => navigate('/admin/import')}>
             <Upload size={16} />
             Importar
           </Button>
-          <Button variant="secondary" size="sm"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={async () => {
               if (!isTermsAccepted()) {
                 setShowTerms(true)
@@ -100,25 +144,47 @@ export function TeamsPage() {
         </div>
       </div>
 
-      {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-card rounded-2xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
-          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
-            {cleanUrl}
-          </a>
-          <Button variant="ghost" size="sm" className="bg-primary/10 text-primary hover:bg-primary/20"
-            onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}>
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'Copiado' : 'Copiar'}
-          </Button>
-        </div>
-      )})()}
+      {shareUrl &&
+        (() => {
+          const cleanUrl = shareUrl.split('#')[0]
+          return (
+            <div className="bg-card rounded-2xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
+              <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
+              <a
+                href={cleanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+              >
+                {cleanUrl}
+              </a>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="bg-primary/10 text-primary hover:bg-primary/20"
+                onClick={() => {
+                  navigator.clipboard.writeText(shareUrl)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
+                }}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copiado' : 'Copiar'}
+              </Button>
+            </div>
+          )
+        })()}
 
       {showTerms && (
         <TermsModal
-          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
-          onClose={() => { setShowTerms(false) }}
+          onAccept={() => {
+            acceptTerms()
+            setShowTerms(false)
+            doShare()
+          }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -130,29 +196,62 @@ export function TeamsPage() {
             const data = sharePending
             const payload = pass ? await encryptData(data, pass) : data
             const { url } = await createShareLink(hours ?? 48, 'performance', undefined, payload)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
             addNotification({ type: 'success', message: 'Enlace de rendimiento generado' })
           }}
           onSkip={async (hours) => {
             const data = sharePending
             const { url } = await createShareLink(hours ?? 48, 'performance', undefined, data)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
             addNotification({ type: 'success', message: 'Enlace de rendimiento generado' })
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
 
       <div className="grid grid-cols-3 gap-4">
-        <StatCard icon={<Users size={20} />} label="Total Equipos" value={teams.length} color="text-primary" onClick={() => setSearchTerm('')} />
-        <StatCard icon={<Award size={20} />} label="Equipos Elite" value={teams.filter((t) => getDoraLevel(t.currentMetrics).label === 'Elite').length} color="text-success" />
-        <StatCard icon={<TrendingUp size={20} />} label="Velocidad Promedio" value={teams.length > 0 ? Math.round(teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) / teams.length) : 0} color="text-info" />
+        <StatCard
+          icon={<Users size={20} />}
+          label="Total Equipos"
+          value={teams.length}
+          color="text-primary"
+          onClick={() => setSearchTerm('')}
+        />
+        <StatCard
+          icon={<Award size={20} />}
+          label="Equipos Elite"
+          value={teams.filter((t) => getDoraLevel(t.currentMetrics).label === 'Elite').length}
+          color="text-success"
+        />
+        <StatCard
+          icon={<TrendingUp size={20} />}
+          label="Velocidad Promedio"
+          value={
+            teams.length > 0
+              ? Math.round(
+                  teams.reduce((sum, t) => sum + (t.currentMetrics?.velocity ?? 0), 0) /
+                    teams.length,
+                )
+              : 0
+          }
+          color="text-info"
+        />
       </div>
 
       <div className="bg-card rounded-2xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar equipos..."
@@ -161,7 +260,9 @@ export function TeamsPage() {
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <Button variant="ghost" size="sm"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setShowFilters(!showFilters)}
             className={`px-3 py-2 border rounded-lg text-sm transition-colors ${
               showFilters || buFilter !== 'all'
@@ -171,9 +272,7 @@ export function TeamsPage() {
           >
             <Filter size={16} />
             Filtros
-            {buFilter !== 'all' && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
+            {buFilter !== 'all' && <span className="w-2 h-2 rounded-full bg-primary" />}
           </Button>
         </div>
 
@@ -181,10 +280,15 @@ export function TeamsPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Unidad de Negocio</label>
-              <Select value={buFilter} onChange={(v) => setBuFilter(v)} options={[
-                { value: 'all', label: 'Todas' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} className="min-w-[140px]" />
+              <Select
+                value={buFilter}
+                onChange={(v) => setBuFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todas' },
+                  ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                ]}
+                className="min-w-[140px]"
+              />
             </div>
             {buFilter !== 'all' && (
               <Button
@@ -204,16 +308,23 @@ export function TeamsPage() {
           const bu = businessUnits.find((b) => b.id === team.businessUnitId)
           const dora = getDoraLevel(team.currentMetrics)
           return (
-            <div key={team.id}
+            <div
+              key={team.id}
               onClick={() => navigate(`/teams/${team.id}`)}
               className="bg-card rounded-2xl border border-boundary p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <Link to={`/teams/${team.id}`} className="text-lg font-semibold text-primary hover:underline" onClick={(e) => e.stopPropagation()}>
+                  <Link
+                    to={`/teams/${team.id}`}
+                    className="text-lg font-semibold text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {team.name}
                   </Link>
-                  <p className="text-sm text-muted">{bu?.name} • {team.members.length} miembros</p>
+                  <p className="text-sm text-muted">
+                    {bu?.name} • {team.members.length} miembros
+                  </p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${dora.color}`}>
                   {dora.label}
@@ -223,23 +334,39 @@ export function TeamsPage() {
               {team.currentMetrics && (
                 <div className="grid grid-cols-2 gap-3 mt-4">
                   <MetricItem label="Velocidad" value={team.currentMetrics.velocity} />
-                  <MetricItem label="Tiempo de Entrega" value={`${team.currentMetrics.leadTimeHours}h`} />
-                  <MetricItem label="Tasa de Fallos" value={`${team.currentMetrics.changeFailureRate}%`} />
+                  <MetricItem
+                    label="Tiempo de Entrega"
+                    value={`${team.currentMetrics.leadTimeHours}h`}
+                  />
+                  <MetricItem
+                    label="Tasa de Fallos"
+                    value={`${team.currentMetrics.changeFailureRate}%`}
+                  />
                   <MetricItem label="MTTR" value={`${team.currentMetrics.mttrHours}h`} />
                 </div>
               )}
 
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-boundary">
                 <Button
-                  onClick={(e) => { e.stopPropagation(); navigate(`${team.id}/edit`) }}
-                  variant="ghost" size="sm" className="p-1.5"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigate(`${team.id}/edit`)
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="p-1.5"
                   title="Editar"
                 >
                   <Pencil size={16} />
                 </Button>
                 <Button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(team.id) }}
-                  variant="ghost" size="sm" className="p-1.5 text-neutral-50 hover:text-danger"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDelete(team.id)
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="p-1.5 text-neutral-50 hover:text-danger"
                   title="Eliminar"
                 >
                   <Trash2 size={16} />
@@ -264,12 +391,23 @@ export function TeamsPage() {
           <p className="text-neutral-50 dark:text-neutral-50">No se encontraron equipos</p>
         </div>
       )}
-
     </div>
   )
 }
 
-function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+  onClick?: () => void
+}) {
   const iconClasses: Record<string, string> = {
     'text-primary': 'bg-primary/10 text-primary',
     'text-success': 'bg-success/10 text-success',
@@ -281,7 +419,9 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
       onClick={onClick}
       className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
-      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </Comp>

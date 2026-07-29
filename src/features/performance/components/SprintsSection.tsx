@@ -3,7 +3,16 @@ import { db } from '@/services/db/database'
 import type { SprintRecord, TeamSprint } from '@/types/domain'
 import { Plus, Trash2, Edit3, BarChart3, List } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  CartesianGrid,
+} from 'recharts'
 import { cn } from '@/lib/utils'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
@@ -46,10 +55,14 @@ export function SprintsSection({ memberId, teamId }: Props) {
   }, [memberId])
 
   useEffect(() => {
-    db.teamSprints.where('teamId').equals(teamId).toArray().then((data) => {
-      setTeamSprints(data)
-      setLoadingTeamSprints(false)
-    })
+    db.teamSprints
+      .where('teamId')
+      .equals(teamId)
+      .toArray()
+      .then((data) => {
+        setTeamSprints(data)
+        setLoadingTeamSprints(false)
+      })
   }, [teamId])
 
   const availableYears = useMemo(() => {
@@ -76,13 +89,21 @@ export function SprintsSection({ memberId, teamId }: Props) {
         name: s.sprintName.length > 12 ? s.sprintName.slice(0, 12) + '...' : s.sprintName,
         completados: s.storyPointsCompleted,
         noCompletados: s.storyPointsNotCompleted,
-        eficiencia: s.storyPointsCompleted + s.storyPointsNotCompleted > 0
-          ? Math.round((s.storyPointsCompleted / (s.storyPointsCompleted + s.storyPointsNotCompleted)) * 100)
-          : 0,
+        eficiencia:
+          s.storyPointsCompleted + s.storyPointsNotCompleted > 0
+            ? Math.round(
+                (s.storyPointsCompleted / (s.storyPointsCompleted + s.storyPointsNotCompleted)) *
+                  100,
+              )
+            : 0,
       }))
   }, [filteredSprints])
 
-  const handleTeamSprintSelect = (sprintName: string, setter: typeof setNewSprint | typeof setEditData, current: typeof newSprint | typeof editData) => {
+  const handleTeamSprintSelect = (
+    sprintName: string,
+    setter: typeof setNewSprint | typeof setEditData,
+    current: typeof newSprint | typeof editData,
+  ) => {
     const ts = teamSprints.find((s) => s.sprintName === sprintName)
     setter({
       ...current,
@@ -103,7 +124,13 @@ export function SprintsSection({ memberId, teamId }: Props) {
     await db.sprintRecords.add(record)
     setSprints([...sprints, record])
     setShowForm(false)
-    setNewSprint({ sprintName: '', quarter: 'Q1', year: new Date().getFullYear(), storyPointsCompleted: 0, storyPointsNotCompleted: 0 })
+    setNewSprint({
+      sprintName: '',
+      quarter: 'Q1',
+      year: new Date().getFullYear(),
+      storyPointsCompleted: 0,
+      storyPointsNotCompleted: 0,
+    })
   }
 
   const startEdit = (sp: SprintRecord) => {
@@ -120,9 +147,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
   const saveEdit = async () => {
     if (!editingId || !editData.sprintName.trim()) return
     const updated = sprints.map((sp) =>
-      sp.id === editingId
-        ? { ...sp, ...editData, sprintName: editData.sprintName.trim() }
-        : sp
+      sp.id === editingId ? { ...sp, ...editData, sprintName: editData.sprintName.trim() } : sp,
     )
     const record = updated.find((sp) => sp.id === editingId)!
     await db.sprintRecords.put(record)
@@ -139,7 +164,8 @@ export function SprintsSection({ memberId, teamId }: Props) {
 
   const totalSP = filteredSprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
   const totalNotDone = filteredSprints.reduce((s, sp) => s + sp.storyPointsNotCompleted, 0)
-  const efficiency = totalSP + totalNotDone > 0 ? Math.round((totalSP / (totalSP + totalNotDone)) * 100) : 0
+  const efficiency =
+    totalSP + totalNotDone > 0 ? Math.round((totalSP / (totalSP + totalNotDone)) * 100) : 0
 
   const groupedByQuarter = filteredSprints.reduce<Record<string, SprintRecord[]>>((acc, s) => {
     const key = `${s.year} ${s.quarter}`
@@ -159,7 +185,8 @@ export function SprintsSection({ memberId, teamId }: Props) {
       })
   }, [teamSprints, sprints])
 
-  const inputClass = 'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
+  const inputClass =
+    'w-full rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card px-3 py-2 text-sm text-neutral-90 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
 
   return (
     <div className="bg-card rounded-xl border border-boundary p-4">
@@ -167,14 +194,24 @@ export function SprintsSection({ memberId, teamId }: Props) {
         <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints</h2>
         <div className="flex items-center gap-2">
           <div className="flex bg-neutral-10 dark:bg-neutral-70 rounded-lg p-0.5">
-            <button onClick={() => setViewMode('list')} className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
+            <button
+              onClick={() => setViewMode('list')}
+              className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white"
+            >
               <List size={16} />
             </button>
-            <button onClick={() => setViewMode('chart')} className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
+            <button
+              onClick={() => setViewMode('chart')}
+              className="p-2 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white"
+            >
               <BarChart3 size={16} />
             </button>
           </div>
-          <Button onClick={() => setShowForm(true)} variant="ghost" className="flex items-center gap-1">
+          <Button
+            onClick={() => setShowForm(true)}
+            variant="ghost"
+            className="flex items-center gap-1"
+          >
             <Plus size={16} /> Agregar Sprint
           </Button>
         </div>
@@ -186,11 +223,24 @@ export function SprintsSection({ memberId, teamId }: Props) {
           <p className="text-xs text-neutral-50">SP Completados</p>
         </div>
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-          <p className={cn('text-xl font-bold', efficiency >= 80 ? 'text-green-600' : efficiency >= 50 ? 'text-amber-600' : 'text-red-600')}>{efficiency}%</p>
+          <p
+            className={cn(
+              'text-xl font-bold',
+              efficiency >= 80
+                ? 'text-green-600'
+                : efficiency >= 50
+                  ? 'text-amber-600'
+                  : 'text-red-600',
+            )}
+          >
+            {efficiency}%
+          </p>
           <p className="text-xs text-neutral-50">Eficiencia</p>
         </div>
         <div className="text-center p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
-          <p className="text-xl font-bold text-neutral-90 dark:text-white">{filteredSprints.length}</p>
+          <p className="text-xl font-bold text-neutral-90 dark:text-white">
+            {filteredSprints.length}
+          </p>
           <p className="text-xs text-neutral-50">Sprints</p>
         </div>
       </div>
@@ -233,10 +283,7 @@ export function SprintsSection({ memberId, teamId }: Props) {
                   borderRadius: '8px',
                   fontSize: '12px',
                 }}
-                formatter={(value) => [
-                  value,
-                  'SP',
-                ]}
+                formatter={(value) => [value, 'SP']}
               />
               <Legend
                 formatter={(value: string) => (
@@ -246,21 +293,30 @@ export function SprintsSection({ memberId, teamId }: Props) {
                 )}
               />
               <Bar dataKey="completados" fill="#22c55e" radius={[4, 4, 0, 0]} name="completados" />
-              <Bar dataKey="noCompletados" fill="#ef4444" radius={[4, 4, 0, 0]} name="noCompletados" />
+              <Bar
+                dataKey="noCompletados"
+                fill="#ef4444"
+                radius={[4, 4, 0, 0]}
+                name="noCompletados"
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
       )}
 
       {viewMode === 'chart' && chartData.length === 0 && (
-        <p className="text-center py-6 text-neutral-40 text-sm">No hay datos para mostrar en el gráfico</p>
+        <p className="text-center py-6 text-neutral-40 text-sm">
+          No hay datos para mostrar en el gráfico
+        </p>
       )}
 
       {showForm && (
         <div className="mb-6 p-4 border border-boundary rounded-lg bg-neutral-10 dark:bg-neutral-70">
           <div className="grid gap-3 sm:grid-cols-5 mb-3">
             <div className="sm:col-span-2">
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">Sprint del Equipo</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                Sprint del Equipo
+              </label>
               <select
                 value={newSprint.sprintName}
                 onChange={(e) => handleTeamSprintSelect(e.target.value, setNewSprint, newSprint)}
@@ -268,22 +324,35 @@ export function SprintsSection({ memberId, teamId }: Props) {
               >
                 <option value="">Seleccionar sprint...</option>
                 {sprintSelectOptions.map((ts) => {
-                  const startStr = ts.startDate instanceof Date ? ts.startDate.toLocaleDateString('es-ES') : ''
-                  const endStr = ts.endDate instanceof Date ? ts.endDate.toLocaleDateString('es-ES') : ''
+                  const startStr =
+                    ts.startDate instanceof Date ? ts.startDate.toLocaleDateString('es-ES') : ''
+                  const endStr =
+                    ts.endDate instanceof Date ? ts.endDate.toLocaleDateString('es-ES') : ''
                   return (
                     <option key={ts.id} value={ts.sprintName}>
                       {ts.sprintName} ({startStr} — {endStr}) — Plan: {ts.plannedSP} SP
                     </option>
                   )
                 })}
-                {!loadingTeamSprints && sprintSelectOptions.length === 0 && teamSprints.length === 0 && (
-                  <option value="" disabled>No hay sprints registrados para este equipo. Agrégalos desde la página del equipo.</option>
-                )}
-                {!loadingTeamSprints && sprintSelectOptions.length === 0 && teamSprints.length > 0 && (
-                  <option value="" disabled>Todos los sprints del equipo ya están registrados</option>
-                )}
+                {!loadingTeamSprints &&
+                  sprintSelectOptions.length === 0 &&
+                  teamSprints.length === 0 && (
+                    <option value="" disabled>
+                      No hay sprints registrados para este equipo. Agrégalos desde la página del
+                      equipo.
+                    </option>
+                  )}
+                {!loadingTeamSprints &&
+                  sprintSelectOptions.length === 0 &&
+                  teamSprints.length > 0 && (
+                    <option value="" disabled>
+                      Todos los sprints del equipo ya están registrados
+                    </option>
+                  )}
                 {loadingTeamSprints && (
-                  <option value="" disabled>Cargando sprints del equipo...</option>
+                  <option value="" disabled>
+                    Cargando sprints del equipo...
+                  </option>
                 )}
               </select>
             </div>
@@ -310,11 +379,15 @@ export function SprintsSection({ memberId, teamId }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">SP No Completados</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                SP No Completados
+              </label>
               <input
                 type="number"
                 value={newSprint.storyPointsNotCompleted}
-                onChange={(e) => setNewSprint({ ...newSprint, storyPointsNotCompleted: Number(e.target.value) })}
+                onChange={(e) =>
+                  setNewSprint({ ...newSprint, storyPointsNotCompleted: Number(e.target.value) })
+                }
                 className={inputClass}
                 min={0}
               />
@@ -322,48 +395,68 @@ export function SprintsSection({ memberId, teamId }: Props) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 mb-3">
             <div>
-              <label className="text-xs font-medium text-neutral-60 mb-1 block">SP Completados</label>
+              <label className="text-xs font-medium text-neutral-60 mb-1 block">
+                SP Completados
+              </label>
               <input
                 type="number"
                 value={newSprint.storyPointsCompleted}
-                onChange={(e) => setNewSprint({ ...newSprint, storyPointsCompleted: Number(e.target.value) })}
+                onChange={(e) =>
+                  setNewSprint({ ...newSprint, storyPointsCompleted: Number(e.target.value) })
+                }
                 className={inputClass}
                 min={0}
               />
             </div>
           </div>
           <div className="flex gap-2">
-            <Button onClick={addSprint} className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark">
+            <Button
+              onClick={addSprint}
+              className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark"
+            >
               Guardar Sprint
             </Button>
-            <Button onClick={() => setShowForm(false)} variant="ghost" className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90">
+            <Button
+              onClick={() => setShowForm(false)}
+              variant="ghost"
+              className="px-4 py-2 text-sm text-neutral-60 hover:text-neutral-90"
+            >
               Cancelar
             </Button>
           </div>
         </div>
       )}
 
-      {viewMode === 'list' && (
-        Object.keys(groupedByQuarter).length === 0 ? (
+      {viewMode === 'list' &&
+        (Object.keys(groupedByQuarter).length === 0 ? (
           <p className="text-center py-8 text-neutral-40">Sin sprints registrados</p>
         ) : (
           Object.entries(groupedByQuarter).map(([quarter, records]) => (
             <div key={quarter} className="mb-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">{quarter}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-50 mb-2">
+                {quarter}
+              </h3>
               <div className="space-y-2">
                 {records.map((sp) =>
                   editingId === sp.id ? (
-                    <div key={sp.id} className="p-3 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60">
+                    <div
+                      key={sp.id}
+                      className="p-3 bg-card rounded-lg border border-neutral-30 dark:border-neutral-60"
+                    >
                       <div className="grid gap-2 sm:grid-cols-5 mb-2">
                         <div className="sm:col-span-2">
                           <select
                             value={editData.sprintName}
-                            onChange={(e) => handleTeamSprintSelect(e.target.value, setEditData, editData)}
+                            onChange={(e) =>
+                              handleTeamSprintSelect(e.target.value, setEditData, editData)
+                            }
                             className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
                           >
                             <option value="">Seleccionar...</option>
                             {teamSprints.map((ts) => (
-                              <option key={ts.id} value={ts.sprintName}>{ts.sprintName}</option>
+                              <option key={ts.id} value={ts.sprintName}>
+                                {ts.sprintName}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -383,7 +476,12 @@ export function SprintsSection({ memberId, teamId }: Props) {
                           <input
                             type="number"
                             value={editData.storyPointsCompleted}
-                            onChange={(e) => setEditData({ ...editData, storyPointsCompleted: Number(e.target.value) })}
+                            onChange={(e) =>
+                              setEditData({
+                                ...editData,
+                                storyPointsCompleted: Number(e.target.value),
+                              })
+                            }
                             className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
                             placeholder="SP completados"
                             min={0}
@@ -393,7 +491,12 @@ export function SprintsSection({ memberId, teamId }: Props) {
                           <input
                             type="number"
                             value={editData.storyPointsNotCompleted}
-                            onChange={(e) => setEditData({ ...editData, storyPointsNotCompleted: Number(e.target.value) })}
+                            onChange={(e) =>
+                              setEditData({
+                                ...editData,
+                                storyPointsNotCompleted: Number(e.target.value),
+                              })
+                            }
                             className="w-full rounded border border-neutral-30 dark:border-neutral-60 bg-transparent px-2 py-1 text-xs"
                             placeholder="SP no completados"
                             min={0}
@@ -401,8 +504,18 @@ export function SprintsSection({ memberId, teamId }: Props) {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button onClick={saveEdit} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">Guardar</Button>
-                        <Button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">Cancelar</Button>
+                        <Button
+                          onClick={saveEdit}
+                          className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark"
+                        >
+                          Guardar
+                        </Button>
+                        <Button
+                          onClick={() => setEditingId(null)}
+                          className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90"
+                        >
+                          Cancelar
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -411,28 +524,38 @@ export function SprintsSection({ memberId, teamId }: Props) {
                       className="flex items-center justify-between p-3 bg-neutral-10 dark:bg-neutral-70 rounded-lg group/sprint"
                     >
                       <div>
-                        <p className="text-sm font-medium text-neutral-90 dark:text-white">{sp.sprintName}</p>
+                        <p className="text-sm font-medium text-neutral-90 dark:text-white">
+                          {sp.sprintName}
+                        </p>
                         <p className="text-xs text-neutral-50">
-                          {sp.storyPointsCompleted} SP completados · {sp.storyPointsNotCompleted} SP no completados
+                          {sp.storyPointsCompleted} SP completados · {sp.storyPointsNotCompleted} SP
+                          no completados
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-primary">{sp.storyPointsCompleted} SP</span>
-                        <button onClick={() => startEdit(sp)} className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white">
+                        <span className="text-sm font-bold text-primary">
+                          {sp.storyPointsCompleted} SP
+                        </span>
+                        <button
+                          onClick={() => startEdit(sp)}
+                          className="p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-muted hover:text-neutral-90 dark:hover:text-white"
+                        >
                           <Edit3 size={14} />
                         </button>
-                        <button onClick={() => removeSprint(sp.id)} className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400">
+                        <button
+                          onClick={() => removeSprint(sp.id)}
+                          className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-muted hover:text-red-600 dark:hover:text-red-400"
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>
           ))
-        )
-      )}
+        ))}
     </div>
   )
 }

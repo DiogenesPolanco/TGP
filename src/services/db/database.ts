@@ -116,9 +116,11 @@ export class TGPDatabase extends Dexie {
       microservices: 'id, applicationId, name',
       users: 'id, email, role',
       plans: 'id, teamId, businessUnitId, objectiveId, status, startDate, endDate',
-      activities: 'id, planId, parentActivityId, assigneeId, teamId, applicationId, status, dueDate',
+      activities:
+        'id, planId, parentActivityId, assigneeId, teamId, applicationId, status, dueDate',
       tasks: 'id, activityId, planId, assigneeId, status, priority, dueDate',
-      commitments: 'id, ownerId, accountableId, teamId, applicationId, objectiveId, status, commitmentDate',
+      commitments:
+        'id, ownerId, accountableId, teamId, applicationId, objectiveId, status, commitmentDate',
       dependencies: 'id, sourceType, sourceId, targetType, targetId, status',
       blockers: 'id, sourceType, sourceId, assigneeId, severity, status',
     })
@@ -145,7 +147,8 @@ export class TGPDatabase extends Dexie {
       candidateEvaluations: 'id, candidateId, category',
     })
     this.version(13).stores({
-      vulnerabilities: 'id, applicationId, severity, status, slaDeadline, detectedAt, title, externalId',
+      vulnerabilities:
+        'id, applicationId, severity, status, slaDeadline, detectedAt, title, externalId',
     })
     this.version(14).stores({
       vulnerabilityMicroservices: 'id, vulnerabilityId, microserviceId',
@@ -170,12 +173,14 @@ export class TGPDatabase extends Dexie {
       equipmentTickets: 'id, equipmentId, requesterId, status, type',
     })
     this.version(19).stores({
-      equipment: 'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
+      equipment:
+        'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
       equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
       equipmentTickets: 'id, equipmentId, requesterId, status, type',
     })
     this.version(20).stores({
-      equipment: 'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
+      equipment:
+        'id, type, status, assignedTo, serialNumber, createdAt, costCenter, businessUnitId',
       equipmentAssignments: 'id, equipmentId, assignedTo, assignedAt',
       equipmentTickets: 'id, equipmentId, requesterId, status, type, assigneeId',
     })
@@ -190,3 +195,16 @@ export class TGPDatabase extends Dexie {
 }
 
 export const db = new TGPDatabase()
+
+// Data Layer Multi-Backend — misma importación, nuevo poder.
+// Los consumidores existentes siguen usando `db` como siempre.
+// Los nuevos pueden usar `dataLayer` que abstrae Dexie, PGlite, etc.
+//
+// Migración progresiva:
+//   import { db, dataLayer } from '@/services/db/database'
+//   // Antes: await db.applications.toArray()
+//   // Ahora: await dataLayer.applications.getAll()
+//   //         await dataLayer.applications.getById(id)
+//   //         await dataLayer.applications.create(obj)
+export { dataLayer } from '@/services/data-layer'
+export type { BackendType, Repository, DatabaseBackend } from '@/services/data-layer'

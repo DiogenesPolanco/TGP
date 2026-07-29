@@ -56,6 +56,6 @@ export const useAppStore = create<AppState>()(
     {
       name: 'tgp-app-storage',
       partialize: (state) => ({ sidebarOpen: state.sidebarOpen, theme: state.theme }),
-    }
-  )
+    },
+  ),
 )

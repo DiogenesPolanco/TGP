@@ -46,9 +46,7 @@ export function usePredictability(teamId?: string | null) {
 
     return filtered
       .map((s) => {
-        const predictability = s.plannedSP > 0
-          ? Math.round((s.completedSP / s.plannedSP) * 100)
-          : 0
+        const predictability = s.plannedSP > 0 ? Math.round((s.completedSP / s.plannedSP) * 100) : 0
 
         return {
           sprintId: s.id,
@@ -97,15 +95,15 @@ export function usePredictability(teamId?: string | null) {
         .map(([periodKey, periodSprints]) => {
           const totalEstimated = periodSprints.reduce((sum, s) => sum + s.plannedSP, 0)
           const totalActual = periodSprints.reduce((sum, s) => sum + s.completedSP, 0)
-          const avgPredictability = totalEstimated > 0
-            ? Math.round((totalActual / totalEstimated) * 100)
-            : 0
+          const avgPredictability =
+            totalEstimated > 0 ? Math.round((totalActual / totalEstimated) * 100) : 0
 
-          const color = avgPredictability >= 80 && avgPredictability <= 120
-            ? 'success'
-            : avgPredictability >= 50 && avgPredictability <= 150
-              ? 'warning'
-              : 'danger'
+          const color =
+            avgPredictability >= 80 && avgPredictability <= 120
+              ? 'success'
+              : avgPredictability >= 50 && avgPredictability <= 150
+                ? 'warning'
+                : 'danger'
 
           let label: string
           switch (granularity) {

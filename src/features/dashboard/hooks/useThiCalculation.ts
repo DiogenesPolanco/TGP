@@ -69,12 +69,31 @@ export function useThiCalculation(businessUnitId?: string | null) {
     }
 
     return result
-  }, [applications, vulnerabilities, incidents, risks, auditFindings, teams, technologies, microservices, businessUnitId])
+  }, [
+    applications,
+    vulnerabilities,
+    incidents,
+    risks,
+    auditFindings,
+    teams,
+    technologies,
+    microservices,
+    businessUnitId,
+  ])
 
   return thi
 }
 
-function calculateDeliveryScore(teams: { currentMetrics: { velocity: number; leadTimeHours: number; changeFailureRate: number; mttrHours: number } | null }[]): number {
+function calculateDeliveryScore(
+  teams: {
+    currentMetrics: {
+      velocity: number
+      leadTimeHours: number
+      changeFailureRate: number
+      mttrHours: number
+    } | null
+  }[],
+): number {
   if (teams.length === 0) return 50
   const scores = teams.map((t) => {
     if (!t.currentMetrics) return 50
@@ -93,18 +112,22 @@ function calculateQualityScore(): number {
 
 function calculateSecurityScore(
   apps: { id: string }[],
-  vulns: { applicationId: string | null; severity: string; status: string }[]
+  vulns: { applicationId: string | null; severity: string; status: string }[],
 ): number {
   if (apps.length === 0) return 100
-  const appVulns = vulns.filter((v) => v.applicationId && apps.some((a) => a.id === v.applicationId))
-  const criticalHigh = appVulns.filter((v) => (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed')
+  const appVulns = vulns.filter(
+    (v) => v.applicationId && apps.some((a) => a.id === v.applicationId),
+  )
+  const criticalHigh = appVulns.filter(
+    (v) => (v.severity === 'critical' || v.severity === 'high') && v.status !== 'fixed',
+  )
   const penalty = Math.min(criticalHigh.length * 5, 80)
   return Math.max(0, 100 - penalty)
 }
 
 function calculateAvailabilityScore(
   apps: unknown[],
-  incidents: { applicationId: string | null; downtimeMinutes: number | null; status: string }[]
+  incidents: { applicationId: string | null; downtimeMinutes: number | null; status: string }[],
 ): number {
   if (apps.length === 0) return 100
   const totalDowntime = incidents
@@ -132,7 +155,7 @@ function calculateObsolescenceScore(
 
 function calculateRiskScore(
   apps: unknown[],
-  risks: { applicationId: string | null; status: string; riskScore: number }[]
+  risks: { applicationId: string | null; status: string; riskScore: number }[],
 ): number {
   if (apps.length === 0) return 100
   const activeRisks = risks.filter((r) => r.status === 'open')

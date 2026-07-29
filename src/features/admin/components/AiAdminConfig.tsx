@@ -29,7 +29,7 @@ export function AiAdminConfig() {
         <Button
           variant="ghost"
           leftIcon={<ExternalLink size={14} />}
-          onClick={() => window.location.href = '/ai/settings'}
+          onClick={() => (window.location.href = '/ai/settings')}
           className="text-xs"
         >
           Ir a Ajustes
@@ -52,7 +52,12 @@ export function AiAdminConfig() {
           </p>
         </div>
       </div>
-      <Button variant="secondary" onClick={() => window.location.href = '/ai/setup'} leftIcon={<Sparkles size={14} />} className="text-sm">
+      <Button
+        variant="secondary"
+        onClick={() => (window.location.href = '/ai/setup')}
+        leftIcon={<Sparkles size={14} />}
+        className="text-sm"
+      >
         Configurar asistente
       </Button>
     </div>

@@ -13,13 +13,15 @@ const SUPPORT_ORDER: Record<string, number> = {
 
 export const consultarObsolescenciaTool: AiToolDefinition = {
   name: 'consultar_obsolescencia',
-  description: 'Reporte de obsolescencia tecnológica. Mostrá tecnologías con soporte vencido o próximo a vencer, filtrado por categoría, vendor o estado de soporte. Sin filtros devuelve el panorama general ordenado por criticidad.',
+  description:
+    'Reporte de obsolescencia tecnológica. Mostrá tecnologías con soporte vencido o próximo a vencer, filtrado por categoría, vendor o estado de soporte. Sin filtros devuelve el panorama general ordenado por criticidad.',
   parameters: {
     type: 'object',
     properties: {
       categoria: {
         type: 'string',
-        description: 'Filtrar por categoría: lenguaje, framework, database, tool, platform, runtime, os, library, middleware',
+        description:
+          'Filtrar por categoría: lenguaje, framework, database, tool, platform, runtime, os, library, middleware',
       },
       vendor: {
         type: 'string',
@@ -41,8 +43,10 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
     const categoria = params.categoria as string | undefined
     const vendor = params.vendor as string | undefined
     const estado = params.estado as string | undefined
-    const soloCriticas = typeof params.soloCriticas === 'boolean' ? params.soloCriticas :
-      params.soloCriticas === 'true' || params.soloCriticas === '1'
+    const soloCriticas =
+      typeof params.soloCriticas === 'boolean'
+        ? params.soloCriticas
+        : params.soloCriticas === 'true' || params.soloCriticas === '1'
     const limit = Math.min(Math.max(1, (params.limit as number) ?? 50), 200)
 
     let techs = await db.technologies.toArray()
@@ -51,15 +55,14 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
     if (vendor) techs = techs.filter((t) => n(t.vendor).includes(n(vendor)))
     if (estado) techs = techs.filter((t) => t.supportStatus === estado)
 
-    const expired = techs.filter((t) =>
-      t.supportStatus === 'eol' ||
-      (t.eolDate && new Date(t.eolDate) < NOW)
+    const expired = techs.filter(
+      (t) => t.supportStatus === 'eol' || (t.eolDate && new Date(t.eolDate) < NOW),
     )
-    const expiring = techs.filter((t) =>
-      !expired.includes(t) && (
-        t.supportStatus === 'extended' ||
-        (t.eolDate && new Date(t.eolDate) >= NOW && new Date(t.eolDate) <= IN_6M)
-      )
+    const expiring = techs.filter(
+      (t) =>
+        !expired.includes(t) &&
+        (t.supportStatus === 'extended' ||
+          (t.eolDate && new Date(t.eolDate) >= NOW && new Date(t.eolDate) <= IN_6M)),
     )
     const healthy = techs.filter((t) => !expired.includes(t) && !expiring.includes(t))
 
@@ -67,7 +70,8 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
       const orderA = SUPPORT_ORDER[a.supportStatus] ?? 99
       const orderB = SUPPORT_ORDER[b.supportStatus] ?? 99
       if (orderA !== orderB) return orderB - orderA
-      if (a.eolDate && b.eolDate) return new Date(a.eolDate).getTime() - new Date(b.eolDate).getTime()
+      if (a.eolDate && b.eolDate)
+        return new Date(a.eolDate).getTime() - new Date(b.eolDate).getTime()
       return 0
     })
 
@@ -93,31 +97,47 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
     }
 
     if (display.length > 0) {
-      const title = soloCriticas ? '**Tecnologías críticas (EOL/Obsoletas):**' :
-        expiring.length > 0 && expired.length > 0 ? '**Tecnologías por estado de soporte:**' :
-        '**Tecnologías:**'
+      const title = soloCriticas
+        ? '**Tecnologías críticas (EOL/Obsoletas):**'
+        : expiring.length > 0 && expired.length > 0
+          ? '**Tecnologías por estado de soporte:**'
+          : '**Tecnologías:**'
       output.push(title)
 
       for (const t of display) {
         const cves = t.cveList.length ? ` · ${t.cveList.length} CVE` : ''
         const eol = t.eolDate ? ` · EOL: ${new Date(t.eolDate).toLocaleDateString('es-ES')}` : ''
-        const icon = t.supportStatus === 'eol' ? '⛔' :
-          t.supportStatus === 'extended' ? '⚡' :
-          t.supportStatus === 'unknown' ? '❓' : '✅'
-        output.push(`  ${icon} **${t.name}** ${t.version} · ${t.vendor} · ${t.supportStatus}${eol}${cves}`)
+        const icon =
+          t.supportStatus === 'eol'
+            ? '⛔'
+            : t.supportStatus === 'extended'
+              ? '⚡'
+              : t.supportStatus === 'unknown'
+                ? '❓'
+                : '✅'
+        output.push(
+          `  ${icon} **${t.name}** ${t.version} · ${t.vendor} · ${t.supportStatus}${eol}${cves}`,
+        )
       }
       output.push('')
     }
 
     if (!soloCriticas && expired.length > 0) {
-      output.push(`💡 Usá \`consultar_obsolescencia({ soloCriticas: true })\` para ver solo las tecnologías críticas.`)
+      output.push(
+        `💡 Usá \`consultar_obsolescencia({ soloCriticas: true })\` para ver solo las tecnologías críticas.`,
+      )
     }
-    output.push(`💡 Usá \`consultar_dependencias({ q: "..." })\` para ver qué aplicaciones usan una tecnología específica.`)
+    output.push(
+      `💡 Usá \`consultar_dependencias({ q: "..." })\` para ver qué aplicaciones usan una tecnología específica.`,
+    )
 
     return output.join('\n')
   },
 }
 
 function n(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
 }

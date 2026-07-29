@@ -16,7 +16,11 @@ function writeSession(data: AuthSession): void {
 function readSession(): AuthSession | null {
   const raw = localStorage.getItem(STORAGE_KEYS.session)
   if (!raw) return null
-  try { return JSON.parse(raw) as AuthSession } catch { return null }
+  try {
+    return JSON.parse(raw) as AuthSession
+  } catch {
+    return null
+  }
 }
 function removeSession(): void {
   localStorage.removeItem(STORAGE_KEYS.session)
@@ -33,15 +37,17 @@ interface RateLimitState {
 
 const RATE_LIMIT_TIERS = [
   { threshold: 10, duration: 300_000 }, // 5 min after 10 failures
-  { threshold: 5, duration: 60_000 },   // 1 min after 5 failures
-  { threshold: 3, duration: 30_000 },   // 30s after 3 failures
+  { threshold: 5, duration: 60_000 }, // 1 min after 5 failures
+  { threshold: 3, duration: 30_000 }, // 30s after 3 failures
 ]
 
 function getRateLimitState(): RateLimitState {
   try {
     const raw = sessionStorage.getItem(RATE_LIMIT_KEY)
     if (raw) return JSON.parse(raw) as RateLimitState
-  } catch { /* ignore corrupted data */ }
+  } catch {
+    /* ignore corrupted data */
+  }
   return { count: 0, lockoutUntil: null }
 }
 
@@ -89,10 +95,7 @@ export function resetRateLimit(): void {
 /* ─── Encryption helpers (AES-GCM at rest) ─── */
 
 async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
-  const fingerprint = [
-    window.location.origin,
-    navigator.userAgent,
-  ].join('::')
+  const fingerprint = [window.location.origin, navigator.userAgent].join('::')
 
   const enc = new TextEncoder()
   const keyMaterial = await crypto.subtle.importKey(
@@ -117,16 +120,14 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   )
 }
 
-async function encryptSecret(plaintext: string): Promise<{ ciphertext: string; iv: string; salt: string }> {
+async function encryptSecret(
+  plaintext: string,
+): Promise<{ ciphertext: string; iv: string; salt: string }> {
   const salt = crypto.getRandomValues(new Uint8Array(16))
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const key = await deriveKey(salt)
   const enc = new TextEncoder()
-  const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    enc.encode(plaintext),
-  )
+  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext))
 
   return {
     ciphertext: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
@@ -137,27 +138,33 @@ async function encryptSecret(plaintext: string): Promise<{ ciphertext: string; i
 
 async function decryptSecret(ciphertext: string, iv: string, salt: string): Promise<string> {
   const key = await deriveKey(
-    new Uint8Array(atob(salt).split('').map((c) => c.charCodeAt(0))),
+    new Uint8Array(
+      atob(salt)
+        .split('')
+        .map((c) => c.charCodeAt(0)),
+    ),
   )
   const decrypted = await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: new Uint8Array(atob(iv).split('').map((c) => c.charCodeAt(0))),
+      iv: new Uint8Array(
+        atob(iv)
+          .split('')
+          .map((c) => c.charCodeAt(0)),
+      ),
     },
     key,
-    new Uint8Array(atob(ciphertext).split('').map((c) => c.charCodeAt(0))),
+    new Uint8Array(
+      atob(ciphertext)
+        .split('')
+        .map((c) => c.charCodeAt(0)),
+    ),
   )
 
   return new TextDecoder().decode(decrypted)
 }
 
 /* ─── Secret management (encrypted at rest) ─── */
-
-export interface EncryptedSecret {
-  ciphertext: string
-  iv: string
-  salt: string
-}
 
 export function isConfigured(): boolean {
   return !!localStorage.getItem(STORAGE_KEYS.secret)
@@ -266,10 +273,4 @@ export interface AuthSession {
   token: string
   createdAt: number
   expiresAt: number
-}
-
-export function getSessionRemainingHours(): number {
-  const session = readSession()
-  if (!session) return 0
-  return Math.max(0, Math.floor((session.expiresAt - Date.now()) / 3600000))
 }

@@ -6,7 +6,19 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, Upload, X, FileWarning, CheckCircle, Clock, Eye, Pencil, Trash2 } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  Upload,
+  X,
+  FileWarning,
+  CheckCircle,
+  Clock,
+  Eye,
+  Pencil,
+  Trash2,
+} from 'lucide-react'
 import type { AuditFinding } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
@@ -38,10 +50,11 @@ export function AuditPage() {
   const findings = useLiveQuery(() => db.auditFindings.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
 
-  const filteredFindings = findings.filter((f) =>
-    f.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (statusFilter === 'all' || f.status === statusFilter) &&
-    (severityFilter === 'all' || f.severity === severityFilter)
+  const filteredFindings = findings.filter(
+    (f) =>
+      f.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === 'all' || f.status === statusFilter) &&
+      (severityFilter === 'all' || f.severity === severityFilter),
   )
 
   const handleDelete = async (id: string) => {
@@ -93,7 +106,9 @@ export function AuditPage() {
       label: 'Referencia',
       sortable: true,
       render: (finding) => (
-        <span className="text-sm font-medium text-neutral-90 dark:text-white">{finding.auditReference}</span>
+        <span className="text-sm font-medium text-neutral-90 dark:text-white">
+          {finding.auditReference}
+        </span>
       ),
     },
     {
@@ -130,12 +145,17 @@ export function AuditPage() {
       label: 'Severidad',
       sortable: true,
       render: (finding) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          finding.severity === 'critical' ? 'bg-danger/10 text-danger' :
-          finding.severity === 'high' ? 'bg-warning/10 text-warning' :
-          finding.severity === 'medium' ? 'bg-info/10 text-info' :
-          'bg-success/10 text-success'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            finding.severity === 'critical'
+              ? 'bg-danger/10 text-danger'
+              : finding.severity === 'high'
+                ? 'bg-warning/10 text-warning'
+                : finding.severity === 'medium'
+                  ? 'bg-info/10 text-info'
+                  : 'bg-success/10 text-success'
+          }`}
+        >
           {severityLabel[finding.severity]}
         </span>
       ),
@@ -145,12 +165,17 @@ export function AuditPage() {
       label: 'Estado',
       sortable: true,
       render: (finding) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          finding.status === 'open' ? 'bg-danger/10 text-danger' :
-          finding.status === 'in_progress' ? 'bg-info/10 text-info' :
-          finding.status === 'overdue' ? 'bg-danger/10 text-danger' :
-          'bg-success/10 text-success'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            finding.status === 'open'
+              ? 'bg-danger/10 text-danger'
+              : finding.status === 'in_progress'
+                ? 'bg-info/10 text-info'
+                : finding.status === 'overdue'
+                  ? 'bg-danger/10 text-danger'
+                  : 'bg-success/10 text-success'
+          }`}
+        >
           {auditStatusLabel[finding.status]}
         </span>
       ),
@@ -172,21 +197,30 @@ export function AuditPage() {
       render: (finding) => (
         <div className="flex items-center justify-end gap-2">
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${finding.id}`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver detalle"
           >
             <Eye size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${finding.id}/edit`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${finding.id}/edit`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(finding.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(finding.id)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
@@ -220,16 +254,56 @@ export function AuditPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={<FileWarning size={20} />} label="Total" value={stats.total} color="text-primary" onClick={() => { setStatusFilter('all'); setSeverityFilter('all'); setShowFilters(false) }} />
-        <StatCard icon={<Clock size={20} />} label="Abiertos" value={stats.open} color="text-warning" onClick={() => { setStatusFilter('open'); setShowFilters(true) }} />
-        <StatCard icon={<FileWarning size={20} />} label="Vencidos" value={stats.overdue} color="text-danger" onClick={() => { setStatusFilter('overdue'); setShowFilters(true) }} />
-        <StatCard icon={<CheckCircle size={20} />} label="Cerrados" value={stats.closed} color="text-success" onClick={() => { setStatusFilter('closed'); setShowFilters(true) }} />
+        <StatCard
+          icon={<FileWarning size={20} />}
+          label="Total"
+          value={stats.total}
+          color="text-primary"
+          onClick={() => {
+            setStatusFilter('all')
+            setSeverityFilter('all')
+            setShowFilters(false)
+          }}
+        />
+        <StatCard
+          icon={<Clock size={20} />}
+          label="Abiertos"
+          value={stats.open}
+          color="text-warning"
+          onClick={() => {
+            setStatusFilter('open')
+            setShowFilters(true)
+          }}
+        />
+        <StatCard
+          icon={<FileWarning size={20} />}
+          label="Vencidos"
+          value={stats.overdue}
+          color="text-danger"
+          onClick={() => {
+            setStatusFilter('overdue')
+            setShowFilters(true)
+          }}
+        />
+        <StatCard
+          icon={<CheckCircle size={20} />}
+          label="Cerrados"
+          value={stats.closed}
+          color="text-success"
+          onClick={() => {
+            setStatusFilter('closed')
+            setShowFilters(true)
+          }}
+        />
       </div>
 
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar hallazgos..."
@@ -258,28 +332,41 @@ export function AuditPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'open', label: 'Abierto' },
-                { value: 'in_progress', label: 'En Progreso' },
-                { value: 'overdue', label: 'Vencido' },
-                { value: 'resolved', label: 'Resuelto' },
-                { value: 'closed', label: 'Cerrado' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todos' },
+                  { value: 'open', label: 'Abierto' },
+                  { value: 'in_progress', label: 'En Progreso' },
+                  { value: 'overdue', label: 'Vencido' },
+                  { value: 'resolved', label: 'Resuelto' },
+                  { value: 'closed', label: 'Cerrado' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Severidad</label>
-              <Select value={severityFilter} onChange={(v) => setSeverityFilter(v)} options={[
-                { value: 'all', label: 'Todas' },
-                { value: 'critical', label: 'Crítica' },
-                { value: 'high', label: 'Alta' },
-                { value: 'medium', label: 'Media' },
-                { value: 'low', label: 'Baja' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={severityFilter}
+                onChange={(v) => setSeverityFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todas' },
+                  { value: 'critical', label: 'Crítica' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'low', label: 'Baja' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             {(statusFilter !== 'all' || severityFilter !== 'all') && (
               <Button
-                onClick={() => { setStatusFilter('all'); setSeverityFilter('all') }}
+                onClick={() => {
+                  setStatusFilter('all')
+                  setSeverityFilter('all')
+                }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
@@ -300,7 +387,19 @@ export function AuditPage() {
   )
 }
 
-function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+  onClick?: () => void
+}) {
   const iconClasses: Record<string, string> = {
     'text-primary': 'bg-primary/10 text-primary',
     'text-warning': 'bg-warning/10 text-warning',
@@ -313,7 +412,9 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
       onClick={onClick}
       className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
-      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </Comp>

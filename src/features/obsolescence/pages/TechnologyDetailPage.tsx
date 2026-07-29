@@ -6,31 +6,79 @@ import { formatDuration } from '@/utils/technologyUtils'
 import { DetailLayout } from '@/components/ui/DetailLayout'
 import { Button } from '@/components/ui/Button'
 import {
-  Pencil, Server, Box, Database, Users, Shield,
-  FileWarning, BookOpen, Calendar,
-  ArrowRight, ExternalLink, CircleUser, Bug, Scale,
-  Activity, Search, CheckCircle, Clock, XCircle, HelpCircle,
+  Pencil,
+  Server,
+  Box,
+  Database,
+  Users,
+  Shield,
+  FileWarning,
+  BookOpen,
+  Calendar,
+  ArrowRight,
+  ExternalLink,
+  CircleUser,
+  Bug,
+  Scale,
+  Activity,
+  Search,
+  CheckCircle,
+  Clock,
+  XCircle,
+  HelpCircle,
 } from 'lucide-react'
 
-const supportStatusLabel: Record<string, string> = { active: 'Activo', extended: 'Soporte Extendido', eol: 'EOL', unknown: 'Desconocido' }
-const supportStatusColor: Record<string, string> = { active: 'bg-success/10 text-success border-success/30', extended: 'bg-warning/10 text-warning border-warning/30', eol: 'bg-danger/10 text-danger border-danger/30', unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60' }
+const supportStatusLabel: Record<string, string> = {
+  active: 'Activo',
+  extended: 'Soporte Extendido',
+  eol: 'EOL',
+  unknown: 'Desconocido',
+}
+const supportStatusColor: Record<string, string> = {
+  active: 'bg-success/10 text-success border-success/30',
+  extended: 'bg-warning/10 text-warning border-warning/30',
+  eol: 'bg-danger/10 text-danger border-danger/30',
+  unknown:
+    'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60',
+}
 const categoryLabel: Record<string, string> = {
-  framework: 'Framework', language: 'Lenguaje', database: 'Base de Datos', os: 'OS',
-  runtime: 'Runtime', library: 'Librería', message_broker: 'Message Broker', cache: 'Cache',
-  web_server: 'Web Server', cloud_service: 'Cloud Service', tool: 'Herramienta', other: 'Otro',
+  framework: 'Framework',
+  language: 'Lenguaje',
+  database: 'Base de Datos',
+  os: 'OS',
+  runtime: 'Runtime',
+  library: 'Librería',
+  message_broker: 'Message Broker',
+  cache: 'Cache',
+  web_server: 'Web Server',
+  cloud_service: 'Cloud Service',
+  tool: 'Herramienta',
+  other: 'Otro',
 }
 const criticalityColor: Record<string, string> = {
-  critical: 'bg-danger/10 text-danger', high: 'bg-warning/10 text-warning',
-  medium: 'bg-info/10 text-info', low: 'bg-success/10 text-success',
+  critical: 'bg-danger/10 text-danger',
+  high: 'bg-warning/10 text-warning',
+  medium: 'bg-info/10 text-info',
+  low: 'bg-success/10 text-success',
 }
-const criticalityLabel: Record<string, string> = { critical: 'Crítica', high: 'Alta', medium: 'Media', low: 'Baja' }
+const criticalityLabel: Record<string, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja',
+}
 const lifecycleLabel: Record<string, string> = {
-  active: 'Activo', evolving: 'Evolución', deprecated: 'Deprecado',
-  decommissioned: 'Retirado', planned: 'Planificado',
+  active: 'Activo',
+  evolving: 'Evolución',
+  deprecated: 'Deprecado',
+  decommissioned: 'Retirado',
+  planned: 'Planificado',
 }
 const lifecycleColor: Record<string, string> = {
-  active: 'bg-success/10 text-success', evolving: 'bg-info/10 text-info',
-  deprecated: 'bg-warning/10 text-warning', decommissioned: 'bg-danger/10 text-danger',
+  active: 'bg-success/10 text-success',
+  evolving: 'bg-info/10 text-info',
+  deprecated: 'bg-warning/10 text-warning',
+  decommissioned: 'bg-danger/10 text-danger',
   planned: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60',
 }
 
@@ -74,10 +122,14 @@ export function TechnologyDetailPage() {
     const appIds = new Set(relatedApps.map((a) => a.id))
     const appOwnerNames = new Set(relatedApps.map((a) => a.ownerName).filter(Boolean))
     const msTechLeadNames = new Set(relatedMs.map((ms) => ms.technicalLead).filter(Boolean))
-    const people = [...new Set([...appOwnerNames, ...msTechLeadNames])].filter((p): p is string => !!p)
+    const people = [...new Set([...appOwnerNames, ...msTechLeadNames])].filter(
+      (p): p is string => !!p,
+    )
 
     // Entities linked to apps using this tech
-    const vulnsForApps = vulnerabilities.filter((v) => v.applicationId && appIds.has(v.applicationId))
+    const vulnsForApps = vulnerabilities.filter(
+      (v) => v.applicationId && appIds.has(v.applicationId),
+    )
     const incidentsForApps = incidents.filter((i) => i.applicationId && appIds.has(i.applicationId))
     const risksForApps = risks.filter((r) => r.applicationId && appIds.has(r.applicationId))
     const auditForApps = auditFindings.filter((a) => a.applicationId && appIds.has(a.applicationId))
@@ -95,12 +147,21 @@ export function TechnologyDetailPage() {
   }, [id, applications, microservices, databases, vulnerabilities, incidents, risks, auditFindings])
 
   if (!tech) {
-    return <DetailLayout title="Tecnología no encontrada" onBack={() => navigate('/catalog/obsolescence')}><p className="text-neutral-50">La tecnología no existe o ha sido eliminada.</p></DetailLayout>
+    return (
+      <DetailLayout
+        title="Tecnología no encontrada"
+        onBack={() => navigate('/catalog/obsolescence')}
+      >
+        <p className="text-neutral-50">La tecnología no existe o ha sido eliminada.</p>
+      </DetailLayout>
+    )
   }
 
   const now = new Date()
   const eolDate = tech.eolDate ? new Date(tech.eolDate) : null
-  const daysUntilEol = eolDate ? Math.ceil((eolDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+  const daysUntilEol = eolDate
+    ? Math.ceil((eolDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : null
   const eolExpired = daysUntilEol !== null && daysUntilEol < 0
 
   const tabs = [
@@ -113,8 +174,12 @@ export function TechnologyDetailPage() {
       title={`${tech.name} ${tech.version}`}
       subtitle={
         <span className="flex items-center gap-2">
-          <span>{tech.vendor} · {categoryLabel[tech.category] ?? tech.category}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}>
+          <span>
+            {tech.vendor} · {categoryLabel[tech.category] ?? tech.category}
+          </span>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}
+          >
             {supportStatusLabel[tech.supportStatus]}
           </span>
         </span>
@@ -153,7 +218,15 @@ export function TechnologyDetailPage() {
         })}
       </div>
 
-      {activeTab === 'info' && renderInfoTab(tech, supportStatusColor, supportStatusLabel, categoryLabel, daysUntilEol, eolExpired)}
+      {activeTab === 'info' &&
+        renderInfoTab(
+          tech,
+          supportStatusColor,
+          supportStatusLabel,
+          categoryLabel,
+          daysUntilEol,
+          eolExpired,
+        )}
       {activeTab === 'relations' && related && renderRelationsTab(related, navigate)}
     </DetailLayout>
   )
@@ -161,34 +234,54 @@ export function TechnologyDetailPage() {
 
 // ─── Info Tab ───
 
-function renderInfoTab(tech: any, _statusColor: Record<string, string>, _statusLabel: Record<string, string>, _catLabel: Record<string, string>, daysUntilEol: number | null, eolExpired: boolean) {
+function renderInfoTab(
+  tech: any,
+  _statusColor: Record<string, string>,
+  _statusLabel: Record<string, string>,
+  _catLabel: Record<string, string>,
+  daysUntilEol: number | null,
+  eolExpired: boolean,
+) {
   const eolDate = tech.eolDate ? new Date(tech.eolDate) : null
   const statusKey = tech.supportStatus as string
   const statusBgColor: Record<string, string> = {
-    active: 'bg-success', extended: 'bg-warning', eol: 'bg-danger', unknown: 'bg-neutral-40',
+    active: 'bg-success',
+    extended: 'bg-warning',
+    eol: 'bg-danger',
+    unknown: 'bg-neutral-40',
   }
 
   return (
     <div className="space-y-6">
       {/* Hero status banner */}
-      <div className={`rounded-xl border p-5 ${supportStatusColor[statusKey] || 'bg-neutral-10'} border-current/20`}>
+      <div
+        className={`rounded-xl border p-5 ${supportStatusColor[statusKey] || 'bg-neutral-10'} border-current/20`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl ${statusBgColor[statusKey] || 'bg-neutral-40'} flex items-center justify-center`}>
-              {statusKey === 'active' ? <CheckCircle size={24} className="text-white" /> :
-               statusKey === 'extended' ? <Clock size={24} className="text-white" /> :
-               statusKey === 'eol' ? <XCircle size={24} className="text-white" /> :
-               <HelpCircle size={24} className="text-white" />}
+            <div
+              className={`w-12 h-12 rounded-xl ${statusBgColor[statusKey] || 'bg-neutral-40'} flex items-center justify-center`}
+            >
+              {statusKey === 'active' ? (
+                <CheckCircle size={24} className="text-white" />
+              ) : statusKey === 'extended' ? (
+                <Clock size={24} className="text-white" />
+              ) : statusKey === 'eol' ? (
+                <XCircle size={24} className="text-white" />
+              ) : (
+                <HelpCircle size={24} className="text-white" />
+              )}
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider opacity-70">Estado Actual</p>
+              <p className="text-xs font-medium uppercase tracking-wider opacity-70">
+                Estado Actual
+              </p>
               <p className="text-xl font-bold">{supportStatusLabel[statusKey] || 'Desconocido'}</p>
               {eolDate && (
                 <p className="text-sm opacity-80 mt-0.5">
                   {eolExpired
                     ? `EOL vencido el ${eolDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`
-                    : `EOL: ${eolDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`
-                  }
+                    : `EOL: ${eolDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`}
                 </p>
               )}
             </div>
@@ -225,25 +318,39 @@ function renderInfoTab(tech: any, _statusColor: Record<string, string>, _statusL
             <MiniField
               label="Estado"
               value={
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}>
+                <span
+                  className={`text-xs font-medium px-2 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}
+                >
                   {supportStatusLabel[tech.supportStatus]}
                 </span>
               }
             />
             <MiniField
               label="EOL Date"
-              value={tech.eolDate ? eolDate!.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No definido'}
+              value={
+                tech.eolDate
+                  ? eolDate!.toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : 'No definido'
+              }
             />
             {daysUntilEol !== null && (
               <MiniField
                 label="Tiempo restante"
-                value={eolExpired
-                  ? `Vencido hace ${formatDuration(daysUntilEol)}`
-                  : formatDuration(daysUntilEol)
+                value={
+                  eolExpired
+                    ? `Vencido hace ${formatDuration(daysUntilEol)}`
+                    : formatDuration(daysUntilEol)
                 }
               />
             )}
-            <MiniField label="CVE(s)" value={`${tech.cveList?.length ?? 0} conocido${tech.cveList?.length !== 1 ? 's' : ''}`} />
+            <MiniField
+              label="CVE(s)"
+              value={`${tech.cveList?.length ?? 0} conocido${tech.cveList?.length !== 1 ? 's' : ''}`}
+            />
           </div>
         </Section>
       </div>
@@ -273,7 +380,13 @@ function EolBar({ eolDate }: { eolDate: Date | string }) {
   const elapsedMs = now.getTime() - new Date(0).getTime()
   const pct = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100))
   const expired = now > eol
-  const barColor = expired ? 'bg-danger' : pct > 80 ? 'bg-warning' : pct > 50 ? 'bg-severity-high' : 'bg-success'
+  const barColor = expired
+    ? 'bg-danger'
+    : pct > 80
+      ? 'bg-warning'
+      : pct > 50
+        ? 'bg-severity-high'
+        : 'bg-success'
   const remainingDays = Math.ceil((eol.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   const totalDays = Math.ceil((eol.getTime() - new Date(0).getTime()) / (1000 * 60 * 60 * 24))
   const usedDays = totalDays - remainingDays
@@ -282,7 +395,9 @@ function EolBar({ eolDate }: { eolDate: Date | string }) {
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs text-neutral-50">
         <span>{usedDays > 0 ? `Desde hace ${formatDuration(usedDays)}` : 'Inicio'}</span>
-        <span className="font-medium">{expired ? 'Vencido' : `${formatDuration(remainingDays)} restantes`}</span>
+        <span className="font-medium">
+          {expired ? 'Vencido' : `${formatDuration(remainingDays)} restantes`}
+        </span>
       </div>
       <div className="h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
         <div
@@ -319,7 +434,8 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
     people: data.people.length,
   }
 
-  const totalImpact = data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length
+  const totalImpact =
+    data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length
 
   return (
     <div className="space-y-6">
@@ -337,7 +453,9 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
           </div>
           {totalImpact > 0 && (
             <div className="text-right">
-              <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{totalImpact}</p>
+              <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">
+                {totalImpact}
+              </p>
               <p className="text-xs text-neutral-50">Entidades vinculadas</p>
             </div>
           )}
@@ -482,12 +600,13 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
       </div>
 
       {/* Security & Governance section */}
-      {(data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length > 0) && (
+      {data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length >
+        0 && (
         <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-boundary bg-gradient-to-r from-transparent via-neutral-5 to-transparent dark:via-neutral-85">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
               <Scale size={16} className="text-primary" />
-      Seguridad y Gobierno — Entidades Vinculadas
+              Seguridad y Gobierno — Entidades Vinculadas
             </h3>
           </div>
           <div className="p-5">
@@ -538,22 +657,39 @@ function renderRelationsTab(data: RelatedData, navigate: (path: string) => void)
       )}
 
       {/* No data at all */}
-      {data.apps.length === 0 && data.microservices.length === 0 && data.databases.length === 0 && data.people.length === 0 && totalImpact === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-card rounded-xl border border-boundary shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-neutral-10 dark:bg-neutral-70 flex items-center justify-center mb-4">
-            <Search size={24} className="text-neutral-50" />
+      {data.apps.length === 0 &&
+        data.microservices.length === 0 &&
+        data.databases.length === 0 &&
+        data.people.length === 0 &&
+        totalImpact === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-card rounded-xl border border-boundary shadow-sm">
+            <div className="w-12 h-12 rounded-xl bg-neutral-10 dark:bg-neutral-70 flex items-center justify-center mb-4">
+              <Search size={24} className="text-neutral-50" />
+            </div>
+            <p className="text-sm font-medium text-neutral-90 dark:text-white">
+              Sin entidades relacionadas
+            </p>
+            <p className="text-xs text-neutral-50 mt-1">
+              Esta tecnología no está vinculada a ninguna aplicación, microservicio u otra entidad
+              del portafolio.
+            </p>
           </div>
-          <p className="text-sm font-medium text-neutral-90 dark:text-white">Sin entidades relacionadas</p>
-          <p className="text-xs text-neutral-50 mt-1">Esta tecnología no está vinculada a ninguna aplicación, microservicio u otra entidad del portafolio.</p>
-        </div>
-      )}
+        )}
     </div>
   )
 }
 
 // ─── Shared Components ───
 
-function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">
@@ -569,12 +705,24 @@ function MiniField({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div className="space-y-0.5">
       <dt className="text-[10px] font-medium text-neutral-40 uppercase tracking-wider">{label}</dt>
-      <dd className="text-sm text-neutral-90 dark:text-white">{typeof value === 'string' ? (value || '—') : value}</dd>
+      <dd className="text-sm text-neutral-90 dark:text-white">
+        {typeof value === 'string' ? value || '—' : value}
+      </dd>
     </div>
   )
 }
 
-function StatBadge({ icon, value, label, color }: { icon: React.ReactNode; value: number; label: string; color: string }) {
+function StatBadge({
+  icon,
+  value,
+  label,
+  color,
+}: {
+  icon: React.ReactNode
+  value: number
+  label: string
+  color: string
+}) {
   const colorMap: Record<string, string> = {
     primary: 'bg-primary/10 text-primary border-primary/20',
     info: 'bg-info/10 text-info border-info/20',
@@ -584,11 +732,17 @@ function StatBadge({ icon, value, label, color }: { icon: React.ReactNode; value
     neutral: 'bg-neutral-10 dark:bg-neutral-70 text-muted border-neutral-30 dark:border-neutral-60',
   }
   const iconMap: Record<string, string> = {
-    primary: 'text-primary', info: 'text-info', danger: 'text-danger',
-    warning: 'text-warning', purple: 'text-purple-500', neutral: 'text-neutral-50',
+    primary: 'text-primary',
+    info: 'text-info',
+    danger: 'text-danger',
+    warning: 'text-warning',
+    purple: 'text-purple-500',
+    neutral: 'text-neutral-50',
   }
   return (
-    <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border ${colorMap[color] || colorMap.neutral}`}>
+    <div
+      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border ${colorMap[color] || colorMap.neutral}`}
+    >
       <span className={`shrink-0 ${iconMap[color] || iconMap.neutral}`}>{icon}</span>
       <div>
         <p className="text-lg font-bold tabular-nums leading-none">{value}</p>
@@ -598,34 +752,66 @@ function StatBadge({ icon, value, label, color }: { icon: React.ReactNode; value
   )
 }
 
-function EntitySection({ title, count, icon, color, empty, children }: {
-  title: string; count: number; icon: React.ReactNode; color: string; empty: string; children: React.ReactNode
+function EntitySection({
+  title,
+  count,
+  icon,
+  color,
+  empty,
+  children,
+}: {
+  title: string
+  count: number
+  icon: React.ReactNode
+  color: string
+  empty: string
+  children: React.ReactNode
 }) {
-  const accentColor = color === 'primary' ? 'bg-primary/10 border-primary/20' :
-    color === 'info' ? 'bg-info/10 border-info/20' :
-    color === 'purple' ? 'bg-purple-500/10 border-purple-500/20' :
-    'bg-neutral-10 dark:bg-neutral-70 border-neutral-30 dark:border-neutral-60'
+  const accentColor =
+    color === 'primary'
+      ? 'bg-primary/10 border-primary/20'
+      : color === 'info'
+        ? 'bg-info/10 border-info/20'
+        : color === 'purple'
+          ? 'bg-purple-500/10 border-purple-500/20'
+          : 'bg-neutral-10 dark:bg-neutral-70 border-neutral-30 dark:border-neutral-60'
 
   return (
     <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
-      <div className={`px-5 py-3 border-b border-boundary flex items-center justify-between ${count > 0 ? '' : 'opacity-60'}`}>
+      <div
+        className={`px-5 py-3 border-b border-boundary flex items-center justify-between ${count > 0 ? '' : 'opacity-60'}`}
+      >
         <div className="flex items-center gap-2">
           <span className={`p-1 rounded-md ${count > 0 ? accentColor : ''}`}>{icon}</span>
           <h3 className="text-sm font-bold text-neutral-90 dark:text-white">{title}</h3>
-          <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">{count}</span>
+          <span className="text-xs font-medium text-neutral-50 bg-neutral-10 dark:bg-neutral-70 px-2 py-0.5 rounded-full">
+            {count}
+          </span>
         </div>
       </div>
       <div className="p-4 space-y-2">
         {count === 0 ? (
           <p className="text-xs text-neutral-50 py-4 text-center">{empty}</p>
-        ) : children}
+        ) : (
+          children
+        )}
       </div>
     </div>
   )
 }
 
-function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
-  name: string; subtitle: string; badge: string; badgeColor: string; onClick: () => void
+function EntityCard({
+  name,
+  subtitle,
+  badge,
+  badgeColor,
+  onClick,
+}: {
+  name: string
+  subtitle: string
+  badge: string
+  badgeColor: string
+  onClick: () => void
 }) {
   return (
     <Button
@@ -645,19 +831,39 @@ function EntityCard({ name, subtitle, badge, badgeColor, onClick }: {
         </div>
         <p className="text-xs text-neutral-50 mt-0.5 truncate">{subtitle}</p>
       </div>
-      <ArrowRight size={14} className="text-neutral-40 group-hover:text-primary transition-colors shrink-0" />
+      <ArrowRight
+        size={14}
+        className="text-neutral-40 group-hover:text-primary transition-colors shrink-0"
+      />
     </Button>
   )
 }
 
-function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
-  title: string; count: number; icon: React.ReactNode; color: string
-  items: any[]; linkLabel: string; onLink: () => void
+function ImpactCard({
+  title,
+  count,
+  icon,
+  color,
+  items,
+  linkLabel,
+  onLink,
+}: {
+  title: string
+  count: number
+  icon: React.ReactNode
+  color: string
+  items: any[]
+  linkLabel: string
+  onLink: () => void
 }) {
   const colorMap: Record<string, { bg: string; text: string; dot: string }> = {
     danger: { bg: 'bg-danger/5 border-danger/20', text: 'text-danger', dot: 'bg-danger' },
     warning: { bg: 'bg-warning/5 border-warning/20', text: 'text-warning', dot: 'bg-warning' },
-    neutral: { bg: 'bg-neutral-5 dark:bg-neutral-85 border-boundary', text: 'text-neutral-60', dot: 'bg-neutral-40' },
+    neutral: {
+      bg: 'bg-neutral-5 dark:bg-neutral-85 border-boundary',
+      text: 'text-neutral-60',
+      dot: 'bg-neutral-40',
+    },
   }
   const style = colorMap[color] || colorMap.neutral
 
@@ -683,7 +889,10 @@ function ImpactCard({ title, count, icon, color, items, linkLabel, onLink }: {
         <p className="text-xs text-neutral-50 mb-3">Sin registros</p>
       )}
       {count > 0 && (
-        <Button onClick={onLink} className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1">
+        <Button
+          onClick={onLink}
+          className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1"
+        >
           {linkLabel}
           <ExternalLink size={12} />
         </Button>

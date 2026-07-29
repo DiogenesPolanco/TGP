@@ -36,11 +36,28 @@ const environmentLabel: Record<EnvironmentType, string> = {
 }
 
 const DB_TYPES: DatabaseType[] = [
-  'relational', 'document', 'key-value', 'graph', 'time-series',
-  'search', 'cache', 'message_queue', 'vector', 'other',
+  'relational',
+  'document',
+  'key-value',
+  'graph',
+  'time-series',
+  'search',
+  'cache',
+  'message_queue',
+  'vector',
+  'other',
 ]
 
-const ENVIRONMENTS: EnvironmentType[] = ['dev', 'qa', 'staging', 'prod', 'dr', 'test', 'uat', 'perf']
+const ENVIRONMENTS: EnvironmentType[] = [
+  'dev',
+  'qa',
+  'staging',
+  'prod',
+  'dr',
+  'test',
+  'uat',
+  'perf',
+]
 
 const dbEngineExamples: Record<DatabaseType, string[]> = {
   relational: ['PostgreSQL', 'MySQL', 'SQL Server', 'Oracle', 'SQLite', 'MariaDB'],
@@ -63,10 +80,11 @@ export function DatabaseFormPage() {
   const { addNotification } = useAppStore()
   const application = useLiveQuery(() => (appId ? db.applications.get(appId) : undefined), [appId])
   const existing = useLiveQuery(() => (id ? db.appDatabases.get(id) : undefined), [id])
-  const microservices = useLiveQuery(
-    () => (appId ? db.microservices.where('applicationId').equals(appId).toArray() : []),
-    [appId],
-  ) ?? []
+  const microservices =
+    useLiveQuery(
+      () => (appId ? db.microservices.where('applicationId').equals(appId).toArray() : []),
+      [appId],
+    ) ?? []
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -103,10 +121,12 @@ export function DatabaseFormPage() {
   }, [existing])
 
   if (id && !existing) return <div className="p-6 text-neutral-50">Cargando...</div>
-  if (!appId || !application) return <div className="p-6 text-neutral-50">Aplicación no encontrada</div>
+  if (!appId || !application)
+    return <div className="p-6 text-neutral-50">Aplicación no encontrada</div>
 
   const availableMs = microservices.filter(
-    (ms) => !selectedMsIds.includes(ms.id) &&
+    (ms) =>
+      !selectedMsIds.includes(ms.id) &&
       (!msSearch || ms.name.toLowerCase().includes(msSearch.toLowerCase())),
   )
 
@@ -161,7 +181,11 @@ export function DatabaseFormPage() {
 
       addNotification({ type: 'success', message: 'Base de datos creada' })
     }
-    navigate(microserviceIdParam ? `/catalog/microservices/${microserviceIdParam}` : `/catalog/applications/${appId}`)
+    navigate(
+      microserviceIdParam
+        ? `/catalog/microservices/${microserviceIdParam}`
+        : `/catalog/applications/${appId}`,
+    )
   }
 
   const engineSuggestions = dbEngineExamples[dbType] ?? []
@@ -179,13 +203,14 @@ export function DatabaseFormPage() {
           <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
             {existing ? 'Editar Base de Datos' : 'Nueva Base de Datos'}
           </h1>
-          <p className="text-sm text-muted">
-            {application.name}
-          </p>
+          <p className="text-sm text-muted">{application.name}</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-5"
+      >
         {/* Name + Type */}
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -206,7 +231,15 @@ export function DatabaseFormPage() {
             <label className="block text-sm font-medium text-secondary mb-1">
               Tipo <span className="text-danger">*</span>
             </label>
-            <Select required value={dbType} onChange={(v) => { setDbType(v as DatabaseType); setEngine('') }} options={DB_TYPES.map((t) => ({ value: t, label: dbTypeLabel[t] }))} />
+            <Select
+              required
+              value={dbType}
+              onChange={(v) => {
+                setDbType(v as DatabaseType)
+                setEngine('')
+              }}
+              options={DB_TYPES.map((t) => ({ value: t, label: dbTypeLabel[t] }))}
+            />
           </div>
         </div>
 
@@ -256,9 +289,7 @@ export function DatabaseFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">
-              Versión
-            </label>
+            <label className="block text-sm font-medium text-secondary mb-1">Versión</label>
             <input
               type="text"
               value={version}
@@ -272,9 +303,7 @@ export function DatabaseFormPage() {
         {/* Host + Port */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">
-              Host / Endpoint
-            </label>
+            <label className="block text-sm font-medium text-secondary mb-1">Host / Endpoint</label>
             <input
               type="text"
               value={host}
@@ -285,9 +314,7 @@ export function DatabaseFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">
-              Puerto
-            </label>
+            <label className="block text-sm font-medium text-secondary mb-1">Puerto</label>
             <input
               type="number"
               value={port ?? ''}
@@ -315,9 +342,7 @@ export function DatabaseFormPage() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">
-            Descripción
-          </label>
+          <label className="block text-sm font-medium text-secondary mb-1">Descripción</label>
           <RichTextEditor
             value={description}
             onChange={(html) => setDescription(html)}
@@ -328,7 +353,10 @@ export function DatabaseFormPage() {
         {/* Technologies */}
         <div>
           <label className="block text-sm font-medium text-secondary mb-2">
-            Tecnologías relacionadas <span className="text-neutral-50 font-normal">({selectedTechIds.length} seleccionadas)</span>
+            Tecnologías relacionadas{' '}
+            <span className="text-neutral-50 font-normal">
+              ({selectedTechIds.length} seleccionadas)
+            </span>
           </label>
           <TechSearch
             selectedIds={selectedTechIds}
@@ -340,7 +368,10 @@ export function DatabaseFormPage() {
         {/* Microservices */}
         <div>
           <label className="block text-sm font-medium text-secondary mb-2">
-            Microservicios relacionados <span className="text-neutral-50 font-normal">({selectedMsIds.length} seleccionados — opcional)</span>
+            Microservicios relacionados{' '}
+            <span className="text-neutral-50 font-normal">
+              ({selectedMsIds.length} seleccionados — opcional)
+            </span>
           </label>
 
           <div className="flex flex-wrap gap-2 mb-2">
@@ -377,10 +408,16 @@ export function DatabaseFormPage() {
                   placeholder="Buscar microservicio para relacionar..."
                   value={msSearch}
                   onFocus={() => setShowMsDropdown(true)}
-                  onChange={(e) => { setMsSearch(e.target.value); setShowMsDropdown(true) }}
+                  onChange={(e) => {
+                    setMsSearch(e.target.value)
+                    setShowMsDropdown(true)
+                  }}
                   className="w-full pl-8 pr-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
-                <Plus size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50" />
+                <Plus
+                  size={16}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-50"
+                />
               </div>
 
               {showMsDropdown && (

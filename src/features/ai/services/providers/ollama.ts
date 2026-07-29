@@ -1,11 +1,17 @@
-import type { AiProviderConfig, AiChatMessage, AiToolDefinition, AiChatResponse, AiProviderInterface } from '../../types'
+import type {
+  AiProviderConfig,
+  AiChatMessage,
+  AiToolDefinition,
+  AiChatResponse,
+  AiProviderInterface,
+} from '../../types'
 
 export function createOllamaProvider(config: AiProviderConfig): AiProviderInterface {
   const baseUrl = config.baseUrl.replace(/\/+$/, '')
 
   async function chat(
     messages: AiChatMessage[],
-    tools?: AiToolDefinition[]
+    tools?: AiToolDefinition[],
   ): Promise<AiChatResponse> {
     const body: Record<string, unknown> = {
       model: config.model,
@@ -19,9 +25,16 @@ export function createOllamaProvider(config: AiProviderConfig): AiProviderInterf
                 function: {
                   name: tc.name,
                   // Ollama espera arguments como objeto, no como string
-                  arguments: typeof tc.arguments === 'string'
-                    ? (() => { try { return JSON.parse(tc.arguments) } catch { return tc.arguments } })()
-                    : tc.arguments,
+                  arguments:
+                    typeof tc.arguments === 'string'
+                      ? (() => {
+                          try {
+                            return JSON.parse(tc.arguments)
+                          } catch {
+                            return tc.arguments
+                          }
+                        })()
+                      : tc.arguments,
                 },
               })),
             }
@@ -56,13 +69,16 @@ export function createOllamaProvider(config: AiProviderConfig): AiProviderInterf
     const output: AiChatResponse = { content: data.message?.content ?? '' }
 
     if (data.message?.tool_calls?.length > 0) {
-      output.toolCalls = data.message.tool_calls.map((tc: { function: { name: string; arguments: unknown } }) => ({
-        id: crypto.randomUUID(),
-        name: tc.function.name,
-        arguments: typeof tc.function.arguments === 'string'
-          ? JSON.parse(tc.function.arguments)
-          : tc.function.arguments as Record<string, unknown>,
-      }))
+      output.toolCalls = data.message.tool_calls.map(
+        (tc: { function: { name: string; arguments: unknown } }) => ({
+          id: crypto.randomUUID(),
+          name: tc.function.name,
+          arguments:
+            typeof tc.function.arguments === 'string'
+              ? JSON.parse(tc.function.arguments)
+              : (tc.function.arguments as Record<string, unknown>),
+        }),
+      )
     }
 
     return output
@@ -70,7 +86,10 @@ export function createOllamaProvider(config: AiProviderConfig): AiProviderInterf
 
   async function testConnection(): Promise<boolean> {
     try {
-      const res = await fetch(`${baseUrl}/api/tags`, { method: 'GET', signal: AbortSignal.timeout(5000) })
+      const res = await fetch(`${baseUrl}/api/tags`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000),
+      })
       return res.ok
     } catch {
       return false

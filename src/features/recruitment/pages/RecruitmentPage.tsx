@@ -13,7 +13,22 @@ import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
 import type { Candidate } from '@/types/domain'
-import { Plus, Search, Users, UserCheck, Calendar, Star, XCircle, Pencil, Trash2, Share2, Check, Copy, ThumbsUp, Rocket } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Users,
+  UserCheck,
+  Calendar,
+  Star,
+  XCircle,
+  Pencil,
+  Trash2,
+  Share2,
+  Check,
+  Copy,
+  ThumbsUp,
+  Rocket,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -44,13 +59,13 @@ export function RecruitmentPage() {
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
 
-  const candidates = useLiveQuery(() =>
-    db.candidates.orderBy('createdAt').reverse().toArray(),
-  ) ?? []
+  const candidates =
+    useLiveQuery(() => db.candidates.orderBy('createdAt').reverse().toArray()) ?? []
 
   const filtered = candidates.filter((c) => {
     const roleLabel = MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? ''
-    const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
+    const matchesSearch =
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
       roleLabel.toLowerCase().includes(search.toLowerCase())
     const matchesStatus = !statusFilter || statusFilter === 'all' || c.status === statusFilter
     return matchesSearch && matchesStatus
@@ -91,8 +106,15 @@ export function RecruitmentPage() {
       label: 'Estado',
       sortable: true,
       render: (c) => {
-        const cfg = statusConfig[c.status] ?? { label: c.status, color: 'bg-neutral-10 text-neutral-60' }
-        return <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
+        const cfg = statusConfig[c.status] ?? {
+          label: c.status,
+          color: 'bg-neutral-10 text-neutral-60',
+        }
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
+            {cfg.label}
+          </span>
+        )
       },
     },
     {
@@ -126,7 +148,10 @@ export function RecruitmentPage() {
       render: (c) => (
         <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`/teams/recruitment/${c.id}/edit`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/teams/recruitment/${c.id}/edit`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
@@ -150,8 +175,10 @@ export function RecruitmentPage() {
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Reclutamiento</h2>
         <div className="flex items-center gap-2">
           {statusFilter && (
-            <Button onClick={() => setStatusFilter(null)}
-              className="px-3 py-2 text-sm text-neutral-50 hover:text-neutral-90 transition-colors">
+            <Button
+              onClick={() => setStatusFilter(null)}
+              className="px-3 py-2 text-sm text-neutral-50 hover:text-neutral-90 transition-colors"
+            >
               Limpiar filtro
             </Button>
           )}
@@ -178,25 +205,45 @@ export function RecruitmentPage() {
         </div>
       </div>
 
-      {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
-          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
-            {cleanUrl}
-          </a>
-          <Button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'Copiado' : 'Copiar'}
-          </Button>
-        </div>
-      )})()}
+      {shareUrl &&
+        (() => {
+          const cleanUrl = shareUrl.split('#')[0]
+          return (
+            <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
+              <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
+              <a
+                href={cleanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+              >
+                {cleanUrl}
+              </a>
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(shareUrl)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0"
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copiado' : 'Copiar'}
+              </Button>
+            </div>
+          )
+        })()}
 
       {showTerms && (
         <TermsModal
-          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
-          onClose={() => { setShowTerms(false) }}
+          onAccept={() => {
+            acceptTerms()
+            setShowTerms(false)
+            doShare()
+          }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -208,57 +255,78 @@ export function RecruitmentPage() {
             const data = sharePending
             const payload = pass ? await encryptData(data, pass) : data
             const { url } = await createShareLink(48, 'recruitment', undefined, payload)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
           onSkip={async () => {
             const data = sharePending
             const { url } = await createShareLink(48, 'recruitment', undefined, data)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
 
       <div className="grid grid-cols-7 gap-4">
         <StatCard
-          icon={<Users size={20} />} label="Total"
-          value={candidates.length} color="text-primary"
+          icon={<Users size={20} />}
+          label="Total"
+          value={candidates.length}
+          color="text-primary"
           active={!statusFilter}
           onClick={() => setStatusFilter(null)}
         />
         <StatCard
-          icon={<Calendar size={20} />} label="Pendientes"
-          value={candidates.filter((c) => c.status === 'pending').length} color="text-warning"
+          icon={<Calendar size={20} />}
+          label="Pendientes"
+          value={candidates.filter((c) => c.status === 'pending').length}
+          color="text-warning"
           active={statusFilter === 'pending'}
           onClick={() => setStatusFilter('pending')}
         />
         <StatCard
-          icon={<UserCheck size={20} />} label="Entrevistados"
-          value={candidates.filter((c) => c.status === 'interviewed').length} color="text-info"
+          icon={<UserCheck size={20} />}
+          label="Entrevistados"
+          value={candidates.filter((c) => c.status === 'interviewed').length}
+          color="text-info"
           active={statusFilter === 'interviewed'}
           onClick={() => setStatusFilter('interviewed')}
         />
         <StatCard
-          icon={<ThumbsUp size={20} />} label="Pre-Seleccionados"
-          value={candidates.filter((c) => c.status === 'pre_selected').length} color="text-primary"
+          icon={<ThumbsUp size={20} />}
+          label="Pre-Seleccionados"
+          value={candidates.filter((c) => c.status === 'pre_selected').length}
+          color="text-primary"
           active={statusFilter === 'pre_selected'}
           onClick={() => setStatusFilter('pre_selected')}
         />
         <StatCard
-          icon={<Star size={20} />} label="Seleccionados"
-          value={candidates.filter((c) => c.status === 'selected').length} color="text-success"
+          icon={<Star size={20} />}
+          label="Seleccionados"
+          value={candidates.filter((c) => c.status === 'selected').length}
+          color="text-success"
           active={statusFilter === 'selected'}
           onClick={() => setStatusFilter('selected')}
         />
         <StatCard
-          icon={<Rocket size={20} />} label="En Onboarding"
-          value={candidates.filter((c) => c.status === 'onboarding').length} color="text-info"
+          icon={<Rocket size={20} />}
+          label="En Onboarding"
+          value={candidates.filter((c) => c.status === 'onboarding').length}
+          color="text-info"
           active={statusFilter === 'onboarding'}
           onClick={() => setStatusFilter('onboarding')}
         />
         <StatCard
-          icon={<XCircle size={20} />} label="No Asistieron"
-          value={candidates.filter((c) => c.status === 'no_show').length} color="text-neutral-50"
+          icon={<XCircle size={20} />}
+          label="No Asistieron"
+          value={candidates.filter((c) => c.status === 'no_show').length}
+          color="text-neutral-50"
           active={statusFilter === 'no_show'}
           onClick={() => setStatusFilter('no_show')}
         />
@@ -287,18 +355,25 @@ export function RecruitmentPage() {
 }
 
 function StatCard({
-  icon, label, value, color, active, onClick,
+  icon,
+  label,
+  value,
+  color,
+  active,
+  onClick,
 }: {
-  icon: React.ReactNode; label: string; value: number; color: string
-  active?: boolean; onClick?: () => void
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+  active?: boolean
+  onClick?: () => void
 }) {
   return (
     <Button
       onClick={onClick}
       className={`text-left bg-card rounded-xl border p-4 shadow-sm transition-all ${
-        active
-          ? 'border-primary ring-2 ring-primary/20'
-          : 'border-boundary hover:shadow-md'
+        active ? 'border-primary ring-2 ring-primary/20' : 'border-boundary hover:shadow-md'
       }`}
     >
       <div className={`${color} mb-2`}>{icon}</div>

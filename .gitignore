@@ -58,3 +58,11 @@ e2e/test-data/large.xlsx
 
 # Build version
 public/version.json
+
+# Coverage reports
+coverage/
+coverage-ts/
+
+# Quality tooling
+.husky/_/
+.tmp/

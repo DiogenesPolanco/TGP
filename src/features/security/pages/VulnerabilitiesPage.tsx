@@ -6,7 +6,21 @@ import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
-import { Plus, Search, Filter, X, Shield, AlertTriangle, Clock, Eye, Pencil, Trash2, ChevronDown, ChevronUp, Bug } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  X,
+  Shield,
+  AlertTriangle,
+  Clock,
+  Eye,
+  Pencil,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  Bug,
+} from 'lucide-react'
 import { FluidAttackImportPanel } from '@/features/admin/components/FluidAttackImportPanel'
 import type { Vulnerability } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
@@ -39,10 +53,11 @@ export function VulnerabilitiesPage() {
   const vulnerabilities = useLiveQuery(() => db.vulnerabilities.toArray()) ?? []
   const applications = useLiveQuery(() => db.applications.toArray()) ?? []
 
-  const filteredVulns = vulnerabilities.filter((v) =>
-    v.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (severityFilter === 'all' || v.severity === severityFilter) &&
-    (statusFilter === 'all' || v.status === statusFilter)
+  const filteredVulns = vulnerabilities.filter(
+    (v) =>
+      v.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (severityFilter === 'all' || v.severity === severityFilter) &&
+      (statusFilter === 'all' || v.status === statusFilter),
   )
 
   const handleDelete = async (id: string) => {
@@ -64,8 +79,11 @@ export function VulnerabilitiesPage() {
   }
 
   const getSlaStatus = (vuln: Vulnerability) => {
-    if (vuln.status === 'fixed' || vuln.status === 'accepted') return { label: '—', color: 'text-neutral-50' }
-    const days = Math.ceil((new Date(vuln.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    if (vuln.status === 'fixed' || vuln.status === 'accepted')
+      return { label: '—', color: 'text-neutral-50' }
+    const days = Math.ceil(
+      (new Date(vuln.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+    )
     if (days < 0) return { label: 'Vencido', color: 'text-danger' }
     if (days <= 7) return { label: `${days}d`, color: 'text-warning' }
     return { label: `${days}d`, color: 'text-success' }
@@ -73,11 +91,15 @@ export function VulnerabilitiesPage() {
 
   const stats = {
     total: vulnerabilities.length,
-    critical: vulnerabilities.filter((v) => v.severity === 'critical' && v.status !== 'fixed').length,
+    critical: vulnerabilities.filter((v) => v.severity === 'critical' && v.status !== 'fixed')
+      .length,
     high: vulnerabilities.filter((v) => v.severity === 'high' && v.status !== 'fixed').length,
     medium: vulnerabilities.filter((v) => v.severity === 'medium' && v.status !== 'fixed').length,
     low: vulnerabilities.filter((v) => v.severity === 'low' && v.status !== 'fixed').length,
-    slaBreached: vulnerabilities.filter((v) => v.status !== 'fixed' && v.status !== 'accepted' && new Date(v.slaDeadline) < new Date()).length,
+    slaBreached: vulnerabilities.filter(
+      (v) =>
+        v.status !== 'fixed' && v.status !== 'accepted' && new Date(v.slaDeadline) < new Date(),
+    ).length,
   }
   const activeOpen = stats.critical + stats.high + stats.medium + stats.low
 
@@ -105,14 +127,20 @@ export function VulnerabilitiesPage() {
       key: 'cvssScore',
       label: 'CVSS',
       sortable: true,
-      render: (vuln) => <span className="text-sm font-medium text-neutral-90 dark:text-white">{vuln.cvssScore}</span>,
+      render: (vuln) => (
+        <span className="text-sm font-medium text-neutral-90 dark:text-white">
+          {vuln.cvssScore}
+        </span>
+      ),
     },
     {
       key: 'severity',
       label: 'Severidad',
       sortable: true,
       render: (vuln) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(vuln.severity)}`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(vuln.severity)}`}
+        >
           {severityLabel[vuln.severity]}
         </span>
       ),
@@ -122,12 +150,17 @@ export function VulnerabilitiesPage() {
       label: 'Estado',
       sortable: true,
       render: (vuln) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          vuln.status === 'fixed' ? 'bg-success/10 text-success' :
-          vuln.status === 'in_progress' ? 'bg-info/10 text-info' :
-          vuln.status === 'accepted' ? 'bg-neutral-10 text-neutral-60' :
-          'bg-danger/10 text-danger'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            vuln.status === 'fixed'
+              ? 'bg-success/10 text-success'
+              : vuln.status === 'in_progress'
+                ? 'bg-info/10 text-info'
+                : vuln.status === 'accepted'
+                  ? 'bg-neutral-10 text-neutral-60'
+                  : 'bg-danger/10 text-danger'
+          }`}
+        >
           {vulnStatusLabel[vuln.status]}
         </span>
       ),
@@ -166,21 +199,30 @@ export function VulnerabilitiesPage() {
       render: (vuln) => (
         <div className="flex items-center justify-end gap-2">
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${vuln.id}`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver detalle"
           >
             <Eye size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${vuln.id}/edit`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${vuln.id}/edit`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(vuln.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(vuln.id)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
@@ -219,24 +261,89 @@ export function VulnerabilitiesPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={<Shield size={20} />} label="Total" value={stats.total} color="text-primary" onClick={() => { setSeverityFilter('all'); setStatusFilter('all'); setShowFilters(false) }} />
-        <StatCard icon={<AlertTriangle size={20} />} label="Críticas" value={stats.critical} color="text-danger" onClick={() => { setSeverityFilter('critical'); setStatusFilter('open'); setShowFilters(true) }} />
-        <StatCard icon={<AlertTriangle size={20} />} label="Altas" value={stats.high} color="text-warning" onClick={() => { setSeverityFilter('high'); setShowFilters(true) }} />
-        <StatCard icon={<Clock size={20} />} label="SLA Vencido" value={stats.slaBreached} color="text-danger" onClick={() => { setSeverityFilter('all'); setStatusFilter('all'); setShowFilters(false) }} />
+        <StatCard
+          icon={<Shield size={20} />}
+          label="Total"
+          value={stats.total}
+          color="text-primary"
+          onClick={() => {
+            setSeverityFilter('all')
+            setStatusFilter('all')
+            setShowFilters(false)
+          }}
+        />
+        <StatCard
+          icon={<AlertTriangle size={20} />}
+          label="Críticas"
+          value={stats.critical}
+          color="text-danger"
+          onClick={() => {
+            setSeverityFilter('critical')
+            setStatusFilter('open')
+            setShowFilters(true)
+          }}
+        />
+        <StatCard
+          icon={<AlertTriangle size={20} />}
+          label="Altas"
+          value={stats.high}
+          color="text-warning"
+          onClick={() => {
+            setSeverityFilter('high')
+            setShowFilters(true)
+          }}
+        />
+        <StatCard
+          icon={<Clock size={20} />}
+          label="SLA Vencido"
+          value={stats.slaBreached}
+          color="text-danger"
+          onClick={() => {
+            setSeverityFilter('all')
+            setStatusFilter('all')
+            setShowFilters(false)
+          }}
+        />
       </div>
 
       {/* Severity distribution bar */}
       {activeOpen > 0 && (
         <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2.5">
-            <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">Distribución por Severidad</h3>
+            <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
+              Distribución por Severidad
+            </h3>
             <span className="text-[11px] text-neutral-50">{activeOpen} activas</span>
           </div>
           <div className="h-2.5 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden flex">
-            {stats.critical > 0 && <div style={{ width: `${(stats.critical / activeOpen) * 100}%` }} className="bg-danger h-full transition-all" title={`Críticas: ${stats.critical}`} />}
-            {stats.high > 0 && <div style={{ width: `${(stats.high / activeOpen) * 100}%` }} className="bg-warning h-full transition-all" title={`Altas: ${stats.high}`} />}
-            {stats.medium > 0 && <div style={{ width: `${(stats.medium / activeOpen) * 100}%` }} className="bg-info h-full transition-all" title={`Medias: ${stats.medium}`} />}
-            {stats.low > 0 && <div style={{ width: `${(stats.low / activeOpen) * 100}%` }} className="bg-success h-full transition-all" title={`Bajas: ${stats.low}`} />}
+            {stats.critical > 0 && (
+              <div
+                style={{ width: `${(stats.critical / activeOpen) * 100}%` }}
+                className="bg-danger h-full transition-all"
+                title={`Críticas: ${stats.critical}`}
+              />
+            )}
+            {stats.high > 0 && (
+              <div
+                style={{ width: `${(stats.high / activeOpen) * 100}%` }}
+                className="bg-warning h-full transition-all"
+                title={`Altas: ${stats.high}`}
+              />
+            )}
+            {stats.medium > 0 && (
+              <div
+                style={{ width: `${(stats.medium / activeOpen) * 100}%` }}
+                className="bg-info h-full transition-all"
+                title={`Medias: ${stats.medium}`}
+              />
+            )}
+            {stats.low > 0 && (
+              <div
+                style={{ width: `${(stats.low / activeOpen) * 100}%` }}
+                className="bg-success h-full transition-all"
+                title={`Bajas: ${stats.low}`}
+              />
+            )}
           </div>
           <div className="flex items-center gap-4 mt-2">
             <SeverityDot color="bg-danger" label={`Críticas ${stats.critical}`} />
@@ -250,7 +357,10 @@ export function VulnerabilitiesPage() {
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar vulnerabilidades..."
@@ -279,27 +389,40 @@ export function VulnerabilitiesPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Severidad</label>
-              <Select value={severityFilter} onChange={(v) => setSeverityFilter(v)} options={[
-                { value: 'all', label: 'Todas' },
-                { value: 'critical', label: 'Crítica' },
-                { value: 'high', label: 'Alta' },
-                { value: 'medium', label: 'Media' },
-                { value: 'low', label: 'Baja' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={severityFilter}
+                onChange={(v) => setSeverityFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todas' },
+                  { value: 'critical', label: 'Crítica' },
+                  { value: 'high', label: 'Alta' },
+                  { value: 'medium', label: 'Media' },
+                  { value: 'low', label: 'Baja' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-xs text-neutral-60">Estado</label>
-              <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                { value: 'all', label: 'Todos' },
-                { value: 'open', label: 'Abierto' },
-                { value: 'in_progress', label: 'En Progreso' },
-                { value: 'fixed', label: 'Corregido' },
-                { value: 'accepted', label: 'Aceptado' },
-              ]} className="min-w-[120px]" />
+              <Select
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v)}
+                options={[
+                  { value: 'all', label: 'Todos' },
+                  { value: 'open', label: 'Abierto' },
+                  { value: 'in_progress', label: 'En Progreso' },
+                  { value: 'fixed', label: 'Corregido' },
+                  { value: 'accepted', label: 'Aceptado' },
+                ]}
+                className="min-w-[120px]"
+              />
             </div>
             {(severityFilter !== 'all' || statusFilter !== 'all') && (
               <Button
-                onClick={() => { setSeverityFilter('all'); setStatusFilter('all') }}
+                onClick={() => {
+                  setSeverityFilter('all')
+                  setStatusFilter('all')
+                }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
               >
                 <X size={14} />
@@ -339,7 +462,19 @@ function SeverityDot({ color, label }: { color: string; label: string }) {
   )
 }
 
-function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNode; label: string; value: number; color: string; onClick?: () => void }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: string
+  onClick?: () => void
+}) {
   const iconClasses: Record<string, string> = {
     'text-primary': 'bg-primary/10 text-primary',
     'text-danger': 'bg-danger/10 text-danger',
@@ -351,7 +486,9 @@ function StatCard({ icon, label, value, color, onClick }: { icon: React.ReactNod
       onClick={onClick}
       className={`bg-card rounded-2xl border border-boundary p-4 shadow-sm flex items-center justify-center gap-3${onClick ? ' cursor-pointer hover:shadow-md transition-all' : ''}`}
     >
-      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+      <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+        {icon}
+      </div>
       <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </Comp>

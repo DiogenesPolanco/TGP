@@ -25,11 +25,16 @@ export interface MemberKPIs {
 const ATTENTION_WEIGHTS = {
   efficiency: 0.35,
   opportunities: 0.35,
-  mood: 0.20,
-  achievement: 0.10,
+  mood: 0.2,
+  achievement: 0.1,
 } as const
 
-function calcAttentionScore(kpis: Pick<MemberKPIs, 'efficiencyPct' | 'openOpportunitiesCount' | 'avgMood' | 'oneOnOneCount' | 'achievementCount'>): number {
+function calcAttentionScore(
+  kpis: Pick<
+    MemberKPIs,
+    'efficiencyPct' | 'openOpportunitiesCount' | 'avgMood' | 'oneOnOneCount' | 'achievementCount'
+  >,
+): number {
   const efficiencyScore = ((100 - kpis.efficiencyPct) / 100) * ATTENTION_WEIGHTS.efficiency * 100
 
   const cappedOpps = Math.min(kpis.openOpportunitiesCount, 5)
@@ -40,9 +45,7 @@ function calcAttentionScore(kpis: Pick<MemberKPIs, 'efficiencyPct' | 'openOpport
     moodScore = ((5 - kpis.avgMood) / 4) * ATTENTION_WEIGHTS.mood * 100
   }
 
-  const achievementScore = kpis.achievementCount === 0
-    ? ATTENTION_WEIGHTS.achievement * 100
-    : 0
+  const achievementScore = kpis.achievementCount === 0 ? ATTENTION_WEIGHTS.achievement * 100 : 0
 
   return Math.round(efficiencyScore + opportunityScore + moodScore + achievementScore)
 }
@@ -56,21 +59,25 @@ export async function getMemberKPIs(memberId: string): Promise<MemberKPIs> {
 
   const totalSP = sprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
   const totalNotDone = sprints.reduce((s, sp) => s + sp.storyPointsNotCompleted, 0)
-  const efficiencyPct = totalSP + totalNotDone > 0
-    ? Math.round((totalSP / (totalSP + totalNotDone)) * 100)
-    : 0
-  const avgMood = oneOnOnes.length > 0
-    ? Math.round(oneOnOnes.reduce((s, o) => s + o.estadoAnimo, 0) / oneOnOnes.length)
-    : 0
+  const efficiencyPct =
+    totalSP + totalNotDone > 0 ? Math.round((totalSP / (totalSP + totalNotDone)) * 100) : 0
+  const avgMood =
+    oneOnOnes.length > 0
+      ? Math.round(oneOnOnes.reduce((s, o) => s + o.estadoAnimo, 0) / oneOnOnes.length)
+      : 0
   const oneOnOneCount = oneOnOnes.length
   const openOpportunitiesCount = oneOnOnes.reduce(
-    (count, o) => count + o.oportunidades.filter((op) => op.status === 'pendiente' || op.status === 'en_progreso').length,
-    0
+    (count, o) =>
+      count +
+      o.oportunidades.filter((op) => op.status === 'pendiente' || op.status === 'en_progreso')
+        .length,
+    0,
   )
   const achievementCount = achievementsList.length
-  const lastOneOnOneDate = oneOnOnes.length > 0
-    ? oneOnOnes.sort((a, b) => b.date.getTime() - a.date.getTime())[0].date
-    : null
+  const lastOneOnOneDate =
+    oneOnOnes.length > 0
+      ? oneOnOnes.sort((a, b) => b.date.getTime() - a.date.getTime())[0].date
+      : null
 
   const kpis = {
     memberId,
@@ -104,26 +111,26 @@ export async function getTeamPerformanceIndicators(team: Team): Promise<{
       const kpis = await getMemberKPIs(m.id)
       kpis.memberName = m.displayName
       return { member: m, kpis }
-    })
+    }),
   )
 
   const withSP = kpisList.filter((k) => k.kpis.totalSP > 0)
 
-  const bestPerformer = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
-    : null
+  const bestPerformer =
+    withSP.length > 0
+      ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
+      : null
 
-  const worstPerformer = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
-    : null
+  const worstPerformer =
+    withSP.length > 0
+      ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
+      : null
 
-  const topSP = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
-    : null
+  const topSP =
+    withSP.length > 0 ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b)) : null
 
-  const bottomSP = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.totalSP < b.kpis.totalSP ? a : b))
-    : null
+  const bottomSP =
+    withSP.length > 0 ? withSP.reduce((a, b) => (a.kpis.totalSP < b.kpis.totalSP ? a : b)) : null
 
   return {
     bestPerformer: bestPerformer
@@ -139,34 +146,34 @@ export async function getTeamPerformanceIndicators(team: Team): Promise<{
 
 export async function getGlobalMembersKPIs() {
   const teams = await db.teams.toArray()
-  const allMembers = teams.flatMap((t) =>
-    t.members.map((m) => ({ member: m, team: t }))
-  )
+  const allMembers = teams.flatMap((t) => t.members.map((m) => ({ member: m, team: t })))
   const kpisList = await Promise.all(
     allMembers.map(async ({ member, team }) => {
       const kpis = await getMemberKPIs(member.id)
       kpis.memberName = member.displayName
       return { member, team, kpis }
-    })
+    }),
   )
 
   // Estadísticas solo con roles de desarrollo (dev, senior, tech lead)
   const devKpis = kpisList.filter((k) => DEV_ROLES.includes(k.member.role))
   const withSP = devKpis.filter((k) => k.kpis.totalSP > 0)
-  const bestPerformer = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
-    : null
-  const worstPerformer = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
-    : null
-  const topSP = withSP.length > 0
-    ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
-    : null
+  const bestPerformer =
+    withSP.length > 0
+      ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
+      : null
+  const worstPerformer =
+    withSP.length > 0
+      ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
+      : null
+  const topSP =
+    withSP.length > 0 ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b)) : null
 
   const withAttention = devKpis.filter((k) => k.kpis.attentionScore > 0)
-  const needsAttention = withAttention.length > 0
-    ? withAttention.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
-    : null
+  const needsAttention =
+    withAttention.length > 0
+      ? withAttention.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
+      : null
 
   return { kpisList, bestPerformer, worstPerformer, topSP, needsAttention }
 }

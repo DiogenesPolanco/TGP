@@ -1,6 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Shield, ShieldCheck, Copy, Check, Clock, ArrowRight, Lock, Users, ChevronRight } from 'lucide-react'
+import {
+  Shield,
+  ShieldCheck,
+  Copy,
+  Check,
+  Clock,
+  ArrowRight,
+  Lock,
+  Users,
+  ChevronRight,
+} from 'lucide-react'
 import {
   generateSecret,
   verifyTotp,
@@ -19,11 +29,9 @@ import type { User, UserRole } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
 export function LoginPage({ onAuth }: { onAuth: () => void }) {
-  const [mode, setMode] = useState<'setup' | 'login'>(
-    isConfigured() ? 'login' : 'setup',
-  )
-  const [secret] = useState<{ base32: string; uri: string } | null>(
-    () => mode === 'setup' ? generateSecret() : null
+  const [mode, setMode] = useState<'setup' | 'login'>(isConfigured() ? 'login' : 'setup')
+  const [secret] = useState<{ base32: string; uri: string } | null>(() =>
+    mode === 'setup' ? generateSecret() : null,
   )
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
@@ -140,8 +148,8 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
             displayName: 'Administrador',
             role: 'admin' as UserRole,
             businessUnitIds: [],
-          isActive: 1,
-          otpRequestIntervalHours: 24,
+            isActive: 1,
+            otpRequestIntervalHours: 24,
             createdAt: new Date(),
           }
           await db.users.add(defaultUser)
@@ -233,9 +241,7 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
                 Demasiados intentos
               </h2>
-              <p className="text-sm text-muted">
-                Cuenta bloqueada temporalmente por seguridad
-              </p>
+              <p className="text-sm text-muted">Cuenta bloqueada temporalmente por seguridad</p>
               <div className="flex items-center justify-center gap-2 text-danger font-medium">
                 <Clock size={18} />
                 <span>{formatLockout(lockoutMs)}</span>
@@ -245,62 +251,86 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
             /* ── User selection after OTP ── */
             <div className="flex flex-col lg:flex-row min-h-[480px]">
               <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10" style={{
-                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
-                }} />
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    background:
+                      'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
+                  }}
+                />
                 <div className="relative flex items-center gap-3 mb-8">
                   <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
                     <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
                   </div>
                   <div>
                     <p className="text-xl font-bold tracking-tight">TGP</p>
-                    <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                    <p className="text-[11px] font-medium opacity-60 tracking-wide">
+                      Technology Governance Platform
+                    </p>
                   </div>
                 </div>
                 <div className="relative flex-1 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-4">
                     <Users size={16} />
-                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Identidad</span>
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">
+                      Identidad
+                    </span>
                   </div>
-                  <h2 className="text-3xl font-bold leading-tight mb-4">
-                    ¿Quién eres?
-                  </h2>
+                  <h2 className="text-3xl font-bold leading-tight mb-4">¿Quién eres?</h2>
                   <p className="text-base leading-relaxed opacity-85">
-                    Selecciona tu perfil para personalizar tu experiencia y determinar el intervalo de re-autenticación OTP.
+                    Selecciona tu perfil para personalizar tu experiencia y determinar el intervalo
+                    de re-autenticación OTP.
                   </p>
                 </div>
               </div>
               <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
                   {Array.from({ length: 24 }).map((_, i) => (
-                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:border-neutral-70" />
+                    <div
+                      key={i}
+                      className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:border-neutral-70"
+                    />
                   ))}
                 </div>
               </div>
               <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
                 <div className="max-w-lg mx-auto w-full space-y-4">
-                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Selecciona tu usuario</h3>
+                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">
+                    Selecciona tu usuario
+                  </h3>
                   <p className="text-sm text-muted">Cuentas activas encontradas en el sistema</p>
                   <div className="space-y-2 max-h-[320px] overflow-y-auto">
                     {userList.map((u) => (
-                      <Button key={u.id} onClick={() => {
-                        useUserStore.getState().login(u)
-                        createSession(u.otpRequestIntervalHours ?? 1)
-                        onAuth()
-                      }}
-                        className="w-full flex items-center justify-between p-4 rounded-xl border border-boundary hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group text-left">
+                      <Button
+                        key={u.id}
+                        onClick={() => {
+                          useUserStore.getState().login(u)
+                          createSession(u.otpRequestIntervalHours ?? 1)
+                          onAuth()
+                        }}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border border-boundary hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group text-left"
+                      >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
                             {u.displayName.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-neutral-90 dark:text-white">{u.displayName}</p>
-                            <p className="text-xs text-neutral-50">{u.email} · {u.role}</p>
+                            <p className="text-sm font-semibold text-neutral-90 dark:text-white">
+                              {u.displayName}
+                            </p>
+                            <p className="text-xs text-neutral-50">
+                              {u.email} · {u.role}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-neutral-40 dark:text-neutral-50">{u.otpRequestIntervalHours ?? 1}h OTP</span>
-                          <ChevronRight size={16} className="text-neutral-30 group-hover:text-primary transition-colors" />
+                          <span className="text-xs text-neutral-40 dark:text-neutral-50">
+                            {u.otpRequestIntervalHours ?? 1}h OTP
+                          </span>
+                          <ChevronRight
+                            size={16}
+                            className="text-neutral-30 group-hover:text-primary transition-colors"
+                          />
                         </div>
                       </Button>
                     ))}
@@ -316,33 +346,45 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
             <div className="flex flex-col lg:flex-row min-h-[520px]">
               {/* Left: Vision + logo inside */}
               <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10" style={{
-                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
-                }} />
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    background:
+                      'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
+                  }}
+                />
 
                 {/* Logo inside card */}
-                  <div className="relative flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
-                      <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
-                    </div>
-                    <div>
-                      <p className="text-xl font-bold tracking-tight">TGP</p>
-                      <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
-                    </div>
+                <div className="relative flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
+                    <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
                   </div>
+                  <div>
+                    <p className="text-xl font-bold tracking-tight">TGP</p>
+                    <p className="text-[11px] font-medium opacity-60 tracking-wide">
+                      Technology Governance Platform
+                    </p>
+                  </div>
+                </div>
 
                 <div className="relative flex-1 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-4">
                     <ShieldCheck size={16} />
-                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Setup · Primer acceso</span>
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">
+                      Setup · Primer acceso
+                    </span>
                   </div>
                   <h2 className="text-3xl font-bold leading-tight mb-4">
-                    Tu gobierno<br />tecnológico<br />empieza aquí
+                    Tu gobierno
+                    <br />
+                    tecnológico
+                    <br />
+                    empieza aquí
                   </h2>
                   <p className="text-base leading-relaxed opacity-85 mb-5">
-                    TGP unifica cada dimensión de tu portafolio en un solo tablero de comando.
-                    Desde la salud de tus aplicaciones hasta el rendimiento de tus equipos,
-                    todo converge en decisiones más rápidas, informadas y estratégicas.
+                    TGP unifica cada dimensión de tu portafolio en un solo tablero de comando. Desde
+                    la salud de tus aplicaciones hasta el rendimiento de tus equipos, todo converge
+                    en decisiones más rápidas, informadas y estratégicas.
                   </p>
                   <ul className="space-y-3 text-base">
                     {[
@@ -370,7 +412,10 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
                   {Array.from({ length: 24 }).map((_, i) => (
-                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70" />
+                    <div
+                      key={i}
+                      className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70"
+                    />
                   ))}
                 </div>
               </div>
@@ -379,7 +424,9 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
                 <div className="max-w-lg mx-auto w-full space-y-6">
                   <div>
-                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Configura tu acceso</h3>
+                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">
+                      Configura tu acceso
+                    </h3>
                     <p className="text-base text-muted mt-1">
                       Escanea el código QR con tu app de autenticación
                     </p>
@@ -392,13 +439,23 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
 
                     <div className="flex-1 space-y-4 w-full">
                       <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-boundary overflow-hidden">
-                        <p className="text-xs font-medium text-neutral-50 mb-1.5">Código secreto (ingreso manual)</p>
+                        <p className="text-xs font-medium text-neutral-50 mb-1.5">
+                          Código secreto (ingreso manual)
+                        </p>
                         <div className="flex items-center gap-2 w-full">
                           <code className="flex-1 text-[10px] font-mono bg-card px-2 py-1.5 rounded-lg border border-boundary select-all truncate min-w-0 leading-relaxed">
                             {secret.base32}
                           </code>
-                          <Button onClick={handleCopy} className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0" title="Copiar">
-                            {copied ? <Check size={18} className="text-success" /> : <Copy size={18} className="text-neutral-50" />}
+                          <Button
+                            onClick={handleCopy}
+                            className="p-2 rounded-lg hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors shrink-0"
+                            title="Copiar"
+                          >
+                            {copied ? (
+                              <Check size={18} className="text-success" />
+                            ) : (
+                              <Copy size={18} className="text-neutral-50" />
+                            )}
                           </Button>
                         </div>
                       </div>
@@ -447,32 +504,49 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
             <div className="flex flex-col lg:flex-row min-h-[480px]">
               {/* Left: Brand + secure access messaging */}
               <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10" style={{
-                  background: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)'
-                }} />
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    background:
+                      'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
+                  }}
+                />
                 <div className="relative flex items-center gap-3 mb-8">
                   <div className="w-10 h-10 rounded-xl bg-white backdrop-blur flex items-center justify-center p-1.5 shadow-sm">
                     <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
                   </div>
                   <div>
                     <p className="text-xl font-bold tracking-tight">TGP</p>
-                    <p className="text-[11px] font-medium opacity-60 tracking-wide">Technology Governance Platform</p>
+                    <p className="text-[11px] font-medium opacity-60 tracking-wide">
+                      Technology Governance Platform
+                    </p>
                   </div>
                 </div>
                 <div className="relative flex-1 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-4">
                     <Shield size={16} />
-                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">Acceso seguro</span>
+                    <span className="text-xs font-medium uppercase tracking-widest opacity-60">
+                      Acceso seguro
+                    </span>
                   </div>
                   <h2 className="text-3xl font-bold leading-tight mb-4">
-                    Tu tablero de<br />gobierno<br />tecnológico
+                    Tu tablero de
+                    <br />
+                    gobierno
+                    <br />
+                    tecnológico
                   </h2>
                   <p className="text-base leading-relaxed opacity-85 mb-5">
-                    Accede a tu portafolio de aplicaciones, métricas DORA, riesgos,
-                    vulnerabilidades y más en un solo lugar.
+                    Accede a tu portafolio de aplicaciones, métricas DORA, riesgos, vulnerabilidades
+                    y más en un solo lugar.
                   </p>
                   <ul className="space-y-3 text-base">
-                    {['THI y KPIs en tiempo real', 'Alertas automáticas', 'Equipos y OKRs', 'Obsolescencia EOL'].map((item, i) => (
+                    {[
+                      'THI y KPIs en tiempo real',
+                      'Alertas automáticas',
+                      'Equipos y OKRs',
+                      'Obsolescencia EOL',
+                    ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
                         <span className="opacity-90">{item}</span>
@@ -491,7 +565,10 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
                   {Array.from({ length: 24 }).map((_, i) => (
-                    <div key={i} className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70" />
+                    <div
+                      key={i}
+                      className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70"
+                    />
                   ))}
                 </div>
               </div>
@@ -500,7 +577,9 @@ export function LoginPage({ onAuth }: { onAuth: () => void }) {
               <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
                 <div className="max-w-sm mx-auto w-full space-y-6">
                   <div>
-                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">Autenticación OTP</h3>
+                    <h3 className="text-xl font-bold text-neutral-90 dark:text-white">
+                      Autenticación OTP
+                    </h3>
                     <p className="text-base text-muted mt-1">
                       Ingresa el código de 6 dígitos de tu app
                     </p>

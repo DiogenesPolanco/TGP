@@ -56,88 +56,96 @@ export interface SyncResult {
 }
 
 const NAME_TO_SLUG: Record<string, string> = {
-  'java': 'oracle-jdk',
-  'kotlin': 'kotlin',
-  'python': 'python',
-  'go': 'go',
-  'rust': 'rust',
-  'php': 'php',
-  'ruby': 'ruby',
+  java: 'oracle-jdk',
+  kotlin: 'kotlin',
+  python: 'python',
+  go: 'go',
+  rust: 'rust',
+  php: 'php',
+  ruby: 'ruby',
   '.net': 'dotnet',
   '.net framework': 'dotnetfx',
-  'angular': 'angular',
-  'react': 'react',
+  angular: 'angular',
+  react: 'react',
   'vue.js': 'vue',
   'next.js': 'nextjs',
   'spring boot': 'spring-boot',
-  'express': 'express',
-  'django': 'django',
-  'laravel': 'laravel',
+  express: 'express',
+  django: 'django',
+  laravel: 'laravel',
   'ruby on rails': 'rails',
-  'symfony': 'symfony',
-  'postgresql': 'postgresql',
-  'mysql': 'mysql',
-  'mariadb': 'mariadb',
+  symfony: 'symfony',
+  postgresql: 'postgresql',
+  mysql: 'mysql',
+  mariadb: 'mariadb',
   'sql server': 'mssqlserver',
   'oracle database': 'oracle-database',
-  'mongodb': 'mongodb',
-  'cockroachdb': 'cockroachdb',
-  'elasticsearch': 'elasticsearch',
-  'opensearch': 'opensearch',
-  'redis': 'redis',
-  'memcached': 'memcached',
-  'sqlite': 'sqlite',
-  'rabbitmq': 'rabbitmq',
+  mongodb: 'mongodb',
+  cockroachdb: 'cockroachdb',
+  elasticsearch: 'elasticsearch',
+  opensearch: 'opensearch',
+  redis: 'redis',
+  memcached: 'memcached',
+  sqlite: 'sqlite',
+  rabbitmq: 'rabbitmq',
   'apache kafka': 'apache-kafka',
   'apache activemq': 'apache-activemq',
   'node.js': 'nodejs',
-  'bun': 'bun',
-  'deno': 'deno',
-  'nginx': 'nginx',
+  bun: 'bun',
+  deno: 'deno',
+  nginx: 'nginx',
   'apache http server': 'apache-http-server',
-  'caddy': 'caddy',
-  'tomcat': 'tomcat',
-  'ubuntu': 'ubuntu',
+  caddy: 'caddy',
+  tomcat: 'tomcat',
+  ubuntu: 'ubuntu',
   'windows server': 'windows-server',
-  'rhel': 'rhel',
-  'debian': 'debian',
+  rhel: 'rhel',
+  debian: 'debian',
   'alpine linux': 'alpine-linux',
-  'centos': 'centos',
+  centos: 'centos',
   'rocky linux': 'rocky-linux',
-  'opensuse': 'opensuse',
-  'sles': 'sles',
+  opensuse: 'opensuse',
+  sles: 'sles',
   'oracle linux': 'oracle-linux',
   'docker engine': 'docker-engine',
-  'docker': 'docker-engine',
-  'kubernetes': 'kubernetes',
-  'podman': 'podman',
-  'containerd': 'containerd',
-  'terraform': 'terraform',
-  'ansible': 'ansible',
-  'jenkins': 'jenkins',
-  'prometheus': 'prometheus',
-  'grafana': 'grafana',
+  docker: 'docker-engine',
+  kubernetes: 'kubernetes',
+  podman: 'podman',
+  containerd: 'containerd',
+  terraform: 'terraform',
+  ansible: 'ansible',
+  jenkins: 'jenkins',
+  prometheus: 'prometheus',
+  grafana: 'grafana',
   'tailwind css': 'tailwind-css',
-  'jquery': 'jquery',
+  jquery: 'jquery',
   'jquery ui': 'jquery-ui',
-  'bootstrap': 'bootstrap',
-  'vault': 'hashicorp-vault',
-  'consul': 'consul',
-  'etcd': 'etcd',
-  'istio': 'istio',
-  'envoy': 'envoy',
-  'haproxy': 'haproxy',
-  'postfix': 'postfix',
-  'openssl': 'openssl',
-  'powershell': 'powershell',
-  'chef': 'chef-infra-client',
-  'puppet': 'puppet',
+  bootstrap: 'bootstrap',
+  vault: 'hashicorp-vault',
+  consul: 'consul',
+  etcd: 'etcd',
+  istio: 'istio',
+  envoy: 'envoy',
+  haproxy: 'haproxy',
+  postfix: 'postfix',
+  openssl: 'openssl',
+  powershell: 'powershell',
+  chef: 'chef-infra-client',
+  puppet: 'puppet',
 }
 
 const SAAS_ONLY = new Set([
-  'amazon web services', 'microsoft azure', 'google cloud platform',
-  'cloudflare', 'datadog', 'github actions', 'gitlab ci', 'azure devops',
-  'amazon sqs', 'sentry', 'new relic',
+  'amazon web services',
+  'microsoft azure',
+  'google cloud platform',
+  'cloudflare',
+  'datadog',
+  'github actions',
+  'gitlab ci',
+  'azure devops',
+  'amazon sqs',
+  'sentry',
+  'new relic',
 ])
 
 const SLUG_BLACKLIST = new Set<string>()
@@ -146,9 +154,12 @@ async function fetchEolData(slug: string): Promise<V1Release[] | null> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
-    const response = await fetch(`https://endoflife.date/api/v1/products/${encodeURIComponent(slug)}`, {
-      signal: controller.signal,
-    })
+    const response = await fetch(
+      `https://endoflife.date/api/v1/products/${encodeURIComponent(slug)}`,
+      {
+        signal: controller.signal,
+      },
+    )
     clearTimeout(timeout)
     if (!response.ok) {
       if (response.status === 404) return []
@@ -162,23 +173,27 @@ async function fetchEolData(slug: string): Promise<V1Release[] | null> {
   }
 }
 
-function latestString(latest: V1Release['latest']): string | null {
+export function latestString(latest: V1Release['latest']): string | null {
   if (!latest) return null
   if (typeof latest === 'string') return latest
   if (typeof latest === 'object' && 'name' in latest) return latest.name ?? null
   return null
 }
 
-function matchCycle(cycles: V1Release[], version: string): V1Release | null {
+export function matchCycle(cycles: V1Release[], version: string): V1Release | null {
   const vLower = version.toLowerCase()
   const exact = cycles.find((c) => c.name.toLowerCase() === vLower)
   if (exact) return exact
   const startsWith = cycles.find(
-    (c) => vLower.startsWith(c.name.toLowerCase() + '.') || vLower.startsWith(c.name.toLowerCase() + '-'),
+    (c) =>
+      vLower.startsWith(c.name.toLowerCase() + '.') ||
+      vLower.startsWith(c.name.toLowerCase() + '-'),
   )
   if (startsWith) return startsWith
   const cycleStartsWith = cycles.find(
-    (c) => c.name.toLowerCase().startsWith(vLower + '.') || c.name.toLowerCase().startsWith(vLower + '-'),
+    (c) =>
+      c.name.toLowerCase().startsWith(vLower + '.') ||
+      c.name.toLowerCase().startsWith(vLower + '-'),
   )
   if (cycleStartsWith) return cycleStartsWith
   if (vLower.endsWith('.x')) {
@@ -191,7 +206,10 @@ function matchCycle(cycles: V1Release[], version: string): V1Release | null {
   return null
 }
 
-function computeSupportStatus(release: V1Release): { status: SupportStatus; eolDate: Date | null } {
+export function computeSupportStatus(release: V1Release): {
+  status: SupportStatus
+  eolDate: Date | null
+} {
   const now = new Date()
   const eolFrom = release.eolFrom ?? null
   const eoesFrom = release.eoesFrom ?? null
@@ -269,7 +287,12 @@ export async function syncTechnologies(): Promise<SyncResult> {
     const cycles = await fetchEolData(slug)
     if (cycles === null) {
       for (const t of techs) {
-        result.details.push({ name: t.name, version: t.version, action: 'error', error: `API request failed for slug: ${slug}` })
+        result.details.push({
+          name: t.name,
+          version: t.version,
+          action: 'error',
+          error: `API request failed for slug: ${slug}`,
+        })
         result.errors++
       }
       continue
@@ -277,7 +300,12 @@ export async function syncTechnologies(): Promise<SyncResult> {
 
     if (cycles.length === 0) {
       for (const t of techs) {
-        result.details.push({ name: t.name, version: t.version, action: 'error', error: `API returned no data for slug: ${slug}` })
+        result.details.push({
+          name: t.name,
+          version: t.version,
+          action: 'error',
+          error: `API returned no data for slug: ${slug}`,
+        })
         result.errors++
       }
       continue
@@ -342,7 +370,7 @@ export async function syncTechnologies(): Promise<SyncResult> {
 
 /* ─── deps.dev helpers ─── */
 
-function detectDepsSystem(tech: Technology): DepsSystem | null {
+export function detectDepsSystem(tech: Technology): DepsSystem | null {
   const sysFromMeta = tech.metadata?.system as string | undefined
   if (sysFromMeta && ['npm', 'maven', 'nuget', 'pypi', 'go', 'cargo'].includes(sysFromMeta)) {
     return sysFromMeta as DepsSystem
@@ -358,9 +386,7 @@ function detectDepsSystem(tech: Technology): DepsSystem | null {
 }
 
 async function syncLibrariesFromDepsDev(): Promise<SyncResultItem[]> {
-  const libraries = await db.technologies
-    .filter((t) => t.category === 'library')
-    .toArray()
+  const libraries = await db.technologies.filter((t) => t.category === 'library').toArray()
 
   const results: SyncResultItem[] = []
 
@@ -404,9 +430,10 @@ async function syncLibrariesFromDepsDev(): Promise<SyncResultItem[]> {
       action: 'updated',
       previousStatus,
       newStatus: depsResult.supportStatus,
-      error: previousCveCount !== depsResult.cveList.length
-        ? `CVEs: ${previousCveCount} → ${depsResult.cveList.length}`
-        : undefined,
+      error:
+        previousCveCount !== depsResult.cveList.length
+          ? `CVEs: ${previousCveCount} → ${depsResult.cveList.length}`
+          : undefined,
     })
   }
 

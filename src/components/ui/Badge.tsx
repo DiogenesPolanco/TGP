@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
 interface BadgeProps {
-  children: ReactNode
+  children?: ReactNode
   variant?: 'status' | 'dot'
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
   size?: 'sm' | 'md'
@@ -48,22 +48,28 @@ const colorMap = {
   },
 }
 
-function Badge({ children, variant = 'status', color = 'primary', size = 'md', className }: BadgeProps) {
+function Badge({
+  children,
+  variant = 'status',
+  color = 'primary',
+  size = 'md',
+  className,
+}: BadgeProps) {
   const c = colorMap[color]
 
   if (variant === 'dot') {
-    return (
-      <span className={cn('w-2 h-2 rounded-full inline-block', c.dot, className)} />
-    )
+    return <span className={cn('w-2 h-2 rounded-full inline-block', c.dot, className)} />
   }
 
   return (
     <span
       className={cn(
         'inline-flex items-center rounded-full text-xs font-semibold border',
-        c.bg, c.text, c.border,
+        c.bg,
+        c.text,
+        c.border,
         size === 'md' ? 'px-2.5 py-1' : 'px-2 py-0.5',
-        className
+        className,
       )}
     >
       {children}

@@ -1,6 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Settings, CornerDownLeft, Sparkles, Clipboard, Check, Plus, MessageSquare, Trash2, ChevronDown, User } from 'lucide-react'
+import {
+  X,
+  Settings,
+  CornerDownLeft,
+  Sparkles,
+  Clipboard,
+  Check,
+  Plus,
+  MessageSquare,
+  Trash2,
+  ChevronDown,
+  User,
+} from 'lucide-react'
 import type { AiProviderConfig, AiChatMessage, AiConversation } from '../types'
 import { useAiChat } from '../hooks/useAiChat'
 
@@ -9,12 +21,15 @@ import { useAiChat } from '../hooks/useAiChat'
 function useCopy(delay = 1800) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const copy = useCallback(async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text)
-    setCopiedId(id)
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => setCopiedId(null), delay)
-  }, [delay])
+  const copy = useCallback(
+    async (text: string, id: string) => {
+      await navigator.clipboard.writeText(text)
+      setCopiedId(id)
+      clearTimeout(timer.current)
+      timer.current = setTimeout(() => setCopiedId(null), delay)
+    },
+    [delay],
+  )
   return { copiedId, copy }
 }
 
@@ -31,15 +46,12 @@ const KF = `
 // ─── Render markdown → HTML ───────────────────────────────────────
 
 function renderMd(text: string): string {
-  const escaped = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // Code blocks first (preserve inner content)
-  const withCode = escaped.replace(
-    /```(\w*)\n([\s\S]*?)```/g,
-    (_, lang, code) => {
-      const langAttr = lang ? ` data-lang="${lang}"` : ''
-      return `<div class="relative group/code my-3 first:mt-0 last:mb-0">
+  const withCode = escaped.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const langAttr = lang ? ` data-lang="${lang}"` : ''
+    return `<div class="relative group/code my-3 first:mt-0 last:mb-0">
         <div class="flex items-center justify-between px-3 py-1.5 rounded-t-lg bg-neutral-85 dark:bg-neutral-20 border-b border-neutral-70 dark:border-neutral-30">
           <span class="text-[10px] font-mono text-neutral-40 dark:text-neutral-50 uppercase tracking-wide">${lang || 'code'}</span>
           <button onclick="(function(b){navigator.clipboard.writeText(b.dataset.code);b.innerHTML='<span style=font-size:10px>✓</span>';setTimeout(()=>b.innerHTML='<span style=font-size:10px>⎘</span>',1500)})(this)"
@@ -49,14 +61,10 @@ function renderMd(text: string): string {
         </div>
         <pre class="bg-neutral-85 dark:bg-neutral-20 text-neutral-20 dark:text-neutral-85 rounded-b-lg p-3 text-[12px] leading-relaxed overflow-x-auto font-mono"${langAttr}><code>${code}</code></pre>
       </div>`
-    }
-  )
+  })
 
   return withCode
-    .replace(
-      /\*\*(.+?)\*\*/g,
-      '<strong class="font-semibold text-default">$1</strong>',
-    )
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-default">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em class="text-secondary">$1</em>')
     .replace(
       /`(.+?)`/g,
@@ -79,10 +87,14 @@ function renderMd(text: string): string {
 
 function providerLabel(config: AiProviderConfig): string {
   switch (config.provider) {
-    case 'ollama': return 'Ollama'
-    case 'groq': return 'Groq'
-    case 'anthropic': return 'Claude'
-    case 'openai': return 'OpenAI'
+    case 'ollama':
+      return 'Ollama'
+    case 'groq':
+      return 'Groq'
+    case 'anthropic':
+      return 'Claude'
+    case 'openai':
+      return 'OpenAI'
   }
 }
 
@@ -104,7 +116,8 @@ function msgTime(date: Date): string {
   const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
   const isToday = d.toDateString() === now.toDateString()
   if (isToday) return time
-  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
   if (d.toDateString() === yesterday.toDateString()) return `ayer, ${time}`
   const dateStr = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
   return `${dateStr}, ${time}`
@@ -142,9 +155,7 @@ function MessageBanner({ msg, index }: { msg: AiChatMessage; index: number }) {
             <User size={13} className="text-muted" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-sm leading-relaxed text-default font-medium">
-              {msg.content}
-            </div>
+            <div className="text-sm leading-relaxed text-default font-medium">{msg.content}</div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[10px] text-muted/50 font-mono">{ts}</span>
             </div>
@@ -153,8 +164,21 @@ function MessageBanner({ msg, index }: { msg: AiChatMessage; index: number }) {
       ) : (
         <div className="flex items-start gap-3">
           <div className="w-7 h-7 rounded-full bg-neutral-10 dark:bg-neutral-75 border border-neutral-20 dark:border-neutral-70 flex items-center justify-center shrink-0 mt-0.5">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted">
-              <path d="M12 3v18" /><path d="M3 12h18" /><path d="M5 7l14 10" /><path d="M5 17l14-10" />
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-muted"
+            >
+              <path d="M12 3v18" />
+              <path d="M3 12h18" />
+              <path d="M5 7l14 10" />
+              <path d="M5 17l14-10" />
             </svg>
           </div>
           <div className="min-w-0 flex-1">
@@ -201,7 +225,8 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
           Hola, soy GobIA
         </h2>
         <p className="text-[13px] text-muted leading-relaxed max-w-md">
-          Consultá la plataforma en lenguaje natural: aplicaciones, seguridad, equipos, estrategia y más.
+          Consultá la plataforma en lenguaje natural: aplicaciones, seguridad, equipos, estrategia y
+          más.
         </p>
       </div>
 
@@ -232,16 +257,41 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
 
 function LoadingDots() {
   return (
-    <div className="flex items-start gap-3 px-4 py-2" style={{ animation: 'msgIn 300ms cubic-bezier(0.16,1,0.3,1) both' }}>
+    <div
+      className="flex items-start gap-3 px-4 py-2"
+      style={{ animation: 'msgIn 300ms cubic-bezier(0.16,1,0.3,1) both' }}
+    >
       <div className="w-7 h-7 rounded-full bg-neutral-10 dark:bg-neutral-75 border border-neutral-20 dark:border-neutral-70 flex items-center justify-center shrink-0">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted">
-          <path d="M12 3v18" /><path d="M3 12h18" /><path d="M5 7l14 10" /><path d="M5 17l14-10" />
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-muted"
+        >
+          <path d="M12 3v18" />
+          <path d="M3 12h18" />
+          <path d="M5 7l14 10" />
+          <path d="M5 17l14-10" />
         </svg>
       </div>
       <div className="flex items-center gap-2 py-1.5">
-        <span className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]" style={{ animationDelay: '0ms' }} />
-        <span className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]" style={{ animationDelay: '250ms' }} />
-        <span className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]" style={{ animationDelay: '500ms' }} />
+        <span
+          className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]"
+          style={{ animationDelay: '0ms' }}
+        />
+        <span
+          className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]"
+          style={{ animationDelay: '250ms' }}
+        />
+        <span
+          className="w-2 h-2 rounded-full bg-neutral-40 dark:bg-neutral-50 animate-[loadPulse_1.4s_ease-in-out_infinite]"
+          style={{ animationDelay: '500ms' }}
+        />
       </div>
     </div>
   )
@@ -255,7 +305,13 @@ function convTitle(conv: AiConversation, reverseIdx: number): string {
   const count = conv.messageCount ?? 0
   if (count > 0) return `Conversación #${reverseIdx}`
   const d = conv.updatedAt ? new Date(conv.updatedAt) : null
-  if (d) return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  if (d)
+    return d.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   return 'Conversación'
 }
 
@@ -333,20 +389,27 @@ function ConversationList({
                 className={`group/item flex items-center gap-2 px-3 py-2.5 cursor-pointer transition-colors border-b border-boundary/50 last:border-b-0 ${
                   isActive ? 'bg-subtle/60' : 'hover:bg-card/80'
                 }`}
-                onClick={() => { onSelect(conv.id); onClose() }}
+                onClick={() => {
+                  onSelect(conv.id)
+                  onClose()
+                }}
               >
                 <MessageSquare size={13} className="shrink-0 text-muted" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-default text-[13px] truncate" style={{ fontWeight: isActive ? 600 : 400 }}>
+                  <p
+                    className="text-default text-[13px] truncate"
+                    style={{ fontWeight: isActive ? 600 : 400 }}
+                  >
                     {convTitle(conv, reverseIdx)}
                   </p>
-                  <p className="text-[10px] text-muted font-mono">
-                    {convSubtitle(conv)}
-                  </p>
+                  <p className="text-[10px] text-muted font-mono">{convSubtitle(conv)}</p>
                 </div>
                 {conversations.length > 1 && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(conv.id) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(conv.id)
+                    }}
                     className="p-1 rounded-md text-muted hover:text-danger hover:bg-danger/10 opacity-0 group-hover/item:opacity-100 transition-all"
                     title="Eliminar conversación"
                   >
@@ -385,9 +448,15 @@ interface AiChatPanelProps {
 export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
   const navigate = useNavigate()
   const {
-    messages, sendMessage, isLoading, error,
-    conversations, activeConversation,
-    switchConversation, newConversation, deleteConv,
+    messages,
+    sendMessage,
+    isLoading,
+    error,
+    conversations,
+    activeConversation,
+    switchConversation,
+    newConversation,
+    deleteConv,
   } = useAiChat({ config })
   const [input, setInput] = useState('')
   const [mounted, setMounted] = useState(false)
@@ -404,7 +473,11 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
       requestAnimationFrame(() => setAnimClass('slide-in'))
     } else if (mounted) {
       setAnimClass('slide-out')
-      const timer = setTimeout(() => { setMounted(false); setAnimClass(''); setShowConvList(false) }, 250)
+      const timer = setTimeout(() => {
+        setMounted(false)
+        setAnimClass('')
+        setShowConvList(false)
+      }, 250)
       return () => clearTimeout(timer)
     }
   }, [isOpen, mounted])
@@ -449,11 +522,12 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
 
   if (!mounted) return null
 
-  const panelAnim = animClass === 'slide-in'
-    ? 'animate-[slideInRight_250ms_cubic-bezier(0.16,1,0.3,1)_both]'
-    : animClass === 'slide-out'
-    ? 'animate-[slideOutRight_250ms_cubic-bezier(0.16,1,0.3,1)_both]'
-    : ''
+  const panelAnim =
+    animClass === 'slide-in'
+      ? 'animate-[slideInRight_250ms_cubic-bezier(0.16,1,0.3,1)_both]'
+      : animClass === 'slide-out'
+        ? 'animate-[slideOutRight_250ms_cubic-bezier(0.16,1,0.3,1)_both]'
+        : ''
 
   return (
     <>
@@ -496,7 +570,7 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
             <span className="text-[10px] text-muted font-mono block px-1.5">
               {providerLabel(config)} · {config.model}
               {activeConversation && messages.length > 0 && (
-                <> · {messages.filter(m => m.role !== 'system').length} mensajes</>
+                <> · {messages.filter((m) => m.role !== 'system').length} mensajes</>
               )}
             </span>
           </div>
@@ -542,7 +616,12 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
         {/* ── Messages ── */}
         <div className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-neutral-80 scrollbar-track-transparent">
           {messages.length === 0 && !isLoading ? (
-            <EmptyState onPick={(text) => { setInput(text); inputRef.current?.focus() }} />
+            <EmptyState
+              onPick={(text) => {
+                setInput(text)
+                inputRef.current?.focus()
+              }}
+            />
           ) : (
             <div className="px-4 space-y-3">
               {messages
@@ -572,17 +651,27 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
         <div className="px-3 py-3 border-t border-boundary shrink-0">
           {error && (
             <div className="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-danger/10 text-[11px] text-danger leading-relaxed border border-danger/20">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
               <span>{error}</span>
             </div>
           )}
 
           <div className="flex items-center gap-2 bg-canvas rounded-xl border border-boundary has-[:focus]:border-primary has-[:focus]:ring-1 has-[:focus]:ring-primary/30 transition-all duration-200 px-3 py-2">
-            <span className="text-muted font-mono text-sm select-none shrink-0">
-              ❯
-            </span>
+            <span className="text-muted font-mono text-sm select-none shrink-0">❯</span>
             <input
               ref={inputRef}
               type="text"
@@ -600,7 +689,17 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
               title="Enviar (Enter)"
             >
               {isLoading ? (
-                <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  className="animate-spin"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
               ) : (

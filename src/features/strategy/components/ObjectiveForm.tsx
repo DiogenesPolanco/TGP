@@ -26,17 +26,25 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
     type: objective?.type ?? 'okr',
     teamId: objective?.teamId ?? '',
     businessUnitId: objective?.businessUnitId ?? '',
-    periodStart: objective?.periodStart ? new Date(objective.periodStart).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    periodEnd: objective?.periodEnd ? new Date(objective.periodEnd).toISOString().split('T')[0] : '',
+    periodStart: objective?.periodStart
+      ? new Date(objective.periodStart).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0],
+    periodEnd: objective?.periodEnd
+      ? new Date(objective.periodEnd).toISOString().split('T')[0]
+      : '',
     status: objective?.status ?? 'not_started',
-    keyResults: objective?.keyResults ?? [] as KeyResult[],
+    keyResults: objective?.keyResults ?? ([] as KeyResult[]),
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const progress = formData.keyResults.length > 0
-      ? (formData.keyResults.reduce((sum, kr) => sum + (kr.target > 0 ? (kr.current / kr.target) * 100 : 0), 0) / formData.keyResults.length)
-      : 0
+    const progress =
+      formData.keyResults.length > 0
+        ? formData.keyResults.reduce(
+            (sum, kr) => sum + (kr.target > 0 ? (kr.current / kr.target) * 100 : 0),
+            0,
+          ) / formData.keyResults.length
+        : 0
 
     const data = {
       ...formData,
@@ -89,7 +97,10 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {objective ? 'Editar Objetivo' : 'Nuevo Objetivo'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <X size={20} />
           </Button>
         </div>
@@ -117,35 +128,55 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Select label="Tipo" value={formData.type} onChange={(v) => setFormData({ ...formData, type: v as typeof formData.type })} options={[
-                { value: 'okr', label: 'OKR' },
-                { value: 'kpi', label: 'KPI' },
-                { value: 'balanced_scorecard', label: 'Balanced Scorecard' },
-              ]} />
+              <Select
+                label="Tipo"
+                value={formData.type}
+                onChange={(v) => setFormData({ ...formData, type: v as typeof formData.type })}
+                options={[
+                  { value: 'okr', label: 'OKR' },
+                  { value: 'kpi', label: 'KPI' },
+                  { value: 'balanced_scorecard', label: 'Balanced Scorecard' },
+                ]}
+              />
             </div>
             <div>
-              <Select label="Equipo" value={formData.teamId} onChange={(v) => setFormData({ ...formData, teamId: v })} options={[
-                { value: '', label: 'Sin equipo' },
-                ...teams.map((team) => ({ value: team.id, label: team.name })),
-              ]} />
+              <Select
+                label="Equipo"
+                value={formData.teamId}
+                onChange={(v) => setFormData({ ...formData, teamId: v })}
+                options={[
+                  { value: '', label: 'Sin equipo' },
+                  ...teams.map((team) => ({ value: team.id, label: team.name })),
+                ]}
+              />
             </div>
             <div>
-              <Select label="Business Unit" value={formData.businessUnitId} onChange={(v) => setFormData({ ...formData, businessUnitId: v })} options={[
-                { value: '', label: 'Sin BU' },
-                ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
-              ]} />
+              <Select
+                label="Business Unit"
+                value={formData.businessUnitId}
+                onChange={(v) => setFormData({ ...formData, businessUnitId: v })}
+                options={[
+                  { value: '', label: 'Sin BU' },
+                  ...businessUnits.map((bu) => ({ value: bu.id, label: bu.name })),
+                ]}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Select label="Estado" value={formData.status} onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })} options={[
-                { value: 'not_started', label: 'No iniciado' },
-                { value: 'on_track', label: 'Encaminado' },
-                { value: 'at_risk', label: 'En riesgo' },
-                { value: 'behind', label: 'Atrasado' },
-                { value: 'achieved', label: 'Logrado' },
-              ]} />
+              <Select
+                label="Estado"
+                value={formData.status}
+                onChange={(v) => setFormData({ ...formData, status: v as ObjectiveStatus })}
+                options={[
+                  { value: 'not_started', label: 'No iniciado' },
+                  { value: 'on_track', label: 'Encaminado' },
+                  { value: 'at_risk', label: 'En riesgo' },
+                  { value: 'behind', label: 'Atrasado' },
+                  { value: 'achieved', label: 'Logrado' },
+                ]}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary mb-1">Inicio *</label>
@@ -181,7 +212,10 @@ export function ObjectiveForm({ objective, onClose, onSave }: ObjectiveFormProps
             </div>
             <div className="space-y-2">
               {formData.keyResults.map((kr, index) => (
-                <div key={kr.id} className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg">
+                <div
+                  key={kr.id}
+                  className="flex items-center gap-2 p-2 bg-neutral-10 dark:bg-neutral-70 rounded-lg"
+                >
                   <input
                     type="text"
                     placeholder="Título KR"

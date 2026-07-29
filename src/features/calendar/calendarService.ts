@@ -9,10 +9,7 @@ export interface CalendarEvent {
   link: string
 }
 
-export async function getCalendarEvents(
-  year: number,
-  month: number
-): Promise<CalendarEvent[]> {
+export async function getCalendarEvents(year: number, month: number): Promise<CalendarEvent[]> {
   const startDate = new Date(year, month, 1)
   const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999)
 

@@ -35,7 +35,9 @@ export function TechnologyFormPage() {
           vendor: technology.vendor ?? '',
           category: technology.category ?? '',
           supportStatus: technology.supportStatus ?? 'active',
-          eolDate: technology.eolDate ? new Date(technology.eolDate).toISOString().split('T')[0] : '',
+          eolDate: technology.eolDate
+            ? new Date(technology.eolDate).toISOString().split('T')[0]
+            : '',
           cveList: technology.cveList?.join(', ') ?? '',
         })
       })
@@ -46,45 +48,137 @@ export function TechnologyFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const cves = formData.cveList.split(',').map((c) => c.trim()).filter(Boolean)
-    const data = { ...formData, category: formData.category as TechCategory, eolDate: formData.eolDate ? parseLocalDate(formData.eolDate) : null, cveList: cves, metadata: technology?.metadata ?? {}, createdAt: technology?.createdAt ?? new Date() }
-    if (technology) { await db.technologies.update(technology.id, data); addNotification({ type: 'success', message: 'Tecnología actualizada' }) }
-    else { await db.technologies.add({ ...data, id: crypto.randomUUID() }); addNotification({ type: 'success', message: 'Tecnología creada' }) }
+    const cves = formData.cveList
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean)
+    const data = {
+      ...formData,
+      category: formData.category as TechCategory,
+      eolDate: formData.eolDate ? parseLocalDate(formData.eolDate) : null,
+      cveList: cves,
+      metadata: technology?.metadata ?? {},
+      createdAt: technology?.createdAt ?? new Date(),
+    }
+    if (technology) {
+      await db.technologies.update(technology.id, data)
+      addNotification({ type: 'success', message: 'Tecnología actualizada' })
+    } else {
+      await db.technologies.add({ ...data, id: crypto.randomUUID() })
+      addNotification({ type: 'success', message: 'Tecnología creada' })
+    }
     navigate('/catalog/obsolescence')
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/catalog/obsolescence')} className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"><ArrowLeft size={20} className="text-neutral-60" /></Button>
-        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">{technology ? 'Editar Tecnología' : 'Nueva Tecnología'}</h1>
+        <Button
+          onClick={() => navigate('/catalog/obsolescence')}
+          className="p-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+        >
+          <ArrowLeft size={20} className="text-neutral-60" />
+        </Button>
+        <h1 className="text-2xl font-bold text-neutral-90 dark:text-white">
+          {technology ? 'Editar Tecnología' : 'Nueva Tecnología'}
+        </h1>
       </div>
-      <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card rounded-xl border border-boundary p-6 shadow-sm space-y-4"
+      >
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-secondary mb-1">Nombre *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-          <div><label className="block text-sm font-medium text-secondary mb-1">Versión *</label><input type="text" required value={formData.version} onChange={(e) => setFormData({ ...formData, version: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Nombre *</label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Versión *</label>
+            <input
+              type="text"
+              required
+              value={formData.version}
+              onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-secondary mb-1">Vendor</label><input type="text" value={formData.vendor} onChange={(e) => setFormData({ ...formData, vendor: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
-          <div><label className="block text-sm font-medium text-secondary mb-1">Categoría</label><input type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="lenguaje, framework, db..." className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Vendor</label>
+            <input
+              type="text"
+              value={formData.vendor}
+              onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Categoría</label>
+            <input
+              type="text"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="lenguaje, framework, db..."
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div><Select label="Estado Soporte *" required value={formData.supportStatus} onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })} options={[
-            { value: 'active', label: 'Activo' },
-            { value: 'extended', label: 'Soporte Extendido' },
-            { value: 'eol', label: 'EOL' },
-            { value: 'unknown', label: 'Desconocido' },
-          ]} /></div>
-          <div><label className="block text-sm font-medium text-secondary mb-1">Fecha EOL</label><DatePicker value={formData.eolDate} onChange={(v) => setFormData({ ...formData, eolDate: v })} className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" /></div>
+          <div>
+            <Select
+              label="Estado Soporte *"
+              required
+              value={formData.supportStatus}
+              onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })}
+              options={[
+                { value: 'active', label: 'Activo' },
+                { value: 'extended', label: 'Soporte Extendido' },
+                { value: 'eol', label: 'EOL' },
+                { value: 'unknown', label: 'Desconocido' },
+              ]}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Fecha EOL</label>
+            <DatePicker
+              value={formData.eolDate}
+              onChange={(v) => setFormData({ ...formData, eolDate: v })}
+              className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">CVE(s) conocidos</label>
-          <input type="text" value={formData.cveList} onChange={(e) => setFormData({ ...formData, cveList: e.target.value })} placeholder="CVE-2024-1234, CVE-2024-5678" className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          <input
+            type="text"
+            value={formData.cveList}
+            onChange={(e) => setFormData({ ...formData, cveList: e.target.value })}
+            placeholder="CVE-2024-1234, CVE-2024-5678"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
           <p className="text-xs text-neutral-50 mt-1">Separados por coma</p>
         </div>
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" onClick={() => navigate('/catalog/obsolescence')} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">Cancelar</Button>
-          <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">{technology ? 'Actualizar' : 'Crear'}</Button>
+          <Button
+            type="button"
+            onClick={() => navigate('/catalog/obsolescence')}
+            className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+          >
+            {technology ? 'Actualizar' : 'Crear'}
+          </Button>
         </div>
       </form>
     </div>

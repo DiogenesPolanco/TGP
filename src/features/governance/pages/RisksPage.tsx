@@ -7,9 +7,20 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import {
-  Plus, Search, Filter, Upload, X, Eye, Pencil, Trash2,
-  AlertTriangle, Shield, CheckCircle, Server,
-  ChevronDown, ChevronRight,
+  Plus,
+  Search,
+  Filter,
+  Upload,
+  X,
+  Eye,
+  Pencil,
+  Trash2,
+  AlertTriangle,
+  Shield,
+  CheckCircle,
+  Server,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import type { Risk } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
@@ -58,11 +69,12 @@ export function RisksPage() {
     closed: risks.filter((r) => r.status === 'closed').length,
   }
 
-  const filteredRisks = risks.filter((r) =>
-    r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (statusFilter === 'all' || r.status === statusFilter) &&
-    (categoryFilter === 'all' || r.category === categoryFilter) &&
-    (!selectedCell || (r.probability === selectedCell.prob && r.impact === selectedCell.impact))
+  const filteredRisks = risks.filter(
+    (r) =>
+      r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === 'all' || r.status === statusFilter) &&
+      (categoryFilter === 'all' || r.category === categoryFilter) &&
+      (!selectedCell || (r.probability === selectedCell.prob && r.impact === selectedCell.impact)),
   )
 
   const handleDelete = async (id: string) => {
@@ -93,8 +105,16 @@ export function RisksPage() {
       className: 'max-w-xs',
       render: (risk) => (
         <div className="min-w-0">
-          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">{risk.title}</p>
-          {risk.description && <HtmlDescription html={risk.description} lines={1} className="text-neutral-50 dark:text-neutral-50" />}
+          <p className="text-sm font-medium text-neutral-90 dark:text-white truncate">
+            {risk.title}
+          </p>
+          {risk.description && (
+            <HtmlDescription
+              html={risk.description}
+              lines={1}
+              className="text-neutral-50 dark:text-neutral-50"
+            />
+          )}
         </div>
       ),
     },
@@ -117,12 +137,17 @@ export function RisksPage() {
       label: 'Score',
       sortable: true,
       render: (risk) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          risk.riskScore >= 20 ? 'bg-danger/10 text-danger' :
-          risk.riskScore >= 15 ? 'bg-warning/10 text-warning' :
-          risk.riskScore >= 10 ? 'bg-orange-100 text-orange-700' :
-          'bg-success/10 text-success'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            risk.riskScore >= 20
+              ? 'bg-danger/10 text-danger'
+              : risk.riskScore >= 15
+                ? 'bg-warning/10 text-warning'
+                : risk.riskScore >= 10
+                  ? 'bg-orange-100 text-orange-700'
+                  : 'bg-success/10 text-success'
+          }`}
+        >
           {risk.riskScore}
         </span>
       ),
@@ -132,9 +157,11 @@ export function RisksPage() {
       label: 'Estado',
       sortable: true,
       render: (risk) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-          statusColor[risk.status] || 'bg-neutral-10 text-neutral-60'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+            statusColor[risk.status] || 'bg-neutral-10 text-neutral-60'
+          }`}
+        >
           {statusLabel[risk.status]}
         </span>
       ),
@@ -147,21 +174,30 @@ export function RisksPage() {
       render: (risk) => (
         <div className="flex items-center justify-end gap-2">
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${risk.id}`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Ver detalle"
           >
             <Eye size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); navigate(`${risk.id}/edit`) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`${risk.id}/edit`)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-primary transition-colors"
             title="Editar"
           >
             <Pencil size={16} />
           </Button>
           <Button
-            onClick={(e) => { e.stopPropagation(); handleDelete(risk.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(risk.id)
+            }}
             className="p-1.5 rounded text-neutral-50 hover:text-danger transition-colors"
             title="Eliminar"
           >
@@ -173,9 +209,19 @@ export function RisksPage() {
   ]
 
   const StatCard = ({
-    icon, label, value, color, active, onClick,
+    icon,
+    label,
+    value,
+    color,
+    active,
+    onClick,
   }: {
-    icon: React.ReactNode; label: string; value: number; color: string; active?: boolean; onClick?: () => void
+    icon: React.ReactNode
+    label: string
+    value: number
+    color: string
+    active?: boolean
+    onClick?: () => void
   }) => {
     const iconClasses: Record<string, string> = {
       'text-primary': 'bg-primary/10 text-primary',
@@ -195,7 +241,9 @@ export function RisksPage() {
             : 'bg-card border-boundary shadow-sm hover:shadow-md hover:border-neutral-30 dark:hover:border-neutral-60'
         }${onClick ? ' cursor-pointer' : ''}`}
       >
-        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>{icon}</div>
+        <div className={`p-2 rounded-lg ${iconClasses[color] || 'bg-primary/10 text-primary'}`}>
+          {icon}
+        </div>
         <p className="text-2xl font-bold text-neutral-90 dark:text-white">{value}</p>
         <p className="text-xs text-muted">{label}</p>
       </Comp>
@@ -233,7 +281,10 @@ export function RisksPage() {
           value={statusCounts.total}
           color="text-primary"
           active={statusFilter === 'all' && !selectedCell}
-          onClick={() => { setStatusFilter('all'); setSelectedCell(null) }}
+          onClick={() => {
+            setStatusFilter('all')
+            setSelectedCell(null)
+          }}
         />
         <StatCard
           icon={statusIcon.open}
@@ -282,7 +333,8 @@ export function RisksPage() {
               Matriz de Calor
               {selectedCell && (
                 <span className="text-xs font-medium text-primary ml-1">
-                  (P{selectedCell.prob} · I{selectedCell.impact} = {selectedCell.prob * selectedCell.impact})
+                  (P{selectedCell.prob} · I{selectedCell.impact} ={' '}
+                  {selectedCell.prob * selectedCell.impact})
                 </span>
               )}
             </Button>
@@ -290,23 +342,39 @@ export function RisksPage() {
             {showHeatMap && (
               <div className="flex items-start gap-4">
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-[10px] font-medium text-neutral-50 -rotate-90 whitespace-nowrap mt-8">Probabilidad</span>
+                  <span className="text-[10px] font-medium text-neutral-50 -rotate-90 whitespace-nowrap mt-8">
+                    Probabilidad
+                  </span>
                   <div className="grid grid-cols-5 gap-1">
                     {[5, 4, 3, 2, 1].map((prob) => (
                       <div key={prob} className="contents">
-                        <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{prob}</div>
+                        <div className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">
+                          {prob}
+                        </div>
                         {[1, 2, 3, 4, 5].map((impact) => (
                           <Button
                             key={`${prob}-${impact}`}
-                            onClick={() => setSelectedCell(selectedCell?.prob === prob && selectedCell?.impact === impact ? null : { prob, impact })}
+                            onClick={() =>
+                              setSelectedCell(
+                                selectedCell?.prob === prob && selectedCell?.impact === impact
+                                  ? null
+                                  : { prob, impact },
+                              )
+                            }
                             className={`w-12 h-12 rounded-lg border-2 transition-all hover:scale-105 ${getCellColor(prob, impact)} ${
-                              selectedCell?.prob === prob && selectedCell?.impact === impact ? 'ring-2 ring-primary' : ''
+                              selectedCell?.prob === prob && selectedCell?.impact === impact
+                                ? 'ring-2 ring-primary'
+                                : ''
                             }`}
                           >
                             <div className="flex flex-col items-center justify-center h-full">
-                              <span className="text-xs font-bold text-neutral-90 dark:text-white">{prob * impact}</span>
+                              <span className="text-xs font-bold text-neutral-90 dark:text-white">
+                                {prob * impact}
+                              </span>
                               {getCellRisks(prob, impact).length > 0 && (
-                                <span className="text-[9px] text-muted">{getCellRisks(prob, impact).length}</span>
+                                <span className="text-[9px] text-muted">
+                                  {getCellRisks(prob, impact).length}
+                                </span>
                               )}
                             </div>
                           </Button>
@@ -315,7 +383,12 @@ export function RisksPage() {
                     ))}
                     <div className="w-6" />
                     {[1, 2, 3, 4, 5].map((impact) => (
-                      <div key={impact} className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50">{impact}</div>
+                      <div
+                        key={impact}
+                        className="flex items-center justify-center w-6 h-6 text-[10px] text-neutral-50"
+                      >
+                        {impact}
+                      </div>
                     ))}
                   </div>
                   <span className="text-[10px] font-medium text-neutral-50 mt-0.5">Impacto</span>
@@ -336,7 +409,10 @@ export function RisksPage() {
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-3">
               <div className="relative flex-1">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+                />
                 <input
                   type="text"
                   placeholder="Buscar riesgos..."
@@ -365,28 +441,41 @@ export function RisksPage() {
               <div className="flex items-center gap-4 pt-3 border-t border-boundary">
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-neutral-60">Estado</label>
-                  <Select value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[
-                    { value: 'all', label: 'Todos' },
-                    { value: 'open', label: 'Abierto' },
-                    { value: 'mitigated', label: 'Mitigado' },
-                    { value: 'accepted', label: 'Aceptado' },
-                    { value: 'closed', label: 'Cerrado' },
-                  ]} className="min-w-[120px]" />
+                  <Select
+                    value={statusFilter}
+                    onChange={(v) => setStatusFilter(v)}
+                    options={[
+                      { value: 'all', label: 'Todos' },
+                      { value: 'open', label: 'Abierto' },
+                      { value: 'mitigated', label: 'Mitigado' },
+                      { value: 'accepted', label: 'Aceptado' },
+                      { value: 'closed', label: 'Cerrado' },
+                    ]}
+                    className="min-w-[120px]"
+                  />
                 </div>
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-neutral-60">Categoría</label>
-                  <Select value={categoryFilter} onChange={(v) => setCategoryFilter(v)} options={[
-                    { value: 'all', label: 'Todas' },
-                    { value: 'technical', label: 'Técnico' },
-                    { value: 'security', label: 'Seguridad' },
-                    { value: 'operational', label: 'Operacional' },
-                    { value: 'regulatory', label: 'Regulatorio' },
-                    { value: 'financial', label: 'Financiero' },
-                  ]} className="min-w-[120px]" />
+                  <Select
+                    value={categoryFilter}
+                    onChange={(v) => setCategoryFilter(v)}
+                    options={[
+                      { value: 'all', label: 'Todas' },
+                      { value: 'technical', label: 'Técnico' },
+                      { value: 'security', label: 'Seguridad' },
+                      { value: 'operational', label: 'Operacional' },
+                      { value: 'regulatory', label: 'Regulatorio' },
+                      { value: 'financial', label: 'Financiero' },
+                    ]}
+                    className="min-w-[120px]"
+                  />
                 </div>
                 {(statusFilter !== 'all' || categoryFilter !== 'all') && (
                   <Button
-                    onClick={() => { setStatusFilter('all'); setCategoryFilter('all') }}
+                    onClick={() => {
+                      setStatusFilter('all')
+                      setCategoryFilter('all')
+                    }}
                     className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger hover:text-danger-dark transition-colors"
                   >
                     <X size={14} />

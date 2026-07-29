@@ -2,9 +2,12 @@ import { useState } from 'react'
 import { Smartphone, Shield, KeyRound, Check, X, Copy, Scan } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import {
-  getMobileSnapshotPassphrase, setMobileSnapshotPassphrase,
-  hasMobileSnapshotPassphrase, computeMobileSnapshot,
-  uploadMobileSnapshot, getStoredSnapshotInfo,
+  getMobileSnapshotPassphrase,
+  setMobileSnapshotPassphrase,
+  hasMobileSnapshotPassphrase,
+  computeMobileSnapshot,
+  uploadMobileSnapshot,
+  getStoredSnapshotInfo,
 } from '@/services/share/metricsSnapshotService'
 
 export function MobileSnapshotConfig() {
@@ -51,7 +54,10 @@ export function MobileSnapshotConfig() {
         addNotification({ type: 'error', message: result.error ?? 'Error al generar enlace' })
       }
     } catch (err) {
-      addNotification({ type: 'error', message: err instanceof Error ? err.message : 'Error desconocido' })
+      addNotification({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Error desconocido',
+      })
     } finally {
       setGenerating(false)
     }
@@ -72,7 +78,9 @@ export function MobileSnapshotConfig() {
           <Smartphone size={18} />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-neutral-90 dark:text-white">Command Center Móvil</h3>
+          <h3 className="text-sm font-bold text-neutral-90 dark:text-white">
+            Command Center Móvil
+          </h3>
           <p className="text-xs text-neutral-50">Snapshot cifrado para dashboard móvil</p>
         </div>
       </div>
@@ -85,25 +93,37 @@ export function MobileSnapshotConfig() {
             Contraseña de cifrado
           </label>
           <div className="flex items-center gap-2">
-            <input type="password" value={passphrase}
-              onChange={(e) => { setPassphrase(e.target.value); setSaved(false); setShareUrl(null) }}
+            <input
+              type="password"
+              value={passphrase}
+              onChange={(e) => {
+                setPassphrase(e.target.value)
+                setSaved(false)
+                setShareUrl(null)
+              }}
               placeholder="Mínimo 4 caracteres"
-              className="flex-1 px-3 py-2.5 text-sm rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white placeholder:text-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary/25"/>
+              className="flex-1 px-3 py-2.5 text-sm rounded-xl border border-neutral-30 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white placeholder:text-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary/25"
+            />
             {saved && passphrase ? (
-              <button onClick={handleClearPassphrase}
-                className="px-3 py-2.5 text-xs font-medium text-danger hover:bg-danger/5 rounded-xl transition-colors shrink-0">
+              <button
+                onClick={handleClearPassphrase}
+                className="px-3 py-2.5 text-xs font-medium text-danger hover:bg-danger/5 rounded-xl transition-colors shrink-0"
+              >
                 <X size={16} />
               </button>
             ) : (
-              <button onClick={handleSavePassphrase} disabled={passphrase.length < 4}
-                className="px-4 py-2.5 text-xs font-semibold bg-primary text-white rounded-xl hover:bg-primary-dark disabled:opacity-40 transition-all shrink-0">
+              <button
+                onClick={handleSavePassphrase}
+                disabled={passphrase.length < 4}
+                className="px-4 py-2.5 text-xs font-semibold bg-primary text-white rounded-xl hover:bg-primary-dark disabled:opacity-40 transition-all shrink-0"
+              >
                 Guardar
               </button>
             )}
           </div>
           <p className="text-[11px] text-neutral-50 mt-1.5">
-            Esta contraseña cifra el snapshot antes de subirlo a Azure.
-            Deberás ingresarla en el móvil para desbloquear el Command Center.
+            Esta contraseña cifra el snapshot antes de subirlo a Azure. Deberás ingresarla en el
+            móvil para desbloquear el Command Center.
           </p>
         </div>
 
@@ -125,12 +145,20 @@ export function MobileSnapshotConfig() {
         )}
 
         {/* Generate button */}
-        <button onClick={handleGenerateLink} disabled={!saved || generating}
-          className="w-full py-3 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dark disabled:opacity-40 transition-all flex items-center justify-center gap-2">
+        <button
+          onClick={handleGenerateLink}
+          disabled={!saved || generating}
+          className="w-full py-3 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dark disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+        >
           {generating ? (
-            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generando...</>
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{' '}
+              Generando...
+            </>
           ) : (
-            <><Scan size={16} /> Generar enlace del Command Center</>
+            <>
+              <Scan size={16} /> Generar enlace del Command Center
+            </>
           )}
         </button>
 
@@ -144,17 +172,22 @@ export function MobileSnapshotConfig() {
               <code className="flex-1 text-xs text-primary bg-primary/5 rounded-lg px-3 py-2.5 break-all select-all font-mono leading-relaxed">
                 {shareUrl}
               </code>
-              <button onClick={handleCopyUrl}
-                className="p-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0">
+              <button
+                onClick={handleCopyUrl}
+                className="p-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
+              >
                 <Copy size={16} />
               </button>
             </div>
-            {copied && <p className="text-xs text-success animate-pulse">¡Copiado al portapapeles!</p>}
+            {copied && (
+              <p className="text-xs text-success animate-pulse">¡Copiado al portapapeles!</p>
+            )}
             <div className="text-[11px] text-neutral-50 space-y-1">
               <p>Abre este enlace en el navegador de tu móvil.</p>
               <p className="flex items-center gap-1">
                 <Shield size={11} />
-                Los datos viajan cifrados de extremo a extremo. Solo quien tenga la contraseña puede verlos.
+                Los datos viajan cifrados de extremo a extremo. Solo quien tenga la contraseña puede
+                verlos.
               </p>
             </div>
           </div>

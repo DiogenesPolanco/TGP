@@ -56,7 +56,7 @@ const PUBLIC_TABLES = new Set(['tenants', 'businessUnits', 'users'])
 const ALL_TABLES = Object.keys(TABLE_TO_DOMAIN)
 
 export function createConsultarDatosTool(
-  permissions: AiProviderConfig['dataPermissions']
+  permissions: AiProviderConfig['dataPermissions'],
 ): AiToolDefinition {
   // Tablas disponibles según permisos
   const available = ALL_TABLES.filter((t) => {
@@ -68,7 +68,8 @@ export function createConsultarDatosTool(
     // Ningún dominio con tablas genéricas habilitado → tool no funcional
     return {
       name: 'consultar_datos',
-      description: 'No hay dominios habilitados para consulta genérica. Habilitá Catálogo, Seguridad, Gobierno, Reclutamiento o Equipamiento en Ajustes.',
+      description:
+        'No hay dominios habilitados para consulta genérica. Habilitá Catálogo, Seguridad, Gobierno, Reclutamiento o Equipamiento en Ajustes.',
       parameters: {
         type: 'object',
         properties: {
@@ -97,7 +98,8 @@ export function createConsultarDatosTool(
         },
         q: {
           type: 'string',
-          description: 'Búsqueda textual: busca el término en TODOS los campos string (case-insensitive, coincidencia parcial). Ej: "Juan", "crítico", "core"',
+          description:
+            'Búsqueda textual: busca el término en TODOS los campos string (case-insensitive, coincidencia parcial). Ej: "Juan", "crítico", "core"',
         },
         limit: {
           type: 'number',
@@ -123,7 +125,11 @@ export function createConsultarDatosTool(
       const whereRaw = params.where
       let where: Record<string, unknown> | undefined
       if (typeof whereRaw === 'string') {
-        try { where = JSON.parse(whereRaw) } catch { /* ignorar where malformado */ }
+        try {
+          where = JSON.parse(whereRaw)
+        } catch {
+          /* ignorar where malformado */
+        }
       } else if (whereRaw && typeof whereRaw === 'object') {
         where = whereRaw as Record<string, unknown>
       }
@@ -131,8 +137,12 @@ export function createConsultarDatosTool(
       const rawLimit = params.limit
       const orderBy = params.orderBy as string | undefined
       const orderDir = (params.orderDir as string) ?? 'asc'
-      const limitNum = typeof rawLimit === 'number' ? rawLimit :
-        typeof rawLimit === 'string' ? parseInt(rawLimit, 10) : 20
+      const limitNum =
+        typeof rawLimit === 'number'
+          ? rawLimit
+          : typeof rawLimit === 'string'
+            ? parseInt(rawLimit, 10)
+            : 20
       const limit = Math.min(Math.max(1, isNaN(limitNum) ? 20 : limitNum), 100)
 
       // Validar tabla
@@ -166,7 +176,7 @@ export function createConsultarDatosTool(
           const entries = Object.entries(where).filter(([, v]) => v !== null && v !== undefined)
           if (entries.length > 0) {
             results = results.filter((item: Record<string, unknown>) =>
-              entries.every(([k, v]) => item[k] === v)
+              entries.every(([k, v]) => item[k] === v),
             )
           }
         }
@@ -177,11 +187,11 @@ export function createConsultarDatosTool(
           const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
           const term = normalize(searchQ.trim().toLowerCase())
           results = results.filter((item: Record<string, unknown>) =>
-            Object.values(item).some(val => {
+            Object.values(item).some((val) => {
               if (typeof val === 'string') return normalize(val.toLowerCase()).includes(term)
               if (typeof val === 'number') return String(val).includes(term)
               return false
-            })
+            }),
           )
         }
 
@@ -217,7 +227,9 @@ export function createConsultarDatosTool(
             try {
               const str = JSON.stringify(val)
               return str.length > 200 ? str.slice(0, 200) + '…' : str
-            } catch { return '<objeto>' }
+            } catch {
+              return '<objeto>'
+            }
           }
           return String(val)
         }
@@ -225,9 +237,7 @@ export function createConsultarDatosTool(
         // Formatear resultados como texto estructurado
         const headers = Object.keys(results[0] as Record<string, unknown>)
         const rows = results.map((r: Record<string, unknown>, i: number) => {
-          const fields = headers
-            .map((h) => `${h}: ${serialize(r[h])}`)
-            .join(' | ')
+          const fields = headers.map((h) => `${h}: ${serialize(r[h])}`).join(' | ')
           return `${i + 1}. ${fields}`
         })
 

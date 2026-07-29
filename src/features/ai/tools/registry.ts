@@ -65,12 +65,31 @@ const SPECIALIZED_TOOLS: AiToolDefinition[] = [
 
 // Mapping de cada dominio a las tools especializadas que habilita.
 const PERMISSION_TO_TOOL: Record<keyof AiProviderConfig['dataPermissions'], string[]> = {
-  catalogo: ['buscar_aplicacion', 'buscar_microservicio', 'buscar_tecnologia', 'buscar_bd', 'consultar_dependencias', 'consultar_obsolescencia'],
+  catalogo: [
+    'buscar_aplicacion',
+    'buscar_microservicio',
+    'buscar_tecnologia',
+    'buscar_bd',
+    'consultar_dependencias',
+    'consultar_obsolescencia',
+  ],
   seguridad: ['buscar_vulnerabilidad', 'buscar_incidente'],
   gobierno: ['buscar_riesgo', 'buscar_hallazgo', 'auditar_datos'],
   estrategia: ['consultar_objetivos', 'consultar_indicadores', 'consultar_health_index'],
-  ejecucion: ['consultar_compromisos', 'consultar_tareas', 'consultar_planes', 'consultar_bloqueos', 'buscar_entregable'],
-  personas: ['consultar_equipos', 'consultar_sprints', 'consultar_metricas_sprint', 'buscar_persona', 'consultar_persona'],
+  ejecucion: [
+    'consultar_compromisos',
+    'consultar_tareas',
+    'consultar_planes',
+    'consultar_bloqueos',
+    'buscar_entregable',
+  ],
+  personas: [
+    'consultar_equipos',
+    'consultar_sprints',
+    'consultar_metricas_sprint',
+    'buscar_persona',
+    'consultar_persona',
+  ],
   reclutamiento: ['buscar_candidato', 'consultar_candidato'],
   equipamiento: ['buscar_equipamiento', 'buscar_ticket_equipo'],
 }
@@ -80,7 +99,9 @@ const PERMISSION_TO_TOOL: Record<keyof AiProviderConfig['dataPermissions'], stri
  * - Tools especializadas para los dominios que las tienen (estrategia, ejecucion, personas)
  * - Tool genérica `consultar_datos` para dominios sin tools especializadas (catalogo, seguridad, gobierno, reclutamiento, equipamiento)
  */
-export function getEnabledTools(permissions: AiProviderConfig['dataPermissions']): AiToolDefinition[] {
+export function getEnabledTools(
+  permissions: AiProviderConfig['dataPermissions'],
+): AiToolDefinition[] {
   const enabledNames = new Set<string>()
 
   for (const [perm, names] of Object.entries(PERMISSION_TO_TOOL)) {
@@ -95,8 +116,11 @@ export function getEnabledTools(permissions: AiProviderConfig['dataPermissions']
 
   // Agregar tool genérica para dominios que la necesitan (sin tools especializadas)
   const needsGenericTool =
-    permissions.catalogo || permissions.seguridad || permissions.gobierno ||
-    permissions.reclutamiento || permissions.equipamiento
+    permissions.catalogo ||
+    permissions.seguridad ||
+    permissions.gobierno ||
+    permissions.reclutamiento ||
+    permissions.equipamiento
 
   if (needsGenericTool) {
     tools.push(createConsultarDatosTool(permissions))

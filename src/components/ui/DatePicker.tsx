@@ -17,8 +17,18 @@ interface DatePickerProps {
 }
 
 const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ]
 
 const DAYS = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá']
@@ -154,17 +164,13 @@ export function DatePicker({
     }
   }
 
-  const selectedStr = selected ? formatDate(selected.getFullYear(), selected.getMonth(), selected.getDate()) : ''
+  const selectedStr = selected
+    ? formatDate(selected.getFullYear(), selected.getMonth(), selected.getDate())
+    : ''
 
   return (
     <div ref={containerRef} className="relative">
-      <input
-        ref={hiddenRef}
-        type="hidden"
-        name={name}
-        value={value ?? ''}
-        readOnly
-      />
+      <input ref={hiddenRef} type="hidden" name={name} value={value ?? ''} readOnly />
 
       {label && (
         <label className="block text-sm font-medium text-secondary mb-1.5">
@@ -178,13 +184,9 @@ export function DatePicker({
         disabled={disabled}
         onClick={() => setOpen(!open)}
         onBlur={onBlur}
-        className={`${className} ${
-          disabled
-            ? 'opacity-50 cursor-not-allowed'
-            : 'cursor-pointer'
-        }`}
+        className={`${className} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
-          <span className={`text-neutral-90 dark:text-white ${displayValue ? '' : 'opacity-60'}`}>
+        <span className={`text-neutral-90 dark:text-white ${displayValue ? '' : 'opacity-60'}`}>
           {displayValue || placeholder}
         </span>
       </button>

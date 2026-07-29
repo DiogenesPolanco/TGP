@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '@/stores/appStore'
-import { getJiraConfig, saveJiraConfig, isJiraConfigured, type JiraConfig } from '@/services/jira/jiraConfigService'
+import {
+  getJiraConfig,
+  saveJiraConfig,
+  isJiraConfigured,
+  type JiraConfig,
+} from '@/services/jira/jiraConfigService'
 import { getBoards } from '@/services/jira/jiraService'
 import { Check, RefreshCw, Globe, Key, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -50,7 +55,10 @@ export function JiraConfigPanel() {
         message: `Conexión exitosa — ${mapped.length} boards encontrados`,
       })
     } catch {
-      addNotification({ type: 'error', message: 'Error al conectar con Jira. Verifica URL, email y token.' })
+      addNotification({
+        type: 'error',
+        message: 'Error al conectar con Jira. Verifica URL, email y token.',
+      })
     } finally {
       setTesting(false)
     }
@@ -115,30 +123,32 @@ export function JiraConfigPanel() {
           onClick={handleSave}
           className={cn(
             'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
-            saved
-              ? 'bg-success/10 text-success'
-              : 'bg-primary text-white hover:bg-primary-dark'
+            saved ? 'bg-success/10 text-success' : 'bg-primary text-white hover:bg-primary-dark',
           )}
         >
-          {saved ? <span className="flex items-center gap-1"><Check size={14} /> Guardado</span> : 'Guardar'}
+          {saved ? (
+            <span className="flex items-center gap-1">
+              <Check size={14} /> Guardado
+            </span>
+          ) : (
+            'Guardar'
+          )}
         </Button>
         <Button
           onClick={handleTestAndFetch}
           disabled={testing || !config.baseUrl}
           className="flex items-center gap-1.5 px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-neutral-60 hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors disabled:opacity-50"
         >
-          {testing ? (
-            <RefreshCw size={14} className="animate-spin" />
-          ) : (
-            <Globe size={14} />
-          )}
+          {testing ? <RefreshCw size={14} className="animate-spin" /> : <Globe size={14} />}
           {testing ? 'Conectando...' : 'Probar Conexión'}
         </Button>
       </div>
 
       {boards.length > 0 && (
         <div>
-          <label className="text-xs font-medium text-neutral-60 mb-2 block">Boards disponibles</label>
+          <label className="text-xs font-medium text-neutral-60 mb-2 block">
+            Boards disponibles
+          </label>
           <div className="grid gap-2 max-h-48 overflow-y-auto">
             {boards.map((b) => (
               <div

@@ -85,8 +85,12 @@ export function DashboardPage() {
       {shareUrl && (
         <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
           <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
+          <a
+            href={cleanUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+          >
             {cleanUrl}
           </a>
           <Button
@@ -99,12 +103,22 @@ export function DashboardPage() {
         </div>
       )}
 
-      {e['thi-gauge'] || e['kpi-critical-vulns'] || e['kpi-p1-incidents'] || e['kpi-thi-score'] || e['kpi-eol-techs'] ? (
+      {e['thi-gauge'] ||
+      e['kpi-critical-vulns'] ||
+      e['kpi-p1-incidents'] ||
+      e['kpi-thi-score'] ||
+      e['kpi-eol-techs'] ? (
         <DashboardHero metrics={metrics} enabledWidgets={e} />
       ) : null}
 
-      {e['kpi-risk-exposure'] || e['kpi-compliance'] || e['kpi-elite-teams'] || e['kpi-total-apps'] ||
-       e['kpi-active-plans'] || e['kpi-blockers'] || e['kpi-overdue-commitments'] || e['kpi-activities-today'] ? (
+      {e['kpi-risk-exposure'] ||
+      e['kpi-compliance'] ||
+      e['kpi-elite-teams'] ||
+      e['kpi-total-apps'] ||
+      e['kpi-active-plans'] ||
+      e['kpi-blockers'] ||
+      e['kpi-overdue-commitments'] ||
+      e['kpi-activities-today'] ? (
         <MetricsGrid metrics={metrics} enabledWidgets={e} />
       ) : null}
 
@@ -154,7 +168,9 @@ export function DashboardPage() {
       {showTerms && (
         <TermsModal
           onAccept={handleTermsAccepted}
-          onClose={() => { setShowTerms(false) }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
@@ -177,7 +193,10 @@ export function DashboardPage() {
             setShowPassphrase(false)
             setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
     </div>

@@ -5,9 +5,7 @@ import { AI_PROVIDER_DEFAULTS } from '../types'
 
 // Migra configs viejas (commitments/objectives/team/sprints/projects)
 // al nuevo schema de 8 dominios que cubre las 40+ tablas de TGP.
-function migratePermissions(
-  perms: Record<string, boolean>
-): AiProviderConfig['dataPermissions'] {
+function migratePermissions(perms: Record<string, boolean>): AiProviderConfig['dataPermissions'] {
   // Si ya tiene las nuevas claves, es el schema actual
   if ('catalogo' in perms) {
     return perms as AiProviderConfig['dataPermissions']
@@ -52,9 +50,16 @@ function getDefaultPermissions(): AiProviderConfig['dataPermissions'] {
 interface AiConfigState {
   configs: Record<string, AiProviderConfig>
   getConfig: (userId: string) => AiProviderConfig | null
-  saveConfig: (userId: string, partial: Partial<AiProviderConfig> & { provider: AiProviderType }) => AiProviderConfig
+  saveConfig: (
+    userId: string,
+    partial: Partial<AiProviderConfig> & { provider: AiProviderType },
+  ) => AiProviderConfig
   removeConfig: (userId: string) => void
-  updatePermission: (userId: string, key: keyof AiProviderConfig['dataPermissions'], value: boolean) => void
+  updatePermission: (
+    userId: string,
+    key: keyof AiProviderConfig['dataPermissions'],
+    value: boolean,
+  ) => void
 }
 
 // Models que NO soporan function calling estándar (type:"function")
@@ -73,7 +78,7 @@ function sanitizeConfig(config: AiProviderConfig): AiProviderConfig {
     if (typeof window !== 'undefined') {
       console.warn(
         `[AI Config] Modelo "${config.model}" no soporta tool calling o tiene rate limit muy bajo. ` +
-          `Cambiando automáticamente a "${GROQ_FALLBACK_MODEL}".`
+          `Cambiando automáticamente a "${GROQ_FALLBACK_MODEL}".`,
       )
     }
     return { ...config, model: GROQ_FALLBACK_MODEL, updatedAt: new Date() }
@@ -128,7 +133,8 @@ export const useAiConfigStore = create<AiConfigState>()(
       },
 
       removeConfig: (userId) => {
-        const { [userId]: _, ...rest } = get().configs
+        const { [userId]: _unused, ...rest } = get().configs
+        void _unused
         set({ configs: rest })
       },
 
@@ -150,6 +156,6 @@ export const useAiConfigStore = create<AiConfigState>()(
     {
       name: 'tgp-ai-config',
       partialize: (state) => ({ configs: state.configs }),
-    }
-  )
+    },
+  ),
 )

@@ -14,7 +14,7 @@ export function EmptyState({ icon, title, description, action, compact }: EmptyS
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        compact ? 'py-8' : 'py-16'
+        compact ? 'py-8' : 'py-16',
       )}
     >
       <div className="w-12 h-12 rounded-full bg-neutral-10 dark:bg-neutral-80 flex items-center justify-center mb-4">

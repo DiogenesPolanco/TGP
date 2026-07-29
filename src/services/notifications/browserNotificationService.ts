@@ -14,7 +14,9 @@ export function areBrowserNotificationsEnabled(): boolean {
 export function setBrowserNotificationsEnabled(enabled: boolean): void {
   try {
     localStorage.setItem(STORAGE_KEY, String(enabled))
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 export async function requestNotificationPermission(): Promise<boolean> {
@@ -30,10 +32,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
   }
 }
 
-export function sendBrowserNotification(
-  title: string,
-  options?: NotificationOptions
-): void {
+export function sendBrowserNotification(title: string, options?: NotificationOptions): void {
   if (!('Notification' in window)) return
   if (Notification.permission !== 'granted') return
   if (!areBrowserNotificationsEnabled()) return
@@ -43,16 +42,15 @@ export function sendBrowserNotification(
       icon: NOTIFICATION_ICON,
       ...options,
     })
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 export function notifyAlert(alert: DashboardAlert): void {
   if (alert.type === 'info' || alert.type === 'success') return
 
-  const title =
-    alert.type === 'critical'
-      ? '🔴 Alerta Crítica - TGP'
-      : '🟡 Alerta - TGP'
+  const title = alert.type === 'critical' ? '🔴 Alerta Crítica - TGP' : '🟡 Alerta - TGP'
 
   sendBrowserNotification(title, { body: alert.message })
 }
@@ -69,13 +67,11 @@ export function notifyAlerts(alerts: DashboardAlert[]): void {
             .slice(0, 5)
             .map((a) => `• ${a.message}`)
             .join('\n') +
-          (criticalAlerts.length > 5
-            ? `\n... y ${criticalAlerts.length - 5} más`
-            : '')
+          (criticalAlerts.length > 5 ? `\n... y ${criticalAlerts.length - 5} más` : '')
 
     sendBrowserNotification(
       `🔴 ${criticalAlerts.length} alerta${criticalAlerts.length > 1 ? 's' : ''} crítica${criticalAlerts.length > 1 ? 's' : ''} - TGP`,
-      { body }
+      { body },
     )
   }
 
@@ -87,13 +83,11 @@ export function notifyAlerts(alerts: DashboardAlert[]): void {
             .slice(0, 3)
             .map((a) => `• ${a.message}`)
             .join('\n') +
-          (warningAlerts.length > 3
-            ? `\n... y ${warningAlerts.length - 3} más`
-            : '')
+          (warningAlerts.length > 3 ? `\n... y ${warningAlerts.length - 3} más` : '')
 
     sendBrowserNotification(
       `🟡 ${warningAlerts.length} alerta${warningAlerts.length > 1 ? 's' : ''} - TGP`,
-      { body }
+      { body },
     )
   }
 }

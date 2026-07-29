@@ -1,14 +1,33 @@
 import * as XLSX from 'xlsx-js-style'
 import { db } from '@/services/db/database'
 import type {
-  Criticality, ArchitectureType, ApplicationStatus, TechCategory, SupportStatus,
-  Severity, VulnSource, VulnStatus, IncidentStatus, RiskCategory, RiskStatus,
-  AuditCategory, AuditStatus, DatabaseType, EnvironmentType,
-  DeliverableStatus, UserRole, BusinessUnitStatus,
+  Criticality,
+  ArchitectureType,
+  ApplicationStatus,
+  TechCategory,
+  SupportStatus,
+  Severity,
+  VulnSource,
+  VulnStatus,
+  IncidentStatus,
+  RiskCategory,
+  RiskStatus,
+  AuditCategory,
+  AuditStatus,
+  DatabaseType,
+  EnvironmentType,
+  DeliverableStatus,
+  UserRole,
+  BusinessUnitStatus,
 } from '@/types/domain'
 import type {
-  TaskStatus, CommitmentStatus, BlockerSeverity, BlockerStatus,
-  DependencyRelation, ProjectStatus, ProjectHealth,
+  TaskStatus,
+  CommitmentStatus,
+  BlockerSeverity,
+  BlockerStatus,
+  DependencyRelation,
+  ProjectStatus,
+  ProjectHealth,
 } from '@/constants/enums'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
@@ -42,10 +61,12 @@ function sanitizeErrorMessage(err: unknown): string {
 
 function sanitizeRecordValue(value: unknown): unknown {
   if (typeof value === 'string') {
-    return value
-      .slice(0, 5000) // limit length to prevent abuse
-      // eslint-disable-next-line no-control-regex
-      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+    return (
+      value
+        .slice(0, 5000) // limit length to prevent abuse
+        // eslint-disable-next-line no-control-regex
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+    )
   }
   return value
 }
@@ -62,7 +83,9 @@ function sanitizeRecordKeys(data: Record<string, unknown>): Record<string, unkno
 
 function parseWithTimeout<T>(fn: () => T, timeoutMs: number): T {
   let timedOut = false
-  const timer = setTimeout(() => { timedOut = true }, timeoutMs)
+  const timer = setTimeout(() => {
+    timedOut = true
+  }, timeoutMs)
 
   try {
     const result = fn()
@@ -130,9 +153,34 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'description', label: 'Descripción' },
       { key: 'ownerName', label: 'Owner', required: true },
       { key: 'businessUnitId', label: 'Business Unit ID', required: true },
-      { key: 'criticality', label: 'Criticidad', required: true, type: 'enum', enumValues: ['low', 'medium', 'high', 'critical'] as const },
-      { key: 'architecture', label: 'Arquitectura', type: 'enum', enumValues: ['monolith', 'microservices', 'serverless', 'soa', 'event_driven', 'hybrid'] as const, default: 'monolith' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['active', 'deprecated', 'retired', 'planned'] as const, default: 'active' },
+      {
+        key: 'criticality',
+        label: 'Criticidad',
+        required: true,
+        type: 'enum',
+        enumValues: ['low', 'medium', 'high', 'critical'] as const,
+      },
+      {
+        key: 'architecture',
+        label: 'Arquitectura',
+        type: 'enum',
+        enumValues: [
+          'monolith',
+          'microservices',
+          'serverless',
+          'soa',
+          'event_driven',
+          'hybrid',
+        ] as const,
+        default: 'monolith',
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['active', 'deprecated', 'retired', 'planned'] as const,
+        default: 'active',
+      },
       { key: 'supportEndDate', label: 'Fin Soporte', type: 'date' },
       { key: 'technologies', label: 'Tecnologías (IDs separados por ;)' },
     ],
@@ -161,10 +209,35 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'name', label: 'Nombre', required: true },
       { key: 'version', label: 'Versión', required: true },
-      { key: 'category', label: 'Categoría', required: true, type: 'enum', enumValues: ['framework', 'language', 'database', 'os', 'library', 'runtime', 'message_broker', 'cache', 'web_server', 'cloud_service', 'tool', 'other'] as const },
+      {
+        key: 'category',
+        label: 'Categoría',
+        required: true,
+        type: 'enum',
+        enumValues: [
+          'framework',
+          'language',
+          'database',
+          'os',
+          'library',
+          'runtime',
+          'message_broker',
+          'cache',
+          'web_server',
+          'cloud_service',
+          'tool',
+          'other',
+        ] as const,
+      },
       { key: 'vendor', label: 'Vendor', required: true },
       { key: 'eolDate', label: 'Fecha EOL', type: 'date' },
-      { key: 'supportStatus', label: 'Estado Soporte', required: true, type: 'enum', enumValues: ['active', 'extended', 'eol', 'unknown'] as const },
+      {
+        key: 'supportStatus',
+        label: 'Estado Soporte',
+        required: true,
+        type: 'enum',
+        enumValues: ['active', 'extended', 'eol', 'unknown'] as const,
+      },
     ],
     buildEntity: (row, id) => ({
       id,
@@ -178,7 +251,10 @@ const importConfigs: Record<string, ImportConfig> = {
       metadata: {},
       createdAt: new Date(),
     }),
-    matchKey: (row) => ({ name: String(row['Nombre'] ?? ''), version: String(row['Versión'] ?? '') }),
+    matchKey: (row) => ({
+      name: String(row['Nombre'] ?? ''),
+      version: String(row['Versión'] ?? ''),
+    }),
   },
 
   vulnerabilities: {
@@ -189,9 +265,27 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
       { key: 'cvssScore', label: 'CVSS', type: 'number', required: true },
-      { key: 'severity', label: 'Severidad', required: true, type: 'enum', enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const },
-      { key: 'source', label: 'Fuente', type: 'enum', enumValues: ['fluid_attacks', 'sonarqube', 'manual', 'github_advisory'] as const, default: 'manual' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['open', 'in_progress', 'fixed', 'accepted'] as const, default: 'open' },
+      {
+        key: 'severity',
+        label: 'Severidad',
+        required: true,
+        type: 'enum',
+        enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const,
+      },
+      {
+        key: 'source',
+        label: 'Fuente',
+        type: 'enum',
+        enumValues: ['fluid_attacks', 'sonarqube', 'manual', 'github_advisory'] as const,
+        default: 'manual',
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['open', 'in_progress', 'fixed', 'accepted'] as const,
+        default: 'open',
+      },
       { key: 'slaDeadline', label: 'SLA Fecha', type: 'date' },
       { key: 'detectedAt', label: 'Detectado', type: 'date' },
       { key: 'externalId', label: 'ID Externo' },
@@ -223,8 +317,20 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'applicationId', label: 'App ID', required: true },
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
-      { key: 'severity', label: 'Severidad', required: true, type: 'enum', enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['detected', 'acknowledged', 'in_progress', 'resolved', 'closed'] as const, default: 'detected' },
+      {
+        key: 'severity',
+        label: 'Severidad',
+        required: true,
+        type: 'enum',
+        enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const,
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['detected', 'acknowledged', 'in_progress', 'resolved', 'closed'] as const,
+        default: 'detected',
+      },
       { key: 'detectedAt', label: 'Detectado', type: 'date' },
       { key: 'downtimeMinutes', label: 'Downtime (min)', type: 'number' },
       { key: 'externalId', label: 'ID Externo' },
@@ -257,11 +363,23 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'description', label: 'Descripción' },
       { key: 'applicationId', label: 'App ID' },
       { key: 'businessUnitId', label: 'Business Unit ID', required: true },
-      { key: 'category', label: 'Categoría', required: true, type: 'enum', enumValues: ['technical', 'security', 'operational', 'regulatory', 'financial'] as const },
+      {
+        key: 'category',
+        label: 'Categoría',
+        required: true,
+        type: 'enum',
+        enumValues: ['technical', 'security', 'operational', 'regulatory', 'financial'] as const,
+      },
       { key: 'probability', label: 'Probabilidad (1-5)', type: 'number', required: true },
       { key: 'impact', label: 'Impacto (1-5)', type: 'number', required: true },
       { key: 'riskScore', label: 'Score', type: 'number' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['open', 'mitigated', 'accepted', 'closed'] as const, default: 'open' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['open', 'mitigated', 'accepted', 'closed'] as const,
+        default: 'open',
+      },
     ],
     buildEntity: (row, id) => {
       const probability = Number(row['Probabilidad (1-5)']) || 1
@@ -294,9 +412,35 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'applicationId', label: 'App ID', required: true },
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
-      { key: 'severity', label: 'Severidad', required: true, type: 'enum', enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const },
-      { key: 'category', label: 'Categoría', required: true, type: 'enum', enumValues: ['security', 'compliance', 'architecture', 'process', 'data_governance', 'access_control', 'business_continuity'] as const },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['open', 'in_progress', 'resolved', 'closed', 'overdue'] as const, default: 'open' },
+      {
+        key: 'severity',
+        label: 'Severidad',
+        required: true,
+        type: 'enum',
+        enumValues: ['critical', 'high', 'medium', 'low', 'info'] as const,
+      },
+      {
+        key: 'category',
+        label: 'Categoría',
+        required: true,
+        type: 'enum',
+        enumValues: [
+          'security',
+          'compliance',
+          'architecture',
+          'process',
+          'data_governance',
+          'access_control',
+          'business_continuity',
+        ] as const,
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['open', 'in_progress', 'resolved', 'closed', 'overdue'] as const,
+        default: 'open',
+      },
       { key: 'dueDate', label: 'Fecha Vencimiento', type: 'date' },
       { key: 'auditReference', label: 'Ref. Auditoría' },
     ],
@@ -328,8 +472,31 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'description', label: 'Descripción' },
       { key: 'engine', label: 'Motor', required: true },
       { key: 'version', label: 'Versión' },
-      { key: 'dbType', label: 'Tipo', required: true, type: 'enum', enumValues: ['relational', 'document', 'key-value', 'graph', 'time-series', 'search', 'cache', 'message_queue', 'vector', 'other'] as const },
-      { key: 'environment', label: 'Ambiente', required: true, type: 'enum', enumValues: ['dev', 'qa', 'staging', 'prod', 'dr', 'test', 'uat', 'perf'] as const },
+      {
+        key: 'dbType',
+        label: 'Tipo',
+        required: true,
+        type: 'enum',
+        enumValues: [
+          'relational',
+          'document',
+          'key-value',
+          'graph',
+          'time-series',
+          'search',
+          'cache',
+          'message_queue',
+          'vector',
+          'other',
+        ] as const,
+      },
+      {
+        key: 'environment',
+        label: 'Ambiente',
+        required: true,
+        type: 'enum',
+        enumValues: ['dev', 'qa', 'staging', 'prod', 'dr', 'test', 'uat', 'perf'] as const,
+      },
       { key: 'host', label: 'Host / Endpoint' },
       { key: 'port', label: 'Puerto', type: 'number' },
       { key: 'isManaged', label: 'Managed (true/false)' },
@@ -353,7 +520,10 @@ const importConfigs: Record<string, ImportConfig> = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
-    matchKey: (row) => ({ name: String(row['Nombre'] ?? ''), applicationId: String(row['App ID'] ?? '') }),
+    matchKey: (row) => ({
+      name: String(row['Nombre'] ?? ''),
+      applicationId: String(row['App ID'] ?? ''),
+    }),
   },
 
   /* ─── Business Units ─── */
@@ -363,7 +533,13 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'name', label: 'Nombre', required: true },
       { key: 'tenantId', label: 'Tenant ID', required: true },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['active', 'inactive'] as const, default: 'active' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['active', 'inactive'] as const,
+        default: 'active',
+      },
     ],
     buildEntity: (row, id) => ({
       id,
@@ -382,8 +558,20 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'applicationId', label: 'App ID (origen)', required: true },
       { key: 'dependsOnAppId', label: 'App ID (destino)', required: true },
-      { key: 'dependencyType', label: 'Tipo Dependencia', type: 'enum', enumValues: ['hard', 'soft', 'data', 'sync', 'async'] as const, default: 'hard' },
-      { key: 'criticality', label: 'Criticidad', type: 'enum', enumValues: ['low', 'medium', 'high', 'critical'] as const, default: 'medium' },
+      {
+        key: 'dependencyType',
+        label: 'Tipo Dependencia',
+        type: 'enum',
+        enumValues: ['hard', 'soft', 'data', 'sync', 'async'] as const,
+        default: 'hard',
+      },
+      {
+        key: 'criticality',
+        label: 'Criticidad',
+        type: 'enum',
+        enumValues: ['low', 'medium', 'high', 'critical'] as const,
+        default: 'medium',
+      },
       { key: 'description', label: 'Descripción' },
     ],
     buildEntity: (row, id) => ({
@@ -395,7 +583,10 @@ const importConfigs: Record<string, ImportConfig> = {
       description: String(row['Descripción'] ?? ''),
       createdAt: new Date(),
     }),
-    matchKey: (row) => ({ applicationId: String(row['App ID (origen)'] ?? ''), dependsOnAppId: String(row['App ID (destino)'] ?? '') }),
+    matchKey: (row) => ({
+      applicationId: String(row['App ID (origen)'] ?? ''),
+      dependsOnAppId: String(row['App ID (destino)'] ?? ''),
+    }),
   },
 
   /* ─── Microservicios ─── */
@@ -417,7 +608,10 @@ const importConfigs: Record<string, ImportConfig> = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
-    matchKey: (row) => ({ name: String(row['Nombre'] ?? ''), applicationId: String(row['App ID'] ?? '') }),
+    matchKey: (row) => ({
+      name: String(row['Nombre'] ?? ''),
+      applicationId: String(row['App ID'] ?? ''),
+    }),
   },
 
   /* ─── Entregables ─── */
@@ -429,7 +623,13 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
       { key: 'dueDate', label: 'Fecha Vencimiento', type: 'date' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['pending', 'in_progress', 'completed', 'cancelled'] as const, default: 'pending' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['pending', 'in_progress', 'completed', 'cancelled'] as const,
+        default: 'pending',
+      },
       { key: 'objectiveId', label: 'Objective ID' },
     ],
     buildEntity: (row, id) => ({
@@ -453,7 +653,13 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'email', label: 'Email', required: true },
       { key: 'displayName', label: 'Nombre', required: true },
-      { key: 'role', label: 'Rol', type: 'enum', enumValues: ['admin', 'manager', 'user', 'viewer'] as const, default: 'user' },
+      {
+        key: 'role',
+        label: 'Rol',
+        type: 'enum',
+        enumValues: ['admin', 'manager', 'user', 'viewer'] as const,
+        default: 'user',
+      },
       { key: 'businessUnitIds', label: 'Business Unit IDs (separados por ;)' },
       { key: 'isActive', label: 'Activo (true/false)' },
     ],
@@ -479,8 +685,20 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'teamId', label: 'Team ID' },
       { key: 'businessUnitId', label: 'Business Unit ID' },
       { key: 'objectiveId', label: 'Objective ID' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['planned', 'in_progress', 'completed', 'cancelled'] as const, default: 'planned' },
-      { key: 'health', label: 'Health', type: 'enum', enumValues: ['green', 'yellow', 'red'] as const, default: 'green' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['planned', 'in_progress', 'completed', 'cancelled'] as const,
+        default: 'planned',
+      },
+      {
+        key: 'health',
+        label: 'Health',
+        type: 'enum',
+        enumValues: ['green', 'yellow', 'red'] as const,
+        default: 'green',
+      },
       { key: 'startDate', label: 'Fecha Inicio', type: 'date' },
       { key: 'endDate', label: 'Fecha Fin', type: 'date' },
     ],
@@ -513,8 +731,20 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'assigneeId', label: 'Assignee ID' },
       { key: 'teamId', label: 'Team ID' },
       { key: 'applicationId', label: 'App ID' },
-      { key: 'priority', label: 'Prioridad', type: 'enum', enumValues: ['low', 'medium', 'high', 'critical'] as const, default: 'medium' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['pending', 'in_progress', 'completed', 'cancelled'] as const, default: 'pending' },
+      {
+        key: 'priority',
+        label: 'Prioridad',
+        type: 'enum',
+        enumValues: ['low', 'medium', 'high', 'critical'] as const,
+        default: 'medium',
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['pending', 'in_progress', 'completed', 'cancelled'] as const,
+        default: 'pending',
+      },
       { key: 'estimatedHours', label: 'Horas Estimadas', type: 'number' },
       { key: 'startDate', label: 'Fecha Inicio', type: 'date' },
       { key: 'dueDate', label: 'Fecha Vencimiento', type: 'date' },
@@ -541,7 +771,10 @@ const importConfigs: Record<string, ImportConfig> = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
-    matchKey: (row) => ({ title: String(row['Título'] ?? ''), planId: String(row['Plan ID'] ?? '') }),
+    matchKey: (row) => ({
+      title: String(row['Título'] ?? ''),
+      planId: String(row['Plan ID'] ?? ''),
+    }),
   },
 
   /* ─── Tareas ─── */
@@ -554,8 +787,20 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
       { key: 'assigneeId', label: 'Assignee ID' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['todo', 'in_progress', 'done', 'blocked'] as const, default: 'todo' },
-      { key: 'priority', label: 'Prioridad', type: 'enum', enumValues: ['low', 'medium', 'high', 'critical'] as const, default: 'medium' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['todo', 'in_progress', 'done', 'blocked'] as const,
+        default: 'todo',
+      },
+      {
+        key: 'priority',
+        label: 'Prioridad',
+        type: 'enum',
+        enumValues: ['low', 'medium', 'high', 'critical'] as const,
+        default: 'medium',
+      },
       { key: 'estimatedHours', label: 'Horas Estimadas', type: 'number' },
       { key: 'dueDate', label: 'Fecha Vencimiento', type: 'date' },
       { key: 'dependsOn', label: 'Depende de (IDs separados por ;)' },
@@ -593,7 +838,13 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'applicationId', label: 'App ID' },
       { key: 'objectiveId', label: 'Objective ID' },
       { key: 'deliverableId', label: 'Deliverable ID' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['active', 'at_risk', 'fulfilled', 'breached', 'cancelled'] as const, default: 'active' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['active', 'at_risk', 'fulfilled', 'breached', 'cancelled'] as const,
+        default: 'active',
+      },
       { key: 'commitmentDate', label: 'Fecha Compromiso', type: 'date' },
     ],
     buildEntity: (row, id) => ({
@@ -621,12 +872,30 @@ const importConfigs: Record<string, ImportConfig> = {
     table: 'blockers',
     label: 'Bloqueos',
     columns: [
-      { key: 'sourceType', label: 'Tipo Origen', required: true, type: 'enum', enumValues: ['task', 'activity', 'plan', 'commitment'] as const },
+      {
+        key: 'sourceType',
+        label: 'Tipo Origen',
+        required: true,
+        type: 'enum',
+        enumValues: ['task', 'activity', 'plan', 'commitment'] as const,
+      },
       { key: 'sourceId', label: 'Source ID', required: true },
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
-      { key: 'severity', label: 'Severidad', required: true, type: 'enum', enumValues: ['low', 'medium', 'high', 'critical'] as const },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['open', 'in_progress', 'resolved', 'escalated'] as const, default: 'open' },
+      {
+        key: 'severity',
+        label: 'Severidad',
+        required: true,
+        type: 'enum',
+        enumValues: ['low', 'medium', 'high', 'critical'] as const,
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['open', 'in_progress', 'resolved', 'escalated'] as const,
+        default: 'open',
+      },
       { key: 'raisedById', label: 'Raised By ID', required: true },
       { key: 'assigneeId', label: 'Assignee ID' },
     ],
@@ -656,13 +925,37 @@ const importConfigs: Record<string, ImportConfig> = {
     table: 'dependencies',
     label: 'Dependencias',
     columns: [
-      { key: 'sourceType', label: 'Tipo Origen', required: true, type: 'enum', enumValues: ['task', 'activity', 'plan', 'commitment'] as const },
+      {
+        key: 'sourceType',
+        label: 'Tipo Origen',
+        required: true,
+        type: 'enum',
+        enumValues: ['task', 'activity', 'plan', 'commitment'] as const,
+      },
       { key: 'sourceId', label: 'Source ID', required: true },
-      { key: 'targetType', label: 'Tipo Destino', required: true, type: 'enum', enumValues: ['task', 'activity', 'plan', 'commitment', 'deliverable'] as const },
+      {
+        key: 'targetType',
+        label: 'Tipo Destino',
+        required: true,
+        type: 'enum',
+        enumValues: ['task', 'activity', 'plan', 'commitment', 'deliverable'] as const,
+      },
       { key: 'targetId', label: 'Target ID', required: true },
-      { key: 'relationType', label: 'Tipo Relación', type: 'enum', enumValues: ['blocks', 'depends_on', 'related_to', 'duplicates'] as const, default: 'depends_on' },
+      {
+        key: 'relationType',
+        label: 'Tipo Relación',
+        type: 'enum',
+        enumValues: ['blocks', 'depends_on', 'related_to', 'duplicates'] as const,
+        default: 'depends_on',
+      },
       { key: 'description', label: 'Descripción' },
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: ['active', 'resolved', 'at_risk'] as const, default: 'active' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'enum',
+        enumValues: ['active', 'resolved', 'at_risk'] as const,
+        default: 'active',
+      },
     ],
     buildEntity: (row, id) => ({
       id,
@@ -678,7 +971,10 @@ const importConfigs: Record<string, ImportConfig> = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
-    matchKey: (row) => ({ sourceId: String(row['Source ID'] ?? ''), targetId: String(row['Target ID'] ?? '') }),
+    matchKey: (row) => ({
+      sourceId: String(row['Source ID'] ?? ''),
+      targetId: String(row['Target ID'] ?? ''),
+    }),
   },
 
   /* ─── Sprint Records ─── */
@@ -688,7 +984,13 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'memberId', label: 'Member ID', required: true },
       { key: 'sprintName', label: 'Sprint', required: true },
-      { key: 'quarter', label: 'Quarter', required: true, type: 'enum', enumValues: ['Q1', 'Q2', 'Q3', 'Q4'] as const },
+      {
+        key: 'quarter',
+        label: 'Quarter',
+        required: true,
+        type: 'enum',
+        enumValues: ['Q1', 'Q2', 'Q3', 'Q4'] as const,
+      },
       { key: 'year', label: 'Año', type: 'number', required: true },
       { key: 'storyPointsCompleted', label: 'SP Completados', type: 'number' },
       { key: 'storyPointsNotCompleted', label: 'SP No Completados', type: 'number' },
@@ -703,7 +1005,10 @@ const importConfigs: Record<string, ImportConfig> = {
       storyPointsNotCompleted: parseNumberCell(row['SP No Completados']) ?? 0,
       createdAt: new Date(),
     }),
-    matchKey: (row) => ({ memberId: String(row['Member ID'] ?? ''), sprintName: String(row['Sprint'] ?? '') }),
+    matchKey: (row) => ({
+      memberId: String(row['Member ID'] ?? ''),
+      sprintName: String(row['Sprint'] ?? ''),
+    }),
   },
 
   /* ─── Logros ─── */
@@ -715,7 +1020,13 @@ const importConfigs: Record<string, ImportConfig> = {
       { key: 'title', label: 'Título', required: true },
       { key: 'description', label: 'Descripción' },
       { key: 'date', label: 'Fecha', type: 'date' },
-      { key: 'type', label: 'Tipo', type: 'enum', enumValues: ['logro', 'certificacion', 'reconocimiento', 'ascenso'] as const, default: 'logro' },
+      {
+        key: 'type',
+        label: 'Tipo',
+        type: 'enum',
+        enumValues: ['logro', 'certificacion', 'reconocimiento', 'ascenso'] as const,
+        default: 'logro',
+      },
     ],
     buildEntity: (row, id) => ({
       id,
@@ -727,7 +1038,10 @@ const importConfigs: Record<string, ImportConfig> = {
       linkedToPromotion: false,
       createdAt: new Date(),
     }),
-    matchKey: (row) => ({ title: String(row['Título'] ?? ''), memberId: String(row['Member ID'] ?? '') }),
+    matchKey: (row) => ({
+      title: String(row['Título'] ?? ''),
+      memberId: String(row['Member ID'] ?? ''),
+    }),
   },
 
   /* ─── Vacaciones ─── */
@@ -750,7 +1064,10 @@ const importConfigs: Record<string, ImportConfig> = {
       status: String(row['Estado'] ?? 'approved'),
       createdAt: new Date(),
     }),
-    matchKey: (row) => ({ memberId: String(row['Member ID'] ?? ''), startDate: parseDateCell(row['Fecha Inicio']) }),
+    matchKey: (row) => ({
+      memberId: String(row['Member ID'] ?? ''),
+      startDate: parseDateCell(row['Fecha Inicio']),
+    }),
   },
 
   /* ─── Team Sprints ─── */
@@ -760,7 +1077,13 @@ const importConfigs: Record<string, ImportConfig> = {
     columns: [
       { key: 'teamId', label: 'Team ID', required: true },
       { key: 'sprintName', label: 'Sprint', required: true },
-      { key: 'quarter', label: 'Quarter', required: true, type: 'enum', enumValues: ['Q1', 'Q2', 'Q3', 'Q4'] as const },
+      {
+        key: 'quarter',
+        label: 'Quarter',
+        required: true,
+        type: 'enum',
+        enumValues: ['Q1', 'Q2', 'Q3', 'Q4'] as const,
+      },
       { key: 'year', label: 'Año', type: 'number', required: true },
       { key: 'plannedSP', label: 'SP Planificados', type: 'number' },
       { key: 'completedSP', label: 'SP Completados', type: 'number' },
@@ -782,7 +1105,10 @@ const importConfigs: Record<string, ImportConfig> = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
-    matchKey: (row) => ({ teamId: String(row['Team ID'] ?? ''), sprintName: String(row['Sprint'] ?? '') }),
+    matchKey: (row) => ({
+      teamId: String(row['Team ID'] ?? ''),
+      sprintName: String(row['Sprint'] ?? ''),
+    }),
   },
 }
 
@@ -859,7 +1185,10 @@ export function parseExcel(file: ArrayBuffer, entityType: string): ParsedRow[] {
     PARSE_TIMEOUT_MS,
   )
 
-  if (rawData.length < 2) throw new ImportParseError('El archivo debe tener una fila de encabezados y al menos una fila de datos')
+  if (rawData.length < 2)
+    throw new ImportParseError(
+      'El archivo debe tener una fila de encabezados y al menos una fila de datos',
+    )
 
   const headers = normalizeHeaders(rawData[0] as string[])
   const rows: ParsedRow[] = []
@@ -886,7 +1215,12 @@ export function parseExcel(file: ArrayBuffer, entityType: string): ParsedRow[] {
       if (value && col.type === 'number' && isNaN(Number(value))) {
         errors.push('"' + col.label + '" debe ser un número')
       }
-      if (value && col.type === 'enum' && col.enumValues && !col.enumValues.includes(String(value))) {
+      if (
+        value &&
+        col.type === 'enum' &&
+        col.enumValues &&
+        !col.enumValues.includes(String(value))
+      ) {
         errors.push('"' + col.label + '" tiene un valor inválido')
       }
     }
@@ -899,7 +1233,10 @@ export function parseExcel(file: ArrayBuffer, entityType: string): ParsedRow[] {
 
 /* ─── Import execution ─── */
 
-export async function importRows(entityType: string, parsedRows: ParsedRow[]): Promise<ImportResult> {
+export async function importRows(
+  entityType: string,
+  parsedRows: ParsedRow[],
+): Promise<ImportResult> {
   const config = importConfigs[entityType]
   if (!config) throw new Error(`Tipo de entidad desconocido: ${entityType}`)
 
@@ -939,9 +1276,7 @@ export async function importRows(entityType: string, parsedRows: ParsedRow[]): P
       } else {
         const all = await table.toArray()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        existing = all.find((item: any) =>
-          matchKeys.every((k) => item[k] === matchFields[k]),
-        )
+        existing = all.find((item: any) => matchKeys.every((k) => item[k] === matchFields[k]))
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

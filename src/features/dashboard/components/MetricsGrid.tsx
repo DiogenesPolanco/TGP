@@ -1,5 +1,13 @@
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, AlertOctagon, Users, FileWarning, TrendingUp, XCircle, Shield } from 'lucide-react'
+import {
+  AlertTriangle,
+  AlertOctagon,
+  Users,
+  FileWarning,
+  TrendingUp,
+  XCircle,
+  Shield,
+} from 'lucide-react'
 import type { DashboardMetrics } from '../hooks/useDashboardMetrics'
 
 interface MetricsGridProps {
@@ -13,9 +21,7 @@ function MetricGroup({ label, children }: { label: string; children: React.React
       <h3 className="text-xs font-semibold text-neutral-50 dark:text-neutral-40 uppercase tracking-wider mb-3 px-1">
         {label}
       </h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {children}
-      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{children}</div>
     </div>
   )
 }
@@ -26,7 +32,10 @@ export function MetricsGrid({ metrics, enabledWidgets = {} }: MetricsGridProps) 
 
   return (
     <div className="space-y-6">
-      {(e['kpi-risk-exposure'] !== false || e['kpi-compliance'] !== false || e['kpi-elite-teams'] !== false || e['kpi-overdue-findings'] !== false) && (
+      {(e['kpi-risk-exposure'] !== false ||
+        e['kpi-compliance'] !== false ||
+        e['kpi-elite-teams'] !== false ||
+        e['kpi-overdue-findings'] !== false) && (
         <MetricGroup label="Gobierno y Riesgos">
           {e['kpi-risk-exposure'] !== false && (
             <SmallKpiCard
@@ -41,9 +50,19 @@ export function MetricsGrid({ metrics, enabledWidgets = {} }: MetricsGridProps) 
             <SmallKpiCard
               title="Compliance Score"
               value={metrics.totalFindings > 0 ? `${Math.round(metrics.complianceScore)}%` : '—'}
-              subtitle={metrics.totalFindings > 0 ? `${metrics.overdueFindings} vencidos · ${metrics.closedFindings} cerrados` : 'Sin hallazgos'}
+              subtitle={
+                metrics.totalFindings > 0
+                  ? `${metrics.overdueFindings} vencidos · ${metrics.closedFindings} cerrados`
+                  : 'Sin hallazgos'
+              }
               icon={<FileWarning size={16} />}
-              color={metrics.complianceScore >= 80 ? 'success' : metrics.complianceScore >= 50 ? 'warning' : 'danger'}
+              color={
+                metrics.complianceScore >= 80
+                  ? 'success'
+                  : metrics.complianceScore >= 50
+                    ? 'warning'
+                    : 'danger'
+              }
               onClick={() => navigate('/governance/audit')}
             />
           )}
@@ -62,14 +81,21 @@ export function MetricsGrid({ metrics, enabledWidgets = {} }: MetricsGridProps) 
               value={metrics.overdueFindings}
               icon={<Shield size={16} />}
               color={metrics.overdueFindings > 0 ? 'danger' : 'success'}
-              subtitle={metrics.overdueFindings > 0 ? `${metrics.totalFindings} hallazgos totales` : undefined}
+              subtitle={
+                metrics.overdueFindings > 0
+                  ? `${metrics.totalFindings} hallazgos totales`
+                  : undefined
+              }
               onClick={() => navigate('/governance/audit')}
             />
           )}
         </MetricGroup>
       )}
 
-      {(e['kpi-active-plans'] !== false || e['kpi-blockers'] !== false || e['kpi-overdue-commitments'] !== false || e['kpi-activities-today'] !== false) && (
+      {(e['kpi-active-plans'] !== false ||
+        e['kpi-blockers'] !== false ||
+        e['kpi-overdue-commitments'] !== false ||
+        e['kpi-activities-today'] !== false) && (
         <MetricGroup label="Ejecución">
           {e['kpi-active-plans'] !== false && (
             <SmallKpiCard
@@ -146,16 +172,16 @@ function SmallKpiCard({ title, value, subtitle, icon, color, onClick }: SmallKpi
 
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
-          <div className={`p-1.5 rounded-lg transition-transform duration-300 group-hover:scale-110 ${styles.icon}`}>
+          <div
+            className={`p-1.5 rounded-lg transition-transform duration-300 group-hover:scale-110 ${styles.icon}`}
+          >
             {icon}
           </div>
         </div>
         <h4 className="text-[11px] font-medium text-muted mb-0.5 uppercase tracking-wider">
           {title}
         </h4>
-        <p className="text-xl font-bold text-neutral-90 dark:text-white tabular-nums">
-          {value}
-        </p>
+        <p className="text-xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
         {subtitle && (
           <p className="text-[11px] text-neutral-50 dark:text-neutral-50 mt-1">{subtitle}</p>
         )}

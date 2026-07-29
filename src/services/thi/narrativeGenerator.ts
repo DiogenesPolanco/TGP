@@ -1,4 +1,16 @@
-import type { Application, Vulnerability, Incident, Risk, AuditFinding, Team, Technology, Blocker, Commitment, BusinessUnit, HealthIndex } from '@/types/domain'
+import type {
+  Application,
+  Vulnerability,
+  Incident,
+  Risk,
+  AuditFinding,
+  Team,
+  Technology,
+  Blocker,
+  Commitment,
+  BusinessUnit,
+  HealthIndex,
+} from '@/types/domain'
 
 export interface ExecutiveNarrative {
   timestamp: Date
@@ -19,7 +31,7 @@ export interface BUNarrative {
   text: string
 }
 
-interface NarrativeInput {
+export interface NarrativeInput {
   thi: HealthIndex | null
   applications: Application[]
   vulnerabilities: Vulnerability[]
@@ -44,8 +56,17 @@ function getThiLabel(score: number): string {
 
 export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarrative {
   const {
-    thi, applications, vulnerabilities, incidents, risks, auditFindings,
-    teams, technologies, businessUnits, blockers, commitments,
+    thi,
+    applications,
+    vulnerabilities,
+    incidents,
+    risks,
+    auditFindings,
+    teams,
+    technologies,
+    businessUnits,
+    blockers,
+    commitments,
   } = input
 
   const now = new Date()
@@ -69,16 +90,15 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   const highVulns = vulnerabilities.filter(
     (v) => v.severity === 'high' && v.status !== 'fixed',
   ).length
-  const totalOpenVulns = vulnerabilities.filter(
-    (v) => v.status !== 'fixed',
-  ).length
+  const totalOpenVulns = vulnerabilities.filter((v) => v.status !== 'fixed').length
 
   if (criticalVulns > 0) {
     insights.push({
       icon: 'critical',
-      text: criticalVulns === 1
-        ? `${criticalVulns} vulnerabilidad crítica sin resolver`
-        : `${criticalVulns} vulnerabilidades críticas sin resolver`,
+      text:
+        criticalVulns === 1
+          ? `${criticalVulns} vulnerabilidad crítica sin resolver`
+          : `${criticalVulns} vulnerabilidades críticas sin resolver`,
     })
   }
   if (highVulns > 3) {
@@ -104,9 +124,10 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   if (p1Incidents > 0) {
     insights.push({
       icon: 'critical',
-      text: p1Incidents === 1
-        ? `${p1Incidents} incidente P1 abierto`
-        : `${p1Incidents} incidentes P1 abiertos`,
+      text:
+        p1Incidents === 1
+          ? `${p1Incidents} incidente P1 abierto`
+          : `${p1Incidents} incidentes P1 abiertos`,
     })
   } else if (openIncidents > 0) {
     insights.push({
@@ -131,10 +152,13 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   )
 
   if (eolTechs.length > 0) {
-    const techNames = [...new Set(eolTechs.map((t) => `${t.name} ${t.version}`))].slice(0, 5).join(', ')
-    const msg = criticalAppsWithEol.length > 0
-      ? `${eolTechs.length} tecnologías EOL (${criticalAppsWithEol.length} apps críticas afectadas): ${techNames}${eolTechs.length > 5 ? ` y ${eolTechs.length - 5} más` : ''}`
-      : `${eolTechs.length} tecnologías EOL — ninguna app crítica afectada`
+    const techNames = [...new Set(eolTechs.map((t) => `${t.name} ${t.version}`))]
+      .slice(0, 5)
+      .join(', ')
+    const msg =
+      criticalAppsWithEol.length > 0
+        ? `${eolTechs.length} tecnologías EOL (${criticalAppsWithEol.length} apps críticas afectadas): ${techNames}${eolTechs.length > 5 ? ` y ${eolTechs.length - 5} más` : ''}`
+        : `${eolTechs.length} tecnologías EOL — ninguna app crítica afectada`
     insights.push({ icon: 'critical', text: msg })
   }
   if (extendedTechs.length > 0) {
@@ -148,9 +172,10 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   if (overdueFindings > 0) {
     insights.push({
       icon: 'warning',
-      text: overdueFindings === 1
-        ? `${overdueFindings} hallazgo de auditoría vencido`
-        : `${overdueFindings} hallazgos de auditoría vencidos`,
+      text:
+        overdueFindings === 1
+          ? `${overdueFindings} hallazgo de auditoría vencido`
+          : `${overdueFindings} hallazgos de auditoría vencidos`,
     })
   }
 
@@ -160,9 +185,10 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   if (criticalRisks.length > 0) {
     insights.push({
       icon: 'critical',
-      text: criticalRisks.length === 1
-        ? `${criticalRisks.length} riesgo crítico sin mitigar (score ≥ 20)`
-        : `${criticalRisks.length} riesgos críticos sin mitigar (score ≥ 20)`,
+      text:
+        criticalRisks.length === 1
+          ? `${criticalRisks.length} riesgo crítico sin mitigar (score ≥ 20)`
+          : `${criticalRisks.length} riesgos críticos sin mitigar (score ≥ 20)`,
     })
     recommendations.push(
       `Establecer plan de mitigación para ${criticalRisks.length} riesgo${criticalRisks.length > 1 ? 's' : ''} crítico${criticalRisks.length > 1 ? 's' : ''} con score ≥ 20`,
@@ -192,13 +218,16 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   }
 
   // ── Execution ──
-  const openBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated').length
+  const openBlockers = blockers.filter(
+    (b) => b.status === 'open' || b.status === 'escalated',
+  ).length
   if (openBlockers > 0) {
     insights.push({
       icon: 'warning',
-      text: openBlockers === 1
-        ? `${openBlockers} bloqueo abierto`
-        : `${openBlockers} bloqueos abiertos`,
+      text:
+        openBlockers === 1
+          ? `${openBlockers} bloqueo abierto`
+          : `${openBlockers} bloqueos abiertos`,
     })
   }
 
@@ -212,9 +241,10 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   if (overdueCommitments > 0) {
     insights.push({
       icon: 'warning',
-      text: overdueCommitments === 1
-        ? `${overdueCommitments} compromiso vencido`
-        : `${overdueCommitments} compromisos vencidos`,
+      text:
+        overdueCommitments === 1
+          ? `${overdueCommitments} compromiso vencido`
+          : `${overdueCommitments} compromisos vencidos`,
     })
     recommendations.push(
       `Revisar ${overdueCommitments} compromiso${overdueCommitments > 1 ? 's' : ''} vencido${overdueCommitments > 1 ? 's' : ''} y establecer nuevas fechas objetivo`,
@@ -239,9 +269,10 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
       .filter((d) => d.score < 70)
       .map((d) => d.name)
 
-    const thiSentence = weakDim.length > 0
-      ? `THI ${thiScore} (${thiLabel}) — dimensiones débiles: ${weakDim.join(', ')}`
-      : `THI ${thiScore} (${thiLabel}) — todas las dimensiones saludables`
+    const thiSentence =
+      weakDim.length > 0
+        ? `THI ${thiScore} (${thiLabel}) — dimensiones débiles: ${weakDim.join(', ')}`
+        : `THI ${thiScore} (${thiLabel}) — todas las dimensiones saludables`
     briefingParts.push(thiSentence)
   }
 
@@ -259,7 +290,8 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
   const urgentItems: string[] = []
   if (criticalVulns > 0) urgentItems.push(`${criticalVulns} vulnerabilidades críticas`)
   if (p1Incidents > 0) urgentItems.push(`${p1Incidents} incidentes P1`)
-  if (eolTechs.length > 0 && criticalAppsWithEol.length > 0) urgentItems.push(`${eolTechs.length} tecnologías EOL`)
+  if (eolTechs.length > 0 && criticalAppsWithEol.length > 0)
+    urgentItems.push(`${eolTechs.length} tecnologías EOL`)
   if (criticalRisks.length > 0) urgentItems.push(`${criticalRisks.length} riesgos críticos`)
   if (overdueCommitments > 0) urgentItems.push(`${overdueCommitments} compromisos vencidos`)
 
@@ -292,11 +324,21 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
 
     const parts: string[] = []
     if (buCriticalVulns > 0) parts.push(`${buCriticalVulns} vulns críticas`)
-    if (buEolApps > 0) parts.push(`${buEolApps} apps con tech EOL${buEolCritical > 0 ? ` (${buEolCritical} críticas)` : ''}`)
+    if (buEolApps > 0)
+      parts.push(
+        `${buEolApps} apps con tech EOL${buEolCritical > 0 ? ` (${buEolCritical} críticas)` : ''}`,
+      )
     if (parts.length === 0) parts.push('sin alertas')
 
     let buThi = 0
-    const buThiEntry = buDataFind(bu.id, applications, vulnerabilities, incidents, risks, technologies)
+    const buThiEntry = buDataFind(
+      bu.id,
+      applications,
+      vulnerabilities,
+      incidents,
+      risks,
+      technologies,
+    )
     if (buThiEntry) buThi = buThiEntry
 
     buHighlights.push({
@@ -360,9 +402,7 @@ function buDataFind(
         return tech?.supportStatus === 'eol'
       }),
     )
-    return buApps.length > 0
-      ? Math.round((1 - appsWithEol.length / buApps.length) * 100)
-      : 100
+    return buApps.length > 0 ? Math.round((1 - appsWithEol.length / buApps.length) * 100) : 100
   })()
 
   const riskScore = (() => {

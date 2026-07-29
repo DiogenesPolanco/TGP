@@ -115,7 +115,13 @@ function forceLayout(
   return nodes
 }
 
-export function ObsolescenceGraph({ nodes: rawNodes, edges: rawEdges, width = 1000, height = 700, onNodeClick }: Props) {
+export function ObsolescenceGraph({
+  nodes: rawNodes,
+  edges: rawEdges,
+  width = 1000,
+  height = 700,
+  onNodeClick,
+}: Props) {
   const prepared = useMemo(() => {
     const radiusMap: Record<string, number> = {
       app: 48,
@@ -147,31 +153,40 @@ export function ObsolescenceGraph({ nodes: rawNodes, edges: rawEdges, width = 10
     )
   }
 
-  const edgePaths = rawEdges.map((edge) => {
-    const source = laidOut.find((n) => n.id === edge.source)
-    const target = laidOut.find((n) => n.id === edge.target)
-    if (!source || !target) return null
+  const edgePaths = rawEdges
+    .map((edge) => {
+      const source = laidOut.find((n) => n.id === edge.source)
+      const target = laidOut.find((n) => n.id === edge.target)
+      if (!source || !target) return null
 
-    const dx = target.x - source.x
-    const dy = target.y - source.y
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1
-    const nx = -dy / dist
-    const ny = dx / dist
+      const dx = target.x - source.x
+      const dy = target.y - source.y
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1
+      const nx = -dy / dist
+      const ny = dx / dist
 
-    const sx = source.x + nx * source.radius
-    const sy = source.y + ny * source.radius
-    const tx = target.x + nx * target.radius
-    const ty = target.y + ny * target.radius
+      const sx = source.x + nx * source.radius
+      const sy = source.y + ny * source.radius
+      const tx = target.x + nx * target.radius
+      const ty = target.y + ny * target.radius
 
-    const midX = (sx + tx) / 2
-    const midY = (sy + ty) / 2
+      const midX = (sx + tx) / 2
+      const midY = (sy + ty) / 2
 
-    const angle = Math.atan2(ty - sy, tx - sx)
-    const ax = tx - Math.cos(angle) * (target.radius + 4)
-    const ay = ty - Math.sin(angle) * (target.radius + 4)
+      const angle = Math.atan2(ty - sy, tx - sx)
+      const ax = tx - Math.cos(angle) * (target.radius + 4)
+      const ay = ty - Math.sin(angle) * (target.radius + 4)
 
-    return { sx, sy, ax, ay, midX, midY }
-  }).filter(Boolean) as { sx: number; sy: number; ax: number; ay: number; midX: number; midY: number }[]
+      return { sx, sy, ax, ay, midX, midY }
+    })
+    .filter(Boolean) as {
+    sx: number
+    sy: number
+    ax: number
+    ay: number
+    midX: number
+    midY: number
+  }[]
 
   const formatLabel = (label: string, maxLen: number) =>
     label.length > maxLen ? label.slice(0, maxLen - 1) + '…' : label
@@ -220,7 +235,9 @@ export function ObsolescenceGraph({ nodes: rawNodes, edges: rawEdges, width = 10
           <g
             key={node.id}
             className="cursor-pointer"
-            onClick={() => onNodeClick?.(node.id, graphNode?.type ?? 'microservice', graphNode?.parentAppId)}
+            onClick={() =>
+              onNodeClick?.(node.id, graphNode?.type ?? 'microservice', graphNode?.parentAppId)
+            }
             role="button"
             tabIndex={0}
           >
@@ -277,7 +294,7 @@ export function ObsolescenceGraph({ nodes: rawNodes, edges: rawEdges, width = 10
               fill="#8888a0"
               className="pointer-events-none select-none"
             >
-              {graphNode ? STATUS_LABELS[graphNode.status] ?? graphNode.status : ''}
+              {graphNode ? (STATUS_LABELS[graphNode.status] ?? graphNode.status) : ''}
             </text>
 
             {/* Type badge */}

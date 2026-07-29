@@ -13,11 +13,27 @@ import {
 } from 'recharts'
 import { ChartTooltipSimple } from '@/components/charts/ChartTooltip'
 import { ChartGradients } from '@/components/charts/ChartGradients'
-import { AlertTriangle, CheckCircle2, Info, AlertOctagon, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  AlertOctagon,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import type { DashboardMetrics } from '../hooks/useDashboardMetrics'
 import { Button } from '@/components/ui/Button'
 
-const BU_COLORS = ['#0052CC', '#36B37E', '#FF8B00', '#6554C0', '#00B8D9', '#C85A48', '#57D9A3', '#FFAB00']
+const BU_COLORS = [
+  '#0052CC',
+  '#36B37E',
+  '#FF8B00',
+  '#6554C0',
+  '#00B8D9',
+  '#C85A48',
+  '#57D9A3',
+  '#FFAB00',
+]
 
 interface DashboardChartsProps {
   metrics: DashboardMetrics
@@ -39,10 +55,33 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
                   <ChartGradients id="bu-chart" />
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EBECF0" strokeOpacity={0.6} />
-                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12, fill: '#6B778C' }} axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }} tickLine={false} />
-                <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12, fill: '#6B778C' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltipSimple />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
-                <Bar dataKey="thi" radius={[0, 6, 6, 0]} maxBarSize={24} animationBegin={0} animationDuration={1200} animationEasing="ease-out">
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tick={{ fontSize: 12, fill: '#6B778C' }}
+                  axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
+                  tickLine={false}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={80}
+                  tick={{ fontSize: 12, fill: '#6B778C' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={<ChartTooltipSimple />}
+                  cursor={{ fill: '#F4F5F7', opacity: 0.5 }}
+                />
+                <Bar
+                  dataKey="thi"
+                  radius={[0, 6, 6, 0]}
+                  maxBarSize={24}
+                  animationBegin={0}
+                  animationDuration={1200}
+                  animationEasing="ease-out"
+                >
                   {buData.map((_, i) => (
                     <Cell key={i} fill={BU_COLORS[i % BU_COLORS.length]} />
                   ))}
@@ -50,7 +89,9 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-neutral-50 py-8 text-center">No hay datos de aplicaciones para calcular THI por unidad de negocio</p>
+            <p className="text-sm text-neutral-50 py-8 text-center">
+              No hay datos de aplicaciones para calcular THI por unidad de negocio
+            </p>
           )}
         </ChartContainer>
       )}
@@ -61,9 +102,26 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
             <div className="flex items-center gap-4">
               <ResponsiveContainer width="60%" height={200}>
                 <PieChart>
-                  <defs><ChartGradients id="pie-chart" /></defs>
-                  <Pie data={techStatusData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} dataKey="value" isAnimationActive={true} animationBegin={200} animationDuration={1000} animationEasing="ease-out" stroke="white" strokeWidth={2}>
-                    {techStatusData.map((entry) => (<Cell key={entry.name} fill={entry.color} stroke="white" strokeWidth={2} />))}
+                  <defs>
+                    <ChartGradients id="pie-chart" />
+                  </defs>
+                  <Pie
+                    data={techStatusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={80}
+                    dataKey="value"
+                    isAnimationActive={true}
+                    animationBegin={200}
+                    animationDuration={1000}
+                    animationEasing="ease-out"
+                    stroke="white"
+                    strokeWidth={2}
+                  >
+                    {techStatusData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} stroke="white" strokeWidth={2} />
+                    ))}
                   </Pie>
                   <Tooltip content={<ChartTooltipSimple />} />
                 </PieChart>
@@ -72,16 +130,23 @@ export function DashboardCharts({ metrics, enabledWidgets = {} }: DashboardChart
                 {techStatusData.map((entry) => (
                   <div key={entry.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                      <span
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: entry.color }}
+                      />
                       <span className="text-xs text-muted">{entry.name}</span>
                     </div>
-                    <span className="text-sm font-medium text-neutral-90 dark:text-white">{entry.value}</span>
+                    <span className="text-sm font-medium text-neutral-90 dark:text-white">
+                      {entry.value}
+                    </span>
                   </div>
                 ))}
                 <div className="border-t border-boundary pt-2 mt-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-muted">Total</span>
-                    <span className="text-sm font-bold text-neutral-90 dark:text-white">{techStatusData.reduce((s, d) => s + d.value, 0)}</span>
+                    <span className="text-sm font-bold text-neutral-90 dark:text-white">
+                      {techStatusData.reduce((s, d) => s + d.value, 0)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -138,9 +203,13 @@ function AlertsList({ alerts }: { alerts: { type: string; message: string }[] })
           className="flex items-center justify-center gap-1.5 w-full py-2 text-xs font-medium text-neutral-50 hover:text-neutral-90 dark:hover:text-white transition-colors rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-75"
         >
           {expanded ? (
-            <>Mostrar menos <ChevronUp size={14} /></>
+            <>
+              Mostrar menos <ChevronUp size={14} />
+            </>
           ) : (
-            <>Ver {hiddenCount} alerta{hiddenCount > 1 ? 's' : ''} más <ChevronDown size={14} /></>
+            <>
+              Ver {hiddenCount} alerta{hiddenCount > 1 ? 's' : ''} más <ChevronDown size={14} />
+            </>
           )}
         </Button>
       )}

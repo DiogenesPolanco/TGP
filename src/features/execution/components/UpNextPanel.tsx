@@ -23,8 +23,7 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
   const navigate = useNavigate()
   const planMap = new Map(plans.map((p) => [p.id, p]))
 
-  const upcoming = gatherUpcoming(activities, commitments, planMap, today)
-    .slice(0, 6)
+  const upcoming = gatherUpcoming(activities, commitments, planMap, today).slice(0, 6)
 
   if (upcoming.length === 0) return null
 
@@ -63,13 +62,15 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
               }}
             >
               {/* Day indicator */}
-              <div className={`shrink-0 w-10 h-10 rounded-lg flex flex-col items-center justify-center border ${
-                isPast
-                  ? 'bg-danger/10 border-danger/20 text-danger'
-                  : isToday
-                    ? 'bg-warning/10 border-warning/20 text-warning'
-                    : 'bg-neutral-10 dark:bg-neutral-70 border-neutral-20 dark:border-neutral-60 text-muted'
-              }`}>
+              <div
+                className={`shrink-0 w-10 h-10 rounded-lg flex flex-col items-center justify-center border ${
+                  isPast
+                    ? 'bg-danger/10 border-danger/20 text-danger'
+                    : isToday
+                      ? 'bg-warning/10 border-warning/20 text-warning'
+                      : 'bg-neutral-10 dark:bg-neutral-70 border-neutral-20 dark:border-neutral-60 text-muted'
+                }`}
+              >
                 <span className="text-[10px] font-bold leading-none">{item.dueDate.getDate()}</span>
                 <span className="text-[9px] leading-none mt-0.5 opacity-75">
                   {item.dueDate.toLocaleDateString('es-ES', { month: 'short' }).slice(0, 3)}
@@ -78,11 +79,11 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
 
               {/* Content */}
               <div className="min-w-0 flex-1">
-                <p className={`text-sm font-medium truncate ${
-                  isPast
-                    ? 'text-danger'
-                    : 'text-neutral-90 dark:text-white'
-                }`}>
+                <p
+                  className={`text-sm font-medium truncate ${
+                    isPast ? 'text-danger' : 'text-neutral-90 dark:text-white'
+                  }`}
+                >
                   {item.title}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -103,14 +104,19 @@ export function UpNextPanel({ activities, plans, commitments, today }: UpNextPan
 
               {/* Due label */}
               <div className="shrink-0 text-right">
-                <span className={`text-[11px] font-semibold ${
-                  isPast ? 'text-danger' : isToday ? 'text-warning' : 'text-neutral-50'
-                }`}>
+                <span
+                  className={`text-[11px] font-semibold ${
+                    isPast ? 'text-danger' : isToday ? 'text-warning' : 'text-neutral-50'
+                  }`}
+                >
                   {dayLabel}
                 </span>
               </div>
 
-              <ArrowRight size={14} className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ArrowRight
+                size={14}
+                className="shrink-0 text-neutral-40 opacity-0 group-hover:opacity-100 transition-opacity"
+              />
             </div>
           )
         })}

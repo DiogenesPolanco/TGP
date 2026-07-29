@@ -6,7 +6,24 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
 import type { MemberStatus } from '@/types/domain'
-import { Search, Filter, Users, TrendingUp, TrendingDown, Star, AlertTriangle, Loader2, X, Edit3, Share2, Check, Copy, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import {
+  Search,
+  Filter,
+  Users,
+  TrendingUp,
+  TrendingDown,
+  Star,
+  AlertTriangle,
+  Loader2,
+  X,
+  Edit3,
+  Share2,
+  Check,
+  Copy,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from 'lucide-react'
 import { getGlobalMembersKPIs, DEV_ROLES } from '@/services/performance/performanceService'
 import { createShareLink, getPublicPerformanceData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
@@ -41,17 +58,23 @@ export function MembersPage() {
 
   const rawTeams = useLiveQuery(() => db.teams.toArray())
   const teams = useMemo(() => rawTeams ?? [], [rawTeams])
-  const [globalData, setGlobalData] = useState<Awaited<ReturnType<typeof getGlobalMembersKPIs>> | null>(null)
+  const [globalData, setGlobalData] = useState<Awaited<
+    ReturnType<typeof getGlobalMembersKPIs>
+  > | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getGlobalMembersKPIs().then((d) => { setGlobalData(d); setLoading(false) })
+    getGlobalMembersKPIs().then((d) => {
+      setGlobalData(d)
+      setLoading(false)
+    })
   }, [])
 
   const allMembers = useMemo(() => {
     if (!globalData) return []
     const filtered = globalData.kpisList.filter((k) => {
-      if (searchTerm && !k.member.displayName.toLowerCase().includes(searchTerm.toLowerCase())) return false
+      if (searchTerm && !k.member.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
+        return false
       if (filterTeam && k.team.id !== filterTeam) return false
       if (filterStatus && k.member.status !== filterStatus) return false
       return true
@@ -97,21 +120,27 @@ export function MembersPage() {
     return sorted
   }, [allMembers, sortKey, sortDir])
 
-  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems } = usePagination(sortedMembers, 10)
+  const { page, setPage, totalPages, pageSize, setPageSize, paginatedItems } = usePagination(
+    sortedMembers,
+    10,
+  )
 
-  const toggleSort = useCallback((key: string) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortKey(key)
-      setSortDir(key === 'name' ? 'asc' : 'desc')
-    }
-    setPage(1)
-  }, [sortKey, setPage])
+  const toggleSort = useCallback(
+    (key: string) => {
+      if (sortKey === key) {
+        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+      } else {
+        setSortKey(key)
+        setSortDir(key === 'name' ? 'asc' : 'desc')
+      }
+      setPage(1)
+    },
+    [sortKey, setPage],
+  )
 
   const teamOptions: TeamEntry[] = useMemo(
     () => teams.map((t) => ({ id: t.id, name: t.name })),
-    [teams]
+    [teams],
   )
 
   const filteredKpis = useMemo(() => {
@@ -124,18 +153,22 @@ export function MembersPage() {
     })
     const withSP = filtered.filter((k) => k.kpis.totalSP > 0)
     return {
-      bestPerformer: withSP.length > 0
-        ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
-        : null,
-      worstPerformer: withSP.length > 0
-        ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
-        : null,
-      topSP: withSP.length > 0
-        ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
-        : null,
-      needsAttention: filtered.length > 0
-        ? filtered.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
-        : null,
+      bestPerformer:
+        withSP.length > 0
+          ? withSP.reduce((a, b) => (a.kpis.efficiencyPct > b.kpis.efficiencyPct ? a : b))
+          : null,
+      worstPerformer:
+        withSP.length > 0
+          ? withSP.reduce((a, b) => (a.kpis.efficiencyPct < b.kpis.efficiencyPct ? a : b))
+          : null,
+      topSP:
+        withSP.length > 0
+          ? withSP.reduce((a, b) => (a.kpis.totalSP > b.kpis.totalSP ? a : b))
+          : null,
+      needsAttention:
+        filtered.length > 0
+          ? filtered.reduce((a, b) => (a.kpis.attentionScore > b.kpis.attentionScore ? a : b))
+          : null,
     }
   }, [globalData, filterTeam])
 
@@ -166,42 +199,69 @@ export function MembersPage() {
         </Button>
       </div>
 
-      {shareUrl && (() => { const cleanUrl = shareUrl.split('#')[0]; return (
-        <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
-          <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
-          <a href={cleanUrl} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline">
-            {cleanUrl}
-          </a>
-          <Button onClick={async () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0">
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'Copiado' : 'Copiar'}
-          </Button>
-        </div>
-      )})()}
+      {shareUrl &&
+        (() => {
+          const cleanUrl = shareUrl.split('#')[0]
+          return (
+            <div className="bg-card rounded-xl border border-boundary p-4 flex items-center gap-3 max-w-full overflow-hidden">
+              <span className="text-sm text-neutral-50 shrink-0">Enlace público:</span>
+              <a
+                href={cleanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-xs bg-primary/5 dark:bg-primary/10 px-3 py-1.5 rounded-lg text-primary hover:text-primary-dark truncate font-mono min-w-0 hover:underline"
+              >
+                {cleanUrl}
+              </a>
+              <Button
+                onClick={async () => {
+                  navigator.clipboard.writeText(shareUrl)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-primary/10 text-primary hover:bg-primary/20 shrink-0"
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copiado' : 'Copiar'}
+              </Button>
+            </div>
+          )
+        })()}
 
       {showTerms && (
         <TermsModal
-          onAccept={() => { acceptTerms(); setShowTerms(false); doShare() }}
-          onClose={() => { setShowTerms(false) }}
+          onAccept={() => {
+            acceptTerms()
+            setShowTerms(false)
+            doShare()
+          }}
+          onClose={() => {
+            setShowTerms(false)
+          }}
         />
       )}
       {showPassphrase && (
         <PassphraseModal
           title="Proteger enlace"
-            buttonLabel="Proteger"
+          buttonLabel="Proteger"
           onSubmit={async (pass) => {
             const data = sharePending
             const payload = pass ? await encryptData(data, pass) : data
             const { url } = await createShareLink(48, 'members', undefined, payload)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
           onSkip={async () => {
             const { url } = await createShareLink(48, 'members', undefined, sharePending)
-            setShareUrl(url); setShowPassphrase(false); setSharePending(null)
+            setShareUrl(url)
+            setShowPassphrase(false)
+            setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
 
@@ -209,18 +269,42 @@ export function MembersPage() {
         <KpiCard
           icon={<TrendingUp size={22} />}
           title="Mejor Rendimiento"
-          value={filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'}
+          value={
+            filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'
+          }
           subtitle={filteredKpis?.bestPerformer?.member.displayName}
           color="success"
-          onClick={filteredKpis?.bestPerformer ? () => { const m = filteredKpis.bestPerformer!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
+          onClick={
+            filteredKpis?.bestPerformer
+              ? () => {
+                  const m = filteredKpis.bestPerformer!
+                  setEditMemberId(m.member.id)
+                  setEditMemberName(m.member.displayName)
+                  setEditMemberTeamId(m.team.id)
+                }
+              : undefined
+          }
         />
         <KpiCard
           icon={<TrendingDown size={22} />}
           title="Menor Rendimiento"
-          value={filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'}
+          value={
+            filteredKpis?.worstPerformer
+              ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%`
+              : '—'
+          }
           subtitle={filteredKpis?.worstPerformer?.member.displayName}
           color="danger"
-          onClick={filteredKpis?.worstPerformer ? () => { const m = filteredKpis.worstPerformer!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
+          onClick={
+            filteredKpis?.worstPerformer
+              ? () => {
+                  const m = filteredKpis.worstPerformer!
+                  setEditMemberId(m.member.id)
+                  setEditMemberName(m.member.displayName)
+                  setEditMemberTeamId(m.team.id)
+                }
+              : undefined
+          }
         />
         <KpiCard
           icon={<Star size={22} />}
@@ -228,39 +312,80 @@ export function MembersPage() {
           value={filteredKpis?.topSP ? `${filteredKpis.topSP.kpis.totalSP}` : '—'}
           subtitle={filteredKpis?.topSP?.member.displayName}
           color="warning"
-          onClick={filteredKpis?.topSP ? () => { const m = filteredKpis.topSP!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
+          onClick={
+            filteredKpis?.topSP
+              ? () => {
+                  const m = filteredKpis.topSP!
+                  setEditMemberId(m.member.id)
+                  setEditMemberName(m.member.displayName)
+                  setEditMemberTeamId(m.team.id)
+                }
+              : undefined
+          }
         />
         <KpiCard
           icon={<AlertTriangle size={22} />}
           title="Requiere Atención"
-          value={filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'}
+          value={
+            filteredKpis?.needsAttention
+              ? `${filteredKpis.needsAttention.kpis.attentionScore}`
+              : '—'
+          }
           subtitle={filteredKpis?.needsAttention?.member.displayName}
           color="danger"
-          onClick={filteredKpis?.needsAttention ? () => { const m = filteredKpis.needsAttention!; setEditMemberId(m.member.id); setEditMemberName(m.member.displayName); setEditMemberTeamId(m.team.id) } : undefined}
-          info={filteredKpis?.needsAttention ? (() => {
-            const k = filteredKpis.needsAttention!.kpis
-            const eff = Math.round(((100 - k.efficiencyPct) / 100) * 35)
-            const opps = k.openOpportunitiesCount
-            const oppScore = Math.round((Math.min(opps, 5) / 5) * 35)
-            const moodScore = k.oneOnOneCount > 0 ? Math.round(((5 - k.avgMood) / 4) * 20) : 0
-            const achScore = k.achievementCount === 0 ? 10 : 0
-            return (
-              <div className="space-y-2">
-                <p className="font-semibold text-xs mb-1">Composición del puntaje (0–100):</p>
-                <div><span className="text-neutral-30">Eficiencia baja</span><span className="float-right font-mono">{eff}/35</span></div>
-                <div><span className="text-neutral-30">Oportunidades de mejora ({opps})</span><span className="float-right font-mono">{oppScore}/35</span></div>
-                <div><span className="text-neutral-30">Ánimo bajo</span><span className="float-right font-mono">{moodScore}/20</span></div>
-                <div><span className="text-neutral-30">Sin logros</span><span className="float-right font-mono">{achScore}/10</span></div>
-              </div>
-            )
-          })() : undefined}
+          onClick={
+            filteredKpis?.needsAttention
+              ? () => {
+                  const m = filteredKpis.needsAttention!
+                  setEditMemberId(m.member.id)
+                  setEditMemberName(m.member.displayName)
+                  setEditMemberTeamId(m.team.id)
+                }
+              : undefined
+          }
+          info={
+            filteredKpis?.needsAttention
+              ? (() => {
+                  const k = filteredKpis.needsAttention!.kpis
+                  const eff = Math.round(((100 - k.efficiencyPct) / 100) * 35)
+                  const opps = k.openOpportunitiesCount
+                  const oppScore = Math.round((Math.min(opps, 5) / 5) * 35)
+                  const moodScore = k.oneOnOneCount > 0 ? Math.round(((5 - k.avgMood) / 4) * 20) : 0
+                  const achScore = k.achievementCount === 0 ? 10 : 0
+                  return (
+                    <div className="space-y-2">
+                      <p className="font-semibold text-xs mb-1">Composición del puntaje (0–100):</p>
+                      <div>
+                        <span className="text-neutral-30">Eficiencia baja</span>
+                        <span className="float-right font-mono">{eff}/35</span>
+                      </div>
+                      <div>
+                        <span className="text-neutral-30">Oportunidades de mejora ({opps})</span>
+                        <span className="float-right font-mono">{oppScore}/35</span>
+                      </div>
+                      <div>
+                        <span className="text-neutral-30">Ánimo bajo</span>
+                        <span className="float-right font-mono">{moodScore}/20</span>
+                      </div>
+                      <div>
+                        <span className="text-neutral-30">Sin logros</span>
+                        <span className="float-right font-mono">{achScore}/10</span>
+                      </div>
+                    </div>
+                  )
+                })()
+              : undefined
+          }
         />
       </div>
 
       <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50" />
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-50"
+            />
             <input
               type="text"
               placeholder="Buscar miembros..."
@@ -279,9 +404,7 @@ export function MembersPage() {
           >
             <Filter size={16} />
             Filtros
-            {(filterTeam || filterStatus) && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
+            {(filterTeam || filterStatus) && <span className="w-2 h-2 rounded-full bg-primary" />}
           </Button>
         </div>
 
@@ -289,21 +412,34 @@ export function MembersPage() {
           <div className="flex items-center gap-4 pt-3 border-t border-boundary">
             <div>
               <label className="text-xs text-neutral-60 mr-2">Equipo</label>
-              <Select value={filterTeam} onChange={(v) => setFilterTeam(v)} options={[
-                { value: '', label: 'Todos' },
-                ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
-              ]} className="min-w-[140px]" />
+              <Select
+                value={filterTeam}
+                onChange={(v) => setFilterTeam(v)}
+                options={[
+                  { value: '', label: 'Todos' },
+                  ...teamOptions.map((t) => ({ value: t.id, label: t.name })),
+                ]}
+                className="min-w-[140px]"
+              />
             </div>
             <div>
               <label className="text-xs text-neutral-60 mr-2">Estado</label>
-              <Select value={filterStatus} onChange={(v) => setFilterStatus(v)} options={[
-                { value: '', label: 'Todos' },
-                ...Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v })),
-              ]} className="min-w-[140px]" />
+              <Select
+                value={filterStatus}
+                onChange={(v) => setFilterStatus(v)}
+                options={[
+                  { value: '', label: 'Todos' },
+                  ...Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v })),
+                ]}
+                className="min-w-[140px]"
+              />
             </div>
             {(filterTeam || filterStatus) && (
               <Button
-                onClick={async () => { setFilterTeam(''); setFilterStatus('') }}
+                onClick={async () => {
+                  setFilterTeam('')
+                  setFilterStatus('')
+                }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger"
               >
                 <X size={14} />
@@ -326,13 +462,58 @@ export function MembersPage() {
               <thead>
                 <tr className="border-b border-boundary">
                   <th className="text-left px-4 py-3 font-medium text-neutral-50 w-10"></th>
-                  <SortTh label="Nombre" sortKey="name" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
-                  <SortTh label="Rol" sortKey="role" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
-                  <SortTh label="Equipo" sortKey="team" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
-                  <SortTh label="Estado" sortKey="status" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} />
-                  <SortTh label="SP" sortKey="sp" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
-                  <SortTh label="Eficiencia" sortKey="efficiency" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
-                  <SortTh label="Aten." sortKey="attention" currentKey={sortKey} dir={sortDir} onToggle={toggleSort} align="right" />
+                  <SortTh
+                    label="Nombre"
+                    sortKey="name"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                  />
+                  <SortTh
+                    label="Rol"
+                    sortKey="role"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                  />
+                  <SortTh
+                    label="Equipo"
+                    sortKey="team"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                  />
+                  <SortTh
+                    label="Estado"
+                    sortKey="status"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                  />
+                  <SortTh
+                    label="SP"
+                    sortKey="sp"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                    align="right"
+                  />
+                  <SortTh
+                    label="Eficiencia"
+                    sortKey="efficiency"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                    align="right"
+                  />
+                  <SortTh
+                    label="Aten."
+                    sortKey="attention"
+                    currentKey={sortKey}
+                    dir={sortDir}
+                    onToggle={toggleSort}
+                    align="right"
+                  />
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-20 dark:divide-neutral-70">
@@ -359,13 +540,25 @@ export function MembersPage() {
                           {member.displayName.charAt(0).toUpperCase()}
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-medium text-neutral-90 dark:text-white">{member.displayName}</td>
-                      <td className="px-4 py-3 text-secondary">{MEMBER_ROLE_LABELS[member.role] ?? member.role}</td>
+                      <td className="px-4 py-3 font-medium text-neutral-90 dark:text-white">
+                        {member.displayName}
+                      </td>
+                      <td className="px-4 py-3 text-secondary">
+                        {MEMBER_ROLE_LABELS[member.role] ?? member.role}
+                      </td>
                       <td className="px-4 py-3 text-secondary">{team.name}</td>
-                      <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[member.status]}`}>{MEMBER_STATUS_LABELS[member.status]}</span></td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[member.status]}`}
+                        >
+                          {MEMBER_STATUS_LABELS[member.status]}
+                        </span>
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <span className="font-semibold text-neutral-90 dark:text-white tabular-nums">{kpis.totalSP}</span>
+                          <span className="font-semibold text-neutral-90 dark:text-white tabular-nums">
+                            {kpis.totalSP}
+                          </span>
                           <div className="w-12 h-1 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden hidden sm:block">
                             <div
                               className="h-full bg-primary rounded-full"
@@ -376,22 +569,42 @@ export function MembersPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
-                          <div className={`w-2 h-2 rounded-full shrink-0 ${
-                            kpis.avgMood >= 7 ? 'bg-success' :
-                            kpis.avgMood >= 4 ? 'bg-warning' : 'bg-danger'
-                          }`} title={`Ánimo: ${kpis.avgMood}/10`} />
-                          <span className={`font-semibold tabular-nums ${
-                            kpis.efficiencyPct >= 75 ? 'text-success' :
-                            kpis.efficiencyPct >= 50 ? 'text-warning' : 'text-danger'
-                          }`}>{kpis.efficiencyPct}%</span>
+                          <div
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                              kpis.avgMood >= 7
+                                ? 'bg-success'
+                                : kpis.avgMood >= 4
+                                  ? 'bg-warning'
+                                  : 'bg-danger'
+                            }`}
+                            title={`Ánimo: ${kpis.avgMood}/10`}
+                          />
+                          <span
+                            className={`font-semibold tabular-nums ${
+                              kpis.efficiencyPct >= 75
+                                ? 'text-success'
+                                : kpis.efficiencyPct >= 50
+                                  ? 'text-warning'
+                                  : 'text-danger'
+                            }`}
+                          >
+                            {kpis.efficiencyPct}%
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
-                          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded tabular-nums ${
-                            kpis.attentionScore <= 20 ? 'bg-success/10 text-success' :
-                            kpis.attentionScore <= 50 ? 'bg-warning/10 text-warning' : 'bg-danger/10 text-danger'
-                          }`}>{kpis.attentionScore}</span>
+                          <span
+                            className={`text-xs font-semibold px-1.5 py-0.5 rounded tabular-nums ${
+                              kpis.attentionScore <= 20
+                                ? 'bg-success/10 text-success'
+                                : kpis.attentionScore <= 50
+                                  ? 'bg-warning/10 text-warning'
+                                  : 'bg-danger/10 text-danger'
+                            }`}
+                          >
+                            {kpis.attentionScore}
+                          </span>
                           <Edit3 size={16} className="text-neutral-30" />
                         </div>
                       </td>
@@ -418,19 +631,37 @@ export function MembersPage() {
         memberName={editMemberName}
         teamId={editMemberTeamId}
         open={editMemberId !== null}
-        onClose={() => { setEditMemberId(null); setEditMemberTeamId('') }}
+        onClose={() => {
+          setEditMemberId(null)
+          setEditMemberTeamId('')
+        }}
       />
     </div>
   )
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {
-  if (!active) return <ArrowUpDown size={14} className="opacity-30 group-hover:opacity-60 transition-opacity" />
+  if (!active)
+    return (
+      <ArrowUpDown size={14} className="opacity-30 group-hover:opacity-60 transition-opacity" />
+    )
   return dir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
 }
 
-function SortTh({ label, sortKey, currentKey, dir, onToggle, align }: {
-  label: string; sortKey: string; currentKey: string; dir: 'asc' | 'desc'; onToggle: (k: string) => void; align?: 'left' | 'right'
+function SortTh({
+  label,
+  sortKey,
+  currentKey,
+  dir,
+  onToggle,
+  align,
+}: {
+  label: string
+  sortKey: string
+  currentKey: string
+  dir: 'asc' | 'desc'
+  onToggle: (k: string) => void
+  align?: 'left' | 'right'
 }) {
   const active = currentKey === sortKey
   return (
@@ -447,5 +678,3 @@ function SortTh({ label, sortKey, currentKey, dir, onToggle, align }: {
     </th>
   )
 }
-
-

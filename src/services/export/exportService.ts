@@ -42,7 +42,7 @@ const TABLE_NAMES = [
 
 async function getTableData(tableName: string): Promise<Record<string, unknown>[]> {
   try {
-    return await db.table(tableName).toArray() as Record<string, unknown>[]
+    return (await db.table(tableName).toArray()) as Record<string, unknown>[]
   } catch {
     return []
   }
@@ -51,17 +51,33 @@ async function getTableData(tableName: string): Promise<Record<string, unknown>[
 // ─── Date helpers ─────────────────────────────────────────────────────
 
 /** Keys whose string values are likely ISO date strings stored by Dexie. */
-const DATE_KEYS = new Set([
-  'date', 'startDate', 'endDate', 'dueDate', 'commitmentDate',
-  'eolDate', 'periodStart', 'periodEnd', 'supportEndDate',
-  'targetDate', 'slaDeadline',
-  'createdAt', 'updatedAt', 'exportedAt',
-  'detectedAt', 'respondedAt', 'resolvedAt', 'escalatedAt',
+export const DATE_KEYS = new Set([
+  'date',
+  'startDate',
+  'endDate',
+  'dueDate',
+  'commitmentDate',
+  'eolDate',
+  'periodStart',
+  'periodEnd',
+  'supportEndDate',
+  'targetDate',
+  'slaDeadline',
+  'createdAt',
+  'updatedAt',
+  'exportedAt',
+  'detectedAt',
+  'respondedAt',
+  'resolvedAt',
+  'escalatedAt',
 ])
 
 /** Rough ISO 8601 check — catches "2026-01-15" and "2026-01-15T00:00:00.000Z". */
-function isIsoDateString(value: unknown): boolean {
-  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/.test(value)
+export function isIsoDateString(value: unknown): boolean {
+  return (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/.test(value)
+  )
 }
 
 /**
@@ -77,8 +93,10 @@ export function dateReviver(_key: string, value: unknown): unknown {
   return value
 }
 
-function isDateObject(value: unknown): value is { __date: string } {
-  return typeof value === 'object' && value !== null && '__date' in (value as Record<string, unknown>)
+export function isDateObject(value: unknown): value is { __date: string } {
+  return (
+    typeof value === 'object' && value !== null && '__date' in (value as Record<string, unknown>)
+  )
 }
 
 // ─── Export ──────────────────────────────────────────────────────────
@@ -89,7 +107,7 @@ export async function exportDatabase(): Promise<DatabaseBackup> {
   await Promise.all(
     TABLE_NAMES.map(async (name) => {
       tables[name] = await getTableData(name)
-    })
+    }),
   )
 
   const backup: DatabaseBackup = {
@@ -99,18 +117,6 @@ export async function exportDatabase(): Promise<DatabaseBackup> {
   }
 
   return backup
-}
-
-export function downloadBackup(backup: DatabaseBackup, filename?: string) {
-  const json = JSON.stringify(backup, dateReviver, 2)
-
-  const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename ?? `tgp-backup-${new Date().toISOString().split('T')[0]}.json`
-  a.click()
-  URL.revokeObjectURL(url)
 }
 
 export function saveBackupToStorage(backup: DatabaseBackup) {
@@ -126,7 +132,7 @@ export function saveBackupToStorage(backup: DatabaseBackup) {
 
 // ─── Import ──────────────────────────────────────────────────────────
 
-function reviveDatesDeep(obj: unknown, parentKey?: string): unknown {
+export function reviveDatesDeep(obj: unknown, parentKey?: string): unknown {
   // Backward compat: bare ISO date string on a known date key → revive
   if (parentKey && DATE_KEYS.has(parentKey) && isIsoDateString(obj)) {
     return new Date(obj as string)
@@ -140,7 +146,11 @@ function reviveDatesDeep(obj: unknown, parentKey?: string): unknown {
   const asRecord = obj as Record<string, unknown>
 
   // Detect our serialized date marker
-  if ('__date' in asRecord && typeof asRecord.__date === 'string' && Object.keys(asRecord).length === 1) {
+  if (
+    '__date' in asRecord &&
+    typeof asRecord.__date === 'string' &&
+    Object.keys(asRecord).length === 1
+  ) {
     return new Date(asRecord.__date)
   }
 
@@ -232,7 +242,9 @@ export async function importBackup(backup: DatabaseBackup): Promise<{
           restoredCount++
         } catch (recErr) {
           failedCount++
-          errors.push(`${tableName}[id=${record.id ?? '?'}]: ${recErr instanceof Error ? recErr.message : String(recErr)}`)
+          errors.push(
+            `${tableName}[id=${record.id ?? '?'}]: ${recErr instanceof Error ? recErr.message : String(recErr)}`,
+          )
         }
       }
     }
@@ -267,7 +279,7 @@ export function readBackupFromFile(file: File): Promise<DatabaseBackup> {
           return value
         }) as DatabaseBackup
         resolve(backup)
-      } catch (err) {
+      } catch {
         reject(new Error('Archivo de backup inválido'))
       }
     }
@@ -301,13 +313,11 @@ export function getBackupInfo(): { exists: boolean; size: string; lastBackup: st
     const raw = localStorage.getItem(BACKUP_STORAGE_KEY)
     if (!raw) return { exists: false, size: '0 B', lastBackup: null }
     const backup = JSON.parse(raw) as DatabaseBackup
-    const sizeKB = Math.round((new Blob([raw]).size) / 1024)
+    const sizeKB = Math.round(new Blob([raw]).size / 1024)
     return {
       exists: true,
       size: sizeKB < 1024 ? `${sizeKB} KB` : `${(sizeKB / 1024).toFixed(1)} MB`,
-      lastBackup: backup.exportedAt
-        ? new Date(backup.exportedAt).toLocaleString('es-ES')
-        : null,
+      lastBackup: backup.exportedAt ? new Date(backup.exportedAt).toLocaleString('es-ES') : null,
     }
   } catch {
     return { exists: false, size: '0 B', lastBackup: null }

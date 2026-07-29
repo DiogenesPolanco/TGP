@@ -17,10 +17,7 @@ const ROUTE_SHORTCUTS: Record<string, string> = {
   '9': '/admin',
 }
 
-export function useGlobalShortcuts(
-  extraShortcuts: ShortcutMap = {},
-  enabled = true
-) {
+export function useGlobalShortcuts(extraShortcuts: ShortcutMap = {}, enabled = true) {
   const navigate = useNavigate()
 
   useEffect(() => {

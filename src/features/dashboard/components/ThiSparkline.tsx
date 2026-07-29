@@ -7,7 +7,12 @@ interface ThiSparklineProps {
   color?: string
 }
 
-export function ThiSparkline({ data, width = 120, height = 40, color = '#36B37E' }: ThiSparklineProps) {
+export function ThiSparkline({
+  data,
+  width = 120,
+  height = 40,
+  color = '#36B37E',
+}: ThiSparklineProps) {
   const path = useMemo(() => {
     if (data.length < 2) return null
 
@@ -25,9 +30,9 @@ export function ThiSparkline({ data, width = 120, height = 40, color = '#36B37E'
       y: yScale(d.score),
     }))
 
-    const linePath = points.map((p, i) =>
-      i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`
-    ).join(' ')
+    const linePath = points
+      .map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`))
+      .join(' ')
 
     const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`
 
@@ -36,14 +41,22 @@ export function ThiSparkline({ data, width = 120, height = 40, color = '#36B37E'
 
   if (!path || data.length < 2) {
     return (
-      <div className="flex items-center justify-center text-xs text-neutral-50" style={{ width, height }}>
+      <div
+        className="flex items-center justify-center text-xs text-neutral-50"
+        style={{ width, height }}
+      >
         Historial no disponible
       </div>
     )
   }
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className="overflow-visible"
+    >
       <defs>
         <linearGradient id={`sparkline-fill`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.2" />

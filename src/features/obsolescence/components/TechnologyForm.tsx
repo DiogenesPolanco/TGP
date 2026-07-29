@@ -39,10 +39,10 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
   const [formData, setFormData] = useState({
     name: technology?.name ?? '',
     version: technology?.version ?? '',
-    category: technology?.category ?? 'framework' as TechCategory,
+    category: technology?.category ?? ('framework' as TechCategory),
     vendor: technology?.vendor ?? '',
     eolDate: technology?.eolDate ? new Date(technology.eolDate).toISOString().split('T')[0] : '',
-    supportStatus: technology?.supportStatus ?? 'active' as SupportStatus,
+    supportStatus: technology?.supportStatus ?? ('active' as SupportStatus),
     cveList: technology?.cveList?.join(', ') ?? '',
   })
 
@@ -56,7 +56,10 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
       eolDate: formData.eolDate ? parseLocalDate(formData.eolDate) : null,
       supportStatus: formData.supportStatus,
       cveList: formData.cveList
-        ? formData.cveList.split(',').map((c) => c.trim()).filter(Boolean)
+        ? formData.cveList
+            .split(',')
+            .map((c) => c.trim())
+            .filter(Boolean)
         : [],
       metadata: technology?.metadata ?? {},
       createdAt: technology?.createdAt ?? new Date(),
@@ -77,7 +80,10 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
           <h3 className="text-lg font-semibold text-neutral-90 dark:text-white">
             {technology ? 'Editar Tecnología' : 'Nueva Tecnología'}
           </h3>
-          <Button onClick={onClose} className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+          <Button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+          >
             <X size={20} />
           </Button>
         </div>
@@ -108,7 +114,13 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Categoría *" required value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as TechCategory })} options={categoryOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
+              <Select
+                label="Categoría *"
+                required
+                value={formData.category}
+                onChange={(v) => setFormData({ ...formData, category: v as TechCategory })}
+                options={categoryOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary mb-1">Vendor *</label>
@@ -124,7 +136,13 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select label="Estado de Soporte *" required value={formData.supportStatus} onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })} options={statusOptions.map((opt) => ({ value: opt.value, label: opt.label }))} />
+              <Select
+                label="Estado de Soporte *"
+                required
+                value={formData.supportStatus}
+                onChange={(v) => setFormData({ ...formData, supportStatus: v as SupportStatus })}
+                options={statusOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary mb-1">Fecha EOL</label>
@@ -137,7 +155,9 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">CVE(s) conocidos</label>
+            <label className="block text-sm font-medium text-secondary mb-1">
+              CVE(s) conocidos
+            </label>
             <input
               type="text"
               value={formData.cveList}
@@ -149,11 +169,17 @@ export function TechnologyForm({ technology, onClose, onSave }: TechnologyFormPr
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button"
-              onClick={onClose} className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors">
+            <Button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-neutral-30 dark:border-neutral-60 rounded-lg text-sm text-secondary hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
+            >
               Cancelar
             </Button>
-            <Button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors">
+            <Button
+              type="submit"
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+            >
               {technology ? 'Actualizar' : 'Crear'}
             </Button>
           </div>

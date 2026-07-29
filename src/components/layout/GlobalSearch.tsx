@@ -107,26 +107,86 @@ interface CategoryMeta {
 }
 
 const CATEGORIES: CategoryMeta[] = [
-  { key: 'applications', label: 'Aplicaciones', icon: AppWindow, description: 'Aplicaciones del portafolio' },
-  { key: 'technologies', label: 'Tecnologías', icon: Cpu, description: 'Tecnologías con tracking EOL' },
-  { key: 'vulnerabilities', label: 'Vulnerabilidades', icon: Bug, description: 'Vulnerabilidades con SLA' },
-  { key: 'incidents', label: 'Incidentes', icon: AlertTriangle, description: 'Incidentes de seguridad' },
-  { key: 'risks', label: 'Riesgos', icon: ShieldAlert, description: 'Riesgos con matriz probabilidad/impacto' },
-  { key: 'auditFindings', label: 'Hallazgos', icon: ClipboardCheck, description: 'Hallazgos de auditoría' },
+  {
+    key: 'applications',
+    label: 'Aplicaciones',
+    icon: AppWindow,
+    description: 'Aplicaciones del portafolio',
+  },
+  {
+    key: 'technologies',
+    label: 'Tecnologías',
+    icon: Cpu,
+    description: 'Tecnologías con tracking EOL',
+  },
+  {
+    key: 'vulnerabilities',
+    label: 'Vulnerabilidades',
+    icon: Bug,
+    description: 'Vulnerabilidades con SLA',
+  },
+  {
+    key: 'incidents',
+    label: 'Incidentes',
+    icon: AlertTriangle,
+    description: 'Incidentes de seguridad',
+  },
+  {
+    key: 'risks',
+    label: 'Riesgos',
+    icon: ShieldAlert,
+    description: 'Riesgos con matriz probabilidad/impacto',
+  },
+  {
+    key: 'auditFindings',
+    label: 'Hallazgos',
+    icon: ClipboardCheck,
+    description: 'Hallazgos de auditoría',
+  },
   { key: 'teams', label: 'Equipos', icon: Users, description: 'Equipos con métricas DORA' },
   { key: 'objectives', label: 'Objetivos', icon: Target, description: 'OKRs con Key Results' },
-  { key: 'businessUnits', label: 'Unidades de Negocio', icon: Building2, description: 'Unidades organizativas' },
+  {
+    key: 'businessUnits',
+    label: 'Unidades de Negocio',
+    icon: Building2,
+    description: 'Unidades organizativas',
+  },
   { key: 'plans', label: 'Planes', icon: FileText, description: 'Planes de ejecución' },
-  { key: 'commitments', label: 'Compromisos', icon: Stamp, description: 'Compromisos con tracking' },
-  { key: 'activities', label: 'Actividades', icon: CheckSquare, description: 'Actividades de planes' },
+  {
+    key: 'commitments',
+    label: 'Compromisos',
+    icon: Stamp,
+    description: 'Compromisos con tracking',
+  },
+  {
+    key: 'activities',
+    label: 'Actividades',
+    icon: CheckSquare,
+    description: 'Actividades de planes',
+  },
   { key: 'tasks', label: 'Tareas', icon: CheckSquare, description: 'Tareas operativas' },
   { key: 'blockers', label: 'Bloqueos', icon: Ban, description: 'Bloqueos con escalamiento' },
-  { key: 'deliverables', label: 'Entregables', icon: Package, description: 'Entregables vinculados' },
-  { key: 'microservices', label: 'Microservicios', icon: Box, description: 'Microservicios por aplicación' },
+  {
+    key: 'deliverables',
+    label: 'Entregables',
+    icon: Package,
+    description: 'Entregables vinculados',
+  },
+  {
+    key: 'microservices',
+    label: 'Microservicios',
+    icon: Box,
+    description: 'Microservicios por aplicación',
+  },
   { key: 'members', label: 'Miembros', icon: User, description: 'Perfiles de miembros' },
   { key: 'teamSprints', label: 'Sprints', icon: CalendarDays, description: 'Sprints de equipo' },
   { key: 'equipment', label: 'Equipos', icon: Monitor, description: 'Equipamiento e inventario' },
-  { key: 'equipmentTickets', label: 'Tickets Equipo', icon: Wrench, description: 'Tickets de mantenimiento' },
+  {
+    key: 'equipmentTickets',
+    label: 'Tickets Equipo',
+    icon: Wrench,
+    description: 'Tickets de mantenimiento',
+  },
 ]
 
 /* ─── Search helpers ─── */
@@ -445,9 +505,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const runSearch = useCallback(async (q: string, category: string | null) => {
     setLoading(true)
     try {
-      const keysToSearch = category
-        ? [category]
-        : Object.keys(SEARCH_REGISTRY)
+      const keysToSearch = category ? [category] : Object.keys(SEARCH_REGISTRY)
 
       const results = await Promise.all(
         keysToSearch.map(async (key) => {
@@ -625,8 +683,12 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
         {query.trim() && groups.length === 0 && !loading && (
           <div className="px-5 py-12 text-center text-neutral-50">
             <Search size={32} className="mx-auto mb-3 opacity-40" />
-            <p className="text-sm">Sin resultados para <span className="font-medium text-secondary">"{query}"</span></p>
-            <p className="text-xs mt-1">Prueba con otro término o selecciona una categoría específica</p>
+            <p className="text-sm">
+              Sin resultados para <span className="font-medium text-secondary">"{query}"</span>
+            </p>
+            <p className="text-xs mt-1">
+              Prueba con otro término o selecciona una categoría específica
+            </p>
           </div>
         )}
 
@@ -718,10 +780,10 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
               ))}
             </div>
             <div className="flex items-center justify-center gap-4 mt-5 text-xs text-neutral-40">
-              <span>⌘K  abrir</span>
-              <span>↓↑  navegar</span>
-              <span>⏎  ir</span>
-              <span>Esc  cerrar</span>
+              <span>⌘K abrir</span>
+              <span>↓↑ navegar</span>
+              <span>⏎ ir</span>
+              <span>Esc cerrar</span>
             </div>
           </div>
         )}

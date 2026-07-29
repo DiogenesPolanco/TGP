@@ -46,12 +46,17 @@ function formatVersion(v: AppVersion) {
 }
 
 function setTestBuild(build: string) {
-  localStorage.setItem(TEST_BUILD_KEY, JSON.stringify({
-    version: '0.0.0',
-    build,
-    timestamp: new Date().toISOString()
-  }))
-  console.log(`[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`)
+  localStorage.setItem(
+    TEST_BUILD_KEY,
+    JSON.stringify({
+      version: '0.0.0',
+      build,
+      timestamp: new Date().toISOString(),
+    }),
+  )
+  console.log(
+    `[VersionCheck] Build de prueba "${build}" guardado — llamá __checkVersion() para probar`,
+  )
 }
 ;(window as any).__setTestBuild = setTestBuild
 
@@ -65,7 +70,7 @@ export function useVersionCheck() {
   }, [])
 
   const check = useCallback(async () => {
-    const result = getBuildOverride() ?? await fetchVersion()
+    const result = getBuildOverride() ?? (await fetchVersion())
 
     // Successful fetch
     if (result && typeof result === 'object' && 'build' in result) {
@@ -90,10 +95,12 @@ export function useVersionCheck() {
     }
 
     // HTTP error (404/500) — server likely changed
-    const failures = (parseInt(localStorage.getItem(FAILURES_KEY) ?? '0', 10)) + 1
+    const failures = parseInt(localStorage.getItem(FAILURES_KEY) ?? '0', 10) + 1
     localStorage.setItem(FAILURES_KEY, String(failures))
     const buildStr = cachedVersion ? formatVersion(cachedVersion) : 'ninguna (primera carga)'
-    console.warn(`[VersionCheck] Error HTTP ${failures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`)
+    console.warn(
+      `[VersionCheck] Error HTTP ${failures}/${MAX_CONSECUTIVE_FAILURES} — versión actual: ${buildStr}`,
+    )
 
     if (cachedVersion && failures >= MAX_CONSECUTIVE_FAILURES) {
       markStale()
@@ -114,7 +121,7 @@ export function useVersionCheck() {
     localStorage.removeItem(FAILURES_KEY)
     if ('caches' in window) {
       const keys = await caches.keys()
-      await Promise.all(keys.map(k => caches.delete(k)))
+      await Promise.all(keys.map((k) => caches.delete(k)))
     }
     const reg = await navigator.serviceWorker?.getRegistration()
     if (reg) await reg.unregister()

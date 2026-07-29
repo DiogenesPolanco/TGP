@@ -1,7 +1,11 @@
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { getShareInfo, getPublicMemberData, type PublicMemberData } from '@/services/share/publicShareService'
+import {
+  getShareInfo,
+  getPublicMemberData,
+  type PublicMemberData,
+} from '@/services/share/publicShareService'
 import { Clock, BarChart3, Brain } from 'lucide-react'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { PrintButton } from '@/components/ui/PrintButton'
@@ -16,24 +20,38 @@ export function PublicMemberPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!hash) { setValid(false); setLoading(false); return }
+    if (!hash) {
+      setValid(false)
+      setLoading(false)
+      return
+    }
 
     const tryDecryptOrShow = (raw: unknown) => {
       if (raw && typeof raw === 'object' && 'e' in raw && (raw as any).e === true) {
-        setPendingEncrypted(raw as EncryptedPayload); setValid(true); setLoading(false)
+        setPendingEncrypted(raw as EncryptedPayload)
+        setValid(true)
+        setLoading(false)
       } else {
-        setData(raw as PublicMemberData); setValid(true); setLoading(false)
+        setData(raw as PublicMemberData)
+        setValid(true)
+        setLoading(false)
       }
     }
 
     import('@/services/share/azureShareService').then(async ({ downloadShareFromAzure }) => {
       const azureData = await downloadShareFromAzure(hash)
-      if (azureData) { tryDecryptOrShow(azureData); return }
+      if (azureData) {
+        tryDecryptOrShow(azureData)
+        return
+      }
       const info = getShareInfo(hash)
       if (info && info.type === 'member' && info.ref) {
         const d = await getPublicMemberData(info.ref)
-        setData(d); setValid(true)
-      } else { setValid(false) }
+        setData(d)
+        setValid(true)
+      } else {
+        setValid(false)
+      }
       setLoading(false)
     })
   }, [hash])
@@ -42,10 +60,18 @@ export function PublicMemberPage() {
     if (!data) return null
     const totalSP = data.sprints.reduce((s, sp) => s + sp.storyPointsCompleted, 0)
     const avgMood = data.oneOnOnes.length
-      ? Math.round(data.oneOnOnes.reduce((s, o) => s + o.estadoAnimo, 0) / data.oneOnOnes.length * 10) / 10
+      ? Math.round(
+          (data.oneOnOnes.reduce((s, o) => s + o.estadoAnimo, 0) / data.oneOnOnes.length) * 10,
+        ) / 10
       : 0
     const achievements = data.achievements.length
-    return { totalSP, avgMood, achievements, sprintCount: data.sprints.length, oneOnOneCount: data.oneOnOnes.length }
+    return {
+      totalSP,
+      avgMood,
+      achievements,
+      sprintCount: data.sprints.length,
+      oneOnOneCount: data.oneOnOnes.length,
+    }
   }, [data])
 
   if (loading) return <Loader />
@@ -54,11 +80,17 @@ export function PublicMemberPage() {
     if (pendingEncrypted) {
       return (
         <div className="min-h-screen bg-canvas flex items-center justify-center">
-          <PassphraseModal title="Datos protegidos" description="Contenido cifrado. Ingresa la contraseña."
+          <PassphraseModal
+            title="Datos protegidos"
+            description="Contenido cifrado. Ingresa la contraseña."
             onSubmit={async (pass) => {
               const decrypted = await decryptData(pendingEncrypted, pass)
-              if (decrypted) { setData(decrypted as PublicMemberData); setPendingEncrypted(null) }
-              else { alert('Contraseña incorrecta') }
+              if (decrypted) {
+                setData(decrypted as PublicMemberData)
+                setPendingEncrypted(null)
+              } else {
+                alert('Contraseña incorrecta')
+              }
             }}
           />
         </div>
@@ -78,7 +110,9 @@ export function PublicMemberPage() {
               <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-90 dark:text-white">Perfil de miembro</h1>
+              <h1 className="text-base font-bold text-neutral-90 dark:text-white">
+                Perfil de miembro
+              </h1>
               <p className="text-xs text-neutral-50">Vista compartida · Solo lectura</p>
             </div>
           </div>
@@ -110,7 +144,9 @@ export function PublicMemberPage() {
                 <p className="text-xs text-neutral-50">SP totales</p>
               </div>
               <div>
-                <p className="text-xl font-bold text-neutral-90 dark:text-white">{stats.sprintCount}</p>
+                <p className="text-xl font-bold text-neutral-90 dark:text-white">
+                  {stats.sprintCount}
+                </p>
                 <p className="text-xs text-neutral-50">Sprints</p>
               </div>
               <div>
@@ -131,22 +167,30 @@ export function PublicMemberPage() {
           </h3>
           {sprints.length > 0 ? (
             <div className="space-y-2">
-              {sprints.slice(-10).reverse().map((sp) => {
-                const total = sp.storyPointsCompleted + sp.storyPointsNotCompleted
-                const pct = total > 0 ? Math.round((sp.storyPointsCompleted / total) * 100) : 0
-                return (
-                  <div key={sp.id} className="flex items-center gap-3 text-sm">
-                    <span className="text-secondary font-medium w-20">{sp.sprintName}</span>
-                    <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
-                      <div className={cn('h-full rounded-full', pct >= 80 ? 'bg-success' : pct >= 50 ? 'bg-warning' : 'bg-danger')}
-                        style={{ width: `${pct}%` }} />
-          </div>
-                    <span className="text-neutral-90 dark:text-white font-medium w-16 text-right">
-                      {sp.storyPointsCompleted}/{total}
-                    </span>
-                  </div>
-                )
-              })}
+              {sprints
+                .slice(-10)
+                .reverse()
+                .map((sp) => {
+                  const total = sp.storyPointsCompleted + sp.storyPointsNotCompleted
+                  const pct = total > 0 ? Math.round((sp.storyPointsCompleted / total) * 100) : 0
+                  return (
+                    <div key={sp.id} className="flex items-center gap-3 text-sm">
+                      <span className="text-secondary font-medium w-20">{sp.sprintName}</span>
+                      <div className="flex-1 h-2 bg-neutral-10 dark:bg-neutral-85 rounded-full overflow-hidden">
+                        <div
+                          className={cn(
+                            'h-full rounded-full',
+                            pct >= 80 ? 'bg-success' : pct >= 50 ? 'bg-warning' : 'bg-danger',
+                          )}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-neutral-90 dark:text-white font-medium w-16 text-right">
+                        {sp.storyPointsCompleted}/{total}
+                      </span>
+                    </div>
+                  )
+                })}
             </div>
           ) : (
             <p className="text-sm text-neutral-50 text-center py-4">Sin datos de sprints</p>
@@ -161,21 +205,36 @@ export function PublicMemberPage() {
               1:1 Recientes
             </h3>
             <div className="space-y-3">
-              {oneOnOnes.slice(-3).reverse().map((oo) => (
-                <div key={oo.id} className="flex items-start gap-3 p-3 rounded-xl bg-neutral-5 dark:bg-neutral-85">
-                  <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
-                    oo.estadoAnimo >= 4 ? 'bg-success/10 text-success' :
-                    oo.estadoAnimo >= 3 ? 'bg-warning/10 text-warning' : 'bg-danger/10 text-danger')}>
-                    {oo.estadoAnimo}
+              {oneOnOnes
+                .slice(-3)
+                .reverse()
+                .map((oo) => (
+                  <div
+                    key={oo.id}
+                    className="flex items-start gap-3 p-3 rounded-xl bg-neutral-5 dark:bg-neutral-85"
+                  >
+                    <div
+                      className={cn(
+                        'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
+                        oo.estadoAnimo >= 4
+                          ? 'bg-success/10 text-success'
+                          : oo.estadoAnimo >= 3
+                            ? 'bg-warning/10 text-warning'
+                            : 'bg-danger/10 text-danger',
+                      )}
+                    >
+                      {oo.estadoAnimo}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-neutral-50">
+                        {new Date(oo.date).toLocaleDateString('es-ES')}
+                      </p>
+                      <p className="text-sm text-neutral-80 dark:text-neutral-20 mt-0.5 line-clamp-2">
+                        {oo.feedbackDelLider || 'Sin registro'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-neutral-50">{new Date(oo.date).toLocaleDateString('es-ES')}</p>
-                    <p className="text-sm text-neutral-80 dark:text-neutral-20 mt-0.5 line-clamp-2">
-                      {oo.feedbackDelLider || 'Sin registro'}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         )}
@@ -195,4 +254,3 @@ function Loader() {
     </div>
   )
 }
-

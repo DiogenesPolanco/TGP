@@ -63,6 +63,6 @@ export const useDashboardConfigStore = create<DashboardConfigState>()(
         setEditing: (editing) => set({ isEditing: editing }),
       }
     },
-    { name: 'tgp-dashboard-config' }
-  )
+    { name: 'tgp-dashboard-config' },
+  ),
 )
