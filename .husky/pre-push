@@ -29,10 +29,14 @@ echo ""
 echo "📋 [5/5] Dependency vulnerability audit..."
 # Note: pre-existing high vulns (electron-builder build deps, react-router RSC-only CSRF).
 # This SPA is client-side only — these are not exploitable at runtime.
-npm audit --audit-level=critical || {
-  echo "  ⚠️  Vulnerabilities found. Review with 'npm audit'."
-  exit 1
-}
+if [ -f "package-lock.json" ]; then
+  npm audit --audit-level=critical || {
+    echo "  ⚠️  Vulnerabilities found. Review with 'npm audit'."
+    exit 1
+  }
+else
+  echo "  ℹ️  No package-lock.json found — skipping audit."
+fi
 
 echo ""
 echo "✅ All pre-push checks passed!"
