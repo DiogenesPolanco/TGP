@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.cjs",
+  "author": "DiogenesPolanco <diogenespolancomartinez@gmail.com>",
+  "description": "TGP - Technology Governance Platform",
+  "desktopName": "TGP",
   "scripts": {
     "dev": "vite",
     "build": "node scripts/generate-version.cjs && tsc -b && vite build",
@@ -21,8 +24,11 @@
     "desktop": "VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "desktop:build": "npm run build && PGP_PROXY_PORT=9876 electron .",
     "build:desktop:linux": "npm run build && electron-builder --linux --x64",
-    "build:desktop:mac": "npm run build && electron-builder --mac --x64",
+    "build:desktop:mac": "npm run build && electron-builder --mac --x64 --arm64",
+    "build:desktop:win": "npm run build && electron-builder --win --x64",
+    "build:desktop:all": "npm run build && electron-builder --linux --x64 --win --x64 --mac --x64 --arm64",
     "build:desktop": "npm run build && electron-builder --$(uname -s | tr '[:upper:]' '[:lower:]') --x64",
+    "desktop:release": "npm version patch && git push --tags && git push",
     "security:scan": "bash scripts/detect-secrets.sh --all",
     "security:audit": "npm audit --audit-level=high",
     "security:all": "npm run security:scan && npm run lint && npm run security:audit",
@@ -158,19 +164,26 @@
         "deb"
       ],
       "category": "Office",
-      "icon": "dist/favicon.svg"
+      "icon": "public/icons/icon-512x512.png",
+      "maintainer": "DiogenesPolanco <diogenespolancomartinez@gmail.com>"
     },
     "mac": {
       "target": [
         "dmg"
       ],
-      "icon": "dist/favicon.svg"
+      "icon": "public/icons/icon-512x512.png",
+      "category": "public.app-category.business"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "dist/favicon.svg"
+      "icon": "public/icons/icon-512x512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/icons/icon-512x512.png"
     }
   }
 }

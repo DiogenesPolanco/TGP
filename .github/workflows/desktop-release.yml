@@ -1,0 +1,97 @@
+name: Build Desktop Releases
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build for (linux, windows, mac, all)'
+        required: true
+        default: 'all'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            target: --linux --x64
+            artifact_name: TGP-Linux-x64
+            ext: AppImage
+          - os: windows-latest
+            platform: win
+            target: --win --x64
+            artifact_name: TGP-Windows-x64
+            ext: exe
+          - os: macos-latest
+            platform: mac
+            target: --mac --x64 --arm64
+            artifact_name: TGP-Mac
+            ext: dmg
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Build desktop installer (${{ matrix.platform }})
+        run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          CI: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: release/
+          retention-days: 30
+
+  create-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate release notes
+        run: |
+          echo "## TGP Desktop Release ${{ github.ref_name }}" > release-notes.md
+          echo "" >> release-notes.md
+          echo "### Instaladores disponibles:" >> release-notes.md
+          echo "- **Linux**: AppImage + deb (portable + instalable)" >> release-notes.md
+          echo "- **Windows**: NSIS installer (.exe)" >> release-notes.md
+          echo "- **Mac**: DMG (Intel + Apple Silicon)" >> release-notes.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "TGP Desktop ${{ github.ref_name }}"
+          body_path: release-notes.md
+          files: |
+            artifacts/**/*
+          draft: true
+          prerelease: false

@@ -73,3 +73,4 @@ coverage-ts/
 # Quality tooling
 .husky/_/
 .tmp/
+release/
