@@ -47,7 +47,25 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          # Ensure native optional bindings are present
+          # npm ci only installs packages in the lockfile, but it was generated
+          # on Linux and is missing platform-specific native bindings (rolldown, etc.)
+          node -e "
+            const {execSync} = require('child_process');
+            const {platform, arch} = process;
+            const rolldownPkg = require('rolldown/package.json');
+            const nativePkg = '@rolldown/binding-' + platform + '-' + arch;
+            if (rolldownPkg.optionalDependencies && rolldownPkg.optionalDependencies[nativePkg]) {
+              const ver = rolldownPkg.optionalDependencies[nativePkg];
+              try { require.resolve(nativePkg); }
+              catch(e) {
+                console.log('Installing missing native binding: ' + nativePkg + '@' + ver);
+                execSync('npm install ' + nativePkg + '@' + ver + ' --no-save', {stdio: 'inherit'});
+              }
+            }
+          "
 
       - name: Build web app
         run: npm run build
