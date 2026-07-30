@@ -29,58 +29,70 @@
 ## Características
 
 ### 🤖 GobIA — Asistente de IA
+
 **GobIA** (Gobierno + IA) es un asistente conversacional integrado en el sidebar que permite consultar la plataforma en lenguaje natural. Soporta múltiples proveedores (OpenAI, Groq, Ollama) con tool calls nativos, ejecuta consultas en tiempo real sobre aplicaciones, tecnologías, equipos, riesgos y más, y maneja resultados vacíos, dominios deshabilitados y multi-turno con respuestas contextualizadas.
 
 ### 📊 Dashboard Ejecutivo
+
 **Technology Health Index (THI)** en tiempo real — puntuación compuesta en 7 dimensiones ponderadas (Delivery, Seguridad, Obsolescencia, Riesgo, y más). Tarjetas KPI interactivas con drill-down, gráficos de distribución por severidad y filtro por período.
 
 ### 📋 Catálogo de Aplicaciones
+
 CRUD completo con búsqueda avanzada, filtros por criticidad/estado/BU, y vista de detalle que consolida vulnerabilidades, riesgos, incidentes y hallazgos **heredados** de microservicios vinculados. Importación desde Excel con upsert inteligente.
 
 ### 🔍 Búsqueda Global
+
 Barra de búsqueda en el header que consulta en **40+ tablas** simultáneamente — aplicaciones, tecnologías, vulnerabilidades, equipos, riesgos, hallazgos, OKRs, planes, equipamiento, enlaces públicos y más. Resultados agrupados por dominio con navegación directa al detalle.
 
 ### 🔒 Seguridad y Gobierno
+
 Vulnerabilidades con puntuación CVSS, SLA y flujo de estados. **Búsqueda y consulta CVE/NVD** integrada — lookup individual desde MITRE cveawg y búsqueda por keyword desde NVD, con panel informativo embebido en los formularios de tecnología. Incidentes con severidad P1-P4 y tracking de tiempos de respuesta. Matriz de **riesgos** (probabilidad × impacto) y **hallazgos de auditoría** con evidencia adjunta y planes de acción.
 
 ### 🎯 OKRs y Estrategia
+
 Objetivos con Key Results, tracking de período, cálculo de progreso y monitoreo de estado (on track, at risk, behind, achieved). Vincula entregables y planes a objetivos estratégicos.
 
 ### 🚀 Seguimiento de Ejecución
+
 Planes con **diagramas de Gantt**, línea de tiempo diaria, compromisos, bloqueos y mapa de dependencias. Servicio de escalamiento para items vencidos. Vista semanal con hitos próximos.
 
 ### 👥 Equipos y Métricas DORA
+
 Gestión de equipos con **métricas DORA** (frecuencia de deploy, lead time, change failure rate, MTTR). Benchmarking automático Elite / Alto / Medio / Bajo.
 
 ### 💻 Inventario de Equipamiento
+
 CRUD completo de equipos (laptops, monitores, teléfonos, periféricos, etc.) con asignación a miembros, historial de asignaciones, tickets de soporte (reparación/reemplazo/nuevo) y reportes. Los tickets se vinculan a Jira con ID y enlace externo. Dashboard público compartible con métricas, inventario y tickets. Vista de detalle con tabs de Información, Tickets e Historial, más diseño hero con icono de estado.
 
 ### 🔗 Enlaces Públicos
+
 Generación de **enlaces públicos cifrados y con expiración** para cualquier vista — dashboard, daily, planes, vulnerabilidades, riesgos, auditoría, OKRs y más. Cifrado AES-GCM 256 en reposo con passphrase opcional. Almacenamiento en Azure Blob Storage o localStorage.
 
 ### 🧭 Onboarding Guiado
+
 Asistente de primer inicio con 10 pasos interactivos que guían al usuario desde la creación de unidades de negocio hasta la carga de datos demo, cubriendo aplicaciones, tecnologías, equipos, seguridad, ejecución y dashboard.
 
 ### ⚡ 100% Cliente-Side
+
 Sin dependencias de servidor. Todos los datos en **IndexedDB** (Dexie.js). Backup en la nube y enlaces públicos vía Azure Blob Storage. Autenticación TOTP con código QR.
 
 ---
 
 ## Stack
 
-| Capa | Tecnología |
-|---|---|
-| **Core** | React 19, TypeScript 5, Vite 6 + SWC |
-| **Ruteo** | React Router v7 |
-| **Estado** | Zustand 5 |
-| **Base de datos** | Dexie.js 4 (IndexedDB) |
-| **Estilos** | Tailwind CSS 4 + design system propio |
-| **Formularios** | React Hook Form + Zod |
-| **Gráficos** | Recharts + ApexCharts |
-| **Iconos** | Lucide React |
-| **Auth** | TOTP (otpauth + QR code) |
-| **Nube** | Azure Blob Storage |
-| **Importación** | SheetJS (XLSX) |
+| Capa              | Tecnología                            |
+| ----------------- | ------------------------------------- |
+| **Core**          | React 19, TypeScript 5, Vite 6 + SWC  |
+| **Ruteo**         | React Router v7                       |
+| **Estado**        | Zustand 5                             |
+| **Base de datos** | Dexie.js 4 (IndexedDB)                |
+| **Estilos**       | Tailwind CSS 4 + design system propio |
+| **Formularios**   | React Hook Form + Zod                 |
+| **Gráficos**      | Recharts + ApexCharts                 |
+| **Iconos**        | Lucide React                          |
+| **Auth**          | TOTP (otpauth + QR code)              |
+| **Nube**          | Azure Blob Storage                    |
+| **Importación**   | SheetJS (XLSX)                        |
 
 ---
 
@@ -166,7 +178,8 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ## 📅 Versión
 
-**v1.0.0** — Lanzamiento inicial
+**v1.0.0** — Lanzamiento inicial  
+_Última actualización: Julio 2026_
 
 ---
 
