@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Search, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
 import { useAppStore } from '@/stores/appStore'
 import type { SupportStatus, TechCategory } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { parseLocalDate } from '@/lib/utils'
+import { searchCvesByKeyword, type NvdCveResult } from '@/services/security/nvdService'
 
 export function TechnologyFormPage() {
   const { id } = useParams()
@@ -43,6 +44,45 @@ export function TechnologyFormPage() {
       })
     }
   }, [technology])
+
+  const [cveSearchResults, setCveSearchResults] = useState<NvdCveResult[] | null>(null)
+  const [cveSearchLoading, setCveSearchLoading] = useState(false)
+  const [cveSearchError, setCveSearchError] = useState<string | null>(null)
+  const [cveSearchTotal, setCveSearchTotal] = useState(0)
+
+  const existingCves = new Set(
+    formData.cveList
+      .split(',')
+      .map((c) => c.trim().toUpperCase())
+      .filter(Boolean),
+  )
+
+  const handleCveSearch = async () => {
+    const keyword = `${formData.name} ${formData.version}`.trim()
+    if (!keyword) return
+
+    setCveSearchLoading(true)
+    setCveSearchError(null)
+    setCveSearchResults(null)
+
+    const result = await searchCvesByKeyword(keyword, 'HIGH', 8)
+    setCveSearchLoading(false)
+
+    if (result.error) {
+      setCveSearchError(result.error)
+      return
+    }
+
+    setCveSearchResults(result.results)
+    setCveSearchTotal(result.totalResults)
+  }
+
+  const addCve = (cveId: string) => {
+    if (existingCves.has(cveId.toUpperCase())) return
+    const current = formData.cveList ? formData.cveList.split(',').map((c) => c.trim()).filter(Boolean) : []
+    current.push(cveId)
+    setFormData({ ...formData, cveList: current.join(', ') })
+  }
 
   if (id && !technology) return <div className="p-6 text-neutral-50">Cargando...</div>
 
@@ -156,15 +196,97 @@ export function TechnologyFormPage() {
         </div>
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">CVE(s) conocidos</label>
-          <input
-            type="text"
-            value={formData.cveList}
-            onChange={(e) => setFormData({ ...formData, cveList: e.target.value })}
-            placeholder="CVE-2024-1234, CVE-2024-5678"
-            className="w-full px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-          <p className="text-xs text-neutral-50 mt-1">Separados por coma</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={formData.cveList}
+              onChange={(e) => setFormData({ ...formData, cveList: e.target.value })}
+              placeholder="CVE-2024-1234, CVE-2024-5678"
+              className="flex-1 px-3 py-2 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            <Button
+              type="button"
+              onClick={handleCveSearch}
+              disabled={cveSearchLoading || !formData.name}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/30 text-primary text-sm hover:bg-primary/5 disabled:opacity-40 transition-colors shrink-0"
+            >
+              <Search size={14} />
+              {cveSearchLoading ? 'Buscando…' : 'Buscar CVEs'}
+            </Button>
+          </div>
+          <p className="text-xs text-neutral-50 mt-1">Separados por coma. Usa "Buscar CVEs" para encontrar CVEs altos en NVD.</p>
         </div>
+
+        {/* CVE search results */}
+        {cveSearchError && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/10 border border-warning/20 text-xs text-warning">
+            <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+            <span>{cveSearchError}</span>
+          </div>
+        )}
+
+        {cveSearchResults && cveSearchResults.length === 0 && (
+          <div className="p-3 rounded-lg bg-neutral-10 dark:bg-neutral-80 text-xs text-neutral-60 text-center">
+            No se encontraron CVEs de severidad alta para "{formData.name} {formData.version}"
+          </div>
+        )}
+
+        {cveSearchResults && cveSearchResults.length > 0 && (
+          <div className="space-y-2 p-3 rounded-lg border border-boundary bg-card max-h-64 overflow-y-auto">
+            <p className="text-xs font-semibold text-neutral-60">
+              {cveSearchTotal} CVE(s) encontrado(s) en NVD — mostrando los {cveSearchResults.length} más recientes
+            </p>
+            {cveSearchResults.map((cve) => {
+              const alreadyAdded = existingCves.has(cve.id.toUpperCase())
+              return (
+                <div
+                  key={cve.id}
+                  className={`flex items-start gap-3 p-2 rounded-lg text-xs ${
+                    alreadyAdded ? 'bg-success/5 opacity-50' : 'hover:bg-neutral-10 dark:hover:bg-neutral-80'
+                  } transition-colors`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Shield size={12} className="shrink-0 text-danger" />
+                      <span className="font-mono font-semibold text-default">{cve.id}</span>
+                      {cve.severity && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-danger/10 text-danger font-medium">
+                          {cve.severity}
+                        </span>
+                      )}
+                      {cve.baseScore !== null && (
+                        <span className="text-[10px] text-muted">CVSS {cve.baseScore}</span>
+                      )}
+                    </div>
+                    <p className="text-muted mt-0.5 line-clamp-2">{cve.description}</p>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <a
+                      href={`https://nvd.nist.gov/vuln/detail/${cve.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 rounded hover:bg-neutral-20 dark:hover:bg-neutral-70 text-muted hover:text-primary transition-colors"
+                    >
+                      <ExternalLink size={12} />
+                    </a>
+                    {!alreadyAdded && (
+                      <button
+                        type="button"
+                        onClick={() => addCve(cve.id)}
+                        className="p-1 rounded hover:bg-primary/10 text-primary transition-colors text-[10px] font-semibold"
+                      >
+                        +Agregar
+                      </button>
+                    )}
+                    {alreadyAdded && (
+                      <span className="p-1 text-[10px] text-success">✓</span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
         <div className="flex justify-end gap-3 pt-4">
           <Button
             type="button"

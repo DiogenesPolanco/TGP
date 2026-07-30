@@ -1,792 +1,157 @@
 import { useState, useEffect, useRef, useCallback, useMemo, startTransition } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { db } from '@/services/db/database'
 import { cn } from '@/lib/utils'
+import { getCategoryMeta, performSearch, statusLabel, severityLabel, priorityLabel } from './globalSearchHelpers'
+import type { SearchGroup } from './globalSearchHelpers'
 
-function statusLabel(status: string): string {
-  const map: Record<string, string> = {
-    open: 'Abierto',
-    mitigated: 'Mitigado',
-    accepted: 'Aceptado',
-    closed: 'Cerrado',
-    in_progress: 'En Progreso',
-    resolved: 'Resuelto',
-    overdue: 'Vencido',
-    fixed: 'Corregido',
-    detected: 'Detectado',
-    acknowledged: 'Reconocido',
-    active: 'Activo',
-    cancelled: 'Cancelado',
-    completed: 'Completado',
-    planned: 'Planificado',
-    on_hold: 'En Pausa',
-    pending: 'Pendiente',
-    todo: 'Por Hacer',
-    review: 'En Revisión',
-    done: 'Hecho',
-    at_risk: 'En Riesgo',
-    breached: 'Incumplido',
-    fulfilled: 'Cumplido',
-    escalated: 'Escalado',
-    not_started: 'No Iniciado',
-    on_track: 'En Curso',
-    behind: 'Atrasado',
-    achieved: 'Logrado',
-  }
-  return map[status] ?? status
-}
-
-function severityLabel(severity: string): string {
-  const map: Record<string, string> = {
-    critical: 'Crítica',
-    high: 'Alta',
-    medium: 'Media',
-    low: 'Baja',
-    info: 'Info',
-  }
-  return map[severity] ?? severity
-}
-
-function priorityLabel(priority: string): string {
-  const map: Record<string, string> = {
-    low: 'Baja',
-    medium: 'Media',
-    high: 'Alta',
-    critical: 'Crítica',
-  }
-  return map[priority] ?? priority
-}
-import { Button } from '@/components/ui/Button'
-import {
-  Search,
-  AppWindow,
-  Cpu,
-  Bug,
-  AlertTriangle,
-  ShieldAlert,
-  ClipboardCheck,
-  Users,
-  Target,
-  Building2,
-  X,
-  FileText,
-  CheckSquare,
-  Ban,
-  Package,
-  Box,
-  User,
-  CalendarDays,
-  Stamp,
-  Monitor,
-  Wrench,
-} from 'lucide-react'
-
-/* ─── Types ─── */
-
-interface SearchGroup {
-  key: string
-  label: string
-  icon: typeof Search
-  route: (item: SearchResult) => string
-  items: SearchResult[]
-}
-
-interface SearchResult {
-  id: string
-  title: string
-  subtitle: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  entity: any
-}
-
-interface CategoryMeta {
-  key: string
-  label: string
-  icon: typeof Search
-  description: string
-}
-
-const CATEGORIES: CategoryMeta[] = [
-  {
-    key: 'applications',
-    label: 'Aplicaciones',
-    icon: AppWindow,
-    description: 'Aplicaciones del portafolio',
-  },
-  {
-    key: 'technologies',
-    label: 'Tecnologías',
-    icon: Cpu,
-    description: 'Tecnologías con tracking EOL',
-  },
-  {
-    key: 'vulnerabilities',
-    label: 'Vulnerabilidades',
-    icon: Bug,
-    description: 'Vulnerabilidades con SLA',
-  },
-  {
-    key: 'incidents',
-    label: 'Incidentes',
-    icon: AlertTriangle,
-    description: 'Incidentes de seguridad',
-  },
-  {
-    key: 'risks',
-    label: 'Riesgos',
-    icon: ShieldAlert,
-    description: 'Riesgos con matriz probabilidad/impacto',
-  },
-  {
-    key: 'auditFindings',
-    label: 'Hallazgos',
-    icon: ClipboardCheck,
-    description: 'Hallazgos de auditoría',
-  },
-  { key: 'teams', label: 'Equipos', icon: Users, description: 'Equipos con métricas DORA' },
-  { key: 'objectives', label: 'Objetivos', icon: Target, description: 'OKRs con Key Results' },
-  {
-    key: 'businessUnits',
-    label: 'Unidades de Negocio',
-    icon: Building2,
-    description: 'Unidades organizativas',
-  },
-  { key: 'plans', label: 'Planes', icon: FileText, description: 'Planes de ejecución' },
-  {
-    key: 'commitments',
-    label: 'Compromisos',
-    icon: Stamp,
-    description: 'Compromisos con tracking',
-  },
-  {
-    key: 'activities',
-    label: 'Actividades',
-    icon: CheckSquare,
-    description: 'Actividades de planes',
-  },
-  { key: 'tasks', label: 'Tareas', icon: CheckSquare, description: 'Tareas operativas' },
-  { key: 'blockers', label: 'Bloqueos', icon: Ban, description: 'Bloqueos con escalamiento' },
-  {
-    key: 'deliverables',
-    label: 'Entregables',
-    icon: Package,
-    description: 'Entregables vinculados',
-  },
-  {
-    key: 'microservices',
-    label: 'Microservicios',
-    icon: Box,
-    description: 'Microservicios por aplicación',
-  },
-  { key: 'members', label: 'Miembros', icon: User, description: 'Perfiles de miembros' },
-  { key: 'teamSprints', label: 'Sprints', icon: CalendarDays, description: 'Sprints de equipo' },
-  { key: 'equipment', label: 'Equipos', icon: Monitor, description: 'Equipamiento e inventario' },
-  {
-    key: 'equipmentTickets',
-    label: 'Tickets Equipo',
-    icon: Wrench,
-    description: 'Tickets de mantenimiento',
-  },
-]
-
-/* ─── Search helpers ─── */
-
-function score(query: string, text: string): number {
-  const lower = text.toLowerCase()
-  const q = query.toLowerCase()
-
-  if (lower === q) return 100
-  if (lower.startsWith(q)) return 80
-  if (lower.includes(q)) return 50
-
-  const words = q.split(/\s+/)
-  const matchCount = words.filter((w) => lower.includes(w)).length
-  if (matchCount > 0) return 30 * (matchCount / words.length)
-
-  return 0
-}
-
-async function searchEntity(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  table: { toArray: () => Promise<any[]> },
-  fields: string[],
-  query: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  buildResult: (item: any) => SearchResult,
-  minScore = 10,
-): Promise<SearchResult[]> {
-  const all = await table.toArray()
-  const scored: { result: SearchResult; score: number }[] = []
-
-  for (const item of all) {
-    let bestScore = 0
-    for (const field of fields) {
-      const value = item[field]
-      if (typeof value === 'string' || typeof value === 'number') {
-        const s = score(query, String(value))
-        if (s > bestScore) bestScore = s
-      }
-    }
-    if (bestScore >= minScore) {
-      scored.push({ result: buildResult(item), score: bestScore })
-    }
-  }
-
-  return scored
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10)
-    .map((s) => s.result)
-}
-
-/* ─── Search registry (maps category key → query config) ─── */
-
-interface SearchConfig {
-  table: { toArray: () => Promise<unknown[]> }
-  fields: string[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  buildResult: (item: any) => SearchResult
-}
-
-const SEARCH_REGISTRY: Record<string, SearchConfig> = {
-  applications: {
-    table: db.applications,
-    fields: ['name', 'description', 'ownerName'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.name,
-      subtitle: item.ownerName,
-      entity: item,
-    }),
-  },
-  technologies: {
-    table: db.technologies,
-    fields: ['name', 'version', 'vendor'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: `${item.name} ${item.version}`,
-      subtitle: item.vendor,
-      entity: item,
-    }),
-  },
-  vulnerabilities: {
-    table: db.vulnerabilities,
-    fields: ['title', 'externalId'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `CVSS ${item.cvssScore} · ${severityLabel(item.severity)}`,
-      entity: item,
-    }),
-  },
-  incidents: {
-    table: db.incidents,
-    fields: ['title', 'externalId'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: severityLabel(item.severity),
-      entity: item,
-    }),
-  },
-  risks: {
-    table: db.risks,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `Score ${item.riskScore} · ${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  auditFindings: {
-    table: db.auditFindings,
-    fields: ['title', 'auditReference'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${item.category} · ${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  teams: {
-    table: db.teams,
-    fields: ['name'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.name,
-      subtitle: `${item.members.length} miembros`,
-      entity: item,
-    }),
-  },
-  objectives: {
-    table: db.objectives,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${item.progress}% · ${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  businessUnits: {
-    table: db.businessUnits,
-    fields: ['name'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.name,
-      subtitle: '',
-      entity: item,
-    }),
-  },
-  plans: {
-    table: db.plans,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${statusLabel(item.status)} · ${item.teamId}`,
-      entity: item,
-    }),
-  },
-  activities: {
-    table: db.activities,
-    fields: ['title'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  tasks: {
-    table: db.tasks,
-    fields: ['title'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${statusLabel(item.status)} · ${priorityLabel(item.priority)}`,
-      entity: item,
-    }),
-  },
-  commitments: {
-    table: db.commitments,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  blockers: {
-    table: db.blockers,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: `${severityLabel(item.severity)} · ${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-  deliverables: {
-    table: db.deliverables,
-    fields: ['title', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: statusLabel(item.status),
-      entity: item,
-    }),
-  },
-  microservices: {
-    table: db.microservices,
-    fields: ['name', 'description'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.name,
-      subtitle: item.description ?? '',
-      entity: item,
-    }),
-  },
-  members: {
-    table: db.memberProfiles,
-    fields: ['email', 'role'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.email,
-      subtitle: `Rol: ${item.role}`,
-      entity: item,
-    }),
-  },
-  teamSprints: {
-    table: db.teamSprints,
-    fields: ['sprintName'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.sprintName,
-      subtitle: `${item.quarter} ${item.year}`,
-      entity: item,
-    }),
-  },
-  equipment: {
-    table: db.equipment,
-    fields: ['brand', 'model', 'serialNumber', 'type'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: `${item.brand} ${item.model}`,
-      subtitle: `${item.serialNumber} · ${item.type}`,
-      entity: item,
-    }),
-  },
-  equipmentTickets: {
-    table: db.equipmentTickets,
-    fields: ['description', 'jiraTicketId'],
-    buildResult: (item) => ({
-      id: item.id,
-      title: item.description.replace(/<[^>]*>/g, '').slice(0, 60),
-      subtitle: `#${item.equipmentId.slice(0, 8)} · ${statusLabel(item.status)}`,
-      entity: item,
-    }),
-  },
-}
-
-/* ─── Route mapping ─── */
-
-const ROUTE_MAP: Record<string, (item: SearchResult) => string> = {
-  applications: (item) => `/catalog/applications/${item.id}`,
-  technologies: (item) => `/catalog/obsolescence/${item.id}`,
-  vulnerabilities: (item) => `/security/vulnerabilities/${item.id}`,
-  incidents: (item) => `/security/incidents/${item.id}`,
-  risks: (item) => `/governance/risks/${item.id}`,
-  auditFindings: (item) => `/governance/audit/${item.id}`,
-  teams: (item) => `/teams/${item.id}`,
-  objectives: (item) => `/strategy/objectives/${item.id}`,
-  businessUnits: () => `/admin/business-units`,
-  plans: (item) => `/execution/plans/${item.id}`,
-  commitments: (item) => `/execution/commitments/${item.id}`,
-  activities: (item) => `/execution/plans/${item.entity.planId}`,
-  tasks: (item) => `/execution/tasks/${item.id}`,
-  blockers: (item) => `/execution/blockers/${item.id}/edit`,
-  deliverables: (item) => `/catalog/deliverables/${item.id}`,
-  microservices: (item) => `/catalog/microservices/${item.id}`,
-  members: (item) => `/teams/${item.entity.teamId}/performance/${item.id}`,
-  teamSprints: (item) => `/teams/${item.entity.teamId}`,
-  equipment: (item) => `/equipment/${item.id}`,
-  equipmentTickets: (item) => `/equipment/${item.entity.equipmentId}`,
-}
-
-/* ─── Component ─── */
-
-interface GlobalSearchProps {
-  open: boolean
-  onClose: () => void
-}
+interface GlobalSearchProps { open: boolean; onClose: () => void }
 
 export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [groups, setGroups] = useState<SearchGroup[]>([])
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selected, setSelected] = useState(0)
   const [loading, setLoading] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
-  const flatResults = useMemo(() => {
-    const items: { route: string; group: SearchGroup; result: SearchResult }[] = []
-    for (const group of groups) {
-      for (const item of group.items) {
-        items.push({ route: group.route(item), group, result: item })
-      }
-    }
-    return items
-  }, [groups])
-
-  const runSearch = useCallback(async (q: string, category: string | null) => {
-    setLoading(true)
-    try {
-      const keysToSearch = category ? [category] : Object.keys(SEARCH_REGISTRY)
-
-      const results = await Promise.all(
-        keysToSearch.map(async (key) => {
-          const config = SEARCH_REGISTRY[key]
-          const items = await searchEntity(config.table, config.fields, q, config.buildResult)
-          return { key, items }
-        }),
-      )
-
-      const resultGroups: SearchGroup[] = []
-      for (const { key, items } of results) {
-        if (items.length === 0) continue
-        const meta = CATEGORIES.find((c) => c.key === key)
-        resultGroups.push({
-          key,
-          label: meta?.label ?? key,
-          icon: meta?.icon ?? Search,
-          route: ROUTE_MAP[key],
-          items,
-        })
-      }
-
-      setGroups(resultGroups)
-      setSelectedIndex(0)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const flatList = useMemo(() => groups.flatMap((g) => g.results), [groups])
 
   useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-        return
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setSelectedIndex((i) => Math.min(i + 1, flatResults.length - 1))
-        return
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setSelectedIndex((i) => Math.max(i - 1, 0))
-        return
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        const result = flatResults[selectedIndex]
-        if (result) {
-          navigate(result.route)
-          onClose()
-        }
-        return
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [open, selectedIndex, flatResults, navigate, onClose])
-
-  useEffect(() => {
-    if (open) {
-      startTransition(() => {
-        setQuery('')
-        setGroups([])
-        setSelectedIndex(0)
-        setActiveCategory(null)
-      })
-      setTimeout(() => inputRef.current?.focus(), 50)
-    }
+    if (open) setTimeout(() => inputRef.current?.focus(), 100)
+    else { setQuery(''); setGroups([]); setSelected(0) }
   }, [open])
 
   useEffect(() => {
-    if (!query.trim()) {
-      startTransition(() => setGroups([]))
-      return
-    }
-
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => runSearch(query.trim(), activeCategory), 200)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-  }, [query, activeCategory, runSearch])
+    if (!query.trim()) { setGroups([]); setSelected(0); setLoading(false); return }
+    setLoading(true)
+    debounceRef.current = setTimeout(async () => {
+      const results = await performSearch(query)
+      startTransition(() => { setGroups(results); setSelected(0); setLoading(false) })
+    }, 200)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [query])
 
-  const handleSelect = (route: string) => {
-    navigate(route)
+  const handleSelect = useCallback((item: (typeof flatList)[number]) => {
     onClose()
-  }
+    startTransition(() => navigate(item.route))
+  }, [navigate, onClose])
 
-  const handleCategoryClick = (key: string) => {
-    if (activeCategory === key) {
-      setActiveCategory(null) // deselect = search all
-    } else {
-      setActiveCategory(key)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (!open) return
+      if (e.key === 'ArrowDown') { e.preventDefault(); setSelected((s) => Math.min(s + 1, flatList.length - 1)) }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setSelected((s) => Math.max(s - 1, 0)) }
+      if (e.key === 'Enter' && flatList[selected]) handleSelect(flatList[selected])
+      if (e.key === 'Escape') onClose()
     }
-    // Re-run search with new category filter
-    if (query.trim()) {
-      runSearch(query.trim(), activeCategory === key ? null : key)
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [open, flatList, selected, handleSelect, onClose])
+
+  useEffect(() => {
+    const el = listRef.current?.querySelector(`[data-idx="${selected}"]`)
+    el?.scrollIntoView({ block: 'nearest' })
+  }, [selected])
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('[data-search-modal]')) onClose()
     }
-  }
+    if (open) setTimeout(() => window.addEventListener('click', handleClick), 0)
+    return () => window.removeEventListener('click', handleClick)
+  }, [open, onClose])
 
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+  const totalResults = groups.reduce((acc, g) => acc + g.results.length, 0)
 
-      {/* Modal */}
-      <div className="relative w-full max-w-2xl mx-4 bg-card rounded-2xl shadow-2xl border border-boundary overflow-hidden">
-        {/* Input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-boundary">
-          <Search size={20} className="text-neutral-50 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar en todos los datos..."
-            className="flex-1 bg-transparent text-neutral-90 dark:text-white text-lg outline-none placeholder:text-neutral-40"
-          />
-          {loading && (
-            <div className="w-5 h-5 border-2 border-neutral-30 border-t-primary rounded-full animate-spin" />
-          )}
-          <Button
-            onClick={onClose}
-            className="p-1 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-70 transition-colors"
-          >
-            <X size={18} className="text-neutral-50" />
-          </Button>
+  return (
+    <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[12vh]" data-search-modal>
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="relative w-full max-w-[620px] mx-4 bg-card rounded-2xl border border-boundary shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="flex items-center gap-3 px-4 border-b border-boundary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-muted"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          <input ref={inputRef} type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscá aplicaciones, equipos, vulnerabilidades, riesgos..."
+            className="flex-1 bg-transparent border-none outline-none text-sm text-default placeholder:text-muted py-4 font-medium" />
+          {loading && <div className="w-4 h-4 border-2 border-neutral-30 dark:border-neutral-60 border-t-primary rounded-full animate-spin shrink-0" />}
+          <kbd className="hidden md:inline-flex text-[10px] font-mono px-1.5 py-0.5 rounded border border-boundary text-muted bg-neutral-5 dark:bg-neutral-85 shrink-0">ESC</kbd>
         </div>
 
-        {/* Category chips (when searching) */}
-        {query.trim() && groups.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3 pb-1 border-b border-neutral-10 dark:border-neutral-75">
-            <span className="text-xs text-neutral-50 font-medium mr-1">Filtrar:</span>
-            <Button
-              onClick={() => {
-                setActiveCategory(null)
-                if (query.trim()) runSearch(query.trim(), null)
-              }}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-full font-medium transition-colors',
-                activeCategory === null
-                  ? 'bg-primary/15 text-primary-dark dark:text-primary-light'
-                  : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 hover:bg-neutral-20 dark:hover:bg-neutral-65',
-              )}
-            >
-              Todas
-            </Button>
-            {CATEGORIES.map((cat) => {
-              const hasItems = groups.some((g) => g.key === cat.key)
-              if (!hasItems) return null
-              return (
-                <Button
-                  key={cat.key}
-                  onClick={() => handleCategoryClick(cat.key)}
-                  className={cn(
-                    'flex items-center gap-1 px-2.5 py-1 text-xs rounded-full font-medium transition-colors',
-                    activeCategory === cat.key
-                      ? 'bg-primary/15 text-primary-dark dark:text-primary-light'
-                      : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 hover:bg-neutral-20 dark:hover:bg-neutral-65',
-                  )}
-                >
-                  <cat.icon size={12} />
-                  {cat.label}
-                </Button>
-              )
-            })}
+        {totalResults > 0 && (
+          <div className="px-2.5 pt-2.5 pb-2">
+            <p className="text-[10px] font-medium text-muted uppercase tracking-wider px-2 mb-1.5">{totalResults} resultado(s)</p>
           </div>
         )}
 
-        {/* No results */}
-        {query.trim() && groups.length === 0 && !loading && (
-          <div className="px-5 py-12 text-center text-neutral-50">
-            <Search size={32} className="mx-auto mb-3 opacity-40" />
-            <p className="text-sm">
-              Sin resultados para <span className="font-medium text-secondary">"{query}"</span>
-            </p>
-            <p className="text-xs mt-1">
-              Prueba con otro término o selecciona una categoría específica
-            </p>
-          </div>
-        )}
-
-        {/* Results */}
-        {groups.length > 0 && (
-          <div className="max-h-[50vh] overflow-y-auto p-2">
-            {groups.map((group) => (
-              <div key={group.key}>
-                <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-neutral-50 uppercase tracking-wider">
-                  <group.icon size={14} />
-                  {group.label}
-                  <span className="ml-auto text-neutral-40 font-normal normal-case">
-                    {group.items.length}
-                  </span>
-                </div>
-                {group.items.map((item) => {
-                  const idx = flatResults.findIndex(
-                    (fr) => fr.result.id === item.id && fr.group.key === group.key,
-                  )
-                  const isSelected = idx === selectedIndex
-                  const route = group.route(item)
-
+        <div ref={listRef} className="overflow-y-auto max-h-[60vh] px-2.5 pb-2.5 space-y-3">
+          {groups.map((group) => (
+            <div key={group.category}>
+              <div className="flex items-center gap-2 px-2 py-1.5">
+                <span className="text-xs">{group.icon}</span>
+                <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">{getCategoryMeta(group.category).label}</span>
+              </div>
+              <div className="space-y-0.5">
+                {group.results.map((result, ri) => {
+                  const globalIdx = flatList.indexOf(result)
                   return (
-                    <Button
-                      key={`${group.key}-${item.id}`}
-                      onClick={() => handleSelect(route)}
-                      onMouseEnter={() => setSelectedIndex(idx)}
+                    <button key={`${group.category}-${result.id}-${ri}`} data-idx={globalIdx}
+                      onClick={() => handleSelect(result)}
+                      onMouseEnter={() => setSelected(globalIdx)}
                       className={cn(
-                        'w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors',
-                        isSelected
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-neutral-10 dark:hover:bg-neutral-70',
+                        'w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-colors cursor-pointer border-none',
+                        globalIdx === selected ? 'bg-neutral-10 dark:bg-neutral-85' : 'hover:bg-neutral-5 dark:hover:bg-neutral-85',
+                      )}>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium text-default block truncate">{result.label}</span>
+                        {result.description && <span className="text-xs text-muted block truncate mt-0.5">{result.description}</span>}
+                      </div>
+                      {result.badge && (
+                        <span className={cn(
+                          'text-[10px] font-mono px-1.5 py-0.5 rounded-md shrink-0 mt-0.5',
+                          'bg-neutral-10 dark:bg-neutral-85 text-muted',
+                        )}>
+                          {statusLabel(result.badge) || severityLabel(result.badge) || priorityLabel(result.badge) || result.badge}
+                        </span>
                       )}
-                    >
-                      <div
-                        className={cn(
-                          'mt-0.5 w-7 h-7 rounded-full flex items-center justify-center shrink-0',
-                          isSelected
-                            ? 'bg-primary/15 text-primary'
-                            : 'bg-neutral-10 dark:bg-neutral-70 text-neutral-50',
-                        )}
-                      >
-                        <group.icon size={14} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={cn(
-                            'text-sm font-medium truncate',
-                            isSelected
-                              ? 'text-primary-dark dark:text-primary-light'
-                              : 'text-neutral-90 dark:text-white',
-                          )}
-                        >
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-neutral-50 truncate">{item.subtitle}</p>
-                      </div>
-                    </Button>
+                    </button>
                   )
                 })}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
 
-        {/* Empty state — category grid */}
-        {!query.trim() && (
-          <div className="px-4 py-5">
-            <p className="text-xs font-semibold text-neutral-50 uppercase tracking-wider px-1 mb-3">
-              Selecciona una categoría para buscar
-            </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {CATEGORIES.map((cat) => (
-                <Button
-                  key={cat.key}
-                  onClick={() => {
-                    setActiveCategory(cat.key)
-                    inputRef.current?.focus()
-                  }}
-                  className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-neutral-10 dark:bg-neutral-75 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors text-center group"
-                >
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-neutral-65 flex items-center justify-center text-neutral-60 group-hover:text-primary transition-colors">
-                    <cat.icon size={16} />
-                  </div>
-                  <span className="text-xs font-medium text-secondary group-hover:text-neutral-90 dark:group-hover:text-white transition-colors leading-tight">
-                    {cat.label}
-                  </span>
-                </Button>
-              ))}
+          {query.trim() && !loading && totalResults === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted mb-3"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <p className="text-sm font-medium text-default">Sin resultados para "{query}"</p>
+              <p className="text-xs text-muted mt-1">Probá con otros términos o revisá que los datos estén cargados.</p>
             </div>
-            <div className="flex items-center justify-center gap-4 mt-5 text-xs text-neutral-40">
-              <span>⌘K abrir</span>
-              <span>↓↑ navegar</span>
-              <span>⏎ ir</span>
-              <span>Esc cerrar</span>
+          )}
+
+          {!query.trim() && (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted mb-3"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <p className="text-sm font-medium text-default">Búsqueda global</p>
+              <p className="text-xs text-muted mt-1">Aplicaciones, equipos, OKRs, vulnerabilidades y más.</p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                {['application', 'team', 'vulnerability', 'objective'].map((key) => {
+                  const meta = getCategoryMeta(key)
+                  return (
+                    <button key={key} onClick={() => setQuery(meta.label.toLowerCase())}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted hover:text-default bg-neutral-5 dark:bg-neutral-85 hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors border-none cursor-pointer">
+                      <span>{meta.icon}</span> {meta.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

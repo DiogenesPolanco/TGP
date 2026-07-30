@@ -5,7 +5,7 @@ beforeEach(() => {
   localStorage.clear()
   useAppStore.setState({
     sidebarOpen: true,
-    theme: 'light',
+    theme: 'dark',
     notifications: [],
     alerts: [],
     browserNotificationsEnabled: false,
@@ -16,7 +16,7 @@ describe('useAppStore', () => {
   it('starts with defaults', () => {
     const state = useAppStore.getState()
     expect(state.sidebarOpen).toBe(true)
-    expect(state.theme).toBe('light')
+    expect(state.theme).toBe('dark')
     expect(state.notifications).toEqual([])
   })
 

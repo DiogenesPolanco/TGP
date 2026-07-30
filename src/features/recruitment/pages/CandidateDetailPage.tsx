@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import {
   getCandidateTechnologies,
   getCandidateEvaluations,
@@ -12,7 +13,7 @@ import {
   selectCandidate,
   startOnboarding,
 } from '@/services/recruitment/candidateService'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import {
   ArrowLeft,
@@ -46,6 +47,7 @@ export function CandidateDetailPage() {
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
+  const roleLabels = useCatalogMap('member_role')
   const [selecting, setSelecting] = useState(false)
   const [preSelecting, setPreSelecting] = useState(false)
   const [onboarding, setOnboarding] = useState(false)
@@ -201,8 +203,7 @@ export function CandidateDetailPage() {
             icon={<Briefcase size={16} />}
             label="Posición"
             value={
-              MEMBER_ROLE_LABELS[candidate.position as keyof typeof MEMBER_ROLE_LABELS] ??
-              candidate.position
+              roleLabels[candidate.position] ?? candidate.position
             }
           />
           <InfoRow
@@ -226,10 +227,7 @@ export function CandidateDetailPage() {
         {candidate.comments && (
           <div className="pt-4 border-t border-boundary">
             <p className="text-sm font-medium text-secondary mb-2">Comentarios</p>
-            <div
-              className="text-sm text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: candidate.comments }}
-            />
+            <HtmlDescription html={candidate.comments} full />
           </div>
         )}
       </div>

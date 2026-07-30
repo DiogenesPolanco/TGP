@@ -1,4 +1,6 @@
 import { useMemo, useEffect, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/services/db/database'
 import { useLiveDataLayer } from '@/hooks/useLiveDataLayer'
 import { useThiCalculation } from './useThiCalculation'
 import { generateExecutiveNarrative } from '@/services/thi/narrativeGenerator'
@@ -137,6 +139,8 @@ export function useDashboardMetrics(): DashboardMetrics {
   const { data: rawActivities } = useLiveDataLayer<Activity>('activities')
   const { data: rawMicroservices } = useLiveDataLayer<Microservice>('microservices')
   const { data: rawHistory } = useLiveDataLayer<HealthIndex>('healthIndexHistory')
+  const doraConfig = useLiveQuery(() => db.systemConfig.get('dora.benchmarks'))
+  const thiRangesConfig = useLiveQuery(() => db.systemConfig.get('thi.ranges'))
 
   const loading =
     !rawApplications ||
@@ -201,7 +205,13 @@ export function useDashboardMetrics(): DashboardMetrics {
     .reduce((sum, r) => sum + r.riskScore, 0)
   const eliteTeams = teams.filter((t) => {
     if (!t.currentMetrics) return false
-    return t.currentMetrics.deploymentFrequency >= 1 && t.currentMetrics.leadTimeHours <= 1
+    const elite = (doraConfig?.value as {
+      elite: { deploymentFrequency: { min: number }; leadTimeHours: { max: number } }
+    })?.elite ?? { deploymentFrequency: { min: 1 }, leadTimeHours: { max: 1 } }
+    return (
+      t.currentMetrics.deploymentFrequency >= elite.deploymentFrequency.min &&
+      (elite.leadTimeHours.max == null || t.currentMetrics.leadTimeHours <= elite.leadTimeHours.max)
+    )
   }).length
 
   const activePlans = plans.filter(
@@ -357,6 +367,7 @@ export function useDashboardMetrics(): DashboardMetrics {
         blockers,
         commitments,
         periodStart,
+        thiRanges: thiRangesConfig?.value as Record<string, { min: number; max: number; label: string }> | undefined,
       }),
     [
       thi,
@@ -371,6 +382,7 @@ export function useDashboardMetrics(): DashboardMetrics {
       blockers,
       commitments,
       periodStart,
+      thiRangesConfig,
     ],
   )
 

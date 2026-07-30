@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, X, FileText, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { AuthBrandPanel, PerforatedDivider } from '../components/loginComponents'
 
 const TERMS_KEY = 'tgp-terms-accepted'
 const TERMS_VERSION = 3
@@ -27,100 +28,58 @@ export function TermsPage({ onAccept, onDecline }: Props) {
   const [showFull, setShowFull] = useState(false)
 
   return (
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)',
-        }}
-      />
-      <div
-        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
+    <div className="min-h-screen font-sans relative overflow-hidden" style={{ background: '#080c14', color: '#c8d0e0' }}>
+      {/* Grid verde estilo landing */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      <div className="fixed top-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none z-0" style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%)' }} />
+      <div className="fixed bottom-[-300px] left-[-200px] w-[700px] h-[700px] rounded-full pointer-events-none z-0" style={{ background: 'radial-gradient(circle, rgba(255,185,0,0.04) 0%, transparent 70%)' }} />
+      <div className="fixed inset-0 pointer-events-none z-[1]" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px)' }} />
 
-      <div className="w-full max-w-4xl relative">
-        <div className="bg-white/95 dark:bg-neutral-80/95 backdrop-blur-xl rounded-3xl border border-neutral-20/80 dark:border-neutral-70/80 shadow-2xl shadow-neutral-30/30 dark:shadow-black/30 overflow-hidden">
-          <div className="flex flex-col lg:flex-row min-h-[520px]">
-            <div className="lg:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 lg:p-10 text-white flex flex-col relative overflow-hidden">
-              <div
-                className="absolute inset-0 opacity-10"
-                style={{
-                  background:
-                    'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
-                }}
-              />
-              <div className="relative flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
-                  <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold tracking-tight">TGP</p>
-                  <p className="text-[11px] font-medium opacity-60 tracking-wide">
-                    Technology Governance Platform
-                  </p>
-                </div>
+      <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl">
+          <div className="rounded-3xl border border-white/10 shadow-2xl shadow-black/40 overflow-hidden bg-neutral-900/60 backdrop-blur-sm">
+            <div className="flex flex-col lg:flex-row min-h-[520px]">
+            <AuthBrandPanel>
+              <div className="flex items-center gap-2 mb-4">
+                <FileText size={16} />
+                <span className="text-xs font-medium uppercase tracking-widest opacity-60">
+                  Términos y Condiciones
+                </span>
               </div>
-              <div className="relative flex-1 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText size={16} />
-                  <span className="text-xs font-medium uppercase tracking-widest opacity-60">
-                    Términos y Condiciones
-                  </span>
-                </div>
-                <h2 className="text-3xl font-bold leading-tight mb-4">
-                  Antes de
-                  <br />
-                  comenzar
-                </h2>
-                <p className="text-base leading-relaxed opacity-85 mb-5">
-                  TGP es una herramienta gratuita de gobierno tecnológico. Al usarla, aceptas los
-                  términos descritos al lado.
-                </p>
-                <ul className="space-y-3 text-base">
-                  {[
-                    'Sin costo · Sin licencias',
-                    '100% cliente-side',
-                    'Tus datos, tu responsabilidad',
-                    'Código abierto',
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
-                      <span className="opacity-90">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="relative mt-6 pt-4 border-t border-white/15">
-                <p className="text-sm opacity-60 leading-relaxed">Versión 3.0 · Julio 2026</p>
-              </div>
-            </div>
-
-            <div className="hidden lg:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70"
-                  />
+              <h2 className="text-3xl font-bold leading-tight mb-4">
+                Antes de
+                <br />
+                comenzar
+              </h2>
+              <p className="text-base leading-relaxed opacity-85 mb-5">
+                TGP es una herramienta gratuita de gobierno tecnológico. Al usarla, aceptas los
+                términos descritos al lado.
+              </p>
+              <ul className="space-y-3 text-base">
+                {[
+                  'Sin costo · Sin licencias',
+                  '100% cliente-side',
+                  'Tus datos, tu responsabilidad',
+                  'Código abierto',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
+                    <span className="opacity-90">{item}</span>
+                  </li>
                 ))}
-              </div>
-            </div>
-
-            <div className="lg:w-[58%] p-8 lg:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
+              </ul>
+            </AuthBrandPanel>
+            <PerforatedDivider />
+            <div className="lg:w-[58%] p-8 lg:p-10 bg-gradient-to-b from-[#0e0e18] to-neutral-900 flex flex-col justify-center">
               <div className="max-w-lg mx-auto w-full space-y-5">
                 <div>
-                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">
+                  <h3 className="text-xl font-bold text-white">
                     Términos de Uso
                   </h3>
-                  <p className="text-sm text-muted mt-1">Leé atentamente antes de continuar</p>
+                  <p className="text-sm text-neutral-400 mt-1">Leé atentamente antes de continuar</p>
                 </div>
 
-                <div className="bg-neutral-5 dark:bg-neutral-85 rounded-xl p-4 border border-boundary max-h-[320px] overflow-y-auto text-sm text-secondary leading-relaxed space-y-3">
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10 max-h-[320px] overflow-y-auto text-sm text-neutral-300 leading-relaxed space-y-3">
                   <p>
                     <strong>1. Naturaleza del servicio.</strong> TGP es una herramienta de gobierno
                     tecnológico gratuita, sin garantías explícitas ni implícitas. Se proporciona
@@ -168,7 +127,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                     ni procesamos datos personales en infraestructura propia. Todo el uso queda bajo
                     tu control de la siguiente manera:
                   </p>
-                  <ul className="pl-4 space-y-1 text-xs text-muted list-disc ml-1">
+                  <ul className="pl-4 space-y-1 text-xs text-neutral-500 list-disc ml-1">
                     <li>
                       <strong>Almacenamiento local (IndexedDB):</strong> Todos los datos de la
                       aplicación se almacenan exclusivamente en tu navegador. No se envían a
@@ -180,7 +139,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                       mensajes que escribas y los resultados de las consultas se envían al proveedor
                       externo que hayas configurado (OpenAI, Groq, Anthropic u Ollama). Esta
                       funcionalidad es opcional y puedes deshabilitarla en cualquier momento desde
-                      Configuración &rarr; IA.
+                      Configuración → IA.
                     </li>
                     <li>
                       <strong>Backup en Azure:</strong> Si configuras la funcionalidad de backup,
@@ -204,7 +163,7 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                       envía información a ningún servidor externo.
                     </li>
                   </ul>
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-neutral-500">
                     Eres responsable de revisar y gestionar estas configuraciones según las
                     políticas de tu institución.
                   </p>
@@ -253,15 +212,12 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                       </p>
                     </>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-0 text-primary hover:underline hover:bg-transparent"
+                  <button
+                    className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
                     onClick={() => setShowFull(!showFull)}
                   >
-                    {showFull ? 'Mostrar menos' : 'Leer términos completos'}{' '}
-                    <ExternalLink size={12} className="inline" />
-                  </Button>
+                    {showFull ? 'Mostrar menos' : 'Leer términos completos'}
+                  </button>
                 </div>
 
                 <label className="flex items-start gap-3 cursor-pointer">
@@ -269,34 +225,34 @@ export function TermsPage({ onAccept, onDecline }: Props) {
                     type="checkbox"
                     checked={accepted}
                     onChange={(e) => setAccepted(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded border-neutral-30 text-primary focus:ring-primary/25 accent-primary"
+                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 text-cyan-400 focus:ring-cyan-400/30 accent-cyan-400"
                   />
-                  <span className="text-sm text-secondary leading-relaxed">
+                  <span className="text-sm text-neutral-300 leading-relaxed">
                     He leído y acepto los{' '}
-                    <span className="text-primary font-medium">términos y condiciones</span> de TGP
+                    <span className="text-cyan-400 font-medium">términos y condiciones</span> de TGP
                   </span>
                 </label>
 
                 <div className="flex items-center gap-3 pt-2">
-                  <Button onClick={onDecline} variant="secondary" className="flex-1 rounded-xl">
+                  <Button onClick={onDecline} variant="secondary" className="flex-1 rounded-xl border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-white">
                     <X size={18} />
                     No acepto
                   </Button>
                   <Button
                     onClick={onAccept}
                     disabled={!accepted}
-                    variant="primary"
-                    className="flex-1 rounded-xl shadow-lg shadow-primary/25 bg-primary text-white hover:bg-primary/90"
+                    className="flex-1 rounded-xl shadow-lg shadow-cyan-500/20 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white border-0"
                   >
                     <Check size={18} />
                     Aceptar y continuar
                   </Button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
+      </div>
       </div>
     </div>
+      </div>
+    </div>
+  </div>
   )
 }

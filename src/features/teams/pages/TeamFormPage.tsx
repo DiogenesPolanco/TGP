@@ -8,7 +8,7 @@ import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
-import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalog } from '@/hooks/useCatalog'
 import type { DoraLevel, MemberRole } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
 
@@ -33,6 +33,7 @@ export function TeamFormPage() {
   const { addNotification } = useAppStore()
   const { confirm } = useConfirm()
   const team = useLiveQuery(() => (id ? db.teams.get(id) : undefined), [id])
+  const memberRoles = useCatalog('member_role')
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const users = useLiveQuery(() => db.users.toArray()) ?? []
@@ -300,9 +301,9 @@ export function TeamFormPage() {
                       <Select
                         value={member.role}
                         onChange={(v) => updateMember(index, 'role', v as MemberRole)}
-                        options={MEMBER_ROLES.map((r) => ({
-                          value: r,
-                          label: MEMBER_ROLE_LABELS[r],
+                        options={memberRoles.map((r) => ({
+                          value: r.value,
+                          label: r.label,
                         }))}
                         className="w-full min-w-28"
                         placeholder="Rol"

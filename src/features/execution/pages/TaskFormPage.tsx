@@ -8,7 +8,7 @@ import { DetailLayout } from '@/components/ui/DetailLayout'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Select } from '@/components/ui/Select'
-import { criticalityOptions, taskStatusOptions } from '@/constants/options'
+import { useCatalog } from '@/hooks/useCatalog'
 import type { Task, Criticality } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 
@@ -29,6 +29,8 @@ export function TaskFormPage() {
   const navigate = useNavigate()
   const { addNotification } = useAppStore()
   const isEdit = !!id
+  const criticalityOptions = useCatalog('criticality')
+  const taskStatusOptions = useCatalog('task_status')
 
   const task = useLiveQuery(() => (id ? db.tasks.get(id) : undefined), [id])
   const plans = useLiveQuery(() => db.plans.toArray()) ?? []

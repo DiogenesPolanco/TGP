@@ -130,9 +130,12 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
 
   return (
     <div className="border border-boundary rounded-xl overflow-hidden">
-      <Button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setCollapsed(!collapsed)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCollapsed(!collapsed) } }}
+        className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <AlertTriangle size={16} className="text-warning" />
@@ -144,7 +147,8 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button
+          <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation()
               resetForm()
@@ -154,10 +158,10 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
             title="Agregar bloqueo"
           >
             <Plus size={16} className="text-neutral-50" />
-          </Button>
+          </button>
           {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
         </div>
-      </Button>
+      </div>
 
       {!collapsed && (
         <div className="divide-y divide-neutral-20 dark:divide-neutral-70">

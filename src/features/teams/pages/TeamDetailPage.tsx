@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import { TeamSprintsSection } from '@/features/teams/components/TeamSprintsSection'
 import {
   ArrowLeft,
@@ -23,6 +23,7 @@ export function TeamDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { confirm } = useConfirm()
+  const roleLabels = useCatalogMap('member_role')
   const [activeTab, setActiveTab] = useState<Tab>('dora')
 
   const team = useLiveQuery(() => db.teams.get(id!), [id])
@@ -219,7 +220,7 @@ export function TeamDetailPage() {
                         {member.displayName}
                       </p>
                       <p className="text-xs text-muted">
-                        {MEMBER_ROLE_LABELS[member.role] ?? member.role}
+                        {roleLabels[member.role] ?? member.role}
                       </p>
                     </div>
                   </div>

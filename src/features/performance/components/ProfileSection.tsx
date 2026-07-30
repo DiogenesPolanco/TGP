@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { db } from '@/services/db/database'
 import type { MemberProfile, MemberStatus } from '@/types/domain'
-import { MEMBER_STATUS_LABELS } from '@/constants/roleLabels'
+import { useCatalog } from '@/hooks/useCatalog'
 import {
   Save,
   AtSign,
@@ -44,6 +44,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const statusOptions = useCatalog('member_status')
 
   const handleSave = async () => {
     setSaving(true)
@@ -139,7 +140,7 @@ export function ProfileSection({ memberId, memberDisplayName, profile }: Props) 
           <Select
             value={form.status}
             onChange={(v) => setForm({ ...form, status: v })}
-            options={Object.entries(MEMBER_STATUS_LABELS).map(([k, v]) => ({ value: k, label: v }))}
+            options={statusOptions.map((s) => ({ value: s.value, label: s.label }))}
           />
         </div>
         <div>

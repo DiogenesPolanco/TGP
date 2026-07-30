@@ -32,7 +32,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       sidebarOpen: true,
-      theme: 'light',
+      theme: 'dark',
       notifications: [],
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setTheme: (theme) => set({ theme }),

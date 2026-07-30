@@ -25,7 +25,7 @@ export default function NotFoundPage() {
         style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%)' }}
       />
 
-      <div className="relative z-10 max-w-[600px] mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-[800px] mx-auto px-6 text-center">
         {/* Status badge */}
         <div
           className="inline-block font-mono text-[11px] font-medium uppercase tracking-wider mb-6 px-3.5 py-1.5"
@@ -98,7 +98,7 @@ export default function NotFoundPage() {
         </h1>
 
         <p
-          className="text-sm leading-relaxed mb-8 max-w-[420px] mx-auto"
+          className="text-sm leading-relaxed mb-8 max-w-[600px] mx-auto"
           style={{ color: '#6b7a99' }}
         >
           Esta URL no pasó el compliance review. El equipo de gobierno tecnológico recomienda
@@ -107,7 +107,7 @@ export default function NotFoundPage() {
 
         {/* Severity table */}
         <div
-          className="max-w-[360px] mx-auto mb-10 font-mono text-[11px] text-left"
+          className="max-w-[480px] mx-auto mb-10 font-mono text-[11px] text-left"
           style={{ border: '1px solid rgba(255,68,68,0.1)', borderRadius: 4 }}
         >
           <div

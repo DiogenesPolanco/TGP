@@ -55,6 +55,15 @@ CLAUDE.md
 version.json
 e2e/test-data/large.xlsx
 
+# Lock file (package manager agnostic)
+package-lock.json
+
+# OpenCode config
+opencode.json
+
+# Local backup files
+tgp-backup-*.json
+
 # Build version
 public/version.json
 

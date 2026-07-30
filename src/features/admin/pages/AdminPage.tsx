@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
@@ -12,6 +12,8 @@ import {
   Download,
   Users,
   BarChart3,
+  Settings,
+  List,
 } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -24,6 +26,8 @@ import { JobSchedulerConfig } from '@/features/admin/components/JobSchedulerConf
 import { MobileSnapshotConfig } from '@/features/admin/components/MobileSnapshotConfig'
 import { JiraConfigPanel } from '@/components/jira/JiraConfigPanel'
 import { DatabaseConfig } from '@/features/admin/components/DatabaseConfig'
+import { SystemConfigSection } from '@/features/admin/components/config/SystemConfigSection'
+import { CatalogsSection } from '@/features/admin/components/config/CatalogsSection'
 import {
   importBackup,
   isDateObject,
@@ -49,6 +53,13 @@ export function AdminPage() {
   const [showStats, setShowStats] = useState(false)
   const [dbStats, setDbStats] = useState<{ name: string; count: number }[]>([])
   const [loadingStats, setLoadingStats] = useState(false)
+
+  // Seed system data on first admin visit
+  useEffect(() => {
+    import('@/services/system/seedSystemData').then(({ seedSystemData }) => {
+      seedSystemData()
+    })
+  }, [])
 
   const handleReAuthExport = async () => {
     const secret = await getSecret()
@@ -365,6 +376,12 @@ export function AdminPage() {
 
       <div className="bg-card rounded-2xl border border-boundary shadow-sm p-5">
         <JiraConfigPanel />
+      </div>
+
+      {/* Configuración dinámica del sistema */}
+      <div className="space-y-6">
+        <SystemConfigSection />
+        <CatalogsSection />
       </div>
 
       {/* TOTP dialog */}

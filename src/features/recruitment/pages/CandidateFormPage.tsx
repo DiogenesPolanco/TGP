@@ -12,7 +12,7 @@ import {
   getCandidateEvaluations,
 } from '@/services/recruitment/candidateService'
 import { RichTextEditor } from '@/components/rich-text/RichTextEditor'
-import { MEMBER_ROLE_LABELS, MEMBER_ROLES } from '@/constants/roleLabels'
+import { useCatalog } from '@/hooks/useCatalog'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { TechSearch } from '@/components/ui/TechSearch'
@@ -27,6 +27,7 @@ export function CandidateFormPage() {
   const { id } = useParams()
   const isEdit = !!id
   const { addNotification } = useAppStore()
+  const memberRoles = useCatalog('member_role')
 
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const allTechnologies = useLiveQuery(() => db.technologies.toArray()) ?? []
@@ -157,9 +158,9 @@ export function CandidateFormPage() {
     }
   }
 
-  const roleOptions = MEMBER_ROLES.map((role) => ({
-    value: role,
-    label: MEMBER_ROLE_LABELS[role],
+  const roleOptions = memberRoles.map((r) => ({
+    value: r.value,
+    label: r.label,
   }))
 
   return (

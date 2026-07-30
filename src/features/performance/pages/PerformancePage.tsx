@@ -7,7 +7,7 @@ import {
 } from '@/services/performance/performanceService'
 import type { Team } from '@/types/domain'
 import type { MemberKPIs } from '@/services/performance/performanceService'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import { KpiCard } from '@/components/data-display/KpiCard'
 import {
   TrendingUp,
@@ -23,6 +23,7 @@ import {
 export function PerformancePage() {
   const { id: teamId } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const roleLabels = useCatalogMap('member_role')
   const [team, setTeam] = useState<Team | null>(null)
   const [indicators, setIndicators] = useState<Awaited<
     ReturnType<typeof getTeamPerformanceIndicators>
@@ -200,8 +201,7 @@ export function PerformancePage() {
                         {member.displayName}
                       </p>
                       <p className="text-xs text-neutral-50 truncate">
-                        {MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ??
-                          member.role}
+                        {roleLabels[member.role] ?? member.role}
                       </p>
                     </div>
                   </div>

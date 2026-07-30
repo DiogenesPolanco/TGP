@@ -41,6 +41,7 @@ import type {
   EquipmentTicket,
 } from '@/types/domain'
 import type { AiConversation, AiChatMessage } from '@/features/ai/types'
+import type { SystemConfig, CatalogEntry, ContentBlock, Skill } from '@/types/system'
 
 export class TGPDatabase extends Dexie {
   tenants!: Table<Tenant, string>
@@ -96,6 +97,12 @@ export class TGPDatabase extends Dexie {
   // AI Chat
   aiConversations!: Table<AiConversation, string>
   aiMessages!: Table<AiChatMessage, string>
+
+  // Sistema — config dinámica (v23)
+  systemConfig!: Table<SystemConfig, string>
+  catalogs!: Table<CatalogEntry, string>
+  contentBlocks!: Table<ContentBlock, string>
+  skills!: Table<Skill, string>
 
   constructor() {
     super('TGPDatabase')
@@ -190,6 +197,12 @@ export class TGPDatabase extends Dexie {
     this.version(22).stores({
       aiConversations: 'id, updatedAt',
       aiMessages: 'id, conversationId, timestamp',
+    })
+    this.version(23).stores({
+      systemConfig: 'key',
+      catalogs: 'id, [category+value], category, enabled',
+      contentBlocks: 'key',
+      skills: 'id, category, name',
     })
   }
 }

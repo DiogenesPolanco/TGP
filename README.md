@@ -37,8 +37,11 @@
 ### 📋 Catálogo de Aplicaciones
 CRUD completo con búsqueda avanzada, filtros por criticidad/estado/BU, y vista de detalle que consolida vulnerabilidades, riesgos, incidentes y hallazgos **heredados** de microservicios vinculados. Importación desde Excel con upsert inteligente.
 
+### 🔍 Búsqueda Global
+Barra de búsqueda en el header que consulta en **40+ tablas** simultáneamente — aplicaciones, tecnologías, vulnerabilidades, equipos, riesgos, hallazgos, OKRs, planes, equipamiento, enlaces públicos y más. Resultados agrupados por dominio con navegación directa al detalle.
+
 ### 🔒 Seguridad y Gobierno
-Vulnerabilidades con puntuación CVSS, SLA y flujo de estados. Incidentes con severidad P1-P4 y tracking de tiempos de respuesta. Matriz de **riesgos** (probabilidad × impacto) y **hallazgos de auditoría** con evidencia adjunta y planes de acción.
+Vulnerabilidades con puntuación CVSS, SLA y flujo de estados. **Búsqueda y consulta CVE/NVD** integrada — lookup individual desde MITRE cveawg y búsqueda por keyword desde NVD, con panel informativo embebido en los formularios de tecnología. Incidentes con severidad P1-P4 y tracking de tiempos de respuesta. Matriz de **riesgos** (probabilidad × impacto) y **hallazgos de auditoría** con evidencia adjunta y planes de acción.
 
 ### 🎯 OKRs y Estrategia
 Objetivos con Key Results, tracking de período, cálculo de progreso y monitoreo de estado (on track, at risk, behind, achieved). Vincula entregables y planes a objetivos estratégicos.
@@ -121,7 +124,7 @@ src/
 
 Decisiones arquitectónicas clave:
 
-- **Fuente única de verdad**: Todos los datos de dominio en IndexedDB con Dexie.js (25+ tablas)
+- **Fuente única de verdad**: Todos los datos de dominio en IndexedDB con Dexie.js (40+ tablas)
 - **Herencia de entidades**: Vulnerabilidades, riesgos, incidentes y hallazgos pueden vincularse a microservicios y ser heredados automáticamente por sus aplicaciones padre
 - **Offline-first**: Todo funciona sin red — las funcionalidades en la nube (backup, sharing) son adicionales
 - **Enlaces cifrados**: Los enlaces públicos siempre se cifran en reposo con AES-GCM 256

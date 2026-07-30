@@ -23,67 +23,23 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts'
-import { Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar } from 'lucide-react'
+import { Target, TrendingUp, TrendingDown, BarChart3, Calendar } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
-import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { SortableTable } from '@/components/ui/SortableTable'
 import { Button } from '@/components/ui/Button'
+import {
+  PredictabilityTooltip,
+  PredictabilitySummaryCard,
+  createPeriodColumns,
+  getPredictabilityColor,
+  getPredictabilityBg,
+} from '@/features/execution/components/predictabilityHelpers'
 
 const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'monthly', label: 'Mensual' },
   { key: 'quarterly', label: 'Trimestral' },
   { key: 'yearly', label: 'Anual' },
 ]
-
-const colorMapSummary = {
-  success: 'text-success bg-success/10',
-  warning: 'text-warning bg-warning/10',
-  danger: 'text-danger bg-danger/10',
-  primary: 'text-primary bg-primary/10',
-}
-
-const gradientAccentSummary = {
-  success: 'bg-success',
-  warning: 'bg-warning',
-  danger: 'bg-danger',
-  primary: 'bg-primary',
-}
-
-const gradientOverlaySummary = {
-  success: 'from-success/5',
-  warning: 'from-warning/5',
-  danger: 'from-danger/5',
-  primary: 'from-primary/5',
-}
-
-interface SprintItem {
-  sprintId: string
-  sprintName: string
-  teamId: string
-  plannedSP: number
-  completedSP: number
-  notCompletedSP: number
-  predictability: number
-  endDate: Date
-  quarter: string
-  year: number
-}
-
-interface TeamInfo {
-  id: string
-  name: string
-}
-
-function getColor(value: number): string {
-  if (value >= 80 && value <= 120) return 'text-success'
-  if (value >= 50 && value <= 150) return 'text-warning'
-  return 'text-danger'
-}
-
-function getBg(value: number): string {
-  if (value >= 80 && value <= 120) return 'bg-success/10'
-  if (value >= 50 && value <= 150) return 'bg-warning/10'
-  return 'bg-danger/10'
-}
 
 function buildPeriods(
   teamSprints: PublicPredictabilityData['teamSprints'],
@@ -190,118 +146,7 @@ function buildPeriods(
   }
 }
 
-function CustomTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean
-  payload?: Array<{ payload: Record<string, unknown> }>
-  label?: string
-}) {
-  if (!active || !payload?.length) return null
-  const data = payload[0].payload
-  return (
-    <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
-      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-boundary">
-        {label}
-      </p>
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Predictibilidad</span>
-          <span className="font-semibold text-neutral-90 dark:text-white">
-            {data.predictabilidad as string}%
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Planificados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.estimado as string} pts
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Completados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.real as string} pts
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4 pt-1 border-t border-boundary">
-          <span className="text-muted">Planes</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.planes as string}
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
-  {
-    key: 'label',
-    label: 'Período',
-    sortable: true,
-    render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>,
-  },
-  {
-    key: 'avgPredictability',
-    label: 'Predictibilidad',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => (
-      <span className={`font-semibold ${getColor(p.avgPredictability)}`}>
-        {p.avgPredictability}%
-      </span>
-    ),
-  },
-  {
-    key: 'totalEstimated',
-    label: 'Story Points Planif.',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.totalEstimated} pts plan.</span>,
-  },
-  {
-    key: 'totalActual',
-    label: 'Story Points Comp.',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.totalActual} pts comp.</span>,
-  },
-  {
-    key: 'planCount',
-    label: 'Planes',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.planCount}</span>,
-  },
-  {
-    key: 'color',
-    label: 'Estado',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getBg(p.avgPredictability)} ${getColor(p.avgPredictability)}`}
-      >
-        {p.avgPredictability >= 80 && p.avgPredictability <= 120 ? (
-          <>
-            <Minus size={12} /> Consistente
-          </>
-        ) : p.avgPredictability < 80 ? (
-          <>
-            <TrendingDown size={12} /> Subestima
-          </>
-        ) : (
-          <>
-            <TrendingUp size={12} /> Sobreestima
-          </>
-        )}
-      </span>
-    ),
-  },
-]
-
+const periodColumns = createPeriodColumns(getPredictabilityColor, getPredictabilityBg)
 export function PublicPredictabilityPage() {
   const { hash } = useParams<{ hash: string }>()
   const [valid, setValid] = useState<boolean | null>(null)
@@ -488,7 +333,7 @@ export function PublicPredictabilityPage() {
 
         {/* Summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <SummaryCard
+          <PredictabilitySummaryCard
             title="Predictibilidad Promedio"
             value={`${summary.avg}%`}
             icon={<Target size={20} />}
@@ -499,27 +344,31 @@ export function PublicPredictabilityPage() {
                   ? 'warning'
                   : 'danger'
             }
+            rounded="rounded-2xl"
           />
-          <SummaryCard
+          <PredictabilitySummaryCard
             title="Mejor Período"
             value={summary.best ? `${summary.best.value}%` : 'N/A'}
             subtitle={summary.best?.label}
             icon={<TrendingUp size={20} />}
             color="success"
+            rounded="rounded-2xl"
           />
-          <SummaryCard
+          <PredictabilitySummaryCard
             title="Peor Período"
             value={summary.worst ? `${summary.worst.value}%` : 'N/A'}
             subtitle={summary.worst?.label}
             icon={<TrendingDown size={20} />}
             color="danger"
+            rounded="rounded-2xl"
           />
-          <SummaryCard
+          <PredictabilitySummaryCard
             title="Planes Analizados"
             value={String(summary.totalPlans)}
             subtitle={`${summary.healthyCount} en rango ideal`}
             icon={<BarChart3 size={20} />}
             color="primary"
+            rounded="rounded-2xl"
           />
         </div>
 
@@ -568,7 +417,7 @@ export function PublicPredictabilityPage() {
                   axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
                   tickLine={false}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
+                <Tooltip content={<PredictabilityTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
                 <ReferenceLine
                   y={80}
                   stroke="#36B37E"
@@ -648,42 +497,4 @@ export function PublicPredictabilityPage() {
         </div>
       </main>
     </div>
-  )
-}
-
-function SummaryCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  color,
-}: {
-  title: string
-  value: string
-  subtitle?: string
-  icon: React.ReactNode
-  color: 'success' | 'warning' | 'danger' | 'primary'
-}) {
-  return (
-    <div className="group relative bg-card rounded-2xl border border-boundary p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
-      <div
-        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
-      />
-      <div
-        className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`}
-      />
-      <div className="relative">
-        <div
-          className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}
-        >
-          {icon}
-        </div>
-        <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
-        <p className="text-xs text-muted mt-0.5">{title}</p>
-        {subtitle && (
-          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>
-        )}
-      </div>
-    </div>
-  )
-}
+  )}

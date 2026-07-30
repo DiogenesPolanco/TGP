@@ -44,13 +44,26 @@ export interface NarrativeInput {
   blockers: Blocker[]
   commitments: Commitment[]
   periodStart: Date
+  thiRanges?: Record<string, { min: number; max: number; label: string }>
 }
 
-function getThiLabel(score: number): string {
-  if (score >= 90) return 'Excelente'
-  if (score >= 70) return 'Saludable'
-  if (score >= 50) return 'Regular'
-  if (score >= 30) return 'En Riesgo'
+const DEFAULT_THI_RANGES = [
+  { min: 90, max: 100, label: 'Excelente' },
+  { min: 70, max: 89, label: 'Saludable' },
+  { min: 50, max: 69, label: 'Regular' },
+  { min: 30, max: 49, label: 'En Riesgo' },
+  { min: 0, max: 29, label: 'Crítico' },
+]
+
+function getThiLabel(score: number, ranges?: Record<string, { min: number; max: number; label: string }>): string {
+  if (ranges) {
+    for (const r of Object.values(ranges)) {
+      if (score >= r.min && score <= r.max) return r.label
+    }
+  }
+  for (const r of DEFAULT_THI_RANGES) {
+    if (score >= r.min && score <= r.max) return r.label
+  }
   return 'Crítico'
 }
 
@@ -76,7 +89,7 @@ export function generateExecutiveNarrative(input: NarrativeInput): ExecutiveNarr
 
   // ── Overall THI ──
   const thiScore = thi?.overallScore ?? 0
-  const thiLabel = getThiLabel(thiScore)
+  const thiLabel = getThiLabel(thiScore, input.thiRanges)
   const missingDimensions: string[] = []
   if (thi) {
     if (thi.deliveryScore === 50) missingDimensions.push('Delivery')

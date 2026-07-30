@@ -5,9 +5,8 @@ import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
-import { MEMBER_ROLES, MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalog, useCatalogMap } from '@/hooks/useCatalog'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
-import type { MemberRole } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'
 
 interface TeamFormProps {
@@ -21,6 +20,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
   const businessUnits = useLiveQuery(() => db.businessUnits.toArray()) ?? []
   const teams = useLiveQuery(() => db.teams.toArray()) ?? []
   const users = useLiveQuery(() => db.users.toArray()) ?? []
+  const memberRoles = useCatalog('member_role')
 
   const resolveDisplayName = (personId: string): string => {
     for (const t of teams) {
@@ -73,7 +73,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
         if (profile && profile.role !== m.role) {
           await db.memberProfiles.put({
             ...profile,
-            role: m.role as MemberRole,
+            role: m.role,
             updatedAt: new Date(),
           })
         }
@@ -207,7 +207,7 @@ export function TeamForm({ team, onClose, onSave }: TeamFormProps) {
                   <Select
                     value={member.role}
                     onChange={(v) => updateMember(index, 'role', v)}
-                    options={MEMBER_ROLES.map((r) => ({ value: r, label: MEMBER_ROLE_LABELS[r] }))}
+                    options={memberRoles.map((r) => ({ value: r.value, label: r.label }))}
                     className="w-28"
                     placeholder="Rol"
                   />

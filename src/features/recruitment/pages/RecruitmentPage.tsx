@@ -11,7 +11,7 @@ import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
 import { SortableTable, type Column } from '@/components/ui/SortableTable'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import type { Candidate } from '@/types/domain'
 import {
   Plus,
@@ -43,6 +43,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 
 export function RecruitmentPage() {
   const navigate = useNavigate()
+  const roleLabels = useCatalogMap('member_role')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
@@ -63,7 +64,7 @@ export function RecruitmentPage() {
     useLiveQuery(() => db.candidates.orderBy('createdAt').reverse().toArray()) ?? []
 
   const filtered = candidates.filter((c) => {
-    const roleLabel = MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? ''
+    const roleLabel = roleLabels[c.position] ?? ''
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       roleLabel.toLowerCase().includes(search.toLowerCase())
@@ -97,7 +98,7 @@ export function RecruitmentPage() {
       sortable: true,
       render: (c) => (
         <span className="text-sm text-secondary">
-          {MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ?? c.position}
+          {roleLabels[c.position] ?? c.position}
         </span>
       ),
     },

@@ -8,8 +8,9 @@ import {
 import { decryptData, type EncryptedPayload } from '@/services/share/encryptionService'
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
+import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { PrintButton } from '@/components/ui/PrintButton'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import { EVALUATION_CATEGORIES } from '@/constants/evaluationCategories'
 import { Users, Calendar, UserCheck, Star, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -26,6 +27,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 
 export function PublicRecruitmentPage() {
   const { hash } = useParams<{ hash: string }>()
+  const roleLabels = useCatalogMap('member_role')
   const [valid, setValid] = useState<boolean | null>(null)
   const [data, setData] = useState<PublicRecruitmentData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -269,7 +271,7 @@ export function PublicRecruitmentPage() {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-neutral-50">
                       <span>
-                        {MEMBER_ROLE_LABELS[c.position as keyof typeof MEMBER_ROLE_LABELS] ??
+                        {roleLabels[c.position] ??
                           c.position}
                       </span>
                       {c.interviewDate && (
@@ -409,10 +411,7 @@ export function PublicRecruitmentPage() {
                         <p className="text-xs font-semibold text-neutral-60 uppercase tracking-wider mb-1">
                           Comentarios
                         </p>
-                        <div
-                          className="text-xs text-neutral-60 leading-relaxed prose prose-sm dark:prose-invert max-w-none"
-                          dangerouslySetInnerHTML={{ __html: c.comments }}
-                        />
+                        <HtmlDescription html={c.comments} full className="text-xs" />
                       </div>
                     )}
                   </div>

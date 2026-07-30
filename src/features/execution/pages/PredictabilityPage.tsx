@@ -1,10 +1,16 @@
 import { useState, useMemo } from 'react'
+import { usePredictability } from '../hooks/usePredictability'
+import type { PeriodGranularity, PredictabilityPeriod } from '../hooks/usePredictability'
 import {
-  usePredictability,
+  PredictabilityTooltip,
+  PredictabilitySummaryCard,
+  createPeriodColumns,
+  colorMapSummary,
+  gradientAccentSummary,
+  gradientOverlaySummary,
   getPredictabilityColor,
   getPredictabilityBg,
-} from '../hooks/usePredictability'
-import type { PeriodGranularity, PredictabilityPeriod } from '../hooks/usePredictability'
+} from '../components/predictabilityHelpers'
 import {
   BarChart,
   Bar,
@@ -27,138 +33,7 @@ const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'yearly', label: 'Anual' },
 ]
 
-const colorMapSummary = {
-  success: 'text-success bg-success/10',
-  warning: 'text-warning bg-warning/10',
-  danger: 'text-danger bg-danger/10',
-  primary: 'text-primary bg-primary/10',
-}
-
-const gradientAccentSummary = {
-  success: 'bg-success',
-  warning: 'bg-warning',
-  danger: 'bg-danger',
-  primary: 'bg-primary',
-}
-
-const gradientOverlaySummary = {
-  success: 'from-success/5',
-  warning: 'from-warning/5',
-  danger: 'from-danger/5',
-  primary: 'from-primary/5',
-}
-
-function CustomTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean
-  payload?: Array<{ payload: Record<string, unknown> }>
-  label?: string
-}) {
-  if (!active || !payload?.length) return null
-  const data = payload[0].payload
-  return (
-    <div className="bg-white/90 dark:bg-neutral-80/90 backdrop-blur-md border border-neutral-20/80 dark:border-neutral-70/80 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
-      <p className="font-semibold text-neutral-90 dark:text-white mb-2 pb-2 border-b border-boundary">
-        {label}
-      </p>
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Predictibilidad</span>
-          <span className="font-semibold text-neutral-90 dark:text-white">
-            {data.predictabilidad as string}%
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Planificados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.estimado as string} pts
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-muted">Completados</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.real as string} pts
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4 pt-1 border-t border-boundary">
-          <span className="text-muted">Planes</span>
-          <span className="font-medium text-neutral-90 dark:text-white">
-            {data.planes as string}
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const periodColumns: Column<PredictabilityPeriod & { id: string }>[] = [
-  {
-    key: 'label',
-    label: 'Período',
-    sortable: true,
-    render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>,
-  },
-  {
-    key: 'avgPredictability',
-    label: 'Predictibilidad',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => (
-      <span className={`font-semibold ${getPredictabilityColor(p.avgPredictability)}`}>
-        {p.avgPredictability}%
-      </span>
-    ),
-  },
-  {
-    key: 'totalEstimated',
-    label: 'Story Points Planif.',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.totalEstimated} pts plan.</span>,
-  },
-  {
-    key: 'totalActual',
-    label: 'Story Points Comp.',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.totalActual} pts comp.</span>,
-  },
-  {
-    key: 'planCount',
-    label: 'Planes',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => <span className="text-muted">{p.planCount}</span>,
-  },
-  {
-    key: 'color',
-    label: 'Estado',
-    sortable: true,
-    className: 'text-right',
-    render: (p) => (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPredictabilityBg(p.avgPredictability)} ${getPredictabilityColor(p.avgPredictability)}`}
-      >
-        {p.avgPredictability >= 80 && p.avgPredictability <= 120 ? (
-          <>
-            <Minus size={12} /> Consistente
-          </>
-        ) : p.avgPredictability < 80 ? (
-          <>
-            <TrendingDown size={12} /> Subestima
-          </>
-        ) : (
-          <>
-            <TrendingUp size={12} /> Sobreestima
-          </>
-        )}
-      </span>
-    ),
-  },
-]
+const periodColumns = createPeriodColumns(getPredictabilityColor, getPredictabilityBg)
 
 export function PredictabilityPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | ''>('')
@@ -257,7 +132,7 @@ export function PredictabilityPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <SummaryCard
+        <PredictabilitySummaryCard
           title="Predictibilidad Promedio"
           value={`${summary.avg}%`}
           icon={<Target size={20} />}
@@ -269,21 +144,21 @@ export function PredictabilityPage() {
                 : 'danger'
           }
         />
-        <SummaryCard
+        <PredictabilitySummaryCard
           title="Mejor Período"
           value={summary.best ? `${summary.best.value}%` : 'N/A'}
           subtitle={summary.best?.label}
           icon={<TrendingUp size={20} />}
           color="success"
         />
-        <SummaryCard
+        <PredictabilitySummaryCard
           title="Peor Período"
           value={summary.worst ? `${summary.worst.value}%` : 'N/A'}
           subtitle={summary.worst?.label}
           icon={<TrendingDown size={20} />}
           color="danger"
         />
-        <SummaryCard
+        <PredictabilitySummaryCard
           title="Planes Analizados"
           value={String(summary.totalPlans)}
           subtitle={`${summary.healthyCount} en rango ideal`}
@@ -337,7 +212,7 @@ export function PredictabilityPage() {
                 axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
                 tickLine={false}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
+              <Tooltip content={<PredictabilityTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
               <ReferenceLine
                 y={80}
                 stroke="#36B37E"
@@ -416,39 +291,4 @@ export function PredictabilityPage() {
   )
 }
 
-function SummaryCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  color,
-}: {
-  title: string
-  value: string
-  subtitle?: string
-  icon: React.ReactNode
-  color: 'success' | 'warning' | 'danger' | 'primary'
-}) {
-  return (
-    <div className="group relative bg-card rounded-xl border border-boundary p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
-      <div
-        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b ${gradientOverlaySummary[color]} via-transparent to-transparent`}
-      />
-      <div
-        className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 ${gradientAccentSummary[color]}`}
-      />
-      <div className="relative">
-        <div
-          className={`w-fit p-2 rounded-lg ${colorMapSummary[color]} mb-3 transition-transform duration-300 group-hover:scale-110`}
-        >
-          {icon}
-        </div>
-        <p className="text-2xl font-bold text-neutral-90 dark:text-white tabular-nums">{value}</p>
-        <p className="text-xs text-muted mt-0.5">{title}</p>
-        {subtitle && (
-          <p className="text-xs text-neutral-50 dark:text-neutral-50 mt-0.5">{subtitle}</p>
-        )}
-      </div>
-    </div>
-  )
-}
+

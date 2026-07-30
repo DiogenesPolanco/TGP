@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
-import { MEMBER_ROLE_LABELS } from '@/constants/roleLabels'
+import { useCatalogMap } from '@/hooks/useCatalog'
 import { createShareLink, getPublicMemberData } from '@/services/share/publicShareService'
 import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
@@ -46,6 +46,7 @@ export function MemberPerformancePage() {
   const { memberId, id: teamId } = useParams<{ memberId: string; id: string }>()
   const navigate = useNavigate()
   const addNotification = useAppStore((s) => s.addNotification)
+  const roleLabels = useCatalogMap('member_role')
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
@@ -123,7 +124,7 @@ export function MemberPerformancePage() {
               {member.displayName}
             </h1>
             <p className="text-sm text-neutral-50">
-              {MEMBER_ROLE_LABELS[member.role as keyof typeof MEMBER_ROLE_LABELS] ?? member.role} ·{' '}
+              {roleLabels[member.role] ?? member.role} ·{' '}
               {team?.name}
             </p>
           </div>

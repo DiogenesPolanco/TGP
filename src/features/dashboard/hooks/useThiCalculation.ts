@@ -22,6 +22,7 @@ export function useThiCalculation(businessUnitId?: string | null) {
   const technologies = useMemo(() => rawTechnologies ?? [], [rawTechnologies])
   const rawMicroservices = useLiveQuery(() => db.microservices.toArray())
   const microservices = useMemo(() => rawMicroservices ?? [], [rawMicroservices])
+  const weightsConfig = useLiveQuery(() => db.systemConfig.get('thi.weights'))
 
   const thi = useMemo(() => {
     const apps = businessUnitId
@@ -30,7 +31,7 @@ export function useThiCalculation(businessUnitId?: string | null) {
 
     if (apps.length === 0) return null
 
-    const weights: HealthWeights = DEFAULT_HEALTH_WEIGHTS
+    const weights: HealthWeights = (weightsConfig?.value as HealthWeights) ?? DEFAULT_HEALTH_WEIGHTS
 
     const deliveryScore = calculateDeliveryScore(teams)
     const qualityScore = calculateQualityScore()

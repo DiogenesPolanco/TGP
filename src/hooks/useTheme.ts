@@ -12,18 +12,4 @@ export function useTheme() {
       root.classList.remove('dark')
     }
   }, [theme])
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tgp-app-storage')
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored)
-        if (parsed.state?.theme === 'dark') {
-          window.document.documentElement.classList.add('dark')
-        }
-      } catch {
-        /* empty */
-      }
-    }
-  }, [])
 }

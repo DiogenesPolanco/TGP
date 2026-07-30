@@ -3,6 +3,7 @@ import type { AiChatMessage, AiProviderConfig, AiConversation } from '../types'
 import { normalizeParams } from '../types'
 import { createProvider, buildSystemPrompt } from '../services/AiProvider'
 import { getEnabledTools } from '../tools/registry'
+import { db } from '@/services/db/database'
 import {
   createConversation,
   listConversations,
@@ -345,6 +346,5 @@ export function useAiChat({ config }: UseAiChatOptions): UseAiChatReturn {
 }
 
 async function dbCleanMessages(conversationId: string) {
-  const { db } = await import('@/services/db/database')
   await db.aiMessages.where('conversationId').equals(conversationId).delete()
 }

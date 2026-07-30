@@ -90,12 +90,35 @@ export function AppShell() {
   if (stale) return <UpdateAvailable onReload={reload} />
 
   return (
-    <div
-      className={cn(
-        'flex h-screen bg-canvas',
-        isTabHidden && 'blur-xl transition-all duration-300',
-      )}
-    >
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Grid texturizado sutil — verde en dark, gris en light */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      <div
+        className="fixed inset-0 pointer-events-none z-[1] hidden dark:block"
+        style={{
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px)',
+        }}
+      />
+      {/* Grid light mode sutil */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 dark:hidden"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      <div
+        className={cn(
+          'relative z-10 flex h-screen',
+          isTabHidden && 'blur-xl transition-all duration-300',
+        )}
+      >
       <Sidebar chatOpen={chatOpen} onToggleChat={toggleChat} aiConfigured={aiConfigured} />
       <div
         className={cn(
@@ -130,6 +153,7 @@ export function AppShell() {
       <NotificationToast />
       <ConfirmDialog />
       {showWizard && <OnboardingWizard onClose={() => setWizardDone(true)} />}
+    </div>
     </div>
   )
 }
