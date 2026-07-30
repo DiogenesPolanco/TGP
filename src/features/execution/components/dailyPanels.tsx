@@ -1,15 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  AlertTriangle,
-  XCircle,
-  Calendar,
-  CheckCircle2,
-  ArrowRight,
-  Pencil,
-  ListTodo,
-  Ban,
-} from 'lucide-react'
+import { XCircle, Calendar, CheckCircle2, ArrowRight, Pencil, ListTodo, Ban } from 'lucide-react'
 import type { Blocker, Activity, Commitment, Task } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
@@ -76,9 +67,7 @@ export function BlockersPanel({
     <div className="bg-card rounded-xl border border-danger/30 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-3 bg-danger/5 border-b border-danger/20">
         <Ban size={16} className="text-danger" />
-        <h3 className="text-sm font-semibold text-danger">
-          Bloqueos Activos ({blockers.length})
-        </h3>
+        <h3 className="text-sm font-semibold text-danger">Bloqueos Activos ({blockers.length})</h3>
       </div>
       <div className="divide-y divide-neutral-20 dark:divide-neutral-70">
         {blockers.slice(0, 5).map((blocker) => {

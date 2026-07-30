@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
-import { CheckCircle, User, Wrench, XCircle, AlertTriangle, HelpCircle } from 'lucide-react'
-import type { EquipmentCondition } from '@/types/domain'
+import { CheckCircle, User, Wrench, XCircle, AlertTriangle } from 'lucide-react'
 
 export const CONDITION_OPTIONS = [
   { value: 'excellent', label: 'Excelente' },
@@ -33,7 +32,15 @@ export const statusIcon: Record<string, ReactNode> = {
   obsolete: <AlertTriangle size={24} className="text-white" />,
 }
 
-export function Section({ title, icon, children }: { title: string; icon?: ReactNode; children: ReactNode }) {
+export function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: ReactNode
+  children: ReactNode
+}) {
   return (
     <div className="bg-card rounded-2xl border border-boundary p-5 shadow-sm space-y-3">
       <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">

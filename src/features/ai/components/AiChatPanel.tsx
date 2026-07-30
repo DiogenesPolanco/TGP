@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Settings, CornerDownLeft, Clipboard, Check, Plus, ChevronDown, Sparkles } from 'lucide-react'
-import type { AiProviderConfig } from '../types'
+import {
+  X,
+  Settings,
+  CornerDownLeft,
+  Clipboard,
+  Check,
+  Plus,
+  ChevronDown,
+  Sparkles,
+} from 'lucide-react'
 import { useAiChat } from '../hooks/useAiChat'
 import { useCopy } from '@/hooks/useCopy'
 import type { AiChatPanelProps } from './aiChatHelpers'
 import { KF, providerLabel } from './aiChatHelpers'
 import { MessageBanner, EmptyState, LoadingDots, ConversationList } from './aiChatComponents'
-
-
-
-
-
-
 
 // ─── Main component ───────────────────────────────────────────────
 
@@ -91,13 +93,19 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
     await newConversation()
   }, [newConversation])
 
-  const handleSwitchConversation = useCallback(async (id: string) => {
-    await switchConversation(id)
-  }, [switchConversation])
+  const handleSwitchConversation = useCallback(
+    async (id: string) => {
+      await switchConversation(id)
+    },
+    [switchConversation],
+  )
 
-  const handleDeleteConversation = useCallback(async (id: string) => {
-    await deleteConv(id)
-  }, [deleteConv])
+  const handleDeleteConversation = useCallback(
+    async (id: string) => {
+      await deleteConv(id)
+    },
+    [deleteConv],
+  )
 
   if (!mounted) return null
 

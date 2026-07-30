@@ -1,5 +1,5 @@
 import { Box, AlertTriangle } from 'lucide-react'
-import { statusColors, categoryIcons } from '@/features/catalog/constants/architectureConstants'
+import { categoryIcons } from '@/features/catalog/constants/architectureConstants'
 import type { Technology, Microservice } from '@/types/domain'
 
 export function MicroserviceCard({

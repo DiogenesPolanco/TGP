@@ -5,7 +5,6 @@ import { getAllConfigs, setConfig, deleteConfig } from '@/services/system/system
 import { seedSystemData } from '@/services/system/seedSystemData'
 import type { SystemConfig } from '@/types/system'
 import { Button } from '@/components/ui/Button'
-import { cn } from '@/lib/utils'
 
 export function SystemConfigSection() {
   const { addNotification } = useAppStore()
@@ -22,7 +21,9 @@ export function SystemConfigSection() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const handleSave = async (key: string) => {
     try {
@@ -37,7 +38,8 @@ export function SystemConfigSection() {
   }
 
   const handleReset = async () => {
-    if (!confirm('¿Restaurar configuraciones por defecto? Los cambios personalizados se perderán.')) return
+    if (!confirm('¿Restaurar configuraciones por defecto? Los cambios personalizados se perderán.'))
+      return
     await Promise.all(configs.map((c) => deleteConfig(c.key)))
     await seedSystemData(true)
     addNotification({ type: 'success', message: 'Configuraciones restauradas' })
@@ -59,10 +61,21 @@ export function SystemConfigSection() {
           </h3>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={load} disabled={loading} variant="secondary" size="sm" leftIcon={<RefreshCw size={14} className={loading ? 'animate-spin' : ''} />}>
+          <Button
+            onClick={load}
+            disabled={loading}
+            variant="secondary"
+            size="sm"
+            leftIcon={<RefreshCw size={14} className={loading ? 'animate-spin' : ''} />}
+          >
             Recargar
           </Button>
-          <Button onClick={handleReset} variant="danger" size="sm" leftIcon={<RotateCcw size={14} />}>
+          <Button
+            onClick={handleReset}
+            variant="danger"
+            size="sm"
+            leftIcon={<RotateCcw size={14} />}
+          >
             Restaurar Default
           </Button>
         </div>
@@ -73,15 +86,23 @@ export function SystemConfigSection() {
       ) : (
         <div className="space-y-1 max-h-[500px] overflow-y-auto">
           {configs.map((cfg) => (
-            <div key={cfg.key} className="border border-neutral-20 dark:border-neutral-70 rounded-lg overflow-hidden">
+            <div
+              key={cfg.key}
+              className="border border-neutral-20 dark:border-neutral-70 rounded-lg overflow-hidden"
+            >
               <div className="flex items-center justify-between px-4 py-2.5 bg-neutral-10 dark:bg-neutral-80/50">
                 <div className="flex-1 min-w-0">
-                  <code className="text-xs font-mono font-semibold text-neutral-90 dark:text-white">{cfg.key}</code>
+                  <code className="text-xs font-mono font-semibold text-neutral-90 dark:text-white">
+                    {cfg.key}
+                  </code>
                   {cfg.description && (
                     <p className="text-[10px] text-neutral-50 mt-0.5 truncate">{cfg.description}</p>
                   )}
                 </div>
-                <button onClick={() => startEdit(cfg)} className="text-[11px] text-primary hover:text-primary-dark font-medium ml-3 shrink-0">
+                <button
+                  onClick={() => startEdit(cfg)}
+                  className="text-[11px] text-primary hover:text-primary-dark font-medium ml-3 shrink-0"
+                >
                   {editing === cfg.key ? 'Editando...' : 'Editar'}
                 </button>
               </div>
@@ -94,10 +115,16 @@ export function SystemConfigSection() {
                     spellCheck={false}
                   />
                   <div className="flex justify-end gap-2 mt-2">
-                    <button onClick={() => setEditing(null)} className="text-xs text-neutral-50 px-3 py-1.5 rounded hover:bg-neutral-10 dark:hover:bg-neutral-70">
+                    <button
+                      onClick={() => setEditing(null)}
+                      className="text-xs text-neutral-50 px-3 py-1.5 rounded hover:bg-neutral-10 dark:hover:bg-neutral-70"
+                    >
                       Cancelar
                     </button>
-                    <button onClick={() => handleSave(cfg.key)} className="text-xs text-white bg-primary px-3 py-1.5 rounded hover:bg-primary-dark flex items-center gap-1">
+                    <button
+                      onClick={() => handleSave(cfg.key)}
+                      className="text-xs text-white bg-primary px-3 py-1.5 rounded hover:bg-primary-dark flex items-center gap-1"
+                    >
                       <Save size={12} /> Guardar
                     </button>
                   </div>

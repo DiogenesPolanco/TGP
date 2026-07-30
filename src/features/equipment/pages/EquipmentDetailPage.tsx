@@ -10,7 +10,7 @@ import {
   getAssignmentHistory,
   getEquipmentTickets,
 } from '@/services/equipment/equipmentService'
-import { EquipmentStatusBadge, EQUIPMENT_TYPE_LABELS } from '../components/EquipmentStatusBadge'
+import { EQUIPMENT_TYPE_LABELS } from '../components/EquipmentStatusBadge'
 import { Pencil, Trash2, Info, ClipboardList, History } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { EquipmentInfoTab } from '@/features/equipment/components/EquipmentInfoTab'
@@ -117,11 +117,7 @@ export function EquipmentDetailPage() {
         />
       )}
       {activeTab === 'history' && (
-        <EquipmentHistoryTab
-          assignments={assignments}
-          members={members}
-          teams={teams}
-        />
+        <EquipmentHistoryTab assignments={assignments} members={members} teams={teams} />
       )}
     </DetailLayout>
   )

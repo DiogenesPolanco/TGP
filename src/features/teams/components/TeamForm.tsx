@@ -5,7 +5,7 @@ import { X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
 import { MemberSelector } from '@/components/ui/MemberSelector'
 import { Select } from '@/components/ui/Select'
-import { useCatalog, useCatalogMap } from '@/hooks/useCatalog'
+import { useCatalog } from '@/hooks/useCatalog'
 import type { Team, TeamMember, TeamMetrics } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 

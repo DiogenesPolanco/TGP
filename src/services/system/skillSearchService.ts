@@ -1,5 +1,4 @@
 import { db } from '@/services/db/database'
-import type { Skill } from '@/types/system'
 
 export interface TechSearchResult {
   id: string

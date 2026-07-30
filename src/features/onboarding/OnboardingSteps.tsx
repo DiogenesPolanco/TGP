@@ -4,17 +4,35 @@ import { db } from '@/services/db/database'
 import { seedDemoData, seedComplianceFindings } from '@/services/demo/seedData'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'
 import { useUserStore } from '@/stores/userStore'
-import { Check, ChevronRight, Building2, Sparkles, Cpu, Shield, LayoutDashboard, User, ArrowRight } from 'lucide-react'
+import {
+  Check,
+  ChevronRight,
+  Building2,
+  Sparkles,
+  Cpu,
+  Shield,
+  LayoutDashboard,
+  User,
+  ArrowRight,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 const STORAGE_KEY = 'tgp-onboarding-done'
 
 export function isOnboardingDone(): boolean {
-  try { return localStorage.getItem(STORAGE_KEY) === 'true' } catch { return false }
+  try {
+    return localStorage.getItem(STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
 }
 
 export function completeOnboarding() {
-  try { localStorage.setItem(STORAGE_KEY, 'true') } catch { /* noop */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, 'true')
+  } catch {
+    /* noop */
+  }
 }
 
 /* ─── Slider data ─── */
@@ -57,10 +75,11 @@ function SlideWelcome({ onNext }: SlideProps) {
       </TechGlow>
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-white tracking-tight">TGP</h1>
-        <p className="text-sm text-cyan-300/80 font-mono tracking-wider uppercase">Technology Governance Platform</p>
+        <p className="text-sm text-cyan-300/80 font-mono tracking-wider uppercase">
+          Technology Governance Platform
+        </p>
         <p className="text-sm text-neutral-400 max-w-xs mx-auto">
-          Gobierno tecnológico empresarial 100% cliente-side.
-          Privacidad total, cero servidores.
+          Gobierno tecnológico empresarial 100% cliente-side. Privacidad total, cero servidores.
         </p>
       </div>
       <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 font-mono">
@@ -69,7 +88,12 @@ function SlideWelcome({ onNext }: SlideProps) {
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:300ms]" />
         OFFLINE-READY
       </div>
-      <Button onClick={onNext} variant="primary" size="lg" className="w-full mt-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 border-0 rounded-xl text-sm font-semibold">
+      <Button
+        onClick={onNext}
+        variant="primary"
+        size="lg"
+        className="w-full mt-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 border-0 rounded-xl text-sm font-semibold"
+      >
         Comenzar <ChevronRight size={16} />
       </Button>
     </div>
@@ -90,16 +114,30 @@ function SlideModel({ onNext, onSkip }: SlideProps) {
       </div>
       <div className="w-full space-y-2 text-xs">
         {[
-          { label: 'Unidades de Negocio', sub: 'Organización base', color: 'border-blue-500/40 bg-blue-500/5' },
-          { label: 'Aplicaciones', sub: 'El portafolio de TI', color: 'border-cyan-500/40 bg-cyan-500/5' },
-          { label: 'Seguridad · Equipos · OKRs', sub: 'Gobierno en capas', color: 'border-violet-500/40 bg-violet-500/5' },
+          {
+            label: 'Unidades de Negocio',
+            sub: 'Organización base',
+            color: 'border-blue-500/40 bg-blue-500/5',
+          },
+          {
+            label: 'Aplicaciones',
+            sub: 'El portafolio de TI',
+            color: 'border-cyan-500/40 bg-cyan-500/5',
+          },
+          {
+            label: 'Seguridad · Equipos · OKRs',
+            sub: 'Gobierno en capas',
+            color: 'border-violet-500/40 bg-violet-500/5',
+          },
         ].map((layer, i) => (
           <div
             key={layer.label}
             className={`flex items-center gap-3 p-3 rounded-xl border ${layer.color} backdrop-blur-sm transition-all`}
             style={{ marginLeft: `${i * 20}px` }}
           >
-            <span className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-[11px] font-bold text-neutral-400 font-mono">{i + 1}</span>
+            <span className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-[11px] font-bold text-neutral-400 font-mono">
+              {i + 1}
+            </span>
             <div className="text-left flex-1">
               <p className="text-sm font-medium text-white">{layer.label}</p>
             </div>
@@ -108,10 +146,18 @@ function SlideModel({ onNext, onSkip }: SlideProps) {
         ))}
       </div>
       <div className="flex gap-3 w-full">
-        <Button onClick={onNext} size="lg" className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 border-0 rounded-xl">
+        <Button
+          onClick={onNext}
+          size="lg"
+          className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 border-0 rounded-xl"
+        >
           Siguiente <ArrowRight size={15} />
         </Button>
-        {onSkip && <Button onClick={onSkip} variant="ghost" size="md">Saltar</Button>}
+        {onSkip && (
+          <Button onClick={onSkip} variant="ghost" size="md">
+            Saltar
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -137,17 +183,31 @@ function SlideSecurity({ onNext, onSkip }: SlideProps) {
           { label: 'Riesgos', sub: 'Prob. × Impacto' },
           { label: 'Auditoría', sub: 'Hallazgos + Plan' },
         ].map((item) => (
-          <div key={item.label} className="p-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-left">
+          <div
+            key={item.label}
+            className="p-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-left"
+          >
             <p className="text-sm font-medium text-white">{item.label}</p>
             <p className="text-[11px] text-neutral-500 font-mono mt-0.5">{item.sub}</p>
           </div>
         ))}
       </div>
       <div className="flex gap-3 w-full">
-        <Button onClick={() => { navigate('/security/vulnerabilities'); onNext() }} size="lg" className="flex-1 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-400 hover:to-orange-500 border-0 rounded-xl">
+        <Button
+          onClick={() => {
+            navigate('/security/vulnerabilities')
+            onNext()
+          }}
+          size="lg"
+          className="flex-1 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-400 hover:to-orange-500 border-0 rounded-xl"
+        >
           Ir a Seguridad <ArrowRight size={15} />
         </Button>
-        {onSkip && <Button onClick={onSkip} variant="ghost" size="md">Saltar</Button>}
+        {onSkip && (
+          <Button onClick={onSkip} variant="ghost" size="md">
+            Saltar
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -171,7 +231,10 @@ function SlideTeams({ onNext, onSkip }: SlideProps) {
           { label: 'OKRs', sub: 'Objetivos con Key Results medibles', icon: '🎯' },
           { label: 'Ejecución', sub: 'Planes, daily, bloqueos, compromisos', icon: '⚡' },
         ].map((item) => (
-          <div key={item.label} className="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm">
+          <div
+            key={item.label}
+            className="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm"
+          >
             <span className="text-lg">{item.icon}</span>
             <div className="text-left">
               <p className="text-sm font-medium text-white">{item.label}</p>
@@ -181,10 +244,18 @@ function SlideTeams({ onNext, onSkip }: SlideProps) {
         ))}
       </div>
       <div className="flex gap-3 w-full">
-        <Button onClick={onNext} size="lg" className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 border-0 rounded-xl">
+        <Button
+          onClick={onNext}
+          size="lg"
+          className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 border-0 rounded-xl"
+        >
           Siguiente <ArrowRight size={15} />
         </Button>
-        {onSkip && <Button onClick={onSkip} variant="ghost" size="md">Saltar</Button>}
+        {onSkip && (
+          <Button onClick={onSkip} variant="ghost" size="md">
+            Saltar
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -209,23 +280,34 @@ function SlideDashboard({ onNext, onSkip }: SlideProps) {
           { value: '7', label: 'Dimensiones', color: 'text-emerald-400' },
           { value: '∞', label: 'Alertas en vivo', color: 'text-amber-400' },
         ].map((stat) => (
-          <div key={stat.label} className="p-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+          <div
+            key={stat.label}
+            className="p-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm"
+          >
             <p className={`text-2xl font-bold ${stat.color} font-mono`}>{stat.value}</p>
             <p className="text-[11px] text-neutral-500 mt-0.5">{stat.label}</p>
           </div>
         ))}
       </div>
       <div className="flex gap-3 w-full">
-        <Button onClick={onNext} size="lg" className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 border-0 rounded-xl">
+        <Button
+          onClick={onNext}
+          size="lg"
+          className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 border-0 rounded-xl"
+        >
           Siguiente <ArrowRight size={15} />
         </Button>
-        {onSkip && <Button onClick={onSkip} variant="ghost" size="md">Saltar</Button>}
+        {onSkip && (
+          <Button onClick={onSkip} variant="ghost" size="md">
+            Saltar
+          </Button>
+        )}
       </div>
     </div>
   )
 }
 
-function SlideDemo({ onNext, onClose }: SlideProps) {
+function SlideDemo({ onNext: _onNext, onClose }: SlideProps) {
   const navigate = useNavigate()
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
@@ -236,8 +318,14 @@ function SlideDemo({ onNext, onClose }: SlideProps) {
   const handleLoad = async () => {
     const trimmedName = displayName.trim()
     const trimmedEmail = email.trim()
-    if (!trimmedName) { setNameError('Ingresa tu nombre'); return }
-    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) { setNameError('Ingresa un email válido'); return }
+    if (!trimmedName) {
+      setNameError('Ingresa tu nombre')
+      return
+    }
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setNameError('Ingresa un email válido')
+      return
+    }
     setNameError('')
     setLoading(true)
     try {
@@ -251,11 +339,18 @@ function SlideDemo({ onNext, onClose }: SlideProps) {
         useUserStore.getState().login(updated)
       }
       setDone(true)
-    } catch (err) { console.error(err) }
-    finally { setLoading(false) }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleFinish = () => { completeOnboarding(); onClose?.(); navigate('/dashboard') }
+  const handleFinish = () => {
+    completeOnboarding()
+    onClose?.()
+    navigate('/dashboard')
+  }
 
   if (done) {
     return (
@@ -267,9 +362,15 @@ function SlideDemo({ onNext, onClose }: SlideProps) {
         </TechGlow>
         <div className="space-y-1">
           <h2 className="text-xl font-bold text-white">¡Listo, {displayName.split(' ')[0]}!</h2>
-          <p className="text-sm text-neutral-400">Datos de ejemplo cargados. Tu dashboard te espera.</p>
+          <p className="text-sm text-neutral-400">
+            Datos de ejemplo cargados. Tu dashboard te espera.
+          </p>
         </div>
-        <Button onClick={handleFinish} size="lg" className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 border-0 rounded-xl">
+        <Button
+          onClick={handleFinish}
+          size="lg"
+          className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 border-0 rounded-xl"
+        >
           Ir al Dashboard <ChevronRight size={16} />
         </Button>
       </div>
@@ -291,27 +392,41 @@ function SlideDemo({ onNext, onClose }: SlideProps) {
         <input
           type="text"
           value={displayName}
-          onChange={(e) => { setDisplayName(e.target.value); setNameError('') }}
+          onChange={(e) => {
+            setDisplayName(e.target.value)
+            setNameError('')
+          }}
           placeholder="Tu nombre"
           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/20 transition-all"
         />
         <input
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setNameError('') }}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            setNameError('')
+          }}
           placeholder="correo@empresa.com"
           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/20 transition-all"
         />
         {nameError && <p className="text-xs text-rose-400">{nameError}</p>}
         <p className="text-[11px] text-neutral-500 leading-relaxed">
-          Se cargarán apps, microservicios, vulnerabilidades, riesgos, 180+ tecnologías, equipos, OKRs y más.
+          Se cargarán apps, microservicios, vulnerabilidades, riesgos, 180+ tecnologías, equipos,
+          OKRs y más.
         </p>
       </div>
       <div className="flex gap-3 w-full">
-        <Button onClick={handleLoad} disabled={loading} size="lg" className="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-0 rounded-xl">
+        <Button
+          onClick={handleLoad}
+          disabled={loading}
+          size="lg"
+          className="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-0 rounded-xl"
+        >
           {loading ? 'Cargando...' : 'Cargar Demo'}
         </Button>
-        <Button onClick={handleFinish} variant="secondary" size="md">Manual</Button>
+        <Button onClick={handleFinish} variant="secondary" size="md">
+          Manual
+        </Button>
       </div>
     </div>
   )

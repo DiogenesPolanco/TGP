@@ -2,7 +2,6 @@ import {
   PageH1,
   Divider,
   SectionTitle,
-  SubSection,
   Body,
   Table,
   CodeBlock,
@@ -110,7 +109,9 @@ db.vulnerabilities
       />
 
       <SectionTitle>Autenticación TOTP</SectionTitle>
-      <Body>TGP usa TOTP (Time-based One-Time Password) para autenticación. El flujo completo:</Body>
+      <Body>
+        TGP usa TOTP (Time-based One-Time Password) para autenticación. El flujo completo:
+      </Body>
       <CodeBlock>
         {`1. Setup: generar secret de 20 bytes (base32 encoded)
    secret = randomBytes(20).toString('base32')
@@ -174,9 +175,8 @@ navigator.storage.estimate().then((e) => {
 
       <SectionTitle>Service Worker y PWA</SectionTitle>
       <Body>
-        TGP usa <InlineCode>vite-plugin-pwa</InlineCode> con estrategia{' '}
-        <strong>generateSW</strong> para generar el Service Worker automáticamente durante el build.
-        Los detalles:
+        TGP usa <InlineCode>vite-plugin-pwa</InlineCode> con estrategia <strong>generateSW</strong>{' '}
+        para generar el Service Worker automáticamente durante el build. Los detalles:
       </Body>
       <Table
         rows={[

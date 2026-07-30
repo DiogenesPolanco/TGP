@@ -1,8 +1,21 @@
-import { Shield, AlertTriangle, Activity, FileWarning, Server, Database, Package, Building2 } from 'lucide-react'
-import { HtmlDescription } from '@/components/ui/HtmlDescription'
+import {
+  Shield,
+  AlertTriangle,
+  Activity,
+  FileWarning,
+  Server,
+  Database,
+  Package,
+  Building2,
+} from 'lucide-react'
 import { MetricCard } from '../components/MetricCard'
 import { QuickLinkCard } from '../components/QuickLinkCard'
-import { criticalityLabel, criticalityColor, appStatusLabel, statusColor } from '../constants/applicationConstants'
+import {
+  criticalityLabel,
+  criticalityColor,
+  appStatusLabel,
+  statusColor,
+} from '../constants/applicationConstants'
 import type { Application, Technology } from '@/types/domain'
 
 interface AppSummaryTabProps {
@@ -38,31 +51,33 @@ export function AppSummaryTab({
       <div>
         <h2 className="text-2xl font-bold text-neutral-90 dark:text-white mb-6">Resumen</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {([
-            ['Nombre', application.name, 'text-primary'],
-            ['Owner', application.ownerName, 'text-neutral-90 dark:text-white'],
-            ['Business Unit', buName || '-', 'text-neutral-90 dark:text-white'],
-            ['Arquitectura', application.architecture, 'text-neutral-90 dark:text-white'],
+          {(
             [
-              'Estado',
-              appStatusLabel[application.status],
-              `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor[application.status]}`,
-            ],
-            [
-              'Criticidad',
-              criticalityLabel[application.criticality],
-              `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`,
-            ],
-            ...(application.supportEndDate
-              ? [
-                  [
-                    'Fin de Soporte',
-                    new Date(application.supportEndDate).toLocaleDateString('es-ES'),
-                    'text-neutral-90 dark:text-white',
-                  ],
-                ]
-              : []),
-          ] as [string, string, string][]).map(([label, value, className]) => (
+              ['Nombre', application.name, 'text-primary'],
+              ['Owner', application.ownerName, 'text-neutral-90 dark:text-white'],
+              ['Business Unit', buName || '-', 'text-neutral-90 dark:text-white'],
+              ['Arquitectura', application.architecture, 'text-neutral-90 dark:text-white'],
+              [
+                'Estado',
+                appStatusLabel[application.status],
+                `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor[application.status]}`,
+              ],
+              [
+                'Criticidad',
+                criticalityLabel[application.criticality],
+                `inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${criticalityColor[application.criticality]}`,
+              ],
+              ...(application.supportEndDate
+                ? [
+                    [
+                      'Fin de Soporte',
+                      new Date(application.supportEndDate).toLocaleDateString('es-ES'),
+                      'text-neutral-90 dark:text-white',
+                    ],
+                  ]
+                : []),
+            ] as [string, string, string][]
+          ).map(([label, value, className]) => (
             <div
               key={label}
               className="bg-neutral-10 dark:bg-neutral-70/40 rounded-lg border border-boundary p-4"

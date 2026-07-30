@@ -12,8 +12,6 @@ import {
   Download,
   Users,
   BarChart3,
-  Settings,
-  List,
 } from 'lucide-react'
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'

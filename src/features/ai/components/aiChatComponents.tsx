@@ -1,7 +1,6 @@
 import { memo, useRef, useEffect } from 'react'
 import { Plus, MessageSquare, Trash2, User, Sparkles } from 'lucide-react'
 import type { AiChatMessage, AiConversation } from '../types'
-import { useCopy } from '@/hooks/useCopy'
 import { Markdown } from '@/lib/markdown'
 import { msgTime, SUGGESTIONS, convTitle, convSubtitle } from './aiChatHelpers'
 
@@ -101,11 +100,7 @@ export const MessageBanner = memo(function MessageBanner({
 
 // ─── EmptyState ───────────────────────────────────────────────────
 
-export const EmptyState = memo(function EmptyState({
-  onPick,
-}: {
-  onPick: (text: string) => void
-}) {
+export const EmptyState = memo(function EmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
     <div className="flex flex-col min-h-full px-5 py-8 select-none">
       <div className="mb-8">

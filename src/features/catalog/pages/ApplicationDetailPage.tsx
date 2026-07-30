@@ -28,7 +28,11 @@ import { EntityList } from '../components/EntityList'
 import { VulnerabilitiesTab } from '../components/VulnerabilitiesTab'
 import { TechStackManager } from '../components/TechStackManager'
 import { AppSummaryTab } from '../components/AppSummaryTab'
-import { criticalityLabel, appStatusLabel, criticalityColor, statusColor } from '../constants/applicationConstants'
+import {
+  criticalityLabel,
+  appStatusLabel,
+  criticalityColor,
+} from '../constants/applicationConstants'
 
 const tabConfig = [
   { id: 'summary', label: 'Resumen', icon: FileText },
@@ -376,5 +380,3 @@ export function ApplicationDetailPage() {
     </div>
   )
 }
-
-

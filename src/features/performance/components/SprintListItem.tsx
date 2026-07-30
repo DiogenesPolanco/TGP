@@ -21,10 +21,20 @@ interface Props {
 }
 
 export function SprintListItem({
-  sprint, isEditing,
-  editSprintName, editQuarter, editYear, editSpCompleted, editSpNotCompleted,
+  sprint,
+  isEditing,
+  editSprintName,
+  editQuarter,
+  editYear: _editYear,
+  editSpCompleted,
+  editSpNotCompleted,
   teamSprints,
-  onEdit, onSave, onCancel, onRemove, onEditField, onEditSprintSelect,
+  onEdit,
+  onSave,
+  onCancel,
+  onRemove,
+  onEditField,
+  onEditSprintSelect,
 }: Props) {
   if (isEditing) {
     return (
@@ -38,7 +48,9 @@ export function SprintListItem({
             >
               <option value="">Seleccionar...</option>
               {teamSprints.map((ts) => (
-                <option key={ts.id} value={ts.sprintName}>{ts.sprintName}</option>
+                <option key={ts.id} value={ts.sprintName}>
+                  {ts.sprintName}
+                </option>
               ))}
             </select>
           </div>
@@ -47,8 +59,10 @@ export function SprintListItem({
               value={editQuarter}
               onChange={(v) => onEditField('quarter', v)}
               options={[
-                { value: 'Q1', label: 'Q1' }, { value: 'Q2', label: 'Q2' },
-                { value: 'Q3', label: 'Q3' }, { value: 'Q4', label: 'Q4' },
+                { value: 'Q1', label: 'Q1' },
+                { value: 'Q2', label: 'Q2' },
+                { value: 'Q3', label: 'Q3' },
+                { value: 'Q4', label: 'Q4' },
               ]}
             />
           </div>
@@ -74,10 +88,16 @@ export function SprintListItem({
           </div>
         </div>
         <div className="flex gap-2">
-          <Button onClick={onSave} className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark">
+          <Button
+            onClick={onSave}
+            className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary-dark"
+          >
             Guardar
           </Button>
-          <Button onClick={onCancel} className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90">
+          <Button
+            onClick={onCancel}
+            className="px-3 py-1 text-xs text-neutral-60 hover:text-neutral-90"
+          >
             Cancelar
           </Button>
         </div>
@@ -90,7 +110,8 @@ export function SprintListItem({
       <div>
         <p className="text-sm font-medium text-neutral-90 dark:text-white">{sprint.sprintName}</p>
         <p className="text-xs text-neutral-50">
-          {sprint.storyPointsCompleted} SP completados · {sprint.storyPointsNotCompleted} SP no completados
+          {sprint.storyPointsCompleted} SP completados · {sprint.storyPointsNotCompleted} SP no
+          completados
         </p>
       </div>
       <div className="flex items-center gap-2">

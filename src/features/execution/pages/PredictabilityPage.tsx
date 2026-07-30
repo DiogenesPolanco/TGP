@@ -5,9 +5,6 @@ import {
   PredictabilityTooltip,
   PredictabilitySummaryCard,
   createPeriodColumns,
-  colorMapSummary,
-  gradientAccentSummary,
-  gradientOverlaySummary,
   getPredictabilityColor,
   getPredictabilityBg,
 } from '../components/predictabilityHelpers'
@@ -21,9 +18,9 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts'
-import { Target, TrendingUp, TrendingDown, Minus, BarChart3, Calendar } from 'lucide-react'
+import { Target, TrendingUp, TrendingDown, BarChart3, Calendar } from 'lucide-react'
 import { ChartGradients } from '@/components/charts/ChartGradients'
-import { SortableTable, type Column } from '@/components/ui/SortableTable'
+import { SortableTable } from '@/components/ui/SortableTable'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 
@@ -212,7 +209,10 @@ export function PredictabilityPage() {
                 axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
                 tickLine={false}
               />
-              <Tooltip content={<PredictabilityTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
+              <Tooltip
+                content={<PredictabilityTooltip />}
+                cursor={{ fill: '#F4F5F7', opacity: 0.5 }}
+              />
               <ReferenceLine
                 y={80}
                 stroke="#36B37E"
@@ -290,5 +290,3 @@ export function PredictabilityPage() {
     </div>
   )
 }
-
-
