@@ -64,7 +64,7 @@ export function EntityList<T extends EntityForList>({
   const alreadyAssociatedIds = new Set(items.map((i) => i.id))
   const availableItems = allItemsOfType.filter(
     (item) =>
-      !alreadyAssociatedIds.has(item.id) &&
+      !alreadyAssociatedIds.has(item.id as string) &&
       (!search ||
         (renderCells(item as unknown as T)[0] ?? '').toLowerCase().includes(search.toLowerCase())),
   ) as unknown as T[]
