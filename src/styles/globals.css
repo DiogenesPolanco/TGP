@@ -69,15 +69,38 @@
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Dark mode overrides for semantic tokens */
+/* Dark mode — 404 tech palette */
 html.dark {
-  --color-default: #d4d4dc;
-  --color-secondary: #b0b0be;
-  --color-muted: #8888a0;
-  --color-canvas: #14141e;
-  --color-card: #1a1a24;
-  --color-boundary: #2e2e3e;
-  --color-subtle: #242430;
+  --color-default: #c8d0e0;
+  --color-secondary: #8899bb;
+  --color-muted: #6b7a99;
+  --color-canvas: #080c14;
+  --color-card: #0d1525;
+  --color-boundary: rgba(255, 255, 255, 0.09);
+  --color-subtle: #0f1422;
+
+  --color-primary: #008a5c;
+  --color-primary-dark: #006b46;
+  --color-primary-light: #26a878;
+
+  --color-success: #008a5c;
+  --color-success-dark: #006b46;
+  --color-warning: #ffb900;
+  --color-danger: #ff4444;
+  --color-info: #00b8d9;
+  --color-info-dark: #008da8;
+
+  --color-severity-critical: #ff4444;
+  --color-severity-high: #ff8b00;
+  --color-severity-medium: #ffb900;
+  --color-severity-low: #008a5c;
+  --color-severity-info: #00b8d9;
+
+  --color-health-excellent: #008a5c;
+  --color-health-healthy: #57d9a3;
+  --color-health-regular: #ffb900;
+  --color-health-at-risk: #ff8b00;
+  --color-health-critical: #ff4444;
 }
 
 @layer base {
@@ -93,7 +116,7 @@ html.dark {
   }
 
   html.dark body {
-    background-color: var(--color-neutral-90);
+    background-color: var(--color-canvas);
     color: var(--color-neutral-10);
   }
 

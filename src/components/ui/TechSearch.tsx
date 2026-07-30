@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
-import { searchTechnologies } from '@/constants/commonSkills'
 import type { Skill } from '@/types/system'
 import {
   lookupDepsPackage,
@@ -56,14 +55,30 @@ export function TechSearch({
   const [depsResult, setDepsResult] = useState<DepsPackageResult | null>(null)
   const [depsError, setDepsError] = useState<string | null>(null)
 
-  const skills = useLiveQuery(() => db.skills.where('enabled').equals(1).toArray()) ?? []
+  const skills =
+    useLiveQuery(() =>
+      db.skills
+        .filter((s) => s.enabled)
+        .toArray()
+        .catch(() => [] as Skill[]),
+    ) ?? []
 
   const results = (() => {
     if (!query.trim()) return []
     const q = query.toLowerCase()
     const fromCatalog = catalog
-      .filter((t) => t.name.toLowerCase().includes(q) || (t.vendor && t.vendor.toLowerCase().includes(q)))
-      .map((t) => ({ id: t.id, name: t.name, category: t.category ?? '', vendor: t.vendor, version: t.version, supportStatus: t.supportStatus, isSkill: false }))
+      .filter(
+        (t) => t.name.toLowerCase().includes(q) || (t.vendor && t.vendor.toLowerCase().includes(q)),
+      )
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        category: t.category ?? '',
+        vendor: t.vendor,
+        version: t.version,
+        supportStatus: t.supportStatus,
+        isSkill: false,
+      }))
     const fromSkills = skills
       .filter((s) => s.name.toLowerCase().includes(q))
       .filter((s) => !fromCatalog.some((c) => c.name.toLowerCase() === s.name.toLowerCase()))
