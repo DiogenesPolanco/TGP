@@ -55,8 +55,7 @@ CLAUDE.md
 version.json
 e2e/test-data/large.xlsx
 
-# Lock file (package manager agnostic)
-package-lock.json
+# Lock file — committed for reproducible CI builds
 
 # OpenCode config
 opencode.json
