@@ -8,12 +8,21 @@ import { encryptData } from '@/services/share/encryptionService'
 import { PassphraseModal } from '@/components/sharing/PassphraseModal'
 import { TermsModal } from '@/components/sharing/TermsModal'
 import { isTermsAccepted, acceptTerms } from '@/services/share/termsService'
-import { AlertTriangle, Clock, XCircle, CheckCircle2, ListTodo, Target, Share2, Check, Copy } from 'lucide-react'
-import type { Blocker } from '@/types/domain'
-
+import {
+  AlertTriangle,
+  Clock,
+  XCircle,
+  CheckCircle2,
+  ListTodo,
+  Target,
+  Share2,
+  Check,
+  Copy,
+} from 'lucide-react'
 import { UpNextPanel } from '../components/UpNextPanel'
+import { PriorityFeed } from '../components/PriorityFeed'
 import { WeeklyTimeline } from '../components/WeeklyTimeline'
-import { StatCard, BlockersPanel, OverduePanel, DuePanel, TasksPanel } from '../components/dailyPanels'
+import { StatCard } from '../components/dailyPanels'
 import { Button } from '@/components/ui/Button'
 
 export function DailyPage() {
@@ -74,29 +83,6 @@ export function DailyPage() {
   const blockers = useMemo(() => rawBlockers ?? [], [rawBlockers])
   const rawCommitments = useLiveQuery(() => db.commitments.toArray())
   const commitments = useMemo(() => rawCommitments ?? [], [rawCommitments])
-  const rawApplications = useLiveQuery(() => db.applications.toArray())
-  const applications = useMemo(() => rawApplications ?? [], [rawApplications])
-
-  const appMap = useMemo(() => new Map(applications.map((a) => [a.id, a])), [applications])
-  const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p])), [plans])
-  const activityMap = useMemo(() => new Map(activities.map((a) => [a.id, a])), [activities])
-
-  const blockerPlan = useMemo(
-    () => (blocker: Blocker) => {
-      if (blocker.sourceType === 'plan') return planMap.get(blocker.sourceId)
-      if (blocker.sourceType === 'activity') {
-        const act = activityMap.get(blocker.sourceId)
-        return act ? planMap.get(act.planId) : undefined
-      }
-      if (blocker.sourceType === 'commitment') return undefined
-      if (blocker.sourceType === 'task') {
-        const task = tasks.find((t) => t.id === blocker.sourceId)
-        return task?.planId ? planMap.get(task.planId) : undefined
-      }
-      return undefined
-    },
-    [planMap, activityMap, tasks],
-  )
 
   const agenda = useMemo(() => {
     const ref = selectedWeek ? new Date(selectedWeek.start) : new Date(today)
@@ -113,10 +99,14 @@ export function DailyPage() {
       const d = new Date(a.dueDate!)
       d.setHours(0, 0, 0, 0)
       const boundary = selectedWeek ? ref : today
-      return d.getTime() < boundary.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
+      return (
+        d.getTime() < boundary.getTime() && a.status !== 'completed' && a.status !== 'cancelled'
+      )
     })
 
-    const activeCommitments = commitments.filter((c) => c.status === 'active' || c.status === 'at_risk')
+    const activeCommitments = commitments.filter(
+      (c) => c.status === 'active' || c.status === 'at_risk',
+    )
     const commitmentsDueSoon = activeCommitments.filter((c) => {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
@@ -128,7 +118,9 @@ export function DailyPage() {
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
       const boundary = selectedWeek ? ref : today
-      return d.getTime() < boundary.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
+      return (
+        d.getTime() < boundary.getTime() && c.status !== 'fulfilled' && c.status !== 'cancelled'
+      )
     })
 
     const activeBlockers = blockers.filter((b) => b.status === 'open' || b.status === 'escalated')
@@ -174,7 +166,10 @@ export function DailyPage() {
           <h2 className="text-2xl font-bold text-neutral-90 dark:text-white">Seguimiento Diario</h2>
           <p className="text-sm text-muted mt-1">
             {today.toLocaleDateString('es-ES', {
-              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}
           </p>
         </div>
@@ -218,27 +213,70 @@ export function DailyPage() {
 
       {/* Stats bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        <StatCard icon={<AlertTriangle size={18} />} label="Bloqueos" value={agenda.activeBlockers.length} color={criticalBlockers.length > 0 ? 'text-danger' : 'text-warning'} onClick={() => navigate('/execution/plans')} />
-        <StatCard icon={<Clock size={18} />} label="Vence Hoy" value={agenda.dueToday.length + agenda.commitmentsDueSoon.length} color="text-warning" />
-        <StatCard icon={<XCircle size={18} />} label="Vencido" value={agenda.overdue.length + agenda.commitmentsOverdue.length} color="text-danger" />
-        <StatCard icon={<CheckCircle2 size={18} />} label={selectedWeek ? 'Completado Semana' : 'Completado Hoy'} value={agenda.completedToday.length} color="text-success" />
-        <StatCard icon={<ListTodo size={18} />} label="Tareas Pendientes" value={agenda.tasksDue.length} color="text-info" />
-        <StatCard icon={<Target size={18} />} label="Planes Activos" value={agenda.activePlans.length} color="text-primary" onClick={() => navigate('/execution/plans')} />
+        <StatCard
+          icon={<AlertTriangle size={18} />}
+          label="Bloqueos"
+          value={agenda.activeBlockers.length}
+          color={criticalBlockers.length > 0 ? 'text-danger' : 'text-warning'}
+          onClick={() => navigate('/execution/plans')}
+        />
+        <StatCard
+          icon={<Clock size={18} />}
+          label="Vence Hoy"
+          value={agenda.dueToday.length + agenda.commitmentsDueSoon.length}
+          color="text-warning"
+        />
+        <StatCard
+          icon={<XCircle size={18} />}
+          label="Vencido"
+          value={agenda.overdue.length + agenda.commitmentsOverdue.length}
+          color="text-danger"
+        />
+        <StatCard
+          icon={<CheckCircle2 size={18} />}
+          label={selectedWeek ? 'Completado Semana' : 'Completado Hoy'}
+          value={agenda.completedToday.length}
+          color="text-success"
+        />
+        <StatCard
+          icon={<ListTodo size={18} />}
+          label="Tareas Pendientes"
+          value={agenda.tasksDue.length}
+          color="text-info"
+        />
+        <StatCard
+          icon={<Target size={18} />}
+          label="Planes Activos"
+          value={agenda.activePlans.length}
+          color="text-primary"
+          onClick={() => navigate('/execution/plans')}
+        />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <BlockersPanel blockers={agenda.activeBlockers} blockerPlan={blockerPlan} />
-          <OverduePanel overdue={agenda.overdue} planMap={planMap} today={today} />
-          <DuePanel dueToday={agenda.dueToday} commitmentsDueSoon={agenda.commitmentsDueSoon} planMap={planMap} appMap={appMap} selectedWeek={!!selectedWeek} />
-          <TasksPanel tasksDue={agenda.tasksDue} planMap={planMap} />
+          <PriorityFeed
+            blockers={blockers}
+            activities={activities}
+            commitments={commitments}
+            tasks={tasks}
+            plans={plans}
+            today={today}
+          />
         </div>
         <div className="space-y-4">
-          <UpNextPanel activities={activities} plans={plans} commitments={commitments} today={selectedWeek?.start ?? today} />
+          <UpNextPanel
+            activities={activities}
+            plans={plans}
+            commitments={commitments}
+            today={selectedWeek?.start ?? today}
+          />
         </div>
       </div>
 
-      {showTerms && <TermsModal onAccept={handleTermsAccepted} onClose={() => setShowTerms(false)} />}
+      {showTerms && (
+        <TermsModal onAccept={handleTermsAccepted} onClose={() => setShowTerms(false)} />
+      )}
       {showPassphrase && (
         <PassphraseModal
           title="Compartir Seguimiento Diario"
@@ -257,7 +295,10 @@ export function DailyPage() {
             setShowPassphrase(false)
             setSharePending(null)
           }}
-          onClose={() => { setShowPassphrase(false); setSharePending(null) }}
+          onClose={() => {
+            setShowPassphrase(false)
+            setSharePending(null)
+          }}
         />
       )}
     </div>
