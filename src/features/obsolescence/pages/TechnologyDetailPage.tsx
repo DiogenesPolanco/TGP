@@ -18,7 +18,8 @@ const supportStatusColor: Record<string, string> = {
   active: 'bg-success/10 text-success border-success/30',
   extended: 'bg-warning/10 text-warning border-warning/30',
   eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60',
+  unknown:
+    'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60',
 }
 
 const categoryLabel: Record<string, string> = {
@@ -45,15 +46,56 @@ export function TechnologyDetailPage() {
 
   const tech = useLiveQuery(() => db.technologies.get(id!), [id])
 
-  const apps = useLiveQuery(() => (tech ? db.applications.filter((a) => a.technologies.includes(id!)).toArray() : []), [tech]) ?? []
-  const microservices = useLiveQuery(() => (tech ? db.microservices.filter((m) => m.technologies.includes(id!)).toArray() : []), [tech]) ?? []
-  const databases = useLiveQuery(() => (tech ? db.appDatabases.filter((d) => d.technologies.includes(id!)).toArray() : []), [tech]) ?? []
-  const vulns = useLiveQuery(() => (tech ? db.vulnerabilities.filter((v) => v.technologies?.includes(id!)).toArray() : []), [tech]) ?? []
-  const incidents = useLiveQuery(() => (tech ? db.incidents.filter((i) => i.technologies?.includes(id!)).toArray() : []), [tech]) ?? []
-  const risks = useLiveQuery(() => (tech ? db.risks.filter((r) => r.technologies?.includes(id!)).toArray() : []), [tech]) ?? []
-  const auditFindings = useLiveQuery(() => (tech ? db.auditFindings.filter((f) => f.technologies?.includes(id!)).toArray() : []), [tech]) ?? []
+  const apps =
+    useLiveQuery(
+      () => (tech ? db.applications.filter((a) => a.technologies.includes(id!)).toArray() : []),
+      [tech],
+    ) ?? []
+  const microservices =
+    useLiveQuery(
+      () => (tech ? db.microservices.filter((m) => m.technologies.includes(id!)).toArray() : []),
+      [tech],
+    ) ?? []
+  const databases =
+    useLiveQuery(
+      () => (tech ? db.appDatabases.filter((d) => d.technologies.includes(id!)).toArray() : []),
+      [tech],
+    ) ?? []
+  const vulns =
+    useLiveQuery(
+      () =>
+        tech
+          ? db.vulnerabilities.filter((v) => (v as any).technologies?.includes(id!)).toArray()
+          : [],
+      [tech],
+    ) ?? []
+  const incidents =
+    useLiveQuery(
+      () =>
+        tech ? db.incidents.filter((i) => (i as any).technologies?.includes(id!)).toArray() : [],
+      [tech],
+    ) ?? []
+  const risks =
+    useLiveQuery(
+      () => (tech ? db.risks.filter((r) => (r as any).technologies?.includes(id!)).toArray() : []),
+      [tech],
+    ) ?? []
+  const auditFindings =
+    useLiveQuery(
+      () =>
+        tech
+          ? db.auditFindings.filter((f) => (f as any).technologies?.includes(id!)).toArray()
+          : [],
+      [tech],
+    ) ?? []
 
-  const people = [...new Set([...apps.map((a) => a.ownerName), ...microservices.map((m) => m.technicalLead)].filter(Boolean))] as string[]
+  const people = [
+    ...new Set(
+      [...apps.map((a) => a.ownerName), ...microservices.map((m) => m.technicalLead)].filter(
+        Boolean,
+      ),
+    ),
+  ] as string[]
 
   const daysUntilEol = tech?.eolDate
     ? Math.ceil((new Date(tech.eolDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -70,7 +112,19 @@ export function TechnologyDetailPage() {
 
   const tabs: { id: TabId; label: string; icon: typeof Server; count?: number }[] = [
     { id: 'info', label: 'Info General', icon: Server },
-    { id: 'relations', label: 'Relaciones', icon: Search, count: apps.length + microservices.length + databases.length + vulns.length + incidents.length + risks.length + auditFindings.length },
+    {
+      id: 'relations',
+      label: 'Relaciones',
+      icon: Search,
+      count:
+        apps.length +
+        microservices.length +
+        databases.length +
+        vulns.length +
+        incidents.length +
+        risks.length +
+        auditFindings.length,
+    },
   ]
 
   return (
@@ -98,8 +152,12 @@ export function TechnologyDetailPage() {
             {tech.version && <span className="text-lg text-neutral-50">v{tech.version}</span>}
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}>
-              <span className={`inline-block w-1.5 h-1.5 rounded-full ${tech.supportStatus === 'active' ? 'bg-success' : tech.supportStatus === 'extended' ? 'bg-warning' : tech.supportStatus === 'eol' ? 'bg-danger' : 'bg-neutral-40'}`} />
+            <span
+              className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full border ${supportStatusColor[tech.supportStatus]}`}
+            >
+              <span
+                className={`inline-block w-1.5 h-1.5 rounded-full ${tech.supportStatus === 'active' ? 'bg-success' : tech.supportStatus === 'extended' ? 'bg-warning' : tech.supportStatus === 'eol' ? 'bg-danger' : 'bg-neutral-40'}`}
+              />
               {supportStatusLabel[tech.supportStatus]}
             </span>
             <span className="text-neutral-50">{categoryLabel[tech.category] ?? tech.category}</span>
@@ -133,7 +191,9 @@ export function TechnologyDetailPage() {
                 <Icon size={18} className="shrink-0" />
                 <span className="truncate">{tab.label}</span>
                 {tab.count !== undefined && (
-                  <span className={`ml-auto text-xs font-medium ${activeTab === tab.id ? 'text-accent' : 'text-neutral-50'}`}>
+                  <span
+                    className={`ml-auto text-xs font-medium ${activeTab === tab.id ? 'text-accent' : 'text-neutral-50'}`}
+                  >
                     {tab.count}
                   </span>
                 )}

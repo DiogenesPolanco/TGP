@@ -25,10 +25,22 @@ function attentionInfo(kpis: MemberDisplay['kpis']) {
   return (
     <div className="space-y-2">
       <p className="font-semibold text-xs mb-1">Composición del puntaje (0–100):</p>
-      <div><span className="text-neutral-30">Eficiencia baja</span><span className="float-right font-mono">{eff}/35</span></div>
-      <div><span className="text-neutral-30">Oportunidades de mejora ({opps})</span><span className="float-right font-mono">{oppScore}/35</span></div>
-      <div><span className="text-neutral-30">Ánimo bajo</span><span className="float-right font-mono">{moodScore}/20</span></div>
-      <div><span className="text-neutral-30">Sin logros</span><span className="float-right font-mono">{achScore}/10</span></div>
+      <div>
+        <span className="text-neutral-30">Eficiencia baja</span>
+        <span className="float-right font-mono">{eff}/35</span>
+      </div>
+      <div>
+        <span className="text-neutral-30">Oportunidades de mejora ({opps})</span>
+        <span className="float-right font-mono">{oppScore}/35</span>
+      </div>
+      <div>
+        <span className="text-neutral-30">Ánimo bajo</span>
+        <span className="float-right font-mono">{moodScore}/20</span>
+      </div>
+      <div>
+        <span className="text-neutral-30">Sin logros</span>
+        <span className="float-right font-mono">{achScore}/10</span>
+      </div>
     </div>
   )
 }
@@ -44,7 +56,7 @@ interface Props {
 }
 
 export function MembersKpiCards({ filteredKpis, onEditMember }: Props) {
-  const clickHandler = (m: MemberDisplay | null) =>
+  const clickHandler = (m: MemberDisplay | null | undefined) =>
     m ? () => onEditMember(m.member.id, m.member.displayName, m.team.id) : undefined
 
   return (
@@ -52,7 +64,9 @@ export function MembersKpiCards({ filteredKpis, onEditMember }: Props) {
       <KpiCard
         icon={<TrendingUp size={22} />}
         title="Mejor Rendimiento"
-        value={filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'}
+        value={
+          filteredKpis?.bestPerformer ? `${filteredKpis.bestPerformer.kpis.efficiencyPct}%` : '—'
+        }
         subtitle={filteredKpis?.bestPerformer?.member.displayName}
         color="success"
         onClick={clickHandler(filteredKpis?.bestPerformer)}
@@ -60,7 +74,9 @@ export function MembersKpiCards({ filteredKpis, onEditMember }: Props) {
       <KpiCard
         icon={<TrendingDown size={22} />}
         title="Menor Rendimiento"
-        value={filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'}
+        value={
+          filteredKpis?.worstPerformer ? `${filteredKpis.worstPerformer.kpis.efficiencyPct}%` : '—'
+        }
         subtitle={filteredKpis?.worstPerformer?.member.displayName}
         color="danger"
         onClick={clickHandler(filteredKpis?.worstPerformer)}
@@ -76,11 +92,15 @@ export function MembersKpiCards({ filteredKpis, onEditMember }: Props) {
       <KpiCard
         icon={<AlertTriangle size={22} />}
         title="Requiere Atención"
-        value={filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'}
+        value={
+          filteredKpis?.needsAttention ? `${filteredKpis.needsAttention.kpis.attentionScore}` : '—'
+        }
         subtitle={filteredKpis?.needsAttention?.member.displayName}
         color="danger"
         onClick={clickHandler(filteredKpis?.needsAttention)}
-        info={filteredKpis?.needsAttention ? attentionInfo(filteredKpis.needsAttention.kpis) : undefined}
+        info={
+          filteredKpis?.needsAttention ? attentionInfo(filteredKpis.needsAttention.kpis) : undefined
+        }
       />
     </div>
   )

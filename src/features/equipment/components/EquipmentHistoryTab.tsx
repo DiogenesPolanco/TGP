@@ -1,6 +1,6 @@
 import { History, User } from 'lucide-react'
 import { EquipmentConditionBadge } from '@/features/equipment/components/EquipmentStatusBadge'
-import type { EquipmentAssignment, MemberProfile, Team } from '@/types/domain'
+import type { EquipmentAssignmentLog, MemberProfile, Team } from '@/types/domain'
 import { useNavigate } from 'react-router-dom'
 
 export function EquipmentHistoryTab({
@@ -8,7 +8,7 @@ export function EquipmentHistoryTab({
   members,
   teams,
 }: {
-  assignments: EquipmentAssignment[]
+  assignments: EquipmentAssignmentLog[]
   members: MemberProfile[]
   teams: Team[]
 }) {
@@ -53,9 +53,7 @@ export function EquipmentHistoryTab({
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      a.returnedAt
-                        ? 'bg-neutral-20 text-neutral-60'
-                        : 'bg-primary/10 text-primary'
+                      a.returnedAt ? 'bg-neutral-20 text-neutral-60' : 'bg-primary/10 text-primary'
                     }`}
                   >
                     <User size={16} />
@@ -66,9 +64,7 @@ export function EquipmentHistoryTab({
                     </p>
                     <p className="text-xs text-neutral-50">
                       {a.assignedAt.toLocaleDateString('es')}
-                      {a.returnedAt
-                        ? ` → ${a.returnedAt.toLocaleDateString('es')}`
-                        : ' (Activo)'}
+                      {a.returnedAt ? ` → ${a.returnedAt.toLocaleDateString('es')}` : ' (Activo)'}
                     </p>
                   </div>
                 </div>

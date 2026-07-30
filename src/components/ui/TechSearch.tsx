@@ -63,10 +63,20 @@ export function TechSearch({
         .catch(() => [] as Skill[]),
     ) ?? []
 
-  const results = (() => {
+  type SearchResult = {
+    id: string
+    name: string
+    category: string
+    isSkill: boolean
+    version?: string
+    vendor?: string
+    supportStatus?: string
+  }
+
+  const results: SearchResult[] = (() => {
     if (!query.trim()) return []
     const q = query.toLowerCase()
-    const fromCatalog = catalog
+    const fromCatalog: SearchResult[] = catalog
       .filter(
         (t) => t.name.toLowerCase().includes(q) || (t.vendor && t.vendor.toLowerCase().includes(q)),
       )
@@ -82,7 +92,15 @@ export function TechSearch({
     const fromSkills = skills
       .filter((s) => s.name.toLowerCase().includes(q))
       .filter((s) => !fromCatalog.some((c) => c.name.toLowerCase() === s.name.toLowerCase()))
-      .map((s) => ({ id: s.id, name: s.name, category: s.category, isSkill: true }))
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        category: s.category,
+        isSkill: true,
+        version: undefined,
+        vendor: undefined,
+        supportStatus: undefined,
+      }))
     return [...fromCatalog, ...fromSkills].slice(0, 20)
   })()
 

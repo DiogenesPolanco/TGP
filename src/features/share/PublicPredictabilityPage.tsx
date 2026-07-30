@@ -41,6 +41,21 @@ const granularityTabs: { key: PeriodGranularity; label: string }[] = [
   { key: 'yearly', label: 'Anual' },
 ]
 
+type TeamInfo = Record<string, unknown>
+
+interface SprintItem {
+  sprintId: string
+  sprintName: string
+  teamId: string
+  plannedSP: number
+  completedSP: number
+  notCompletedSP: number
+  predictability: number
+  endDate: Date
+  quarter: string
+  year: number
+}
+
 function buildPeriods(
   teamSprints: PublicPredictabilityData['teamSprints'],
   _teams: TeamInfo[],
@@ -417,7 +432,10 @@ export function PublicPredictabilityPage() {
                   axisLine={{ stroke: '#DFE1E6', strokeOpacity: 0.5 }}
                   tickLine={false}
                 />
-                <Tooltip content={<PredictabilityTooltip />} cursor={{ fill: '#F4F5F7', opacity: 0.5 }} />
+                <Tooltip
+                  content={<PredictabilityTooltip />}
+                  cursor={{ fill: '#F4F5F7', opacity: 0.5 }}
+                />
                 <ReferenceLine
                   y={80}
                   stroke="#36B37E"
@@ -497,4 +515,5 @@ export function PublicPredictabilityPage() {
         </div>
       </main>
     </div>
-  )}
+  )
+}

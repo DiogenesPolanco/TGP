@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/Button'
 
 interface BackupInfo {
   configured: boolean
-  lastBackup?: Date
+  lastBackup?: string | null
 }
 
 interface BackupBlob {
   name: string
   size: number
-  lastModified: Date
+  lastModified: string
 }
 
 interface Props {
@@ -25,8 +25,14 @@ interface Props {
 }
 
 export function AzureBackupListSection({
-  info, backups, loadingBackups, uploading, restoring,
-  onUpload, onRefresh, onRestore,
+  info,
+  backups,
+  loadingBackups,
+  uploading,
+  restoring,
+  onUpload,
+  onRefresh,
+  onRestore,
 }: Props) {
   if (!info.configured) return null
 
@@ -47,11 +53,21 @@ export function AzureBackupListSection({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button variant="primary" onClick={onUpload} isLoading={!!uploading} leftIcon={<Upload size={14} />}
-            className="bg-primary text-white hover:bg-primary/90">
+          <Button
+            variant="primary"
+            onClick={onUpload}
+            isLoading={!!uploading}
+            leftIcon={<Upload size={14} />}
+            className="bg-primary text-white hover:bg-primary/90"
+          >
             {uploading ? 'Subiendo...' : 'Subir Backup Ahora'}
           </Button>
-          <Button variant="secondary" onClick={onRefresh} isLoading={loadingBackups} leftIcon={<RefreshCw size={14} />}>
+          <Button
+            variant="secondary"
+            onClick={onRefresh}
+            isLoading={loadingBackups}
+            leftIcon={<RefreshCw size={14} />}
+          >
             {loadingBackups ? 'Cargando...' : 'Listar Backups'}
           </Button>
         </div>
@@ -86,7 +102,11 @@ export function AzureBackupListSection({
                     disabled={restoring === b.name}
                     className="mt-2 flex items-center justify-center gap-1 py-1.5 text-[10px] font-medium rounded-lg bg-warning/10 text-warning hover:bg-warning/20 transition-colors disabled:opacity-50"
                   >
-                    {restoring === b.name ? <Loader2 size={10} className="animate-spin" /> : <ExternalLink size={10} />}
+                    {restoring === b.name ? (
+                      <Loader2 size={10} className="animate-spin" />
+                    ) : (
+                      <ExternalLink size={10} />
+                    )}
                     {restoring === b.name ? 'Restaurando...' : 'Restaurar'}
                   </Button>
                 </Card>
@@ -104,5 +124,3 @@ export function AzureBackupListSection({
     </>
   )
 }
-
-

@@ -115,7 +115,7 @@ export function PriorityFeed({
         score: 0,
         severity: b.severity,
         planId: b.sourceType === 'plan' ? b.sourceId : undefined,
-        assigneeId: b.assigneeId,
+        assigneeId: b.assigneeId ?? undefined,
         link: `/execution/blockers/${b.id}/edit`,
       })
     }
@@ -136,7 +136,7 @@ export function PriorityFeed({
         daysOverdue: diff,
         planId: a.planId,
         planTitle: plan?.title,
-        assigneeId: a.assigneeId,
+        assigneeId: a.assigneeId ?? undefined,
         link: a.planId ? `/execution/plans/${a.planId}` : undefined,
         dueDate: d,
       })
@@ -144,7 +144,6 @@ export function PriorityFeed({
 
     for (const c of commitments) {
       if (c.status !== 'active' && c.status !== 'at_risk') continue
-      if (c.status === 'fulfilled' || c.status === 'cancelled') continue
       const d = new Date(c.commitmentDate)
       d.setHours(0, 0, 0, 0)
       const diff = Math.ceil((today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24))
@@ -156,7 +155,7 @@ export function PriorityFeed({
         description: `Vencido hace ${diff}d${c.ownerId ? ` · ${c.ownerId}` : ''}`,
         score: 0,
         daysOverdue: diff,
-        assigneeId: c.ownerId,
+        assigneeId: c.ownerId ?? undefined,
         link: '/execution/commitments',
         dueDate: d,
       })
@@ -178,14 +177,14 @@ export function PriorityFeed({
         daysUntilDue: 0,
         planId: a.planId,
         planTitle: plan?.title,
-        assigneeId: a.assigneeId,
+        assigneeId: a.assigneeId ?? undefined,
         link: a.planId ? `/execution/plans/${a.planId}` : undefined,
         dueDate: d,
       })
     }
 
     for (const t of tasks) {
-      if (t.status === 'done' || t.status === 'cancelled') continue
+      if (t.status === 'done') continue
       const plan = t.planId ? planMap.get(t.planId) : undefined
       let dueLabel = ''
       let dd: Date | undefined
@@ -202,7 +201,7 @@ export function PriorityFeed({
         description: `${plan?.title ?? 'Sin plan'}${dueLabel ? ` · ${dueLabel}` : ''}`,
         score: 0,
         severity: t.priority,
-        planId: t.planId,
+        planId: t.planId ?? undefined,
         link: t.planId ? `/execution/plans/${t.planId}` : undefined,
         dueDate: dd,
       })

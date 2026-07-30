@@ -38,16 +38,25 @@ export function EntityList<T extends EntityForList>({
   const [search, setSearch] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
   const allItemsOfType =
-    useLiveQuery(() => (db[entityType] as Table<Record<string, unknown>, string>).toArray(), [entityType]) ?? []
+    useLiveQuery(
+      () => (db[entityType] as unknown as Table<Record<string, unknown>, string>).toArray(),
+      [entityType],
+    ) ?? []
 
   const dissociate = async (item: T) => {
-    const appId = (item as Record<string, unknown>).applicationId
+    const appId = (item as unknown as Record<string, unknown>).applicationId
     if (typeof appId !== 'string' || appId !== applicationId) return
-    await (db[entityType] as Table<Record<string, unknown>, string>).update(item.id as string, { applicationId: null })
+    await (db[entityType] as unknown as Table<Record<string, unknown>, string>).update(
+      item.id as unknown as string,
+      { applicationId: null },
+    )
   }
 
   const associate = async (item: T) => {
-    await (db[entityType] as Table<Record<string, unknown>, string>).update(item.id as string, { applicationId } as Record<string, unknown>)
+    await (db[entityType] as unknown as Table<Record<string, unknown>, string>).update(
+      item.id as unknown as string,
+      { applicationId } as Record<string, unknown>,
+    )
     setSearch('')
     setShowDropdown(false)
   }
@@ -56,7 +65,8 @@ export function EntityList<T extends EntityForList>({
   const availableItems = allItemsOfType.filter(
     (item) =>
       !alreadyAssociatedIds.has(item.id) &&
-      (!search || (renderCells(item as unknown as T)[0] ?? '').toLowerCase().includes(search.toLowerCase())),
+      (!search ||
+        (renderCells(item as unknown as T)[0] ?? '').toLowerCase().includes(search.toLowerCase())),
   ) as unknown as T[]
 
   const columns: Column<T>[] = useMemo(() => {
@@ -70,7 +80,9 @@ export function EntityList<T extends EntityForList>({
         const sev = severityColor(item)
         if (idx === 1 && sev) {
           return (
-            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${severityColorClass(sev)}`}>
+            <span
+              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${severityColorClass(sev)}`}
+            >
               {cell}
             </span>
           )
@@ -152,7 +164,9 @@ export function EntityList<T extends EntityForList>({
                       <span className="text-neutral-90 dark:text-white truncate">{cells[0]}</span>
                     </div>
                     {sev && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${severityColorClass(sev)}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${severityColorClass(sev)}`}
+                      >
                         {cells[1]}
                       </span>
                     )}

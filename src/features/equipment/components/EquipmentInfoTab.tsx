@@ -8,8 +8,15 @@ import {
 } from '@/features/equipment/components/EquipmentStatusBadge'
 import { HtmlDescription } from '@/components/ui/HtmlDescription'
 import { Monitor, Calendar, User, Package, RotateCcw, Info, HelpCircle } from 'lucide-react'
-import { statusBg, statusIconBg, statusIcon, CONDITION_OPTIONS, Section, MiniField } from './equipmentDetailComponents'
-import type { EquipmentAssignment, EquipmentItem, MemberProfile, Team } from '@/types/domain'
+import {
+  statusBg,
+  statusIconBg,
+  statusIcon,
+  CONDITION_OPTIONS,
+  Section,
+  MiniField,
+} from './equipmentDetailComponents'
+import type { EquipmentAssignmentLog, EquipmentItem, MemberProfile, Team } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { MemberSelector } from '@/components/ui/MemberSelector'
@@ -24,7 +31,7 @@ export function EquipmentInfoTab({
   equipment: EquipmentItem
   members: MemberProfile[]
   teams: Team[]
-  assignments: EquipmentAssignment[]
+  assignments: EquipmentAssignmentLog[]
 }) {
   const { addNotification } = useAppStore()
   const [assigning, setAssigning] = useState(false)
@@ -112,8 +119,14 @@ export function EquipmentInfoTab({
             <MiniField label="Marca" value={equipment.brand} />
             <MiniField label="Modelo" value={equipment.model} />
             <MiniField label="N° Serie" value={equipment.serialNumber} />
-            <MiniField label="Condición" value={<EquipmentConditionBadge condition={equipment.condition} />} />
-            <MiniField label="Tipo" value={EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type} />
+            <MiniField
+              label="Condición"
+              value={<EquipmentConditionBadge condition={equipment.condition} />}
+            />
+            <MiniField
+              label="Tipo"
+              value={EQUIPMENT_TYPE_LABELS[equipment.type] ?? equipment.type}
+            />
             <MiniField label="Estado" value={<EquipmentStatusBadge status={equipment.status} />} />
           </div>
         </Section>
@@ -132,8 +145,12 @@ export function EquipmentInfoTab({
               label="Garantía"
               value={<span className={warrantyExpired ? 'text-danger' : ''}>{warrantyLabel}</span>}
             />
-            {equipment.costCenter && <MiniField label="Centro de Costo" value={equipment.costCenter} />}
-            {equipment.businessUnitId && <MiniField label="Unidad de Negocio" value={equipment.businessUnitId} />}
+            {equipment.costCenter && (
+              <MiniField label="Centro de Costo" value={equipment.costCenter} />
+            )}
+            {equipment.businessUnitId && (
+              <MiniField label="Unidad de Negocio" value={equipment.businessUnitId} />
+            )}
           </div>
         </Section>
       </div>
@@ -151,10 +168,15 @@ export function EquipmentInfoTab({
                       : (equipment.assignedTo ?? '—')
                   }
                 />
-                <MiniField label="Desde" value={activeAssignment.assignedAt.toLocaleDateString('es')} />
+                <MiniField
+                  label="Desde"
+                  value={activeAssignment.assignedAt.toLocaleDateString('es')}
+                />
                 <MiniField
                   label="Condición entrega"
-                  value={<EquipmentConditionBadge condition={activeAssignment.conditionAtAssignment} />}
+                  value={
+                    <EquipmentConditionBadge condition={activeAssignment.conditionAtAssignment} />
+                  }
                 />
               </div>
 
