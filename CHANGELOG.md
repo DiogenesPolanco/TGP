@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/DiogenesPolanco/TGP/compare/v1.1.1...v1.1.2) (2026-07-31)
+
+### 👷 CI
+
+- **version:** dispatch desktop release after bump because github token pushes are ignored ([796fc74](https://github.com/DiogenesPolanco/TGP/commit/796fc7432a1a880c49de5b3ae77c5b5d93e64d31))
+
 ### [1.1.1](https://github.com/DiogenesPolanco/TGP/compare/v1.1.0...v1.1.1) (2026-07-31)
 
 ### 🐛 Bug Fixes
