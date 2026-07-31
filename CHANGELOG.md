@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://github.com/DiogenesPolanco/TGP/compare/v1.1.3...v1.1.4) (2026-07-31)
+
+### 👷 CI
+
+- **version:** allow workflow_dispatch in azure deploy job ([795061f](https://github.com/DiogenesPolanco/TGP/commit/795061fa40f892ac9d14e48441e627a5a4d0c8f7))
+
 ### [1.1.3](https://github.com/DiogenesPolanco/TGP/compare/v1.1.2...v1.1.3) (2026-07-31)
 
 ### 🐛 Bug Fixes
