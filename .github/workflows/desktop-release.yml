@@ -72,10 +72,12 @@ jobs:
       - name: Prepare installer artifacts
         shell: bash
         run: |
-          # Keep only installer files; remove all subdirectories (app bundles)
-          # and debug logs. Electron-builder creates mac/, mac-arm64/,
+          # Keep ONLY installer files. Remove all subdirectories (app bundles),
+          # debug logs, auto-update metadata (latest*.yml) and differential
+          # update blockmaps. Electron-builder creates mac/, mac-arm64/,
           # win-unpacked/, linux-unpacked/ — none should go to the Release.
           rm -rf release/*/ release/builder-debug.yml release/*.nsis.7z
+          rm -f release/latest*.yml release/*.blockmap
           echo "=== Installer artifacts ==="
           ls -lh release/
 

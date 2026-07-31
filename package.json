@@ -182,7 +182,8 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/icons/icon.ico"
+      "icon": "public/icons/icon.ico",
+      "artifactName": "TGP.Setup.${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
