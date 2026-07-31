@@ -48,11 +48,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
-          # Ensure platform-specific native optional bindings are installed
-          # The lockfile was generated on Linux and only has Linux native bindings.
-          # npm ci skips darwin/win32 optional deps missing from the lockfile.
-          node scripts/install-native-bindings.js
+          # The lockfile was generated on Linux and only has Linux native bindings
+          # (rolldown, lightningcss, tailwindcss-oxide, etc.).
+          # On non-Linux runners, we must remove the lockfile so npm resolves
+          # all platform-specific optional deps correctly for the current platform.
+          if [ "${{ matrix.platform }}" != "linux" ]; then
+            echo "Non-Linux runner: removing lockfile for fresh resolve"
+            rm -f package-lock.json
+            npm install
+          else
+            npm ci
+          fi
 
       - name: Build web app
         run: npm run build
