@@ -47,6 +47,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        shell: bash
         run: |
           # The lockfile was generated on Linux and only has Linux native bindings
           # (rolldown, lightningcss, tailwindcss-oxide, etc.).
