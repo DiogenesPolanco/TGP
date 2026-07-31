@@ -69,7 +69,15 @@ jobs:
         env:
           CI: true
 
-      - name: Upload artifacts
+      - name: Prepare installer artifacts
+        shell: bash
+        run: |
+          # Remove unpacked app bundles and debug logs; keep only final installers
+          rm -rf release/*-unpacked release/builder-debug.yml release/*.nsis.7z
+          echo "=== Installer artifacts ==="
+          ls -lh release/
+
+      - name: Upload installer artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
