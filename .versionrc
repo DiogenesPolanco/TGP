@@ -11,5 +11,5 @@
     { "type": "ci", "section": "👷 CI" },
     { "type": "chore", "section": "📦 Chores" }
   ],
-  "releaseCommitMessageFormat": "chore(release): {{currentTag}} [skip ci]"
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}"
 }
