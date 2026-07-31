@@ -178,12 +178,12 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/icons/icon-512x512.png"
+      "icon": "public/icons/icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "public/icons/icon-512x512.png"
+      "installerIcon": "public/icons/icon.ico"
     }
   }
 }
