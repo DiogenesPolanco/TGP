@@ -6,10 +6,11 @@ on:
 
 permissions:
   contents: write
+  actions: write   # required to dispatch desktop-release via API
 
 jobs:
   auto-version:
-    # Skip if this push came from a version bump (our own [skip ci] commits)
+    # Skip if this push came from a version bump (our own release commits)
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +32,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version (standard-version)
+        id: bump
         run: |
           # --dry-run first to see if there's anything to bump
           OUTPUT=$(npx standard-version --dry-run 2>&1 || true)
@@ -39,11 +41,29 @@ jobs:
           if echo "$OUTPUT" | grep -q "bumping version"; then
             echo "✅ New commits detected — bumping version..."
             npx standard-version
+            NEW_TAG=$(git describe --tags --abbrev=0)
+            echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
           else
             echo "ℹ️  No feature/fix commits since last tag — skipping bump"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Push new tag
+        if: steps.bump.outputs.bumped == 'true'
         run: |
-          # Push both the commit (with [skip ci]) and the new tag
+          # Push both the release commit and the new tag.
+          # Note: pushes made with GITHUB_TOKEN do NOT trigger other workflows,
+          # so desktop-release must be dispatched explicitly (next step).
           git push --follow-tags origin master
+
+      - name: Dispatch desktop release
+        if: steps.bump.outputs.bumped == 'true'
+        run: |
+          TAG="${{ steps.bump.outputs.new_tag }}"
+          echo "Dispatching desktop-release for ${TAG}"
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/desktop-release.yml/dispatches \
+            -d "{\"ref\":\"${TAG}\",\"inputs\":{\"platform\":\"all\"}}"
