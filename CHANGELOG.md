@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5](https://github.com/DiogenesPolanco/TGP/compare/v1.1.4...v1.1.5) (2026-07-31)
+
+### 🐛 Bug Fixes
+
+- **version:** show real version in landing footer ([e0a478f](https://github.com/DiogenesPolanco/TGP/commit/e0a478f657eec0533811373d2e06e25c99a43855))
+
 ### [1.1.4](https://github.com/DiogenesPolanco/TGP/compare/v1.1.3...v1.1.4) (2026-07-31)
 
 ### 👷 CI
