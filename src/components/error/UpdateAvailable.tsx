@@ -1,119 +1,225 @@
-import { RefreshCw, Sparkles, Download } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+const R = 50
+const CIRCUMFERENCE = 2 * Math.PI * R
 
-export function UpdateAvailable({ onReload }: { onReload: () => void }) {
+export function UpdateAvailable({
+  onReload,
+  onDismiss,
+  currentBuild,
+}: {
+  onReload: () => void
+  onDismiss?: () => void
+  currentBuild?: string | null
+}) {
   return (
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      className="min-h-screen font-sans overflow-x-hidden relative flex items-center justify-center"
+      style={{ background: '#080c14', color: '#c8d0e0' }}
+    >
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: `
-            radial-gradient(ellipse 60% 50% at 20% 30%, #0052CC 0%, transparent 60%),
-            radial-gradient(ellipse 50% 60% at 80% 70%, #C85A48 0%, transparent 60%),
-            radial-gradient(ellipse 40% 40% at 50% 50%, #36B37E 0%, transparent 50%)
-          `,
+          backgroundImage:
+            'linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
         }}
       />
-
       <div
-        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
-        style={{
-          backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-        }}
+        className="fixed top-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)' }}
+      />
+      <div
+        className="fixed bottom-[-300px] left-[-200px] w-[700px] h-[700px] rounded-full pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.04) 0%, transparent 70%)' }}
       />
 
-      <div className="w-full max-w-4xl relative">
-        <div className="bg-white/95 dark:bg-neutral-80/95 backdrop-blur-xl rounded-3xl border border-neutral-20/80 dark:border-neutral-70/80 shadow-2xl shadow-neutral-30/30 dark:shadow-black/30 overflow-hidden">
-          <div className="flex flex-col sm:flex-row min-h-[380px]">
-            <div className="sm:w-[42%] bg-gradient-to-br from-primary via-primary-dark to-[#03245E] p-8 sm:p-10 text-white flex flex-col relative overflow-hidden">
+      <div className="relative z-10 w-full max-w-5xl px-4 py-8">
+        <div className="rounded-3xl border border-white/10 shadow-2xl shadow-black/40 overflow-hidden bg-neutral-900/60 backdrop-blur-sm p-8 lg:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="text-center lg:text-left">
               <div
-                className="absolute inset-0 opacity-10"
+                className="inline-block lg:inline-flex font-mono text-[11px] font-medium uppercase tracking-wider mb-6 px-3.5 py-1.5"
                 style={{
-                  background:
-                    'radial-gradient(circle at 30% 40%, white 0%, transparent 60%), radial-gradient(circle at 70% 80%, #4C9AFF 0%, transparent 50%)',
+                  color: '#22d3ee',
+                  border: '1px solid rgba(34,211,238,0.25)',
+                  borderRadius: 2,
+                  background: 'rgba(34,211,238,0.06)',
                 }}
-              />
-              <div className="relative flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm">
-                  <img src="/favicon.svg" alt="TGP" className="w-full h-full" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold tracking-tight">TGP</p>
-                  <p className="text-[11px] font-medium opacity-60 tracking-wide">
-                    Technology Governance Platform
-                  </p>
+              >
+                ✦ RELEASE-2026 — Nueva Versión Detectada
+              </div>
+
+              <div className="relative w-[180px] h-[180px] mx-auto lg:mx-0 mb-8">
+                <svg
+                  viewBox="0 0 120 120"
+                  className="w-full h-full"
+                  style={{ transform: 'rotate(-90deg)' }}
+                >
+                  <defs>
+                    <linearGradient id="ug" x1="0%" x2="100%">
+                      <stop offset="0%" stopColor="#06b6d4" />
+                      <stop offset="100%" stopColor="#3b82f6" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r={R}
+                    fill="none"
+                    stroke="rgba(34,211,238,0.08)"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r={R}
+                    fill="none"
+                    stroke="url(#ug)"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeDasharray={`${0.75 * CIRCUMFERENCE} ${0.25 * CIRCUMFERENCE}`}
+                    strokeDashoffset={-0.05 * CIRCUMFERENCE}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                  <div
+                    className="font-mono text-[48px] font-extrabold leading-none"
+                    style={{ color: '#22d3ee' }}
+                  >
+                    NEW
+                  </div>
+                  <div
+                    className="font-mono text-[10px] uppercase tracking-wider mt-1"
+                    style={{ color: '#6b7a99' }}
+                  >
+                    Update Check
+                  </div>
                 </div>
               </div>
 
-              <div className="relative flex-1 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles size={16} />
-                  <span className="text-xs font-medium uppercase tracking-widest opacity-60">
-                    Actualización
+              <h1
+                className="font-mono text-[28px] font-extrabold leading-tight mb-4"
+                style={{ color: '#e8edf5' }}
+              >
+                Nueva versión
+                <br />
+                disponible
+              </h1>
+
+              <p className="text-sm leading-relaxed max-w-[480px]" style={{ color: '#6b7a99' }}>
+                Se ha detectado una versión más reciente de TGP. Recarga la aplicación para aplicar
+                las últimas mejoras y correcciones.
+              </p>
+            </div>
+
+            <div className="text-center lg:text-left">
+              <div
+                className="w-full font-mono text-[11px] text-left mb-8"
+                style={{ border: '1px solid rgba(34,211,238,0.1)', borderRadius: 4 }}
+              >
+                <div
+                  className="flex justify-between px-4 py-2.5"
+                  style={{ borderBottom: '1px solid rgba(34,211,238,0.06)', color: '#6b7a99' }}
+                >
+                  <span>Indicador</span>
+                  <span>Estado</span>
+                </div>
+                <div
+                  className="flex justify-between px-4 py-2.5"
+                  style={{ borderBottom: '1px solid rgba(34,211,238,0.06)' }}
+                >
+                  <span style={{ color: '#6b7a99' }}>Versión</span>
+                  <span style={{ color: '#22d3ee' }}>Nueva</span>
+                </div>
+                <div
+                  className="flex justify-between px-4 py-2.5"
+                  style={{ borderBottom: '1px solid rgba(34,211,238,0.06)' }}
+                >
+                  <span style={{ color: '#6b7a99' }}>Build</span>
+                  <span style={{ color: currentBuild ? '#ffb900' : '#22d3ee' }}>
+                    {currentBuild ?? 'Disponible'}
                   </span>
                 </div>
-                <h2 className="text-3xl font-bold leading-tight mb-3">
-                  Nueva versión
-                  <br />
-                  disponible
-                </h2>
-                <p className="text-base leading-relaxed opacity-85">
-                  Se ha detectado una versión más reciente de TGP. Recarga la aplicación para
-                  disfrutar de las últimas mejoras.
-                </p>
-              </div>
-
-              <div className="relative mt-6 pt-4 border-t border-white/15">
-                <p className="text-sm opacity-60 leading-relaxed">TGP · Mejora continua</p>
-              </div>
-            </div>
-
-            <div className="hidden sm:block w-5 bg-white/95 dark:bg-neutral-80/95 relative">
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-2.5 h-2.5 rounded-full bg-neutral-20 dark:bg-neutral-70"
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="sm:w-[58%] p-8 sm:p-10 bg-white/95 dark:bg-neutral-80/95 flex flex-col justify-center">
-              <div className="max-w-sm mx-auto w-full space-y-6">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Download size={32} className="text-primary" />
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-neutral-90 dark:text-white">
-                    Instalar actualización
-                  </h3>
-                  <p className="text-sm text-muted leading-relaxed">
-                    Aplica los cambios más recientes para mantener todo funcionando correctamente.
-                  </p>
-                </div>
-
-                <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-4 border border-amber-200 dark:border-amber-500/20">
-                  <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                    Tus datos no se perderán. La aplicación se descargará de nuevo con las últimas
-                    mejoras.
-                  </p>
-                </div>
-
-                <Button
-                  onClick={onReload}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
+                <div
+                  className="flex justify-between px-4 py-2.5"
+                  style={{ borderBottom: '1px solid rgba(34,211,238,0.06)' }}
                 >
-                  <RefreshCw size={20} />
-                  Instalar ahora
-                </Button>
+                  <span style={{ color: '#6b7a99' }}>Datos</span>
+                  <span style={{ color: '#00ff88' }}>Seguros</span>
+                </div>
+                <div className="flex justify-between px-4 py-2.5">
+                  <span style={{ color: '#6b7a99' }}>Estado</span>
+                  <span style={{ color: '#22d3ee' }}>Pendiente</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <button
+                  onClick={onReload}
+                  className="font-mono text-[13px] font-bold uppercase tracking-wider cursor-pointer border-none transition-all"
+                  style={{
+                    background: '#00ff88',
+                    color: '#080c14',
+                    padding: '12px 28px',
+                    borderRadius: 4,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(0,255,136,0.3)'
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none'
+                    e.currentTarget.style.transform = 'none'
+                  }}
+                >
+                  ⟳ Recargar ahora
+                </button>
+                {onDismiss && (
+                  <button
+                    onClick={onDismiss}
+                    className="font-mono text-[13px] font-semibold uppercase tracking-wider cursor-pointer transition-all"
+                    style={{
+                      background: 'transparent',
+                      color: '#6b7a99',
+                      border: '1px solid rgba(107,122,153,0.3)',
+                      padding: '12px 28px',
+                      borderRadius: 4,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#c8d0e0'
+                      e.currentTarget.style.borderColor = '#6b7a99'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#6b7a99'
+                      e.currentTarget.style.borderColor = 'rgba(107,122,153,0.3)'
+                    }}
+                  >
+                    Continuar sin actualizar
+                  </button>
+                )}
+              </div>
+
+              <div className="font-mono text-[11px]" style={{ color: 'rgba(0,255,136,0.3)' }}>
+                $ curl -s https://tgp.local/version.json | jq .build
+                <span
+                  className="inline-block w-[7px] h-[14px] align-middle ml-1"
+                  style={{
+                    background: 'rgba(0,255,136,0.5)',
+                    animation: 'tgp-blink 1s step-end infinite',
+                  }}
+                />
+              </div>
+              <div className="font-mono text-[11px] mt-1" style={{ color: 'rgba(34,211,238,0.4)' }}>
+                → 200 — update available (recarga para aplicar)
               </div>
             </div>
           </div>
         </div>
+        <p className="text-center text-xs text-neutral-500 mt-6 font-medium font-mono">
+          LOCAL-FIRST · SIN CONEXIÓN EXTERNA
+        </p>
       </div>
+
+      <style>{`@keyframes tgp-blink { 50% { opacity: 0 } }`}</style>
     </div>
   )
 }

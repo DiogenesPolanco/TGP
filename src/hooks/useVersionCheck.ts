@@ -128,5 +128,18 @@ export function useVersionCheck() {
     window.location.reload()
   }, [])
 
-  return { stale, reload, currentBuild }
+  const dismiss = useCallback(async () => {
+    localStorage.removeItem(STALE_KEY)
+    localStorage.removeItem(FAILURES_KEY)
+    const result = getBuildOverride() ?? (await fetchVersion())
+    if (result && typeof result === 'object' && 'build' in result) {
+      cachedVersion = result
+      setCurrentBuild(result.build)
+    } else {
+      cachedVersion = null
+    }
+    setStale(false)
+  }, [])
+
+  return { stale, reload, currentBuild, dismiss }
 }

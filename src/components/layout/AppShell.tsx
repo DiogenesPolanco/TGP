@@ -86,8 +86,9 @@ export function AppShell() {
 
   useGlobalShortcuts(appShortcuts())
 
-  const { stale, reload } = useVersionCheck()
-  if (stale) return <UpdateAvailable onReload={reload} />
+  const { stale, reload, currentBuild, dismiss } = useVersionCheck()
+  if (stale)
+    return <UpdateAvailable onReload={reload} onDismiss={dismiss} currentBuild={currentBuild} />
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -102,7 +103,8 @@ export function AppShell() {
       <div
         className="fixed inset-0 pointer-events-none z-[1] hidden dark:block"
         style={{
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px)',
+          background:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px)',
         }}
       />
       {/* Grid light mode sutil */}
@@ -119,41 +121,42 @@ export function AppShell() {
           isTabHidden && 'blur-xl transition-all duration-300',
         )}
       >
-      <Sidebar chatOpen={chatOpen} onToggleChat={toggleChat} aiConfigured={aiConfigured} />
-      <div
-        className={cn(
-          'flex flex-col flex-1 transition-all duration-300',
-          sidebarOpen ? 'ml-60' : 'ml-16',
+        <Sidebar chatOpen={chatOpen} onToggleChat={toggleChat} aiConfigured={aiConfigured} />
+        <div
+          className={cn(
+            'flex flex-col flex-1 transition-all duration-300',
+            sidebarOpen ? 'ml-60' : 'ml-16',
+          )}
+        >
+          <Header />
+          <main className="flex-1 overflow-auto p-4">
+            <PageTransition>
+              <Outlet />
+            </PageTransition>
+          </main>
+          <footer className="shrink-0 border-t border-boundary px-6 py-2 flex items-center justify-between text-[11px] text-muted">
+            <span>TGP — Technology Governance Platform</span>
+            <span>
+              v{version}
+              {currentBuild ? ` · build ${currentBuild}` : ''} · {new Date().getFullYear()}
+            </span>
+            <button
+              onClick={() => navigate('/terms')}
+              className="hover:text-primary transition-colors underline underline-offset-2"
+            >
+              Términos y condiciones
+            </button>
+          </footer>
+        </div>
+
+        {aiConfigured && chatOpen && aiConfig && (
+          <AiChatPanel config={aiConfig} isOpen={chatOpen} onClose={() => setChatOpen(false)} />
         )}
-      >
-        <Header />
-        <main className="flex-1 overflow-auto p-4">
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
-        </main>
-        <footer className="shrink-0 border-t border-boundary px-6 py-2 flex items-center justify-between text-[11px] text-muted">
-          <span>TGP — Technology Governance Platform</span>
-          <span>
-            v{version} · {new Date().getFullYear()}
-          </span>
-          <button
-            onClick={() => navigate('/terms')}
-            className="hover:text-primary transition-colors underline underline-offset-2"
-          >
-            Términos y condiciones
-          </button>
-        </footer>
+
+        <NotificationToast />
+        <ConfirmDialog />
+        {showWizard && <OnboardingWizard onClose={() => setWizardDone(true)} />}
       </div>
-
-      {aiConfigured && chatOpen && aiConfig && (
-        <AiChatPanel config={aiConfig} isOpen={chatOpen} onClose={() => setChatOpen(false)} />
-      )}
-
-      <NotificationToast />
-      <ConfirmDialog />
-      {showWizard && <OnboardingWizard onClose={() => setWizardDone(true)} />}
-    </div>
     </div>
   )
 }
