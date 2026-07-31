@@ -115,5 +115,5 @@ jobs:
           body_path: release-notes.md
           files: |
             artifacts/**/*
-          draft: true
+          draft: false
           prerelease: false
