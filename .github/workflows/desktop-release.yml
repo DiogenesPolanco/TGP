@@ -48,10 +48,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Use npm install (not npm ci) because npm ci only installs what's in
-          # the lockfile, but the lockfile was generated on Linux and is missing
-          # platform-specific native bindings (lightningcss, rolldown, tailwindcss-oxide, rollup, etc.)
-          npm install
+          npm ci
+          # Ensure platform-specific native optional bindings are installed
+          # The lockfile was generated on Linux and only has Linux native bindings.
+          # npm ci skips darwin/win32 optional deps missing from the lockfile.
+          node scripts/install-native-bindings.js
 
       - name: Build web app
         run: npm run build
