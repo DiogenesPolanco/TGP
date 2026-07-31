@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/DiogenesPolanco/TGP/compare/v1.1.2...v1.1.3) (2026-07-31)
+
+### 🐛 Bug Fixes
+
+- **version:** show build hash in footer and restyle update screen ([1f8b573](https://github.com/DiogenesPolanco/TGP/commit/1f8b5735b6036b8e2ff88108bb6f144707e51b5b))
+
+### 👷 CI
+
+- **version:** deploy web after bump and trim release assets ([fd2e703](https://github.com/DiogenesPolanco/TGP/commit/fd2e7037fd304814b27d9b6dc295a3dcb00c5ebc))
+
 ### [1.1.2](https://github.com/DiogenesPolanco/TGP/compare/v1.1.1...v1.1.2) (2026-07-31)
 
 ### 👷 CI
