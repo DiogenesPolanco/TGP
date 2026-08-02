@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.8](https://github.com/DiogenesPolanco/TGP/compare/v1.1.7...v1.1.8) (2026-08-02)
+
+### 📦 Chores
+
+- **docker:** add docker compose service ([9f4084f](https://github.com/DiogenesPolanco/TGP/commit/9f4084fa1a8674046eb55344ab75356b662cc8a1))
+- **docker:** add dockerignore ([adbe638](https://github.com/DiogenesPolanco/TGP/commit/adbe638998d75dad64e12d5b8ba8801ab034bd89))
+- **docker:** add multi-stage dockerfile ([898dbc8](https://github.com/DiogenesPolanco/TGP/commit/898dbc8f670f145ba8748aed0987241f84cf0340))
+- **docker:** add spa-aware nginx config ([e4cba09](https://github.com/DiogenesPolanco/TGP/commit/e4cba09fd31394e440fc977f63afbfe2ba8b80ce))
+
+### 👷 CI
+
+- **docker:** publish multi-arch image to ghcr and docker hub ([20ece4a](https://github.com/DiogenesPolanco/TGP/commit/20ece4a5631b6ee1b9ed0070b5e3e19e328340d5))
+
+### 📖 Documentation
+
+- **deploy:** add on-premise docker design spec ([6c0a4f5](https://github.com/DiogenesPolanco/TGP/commit/6c0a4f5ca7700797112e8a175b85c9ca648fadaa))
+- **deploy:** add on-premise docker implementation plan ([28f401f](https://github.com/DiogenesPolanco/TGP/commit/28f401f2583ab347cb6bc810feb007fb71366568))
+- **readme:** add on-premise docker deployment section ([4e981f3](https://github.com/DiogenesPolanco/TGP/commit/4e981f3e1d1995954999231cf175d46bb33c8933))
+
 ### [1.1.7](https://github.com/DiogenesPolanco/TGP/compare/v1.1.6...v1.1.7) (2026-08-02)
 
 ### 🐛 Bug Fixes
