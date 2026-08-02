@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.10](https://github.com/DiogenesPolanco/TGP/compare/v1.1.9...v1.1.10) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **docker:** pin rolldown native binding for multi-arch builds ([034c113](https://github.com/DiogenesPolanco/TGP/commit/034c1132dfee108149c9dc2f38d9f60f2451cd73))
+
 ### [1.1.9](https://github.com/DiogenesPolanco/TGP/compare/v1.1.8...v1.1.9) (2026-08-02)
 
 ### 🐛 Bug Fixes
