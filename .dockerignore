@@ -1,5 +1,6 @@
 node_modules
 dist
+*.deb
 .git
 .gitignore
 .github
