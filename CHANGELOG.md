@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.6](https://github.com/DiogenesPolanco/TGP/compare/v1.1.5...v1.1.6) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **admin:** export all tables with portable encryption and validate before import ([60bce42](https://github.com/DiogenesPolanco/TGP/commit/60bce425f4217ba3539ad1fae9479a0d2cceff14))
+
 ### [1.1.5](https://github.com/DiogenesPolanco/TGP/compare/v1.1.4...v1.1.5) (2026-07-31)
 
 ### 🐛 Bug Fixes
