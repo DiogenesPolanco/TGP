@@ -16,7 +16,6 @@ import {
 import { syncTechnologies } from '@/services/sync/endoflifeSyncService'
 import { useConfirm } from '@/hooks/useConfirm'
 import { getSecret, verifyTotp } from '@/services/auth/authService'
-import { encryptField } from '@/services/crypto/fieldCipher'
 import type { SyncResult } from '@/services/sync/endoflifeSyncService'
 import { AzureCloudConfig } from '@/features/admin/components/AzureCloudConfig'
 import { AiAdminConfig } from '@/features/admin/components/AiAdminConfig'
@@ -27,7 +26,10 @@ import { DatabaseConfig } from '@/features/admin/components/DatabaseConfig'
 import { SystemConfigSection } from '@/features/admin/components/config/SystemConfigSection'
 import { CatalogsSection } from '@/features/admin/components/config/CatalogsSection'
 import {
+  exportDatabase,
+  dateReviver,
   importBackup,
+  isValidBackup,
   isDateObject,
   DATE_KEYS,
   isIsoDateString,
@@ -86,47 +88,24 @@ export function AdminPage() {
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      const [apps, findings] = await Promise.all([
-        db.applications.toArray(),
-        db.auditFindings.toArray(),
-      ])
-      const encApps = await Promise.all(
-        apps.map(async (a) => ({
-          ...a,
-          name: await encryptField(a.name),
-          description: a.description ? await encryptField(a.description) : '',
-        })),
-      )
-      const encFindings = await Promise.all(
-        findings.map(async (f) => ({
-          ...f,
-          title: await encryptField(f.title),
-          description: f.description ? await encryptField(f.description) : '',
-        })),
-      )
-      const data = {
-        tenants: await db.tenants.toArray(),
-        businessUnits: await db.businessUnits.toArray(),
-        applications: encApps,
-        technologies: await db.technologies.toArray(),
-        vulnerabilities: await db.vulnerabilities.toArray(),
-        incidents: await db.incidents.toArray(),
-        risks: await db.risks.toArray(),
-        auditFindings: encFindings,
-        teams: await db.teams.toArray(),
-        objectives: await db.objectives.toArray(),
-        healthIndexHistory: await db.healthIndexHistory.toArray(),
-        users: await db.users.toArray(),
-        exportedAt: new Date().toISOString(),
-      }
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const backup = await exportDatabase({ encrypt: true })
+      const blob = new Blob([JSON.stringify(backup, dateReviver, 2)], {
+        type: 'application/json',
+      })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       a.download = `tgp-backup-${new Date().toISOString().split('T')[0]}.json`
       a.click()
       URL.revokeObjectURL(url)
-      addNotification({ type: 'success', message: 'Datos exportados correctamente' })
+      if (backup.exportWarnings?.length) {
+        addNotification({
+          type: 'warning',
+          message: `Datos exportados con ${backup.exportWarnings.length} advertencia(s)`,
+        })
+      } else {
+        addNotification({ type: 'success', message: 'Datos exportados correctamente' })
+      }
     } catch {
       addNotification({ type: 'error', message: 'Error al exportar datos' })
     } finally {
@@ -141,8 +120,14 @@ export function AdminPage() {
     try {
       const text = await file.text()
       const parsed = JSON.parse(text, (_key, value) => {
-        if (isDateObject(value)) return new Date(value.__date)
-        if (DATE_KEYS.has(_key) && isIsoDateString(value)) return new Date(value)
+        if (isDateObject(value)) {
+          const d = new Date(value.__date)
+          return isNaN(d.getTime()) ? null : d
+        }
+        if (DATE_KEYS.has(_key) && isIsoDateString(value)) {
+          const d = new Date(value as string)
+          return isNaN(d.getTime()) ? null : d
+        }
         return value
       })
 
@@ -166,6 +151,15 @@ export function AdminPage() {
             typeof parsed.exportedAt === 'string' ? parsed.exportedAt : new Date().toISOString(),
           tables,
         }
+      }
+
+      // Validate BEFORE wiping any existing data
+      if (!isValidBackup(backup)) {
+        addNotification({
+          type: 'error',
+          message: 'Archivo de backup inválido: no se importaron datos',
+        })
+        return
       }
 
       if (await confirm('Esto sobrescribirá TODOS los datos existentes. ¿Continuar?')) {

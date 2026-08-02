@@ -11,6 +11,7 @@ import {
   readBackupFromFile,
   exportDatabase,
   importBackup,
+  isValidBackup,
 } from '../exportService'
 import type { DatabaseBackup } from '../exportService'
 
@@ -376,5 +377,109 @@ describe('readBackupFromFile', () => {
     }
     await expect(promise).rejects.toThrow('Error al leer el archivo')
     ;(globalThis as any).FileReader = origFileReader
+  })
+})
+
+describe('invalid date handling', () => {
+  it('dateReviver returns null for invalid Date instances instead of throwing', () => {
+    const d = new Date('not-a-real-date')
+    expect(dateReviver('createdAt', d)).toBeNull()
+  })
+
+  it('reviveDatesDeep returns null for invalid __date markers', () => {
+    const result = reviveDatesDeep({ __date: 'not-a-real-date' })
+    expect(result).toBeNull()
+  })
+
+  it('reviveDatesDeep returns null for regex-valid but calendar-invalid dates', () => {
+    const result = reviveDatesDeep('2026-13-01', 'createdAt')
+    expect(result).toBeNull()
+  })
+})
+
+describe('isValidBackup', () => {
+  it('accepts a well-formed backup', () => {
+    expect(isValidBackup({ version: '1.0', exportedAt: 'x', tables: { tenants: [] } })).toBe(true)
+  })
+
+  it('rejects values without a valid version', () => {
+    expect(isValidBackup({ exportedAt: 'x', tables: { tenants: [] } })).toBe(false)
+    expect(isValidBackup({ version: '', tables: { tenants: [] } })).toBe(false)
+  })
+
+  it('rejects missing or malformed tables', () => {
+    expect(isValidBackup({ version: '1.0', exportedAt: 'x' })).toBe(false)
+    expect(isValidBackup({ version: '1.0', tables: 'nope' })).toBe(false)
+    expect(isValidBackup({ version: '1.0', tables: [] })).toBe(false)
+  })
+
+  it('rejects an empty tables object', () => {
+    expect(isValidBackup({ version: '1.0', tables: {} })).toBe(false)
+  })
+
+  it('rejects null and non-objects', () => {
+    expect(isValidBackup(null)).toBe(false)
+    expect(isValidBackup(undefined)).toBe(false)
+    expect(isValidBackup('str')).toBe(false)
+    expect(isValidBackup(42)).toBe(false)
+  })
+})
+
+describe('encrypted backups (portable key)', () => {
+  beforeEach(() => {
+    mockTableObj.toArray.mockReset()
+    mockTableObj.bulkPut.mockReset()
+    mockDb.table.mockReset()
+    mockDb.table.mockReturnValue(mockTableObj)
+  })
+
+  it('encrypts sensitive fields and attaches portable crypto metadata when encrypt: true', async () => {
+    mockTableObj.toArray.mockResolvedValue([
+      { id: 'a1', name: 'Secret App', description: 'Secret desc' },
+    ])
+    const result = await exportDatabase({ encrypt: true })
+    expect(result.crypto).toBeDefined()
+    expect(result.crypto!.algorithm).toBe('AES-GCM-256')
+    expect(result.crypto!.key.length).toBeGreaterThan(0)
+    const apps = result.tables.applications
+    expect(apps).toHaveLength(1)
+    expect(apps[0].name).toContain(':')
+    expect(apps[0].name).not.toBe('Secret App')
+    expect(apps[0].description).not.toBe('Secret desc')
+  })
+
+  it('does not encrypt or attach crypto when encrypt is not requested', async () => {
+    mockTableObj.toArray.mockResolvedValue([{ id: 'a1', name: 'Secret App' }])
+    const result = await exportDatabase()
+    expect(result.crypto).toBeUndefined()
+    expect(result.tables.applications[0].name).toBe('Secret App')
+  })
+
+  it('round-trips encrypted fields through export and import', async () => {
+    mockTableObj.toArray.mockResolvedValue([
+      { id: 'a1', name: 'Secret App', description: 'Secret desc' },
+    ])
+    const backup = await exportDatabase({ encrypt: true })
+
+    let captured: unknown[] = []
+    mockTableObj.bulkPut.mockImplementation(async (records: unknown[]) => {
+      captured = records as unknown[]
+    })
+    const result = await importBackup(backup)
+    expect(result.success).toBe(true)
+    expect(captured).toHaveLength(1)
+    expect(captured[0]).toMatchObject({
+      id: 'a1',
+      name: 'Secret App',
+      description: 'Secret desc',
+    })
+  })
+
+  it('collects exportWarnings when a table read fails', async () => {
+    mockTableObj.toArray.mockRejectedValue(new Error('boom'))
+    const result = await exportDatabase()
+    expect(result.exportWarnings).toBeDefined()
+    expect(result.exportWarnings!.length).toBeGreaterThan(0)
+    expect(result.exportWarnings![0]).toContain('boom')
   })
 })

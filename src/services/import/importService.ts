@@ -669,7 +669,7 @@ const importConfigs: Record<string, ImportConfig> = {
       displayName: String(row['Nombre'] ?? ''),
       role: (row['Rol'] as UserRole) ?? 'user',
       businessUnitIds: parseArrayCell(row['Business Unit IDs (separados por ;)']),
-      isActive: String(row['Activo (true/false)'] ?? 'true').toLowerCase() !== 'false',
+      isActive: String(row['Activo (true/false)'] ?? 'true').toLowerCase() !== 'false' ? 1 : 0,
       createdAt: new Date(),
     }),
     matchKey: (row) => ({ email: String(row['Email'] ?? '') }),

@@ -1,6 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import LandingPage from '@/features/landing/LandingPage'
+import { isTermsAccepted } from '@/features/auth/pages/TermsPage'
+import { isConfigured } from '@/services/auth/authService'
 import NotFoundPage from '@/features/landing/NotFoundPage'
 import { RouteErrorPage } from '@/components/error/RouteErrorPage'
 import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
@@ -23,6 +25,11 @@ import { PublicEquipmentPage } from '@/features/equipment/pages/PublicEquipmentP
 import { TermsPage } from '@/features/share/TermsPage'
 import { appShellRoutes } from './router/appShellRoutes'
 
+function RootRoute() {
+  const ready = isTermsAccepted() && isConfigured()
+  return ready ? <Navigate to="/dashboard" replace /> : <LandingPage />
+}
+
 export const router = createBrowserRouter([
   { path: '/public/:hash', element: <PublicDashboardPage /> },
   { path: '/public/performance/:hash', element: <PublicPerformancePage /> },
@@ -44,9 +51,12 @@ export const router = createBrowserRouter([
   { path: '/terms', element: <TermsPage /> },
   {
     path: '/mobile/dashboard',
-    lazy: () => import('@/features/mobile/dashboard/MobileDashboardPage').then((m) => ({ Component: m.MobileDashboardPage })),
+    lazy: () =>
+      import('@/features/mobile/dashboard/MobileDashboardPage').then((m) => ({
+        Component: m.MobileDashboardPage,
+      })),
   },
-  { index: true, element: <LandingPage /> },
+  { index: true, element: <RootRoute /> },
   {
     path: '/docs',
     lazy: () => import('@/features/docs/pages/DocsPage').then((m) => ({ Component: m.default })),

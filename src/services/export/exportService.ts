@@ -1,5 +1,13 @@
 import Dexie from 'dexie'
 import { db } from '@/services/db/database'
+import {
+  generatePortableBackupKey,
+  importPortableBackupKey,
+  encryptFieldWithKey,
+  decryptFieldWithKey,
+  decryptField,
+} from '@/services/crypto/fieldCipher'
+import type { PortableBackupKey } from '@/services/crypto/fieldCipher'
 
 const BACKUP_STORAGE_KEY = 'tgp-db-backup'
 
@@ -7,6 +15,10 @@ export interface DatabaseBackup {
   version: string
   exportedAt: string
   tables: Record<string, Record<string, unknown>[]>
+  /** Per-table read failures during export (table → error message). */
+  exportWarnings?: string[]
+  /** Portable AES-GCM-256 key material so the backup decrypts on any device. */
+  crypto?: { key: string; algorithm: string }
 }
 
 const TABLE_NAMES = [
@@ -40,12 +52,83 @@ const TABLE_NAMES = [
   'teamSprints',
 ] as const
 
-async function getTableData(tableName: string): Promise<Record<string, unknown>[]> {
+async function getTableData(tableName: string): Promise<{
+  records: Record<string, unknown>[]
+  error: string | null
+}> {
   try {
-    return (await db.table(tableName).toArray()) as Record<string, unknown>[]
-  } catch {
-    return []
+    return {
+      records: (await db.table(tableName).toArray()) as Record<string, unknown>[],
+      error: null,
+    }
+  } catch (err) {
+    return { records: [], error: err instanceof Error ? err.message : String(err) }
   }
+}
+
+const SENSITIVE_FIELD_TABLES = new Set(['applications', 'auditFindings'])
+const SENSITIVE_FIELDS: Record<string, string[]> = {
+  applications: ['name', 'description'],
+  auditFindings: ['title', 'description'],
+}
+
+async function encryptSensitiveFields(
+  tableName: string,
+  records: Record<string, unknown>[],
+  key: CryptoKey,
+): Promise<Record<string, unknown>[]> {
+  const fields = SENSITIVE_FIELDS[tableName]
+  if (!fields) return records
+  return Promise.all(
+    records.map(async (r) => {
+      const out: Record<string, unknown> = { ...r }
+      for (const field of fields) {
+        if (typeof out[field] === 'string') out[field] = await encryptFieldWithKey(out[field], key)
+      }
+      return out
+    }),
+  )
+}
+
+async function decryptSensitiveFields(
+  tableName: string,
+  records: Record<string, unknown>[],
+  key: CryptoKey,
+): Promise<Record<string, unknown>[]> {
+  const fields = SENSITIVE_FIELDS[tableName]
+  if (!fields) return records
+  return Promise.all(
+    records.map(async (r) => {
+      const out: Record<string, unknown> = { ...r }
+      for (const field of fields) {
+        const value = out[field]
+        if (typeof value === 'string' && value.includes(':')) {
+          out[field] = await decryptFieldWithKey(value, key)
+        }
+      }
+      return out
+    }),
+  )
+}
+
+async function decryptSensitiveFieldsWithFingerprint(
+  tableName: string,
+  records: Record<string, unknown>[],
+): Promise<Record<string, unknown>[]> {
+  const fields = SENSITIVE_FIELDS[tableName]
+  if (!fields) return records
+  return Promise.all(
+    records.map(async (r) => {
+      const out: Record<string, unknown> = { ...r }
+      for (const field of fields) {
+        const value = out[field]
+        if (typeof value === 'string' && value.includes(':')) {
+          out[field] = await decryptField(value)
+        }
+      }
+      return out
+    }),
+  )
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────
@@ -86,7 +169,10 @@ export function isIsoDateString(value: unknown): boolean {
  * import side can revive them back to Date instances.
  */
 export function dateReviver(_key: string, value: unknown): unknown {
-  if (value instanceof Date) return { __date: value.toISOString() }
+  if (value instanceof Date) {
+    if (isNaN(value.getTime())) return null
+    return { __date: value.toISOString() }
+  }
   if (DATE_KEYS.has(_key) && isIsoDateString(value)) {
     return { __date: value as string }
   }
@@ -101,12 +187,27 @@ export function isDateObject(value: unknown): value is { __date: string } {
 
 // ─── Export ──────────────────────────────────────────────────────────
 
-export async function exportDatabase(): Promise<DatabaseBackup> {
+export interface ExportOptions {
+  /** Encrypt sensitive fields (applications/auditFindings) with a portable per-backup key. */
+  encrypt?: boolean
+}
+
+export async function exportDatabase(options?: ExportOptions): Promise<DatabaseBackup> {
   const tables: Record<string, Record<string, unknown>[]> = {}
+  const exportWarnings: string[] = []
+
+  let portableKey: PortableBackupKey | null = null
+  if (options?.encrypt) portableKey = await generatePortableBackupKey()
 
   await Promise.all(
     TABLE_NAMES.map(async (name) => {
-      tables[name] = await getTableData(name)
+      const { records, error } = await getTableData(name)
+      if (error) exportWarnings.push(`${name}: ${error}`)
+      let data = records
+      if (portableKey && SENSITIVE_FIELD_TABLES.has(name)) {
+        data = await encryptSensitiveFields(name, records, portableKey.key)
+      }
+      tables[name] = data
     }),
   )
 
@@ -115,6 +216,8 @@ export async function exportDatabase(): Promise<DatabaseBackup> {
     exportedAt: new Date().toISOString(),
     tables,
   }
+  if (exportWarnings.length > 0) backup.exportWarnings = exportWarnings
+  if (portableKey) backup.crypto = { key: portableKey.raw, algorithm: 'AES-GCM-256' }
 
   return backup
 }
@@ -135,7 +238,8 @@ export function saveBackupToStorage(backup: DatabaseBackup) {
 export function reviveDatesDeep(obj: unknown, parentKey?: string): unknown {
   // Backward compat: bare ISO date string on a known date key → revive
   if (parentKey && DATE_KEYS.has(parentKey) && isIsoDateString(obj)) {
-    return new Date(obj as string)
+    const d = new Date(obj as string)
+    return isNaN(d.getTime()) ? null : d
   }
   // Date already revived by JSON.parse — return as-is
   if (obj instanceof Date) return obj
@@ -151,7 +255,8 @@ export function reviveDatesDeep(obj: unknown, parentKey?: string): unknown {
     typeof asRecord.__date === 'string' &&
     Object.keys(asRecord).length === 1
   ) {
-    return new Date(asRecord.__date)
+    const d = new Date(asRecord.__date)
+    return isNaN(d.getTime()) ? null : d
   }
 
   const result: Record<string, unknown> = {}
@@ -201,6 +306,20 @@ const IMPORT_ORDER: string[] = [
   'teamSprints',
 ]
 
+export function isValidBackup(value: unknown): value is DatabaseBackup {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Partial<DatabaseBackup>
+  if (typeof candidate.version !== 'string' || candidate.version.length === 0) return false
+  if (
+    !candidate.tables ||
+    typeof candidate.tables !== 'object' ||
+    Array.isArray(candidate.tables)
+  ) {
+    return false
+  }
+  return Object.values(candidate.tables).some((records) => Array.isArray(records))
+}
+
 export async function importBackup(backup: DatabaseBackup): Promise<{
   success: boolean
   tablesRestored: string[]
@@ -213,12 +332,29 @@ export async function importBackup(backup: DatabaseBackup): Promise<{
   const errors: string[] = []
   let totalRecords = 0
 
+  let portableKey: CryptoKey | null = null
+  if (backup.crypto?.key) {
+    try {
+      portableKey = await importPortableBackupKey(backup.crypto.key)
+    } catch {
+      portableKey = null
+    }
+  }
+
   for (const tableName of IMPORT_ORDER) {
     const rawRecords = backup.tables[tableName]
     if (!rawRecords || rawRecords.length === 0) continue
 
     // Revive dates deeply and cast
-    const records = rawRecords.map((r) => reviveDatesDeep(r)) as Record<string, unknown>[]
+    let records = rawRecords.map((r) => reviveDatesDeep(r)) as Record<string, unknown>[]
+
+    // Decrypt sensitive fields: portable key when present, fingerprint key for legacy backups
+    if (SENSITIVE_FIELD_TABLES.has(tableName)) {
+      records = portableKey
+        ? await decryptSensitiveFields(tableName, records, portableKey)
+        : await decryptSensitiveFieldsWithFingerprint(tableName, records)
+    }
+
     let table: Dexie.Table
     try {
       table = db.table(tableName)
@@ -274,8 +410,14 @@ export function readBackupFromFile(file: File): Promise<DatabaseBackup> {
       try {
         const text = e.target?.result as string
         const backup = JSON.parse(text, (_key, value) => {
-          if (isDateObject(value)) return new Date(value.__date)
-          if (DATE_KEYS.has(_key) && isIsoDateString(value)) return new Date(value)
+          if (isDateObject(value)) {
+            const d = new Date(value.__date)
+            return isNaN(d.getTime()) ? null : d
+          }
+          if (DATE_KEYS.has(_key) && isIsoDateString(value)) {
+            const d = new Date(value as string)
+            return isNaN(d.getTime()) ? null : d
+          }
           return value
         }) as DatabaseBackup
         resolve(backup)
@@ -294,10 +436,12 @@ export function loadBackupFromStorage(): DatabaseBackup | null {
     if (!raw) return null
     return JSON.parse(raw, (_key, value) => {
       if (isDateObject(value)) {
-        return new Date(value.__date)
+        const d = new Date(value.__date)
+        return isNaN(d.getTime()) ? null : d
       }
       if (DATE_KEYS.has(_key) && isIsoDateString(value)) {
-        return new Date(value)
+        const d = new Date(value as string)
+        return isNaN(d.getTime()) ? null : d
       }
       return value
     }) as DatabaseBackup
@@ -314,10 +458,15 @@ export function getBackupInfo(): { exists: boolean; size: string; lastBackup: st
     if (!raw) return { exists: false, size: '0 B', lastBackup: null }
     const backup = JSON.parse(raw) as DatabaseBackup
     const sizeKB = Math.round(new Blob([raw]).size / 1024)
+    let lastBackup: string | null = null
+    if (backup.exportedAt) {
+      const d = new Date(backup.exportedAt)
+      lastBackup = isNaN(d.getTime()) ? null : d.toLocaleString('es-ES')
+    }
     return {
       exists: true,
       size: sizeKB < 1024 ? `${sizeKB} KB` : `${(sizeKB / 1024).toFixed(1)} MB`,
-      lastBackup: backup.exportedAt ? new Date(backup.exportedAt).toLocaleString('es-ES') : null,
+      lastBackup,
     }
   } catch {
     return { exists: false, size: '0 B', lastBackup: null }

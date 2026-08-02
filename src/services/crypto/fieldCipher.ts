@@ -74,3 +74,55 @@ export async function decryptField(ciphertext: string): Promise<string> {
     return ciphertext
   }
 }
+
+/* ─── Portable backup key ────────────────────────────────────────────
+ * The fingerprint key above is NOT portable (origin + userAgent + localStorage
+ * salt differ per device). For JSON backups we embed a random AES-GCM-256 key
+ * in the file (`backup.crypto.key`) so it decrypts anywhere — intentional
+ * trade-off: protects at-rest fields from casual inspection, not from anyone
+ * holding the file.
+ */
+
+export interface PortableBackupKey {
+  key: CryptoKey
+  raw: string
+}
+
+export async function generatePortableBackupKey(): Promise<PortableBackupKey> {
+  const rawBytes = crypto.getRandomValues(new Uint8Array(32))
+  const key = await crypto.subtle.importKey('raw', rawBytes, 'AES-GCM', false, [
+    'encrypt',
+    'decrypt',
+  ])
+  return { key, raw: bytesToBase64(rawBytes) }
+}
+
+export async function importPortableBackupKey(raw: string): Promise<CryptoKey> {
+  const rawBytes = base64ToBytes(raw)
+  if (rawBytes.length !== 32) throw new Error('Longitud de clave de backup inválida')
+  return crypto.subtle.importKey('raw', rawBytes, 'AES-GCM', false, ['encrypt', 'decrypt'])
+}
+
+export async function encryptFieldWithKey(plaintext: string, key: CryptoKey): Promise<string> {
+  if (!plaintext) return plaintext
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const enc = new TextEncoder()
+  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext))
+  return `${bytesToBase64(iv)}:${bytesToBase64(new Uint8Array(encrypted))}`
+}
+
+export async function decryptFieldWithKey(ciphertext: string, key: CryptoKey): Promise<string> {
+  if (!ciphertext || !ciphertext.includes(':')) return ciphertext
+  const parts = ciphertext.split(':')
+  if (parts.length !== 2) return ciphertext
+
+  try {
+    const iv = base64ToBytes(parts[0])
+    const data = base64ToBytes(parts[1])
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data)
+    return new TextDecoder().decode(decrypted)
+  } catch {
+    // Not encrypted with this key (plaintext containing ':' or wrong key) — leave as-is
+    return ciphertext
+  }
+}
