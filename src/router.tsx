@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import LandingPage from '@/features/landing/LandingPage'
 import { isTermsAccepted } from '@/features/auth/pages/TermsPage'
-import { isConfigured } from '@/services/auth/authService'
+import { isConfigured, getSession } from '@/services/auth/authService'
 import NotFoundPage from '@/features/landing/NotFoundPage'
 import { RouteErrorPage } from '@/components/error/RouteErrorPage'
 import { PublicDashboardPage } from '@/features/share/PublicDashboardPage'
@@ -26,7 +26,10 @@ import { TermsPage } from '@/features/share/TermsPage'
 import { appShellRoutes } from './router/appShellRoutes'
 
 function RootRoute() {
-  const ready = isTermsAccepted() && isConfigured()
+  // Redirect straight into the app when the OTP is configured OR an active
+  // session exists (user already accepted terms to get a session). Sessions
+  // survive browser restarts; getSession() also clears expired ones.
+  const ready = (isTermsAccepted() && isConfigured()) || getSession() !== null
   return ready ? <Navigate to="/dashboard" replace /> : <LandingPage />
 }
 
