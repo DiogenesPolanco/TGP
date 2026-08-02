@@ -30,7 +30,7 @@ function parseLegacyFunctionCall(
   // Si la raw empieza con leading comma, agregar la llave faltante
   if (!raw.startsWith('{')) {
     if (raw.startsWith(',')) {
-      raw = '{' + raw
+      raw = '{' + raw.replace(/^\s*,\s*/, '')
     } else {
       raw = '{' + raw + '}'
     }

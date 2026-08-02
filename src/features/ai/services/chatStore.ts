@@ -69,7 +69,7 @@ export async function saveMessages(
   }))
   await db.aiMessages.bulkPut(toStore)
   await db.aiConversations.update(conversationId, {
-    title: title || undefined,
+    ...(title ? { title } : {}),
     updatedAt: new Date(),
     messageCount: toStore.length,
   })
