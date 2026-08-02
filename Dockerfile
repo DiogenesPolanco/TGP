@@ -3,12 +3,11 @@ FROM node:22-slim AS build
 WORKDIR /app
 COPY package*.json ./
 ARG TARGETARCH
-RUN npm install -g npm@latest \
-  && npm ci --include=optional \
+RUN npm ci --include=optional \
   && case "${TARGETARCH}" in \
-       amd64) npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.3 ;; \
-       arm64) npm install --no-save @rolldown/binding-linux-arm64-gnu@1.0.3 ;; \
-       *) echo "Unsupported TARGETARCH: ${TARGETARCH}" && exit 1 ;; \
+       amd64) npm install --no-save --force @rolldown/binding-linux-x64-gnu@1.0.3 ;; \
+       arm64) npm install --no-save --force @rolldown/binding-linux-arm64-gnu@1.0.3 ;; \
+       *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2 && exit 1 ;; \
      esac
 COPY . .
 RUN npm run build
