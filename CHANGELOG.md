@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.12](https://github.com/DiogenesPolanco/TGP/compare/v1.1.11...v1.1.12) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **docker:** regenerate lockfile with all platform bindings ([779b3c1](https://github.com/DiogenesPolanco/TGP/commit/779b3c1b10163f5f34ca604917db687608ccb069))
+
+### 📦 Chores
+
+- **docker:** exclude deb packages from build context ([92ed814](https://github.com/DiogenesPolanco/TGP/commit/92ed8142a7cf1b0566fb519bd2baecb8b51af48c))
+
 ### [1.1.11](https://github.com/DiogenesPolanco/TGP/compare/v1.1.10...v1.1.11) (2026-08-02)
 
 ### 🐛 Bug Fixes
