@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.9](https://github.com/DiogenesPolanco/TGP/compare/v1.1.8...v1.1.9) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **docker:** keep nginx.conf in build context ([ddbbf00](https://github.com/DiogenesPolanco/TGP/commit/ddbbf00468b6bb0e33b04f1ad3741a090b4a0032))
+
 ### [1.1.8](https://github.com/DiogenesPolanco/TGP/compare/v1.1.7...v1.1.8) (2026-08-02)
 
 ### 📦 Chores
