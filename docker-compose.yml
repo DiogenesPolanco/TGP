@@ -1,0 +1,7 @@
+services:
+  tgp:
+    image: ghcr.io/diogenespolanco/tgp:latest
+    build: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped
