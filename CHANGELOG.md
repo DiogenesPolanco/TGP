@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.7](https://github.com/DiogenesPolanco/TGP/compare/v1.1.6...v1.1.7) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **auth:** redirect to dashboard when an active session exists ([3b38866](https://github.com/DiogenesPolanco/TGP/commit/3b388664ee40123bafc23d15a7e135cf9bd04efa))
+- **onboarding:** keep wizard mounted across route changes ([2210415](https://github.com/DiogenesPolanco/TGP/commit/221041586453184f63bb7f4fcb3feed94567aa83))
+
+### 🧪 Tests
+
+- **ai:** add unit tests and fix groq rescue and chatstore title bugs ([8d641f0](https://github.com/DiogenesPolanco/TGP/commit/8d641f0b49b4283a4ee41a7f24f9661e0243092a))
+
 ### [1.1.6](https://github.com/DiogenesPolanco/TGP/compare/v1.1.5...v1.1.6) (2026-08-02)
 
 ### 🐛 Bug Fixes
