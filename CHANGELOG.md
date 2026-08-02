@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.11](https://github.com/DiogenesPolanco/TGP/compare/v1.1.10...v1.1.11) (2026-08-02)
+
+### 🐛 Bug Fixes
+
+- **docker:** use bundled npm to avoid lockfile eusage ([3b9c34d](https://github.com/DiogenesPolanco/TGP/commit/3b9c34d40db0b169cefc8c5b65c5174e017d02a4))
+
 ### [1.1.10](https://github.com/DiogenesPolanco/TGP/compare/v1.1.9...v1.1.10) (2026-08-02)
 
 ### 🐛 Bug Fixes
