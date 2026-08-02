@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+.github
+coverage
+.codegraph
+.playwright-mcp
+.tmp
+docs
+e2e
+Dockerfile
+docker-compose.yml
+nginx.conf
+*.log
+.env
+.env.*
