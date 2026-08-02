@@ -143,6 +143,22 @@ Decisiones arquitectónicas clave:
 
 ---
 
+## 🐳 Deployment On-Premise (Docker)
+
+Despliega TGP en tu propio servidor (LAN o nube privada) con una sola imagen multi-arch (amd64 + arm64) publicada en GitHub Container Registry y Docker Hub.
+
+```bash
+# Opción A: imagen publicada
+docker compose up -d
+
+# Opción B: construir localmente desde el repo
+docker compose up -d --build
+```
+
+La app queda disponible en `http://<servidor>:8080`. Cambia el puerto en `docker-compose.yml` si lo necesitas. Para HTTPS, apunta un reverse proxy (Caddy, Nginx o Traefik) al puerto del contenedor.
+
+---
+
 ## Estado del Proyecto
 
 Desarrollo activo. Construido para necesidades de gobierno empresarial, diseñado para ser autónomo y fácil de desplegar — solo sirve la carpeta de build estático.
