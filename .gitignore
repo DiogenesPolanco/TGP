@@ -74,3 +74,6 @@ coverage-ts/
 .husky/_/
 .tmp/
 release/
+
+# Documentación local (specs/plans de trabajo)
+/docs
