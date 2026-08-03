@@ -1,0 +1,321 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  actions: write
+  checks: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  lint-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: ESLint
+        run: npm run lint
+      - name: Prettier Check
+        run: npm run format:check
+
+  type-check:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: tsc --noEmit
+        run: npx tsc --noEmit
+
+  tests:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Unit Tests + Coverage
+        run: npx vitest run --coverage --reporter=verbose
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: npm audit
+        run: npm audit --audit-level=high
+
+  build:
+    name: Build
+    needs: [lint-format, type-check, tests, security]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+  version:
+    name: Version Bump
+    needs: [build]
+    runs-on: ubuntu-latest
+    outputs:
+      bumped: ${{ steps.bump.outputs.bumped }}
+      new_tag: ${{ steps.bump.outputs.new_tag }}
+      new_version: ${{ steps.bump.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version (standard-version)
+        id: bump
+        run: |
+          OUTPUT=$(npx standard-version --dry-run 2>&1 || true)
+          echo "$OUTPUT"
+
+          if echo "$OUTPUT" | grep -q "bumping version"; then
+            echo "New commits detected — bumping version..."
+            npx standard-version
+            NEW_TAG=$(git describe --tags --abbrev=0)
+            echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+            echo "new_version=${NEW_TAG#v}" >> "$GITHUB_OUTPUT"
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No feature/fix commits since last tag — skipping bump"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push release commit and tag
+        if: steps.bump.outputs.bumped == 'true'
+        run: git push --follow-tags origin master
+
+  docker-publish:
+    name: Publish Docker Image
+    needs: [version]
+    if: needs.version.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.new_tag }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/diogenespolanco/tgp
+            diogenespolanco/tgp
+          tags: |
+            type=raw,value=${{ needs.version.outputs.new_tag }}
+            type=raw,value=${{ needs.version.outputs.new_version }}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=master,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  azure-deploy:
+    name: Deploy to Azure
+    needs: [version]
+    if: needs.version.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.new_tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build
+
+      - name: Build and Deploy to Azure
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /
+          api_location: ''
+          output_location: dist
+
+  desktop-build:
+    name: Desktop Build ${{ matrix.platform }}
+    needs: [version]
+    if: needs.version.outputs.bumped == 'true'
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            target: --linux --x64
+            artifact_name: TGP-Linux-x64
+          - os: windows-latest
+            platform: win
+            target: --win --x64
+            artifact_name: TGP-Windows-x64
+          - os: macos-latest
+            platform: mac
+            target: --mac --x64 --arm64
+            artifact_name: TGP-Mac
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.new_tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Build desktop installer (${{ matrix.platform }})
+        run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          CI: true
+
+      - name: Prepare installer artifacts
+        shell: bash
+        run: |
+          rm -rf release/*/ release/builder-debug.yml release/*.nsis.7z
+          rm -f release/latest*.yml release/*.blockmap
+          echo "=== Installer artifacts ==="
+          ls -lh release/
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: release/
+          retention-days: 30
+
+  desktop-release:
+    name: Create Desktop Release
+    needs: [version, desktop-build]
+    if: needs.version.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.new_tag }}
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate release notes
+        run: |
+          echo "## TGP Desktop Release ${{ needs.version.outputs.new_tag }}" > release-notes.md
+          echo "" >> release-notes.md
+          echo "### Instaladores disponibles:" >> release-notes.md
+          echo "- **Linux**: AppImage + deb (portable + instalable)" >> release-notes.md
+          echo "- **Windows**: NSIS installer (.exe)" >> release-notes.md
+          echo "- **Mac**: DMG (Intel + Apple Silicon)" >> release-notes.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.new_tag }}
+          name: "TGP Desktop ${{ needs.version.outputs.new_tag }}"
+          body_path: release-notes.md
+          files: |
+            artifacts/**/*
+          draft: false
+          prerelease: false
