@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.18](https://github.com/DiogenesPolanco/TGP/compare/v1.1.17...v1.1.18) (2026-08-06)
+
+### 👷 CI
+
+- filtrar artifacts de desktop en gh release create ([e5efbd3](https://github.com/DiogenesPolanco/TGP/commit/e5efbd3b1aaaa876bd637f1e758ab648a0c4d28d))
+
 ### [1.1.17](https://github.com/DiogenesPolanco/TGP/compare/v1.1.16...v1.1.17) (2026-08-06)
 
 ### 👷 CI
