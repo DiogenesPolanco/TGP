@@ -13,9 +13,7 @@ export function LockoutScreen({ lockoutMs }: { lockoutMs: number }) {
       <div className="w-14 h-14 bg-danger/10 rounded-full flex items-center justify-center mx-auto">
         <Lock size={28} className="text-danger" />
       </div>
-      <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
-        Demasiados intentos
-      </h2>
+      <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Demasiados intentos</h2>
       <p className="text-sm text-muted">Cuenta bloqueada temporalmente por seguridad</p>
       <div className="flex items-center justify-center gap-2 text-danger font-medium">
         <Clock size={18} />

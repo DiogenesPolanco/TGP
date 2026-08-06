@@ -90,7 +90,10 @@ export function MembersFilterBar({
             />
           </div>
           {hasActiveFilters && (
-            <Button onClick={onClearFilters} className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger">
+            <Button
+              onClick={onClearFilters}
+              className="flex items-center gap-1 px-2 py-1.5 text-xs text-danger"
+            >
               <X size={14} />
               Limpiar
             </Button>

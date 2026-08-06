@@ -136,7 +136,9 @@ export function RoadmapSection({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-neutral-50 mb-1">Fecha Objetivo</label>
+              <label className="block text-xs font-medium text-neutral-50 mb-1">
+                Fecha Objetivo
+              </label>
               <input
                 type="date"
                 value={form.targetDate}
@@ -216,9 +218,7 @@ export function RoadmapSection({
                   <span className="text-xs text-neutral-50 capitalize bg-neutral-10 dark:bg-neutral-70 px-1.5 py-0.5 rounded">
                     {item.type}
                   </span>
-                  {isOverdue && (
-                    <span className="text-xs text-danger font-medium">Vencido</span>
-                  )}
+                  {isOverdue && <span className="text-xs text-danger font-medium">Vencido</span>}
                 </div>
                 {item.description && (
                   <p className="text-xs text-muted mt-0.5">{item.description}</p>

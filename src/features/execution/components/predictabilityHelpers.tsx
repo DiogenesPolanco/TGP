@@ -139,9 +139,7 @@ export function createPeriodColumns(
       key: 'label',
       label: 'Período',
       sortable: true,
-      render: (p) => (
-        <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>
-      ),
+      render: (p) => <span className="font-medium text-neutral-90 dark:text-white">{p.label}</span>,
     },
     {
       key: 'avgPredictability',

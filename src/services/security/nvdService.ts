@@ -35,14 +35,25 @@ export async function searchCvesByKeyword(
     const res = await fetch(`https://services.nvd.nist.gov/rest/json/cves/2.0?${params}`)
 
     if (!res.ok) {
-      const result: NvdSearchResult = { totalResults: 0, results: [], error: `Error HTTP ${res.status} al consultar NVD` }
+      const result: NvdSearchResult = {
+        totalResults: 0,
+        results: [],
+        error: `Error HTTP ${res.status} al consultar NVD`,
+      }
       SEARCH_CACHE.set(cacheKey, result)
       return result
     }
 
     const json = await res.json()
     const totalResults = json.totalResults ?? 0
-    const vulns: { cve: { id: string; descriptions: { lang: string; value: string }[]; metrics?: Record<string, { cvssData?: { baseSeverity?: string; baseScore?: number } }[]>; published?: string } }[] = json.vulnerabilities ?? []
+    const vulns: {
+      cve: {
+        id: string
+        descriptions: { lang: string; value: string }[]
+        metrics?: Record<string, { cvssData?: { baseSeverity?: string; baseScore?: number } }[]>
+        published?: string
+      }
+    }[] = json.vulnerabilities ?? []
 
     const results: NvdCveResult[] = vulns.map((v) => {
       const cve = v.cve
@@ -75,9 +86,10 @@ export async function searchCvesByKeyword(
     SEARCH_CACHE.set(cacheKey, result)
     return result
   } catch (err) {
-    const message = err instanceof TypeError
-      ? `Error de red al consultar NVD: sin conexión o timeout`
-      : `Error al consultar NVD: ${err instanceof Error ? err.message : 'desconocido'}`
+    const message =
+      err instanceof TypeError
+        ? `Error de red al consultar NVD: sin conexión o timeout`
+        : `Error al consultar NVD: ${err instanceof Error ? err.message : 'desconocido'}`
     const result: NvdSearchResult = { totalResults: 0, results: [], error: message }
     SEARCH_CACHE.set(cacheKey, result)
     return result

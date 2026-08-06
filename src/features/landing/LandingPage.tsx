@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { getSession } from '@/services/auth/authService'
 import { LandingHero } from './components/LandingHero'
 import { LandingDashboardPreview } from './components/LandingDashboardPreview'

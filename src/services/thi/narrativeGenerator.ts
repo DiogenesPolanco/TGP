@@ -55,7 +55,10 @@ const DEFAULT_THI_RANGES = [
   { min: 0, max: 29, label: 'Crítico' },
 ]
 
-function getThiLabel(score: number, ranges?: Record<string, { min: number; max: number; label: string }>): string {
+function getThiLabel(
+  score: number,
+  ranges?: Record<string, { min: number; max: number; label: string }>,
+): string {
   if (ranges) {
     for (const r of Object.values(ranges)) {
       if (score >= r.min && score <= r.max) return r.label

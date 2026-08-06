@@ -27,12 +27,9 @@ export function SprintCard({ sprint: s, onEdit, onDelete }: Props) {
   const effPct = totalSP > 0 ? Math.round((doneSP / totalSP) * 100) : 0
   const plannedPct = s.plannedSP > 0 ? Math.round((doneSP / s.plannedSP) * 100) : 0
 
-  const effColor =
-    effPct >= 80 ? 'text-success' : effPct >= 50 ? 'text-warning' : 'text-danger'
-  const effBg =
-    effPct >= 80 ? 'bg-success/10' : effPct >= 50 ? 'bg-warning/10' : 'bg-danger/10'
-  const progressColor =
-    effPct >= 80 ? 'bg-success' : effPct >= 50 ? 'bg-warning' : 'bg-danger'
+  const effColor = effPct >= 80 ? 'text-success' : effPct >= 50 ? 'text-warning' : 'text-danger'
+  const effBg = effPct >= 80 ? 'bg-success/10' : effPct >= 50 ? 'bg-warning/10' : 'bg-danger/10'
+  const progressColor = effPct >= 80 ? 'bg-success' : effPct >= 50 ? 'bg-warning' : 'bg-danger'
 
   return (
     <div className="bg-card rounded-xl border border-boundary p-4 shadow-sm hover:shadow-md transition-all duration-200 group/sprint">
@@ -42,7 +39,9 @@ export function SprintCard({ sprint: s, onEdit, onDelete }: Props) {
             <h4 className="text-base font-semibold text-neutral-90 dark:text-white truncate">
               {s.sprintName}
             </h4>
-            <div className={`shrink-0 px-2 py-0.5 text-xs font-bold rounded-md ${effBg} ${effColor}`}>
+            <div
+              className={`shrink-0 px-2 py-0.5 text-xs font-bold rounded-md ${effBg} ${effColor}`}
+            >
               {effPct}%
             </div>
           </div>
@@ -55,7 +54,9 @@ export function SprintCard({ sprint: s, onEdit, onDelete }: Props) {
       <div className="mb-3">
         <div className="flex items-center justify-between text-[11px] text-neutral-50 mb-1">
           <span>Progreso de ejecución</span>
-          <span>{doneSP}/{totalSP || s.plannedSP} SP</span>
+          <span>
+            {doneSP}/{totalSP || s.plannedSP} SP
+          </span>
         </div>
         <div className="w-full bg-neutral-20 dark:bg-neutral-70 rounded-full h-2 overflow-hidden">
           <div
@@ -71,7 +72,9 @@ export function SprintCard({ sprint: s, onEdit, onDelete }: Props) {
           <p className="text-sm font-bold text-neutral-90 dark:text-white mt-0.5">{s.plannedSP}</p>
         </div>
         <div className="text-center py-2 px-1 rounded-lg bg-success/5">
-          <p className="text-[10px] font-medium text-success uppercase tracking-wider">Completado</p>
+          <p className="text-[10px] font-medium text-success uppercase tracking-wider">
+            Completado
+          </p>
           <p className="text-sm font-bold text-success mt-0.5">{doneSP}</p>
         </div>
         <div className="text-center py-2 px-1 rounded-lg bg-danger/5">

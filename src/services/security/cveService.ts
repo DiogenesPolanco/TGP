@@ -37,7 +37,10 @@ export async function lookupCve(cveId: string): Promise<CveLookupResult> {
     }
 
     if (!res.ok) {
-      const result: CveLookupResult = { data: null, error: `Error HTTP ${res.status} al consultar ${id}` }
+      const result: CveLookupResult = {
+        data: null,
+        error: `Error HTTP ${res.status} al consultar ${id}`,
+      }
       CACHE.set(id, result)
       return result
     }
@@ -45,9 +48,9 @@ export async function lookupCve(cveId: string): Promise<CveLookupResult> {
     const json = await res.json()
     const cna = json.containers?.cna
 
-    const description = cna?.descriptions?.find(
-      (d: { lang: string; value: string }) => d.lang === 'en',
-    )?.value ?? null
+    const description =
+      cna?.descriptions?.find((d: { lang: string; value: string }) => d.lang === 'en')?.value ??
+      null
 
     const data: CveData = {
       cveId: id,
@@ -60,9 +63,10 @@ export async function lookupCve(cveId: string): Promise<CveLookupResult> {
     CACHE.set(id, result)
     return result
   } catch (err) {
-    const message = err instanceof TypeError
-      ? `Error de red al consultar ${id}: sin conexión o timeout`
-      : `Error al consultar ${id}: ${err instanceof Error ? err.message : 'desconocido'}`
+    const message =
+      err instanceof TypeError
+        ? `Error de red al consultar ${id}: sin conexión o timeout`
+        : `Error al consultar ${id}: ${err instanceof Error ? err.message : 'desconocido'}`
 
     const result: CveLookupResult = { data: null, error: message }
     CACHE.set(id, result)

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { XCircle, Calendar, CheckCircle2, ArrowRight, Pencil, ListTodo, Ban } from 'lucide-react'
 import type { Blocker, Activity, Commitment, Task } from '@/types/domain'
 import { Button } from '@/components/ui/Button'

@@ -58,7 +58,12 @@ function GobiaMessage({ msg, index }: { msg: (typeof MSGS)[number]; index: numbe
       <div className="flex justify-end">
         <div
           className="font-mono text-xs leading-relaxed rounded-sm"
-          style={{ color: '#e8edf5', background: 'rgba(0,255,136,0.06)', padding: '10px 14px', maxWidth: '80%' }}
+          style={{
+            color: '#e8edf5',
+            background: 'rgba(0,255,136,0.06)',
+            padding: '10px 14px',
+            maxWidth: '80%',
+          }}
         >
           {msg.text}
         </div>
@@ -69,15 +74,30 @@ function GobiaMessage({ msg, index }: { msg: (typeof MSGS)[number]; index: numbe
   return (
     <div key={index} className="gobia-msg" style={{ animationDelay: `${index * 2.2}s` }}>
       <div className="flex items-start gap-3">
-        <div className="w-5 h-5 shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5" style={{ border: '1px solid rgba(0,255,136,0.15)', borderRadius: 3, color: '#00ff88' }}>
+        <div
+          className="w-5 h-5 shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5"
+          style={{ border: '1px solid rgba(0,255,136,0.15)', borderRadius: 3, color: '#00ff88' }}
+        >
           G
         </div>
-        <div className="font-mono text-xs leading-relaxed rounded-sm" style={{ color: '#b0b8c8', background: 'rgba(0,255,136,0.02)', padding: '10px 14px', maxWidth: '90%' }}>
+        <div
+          className="font-mono text-xs leading-relaxed rounded-sm"
+          style={{
+            color: '#b0b8c8',
+            background: 'rgba(0,255,136,0.02)',
+            padding: '10px 14px',
+            maxWidth: '90%',
+          }}
+        >
           {msg.text.split('\n').map((line, j, arr) => (
             <span key={j}>
-              {line.startsWith('• ') ? <span style={{ color: '#6b7a99' }}>{line}</span>
-                : line.startsWith('✅ ') ? <span style={{ color: '#00ff88' }}>{line}</span>
-                  : <span>{line}</span>}
+              {line.startsWith('• ') ? (
+                <span style={{ color: '#6b7a99' }}>{line}</span>
+              ) : line.startsWith('✅ ') ? (
+                <span style={{ color: '#00ff88' }}>{line}</span>
+              ) : (
+                <span>{line}</span>
+              )}
               {j < arr.length - 1 && <br />}
             </span>
           ))}
@@ -91,17 +111,39 @@ export function LandingGobiaDemo() {
   return (
     <>
       <section className="py-16">
-        <h2 className="font-mono text-[13px] uppercase tracking-[3px] mb-10 text-center" style={{ color: '#6b7a99' }}>
+        <h2
+          className="font-mono text-[13px] uppercase tracking-[3px] mb-10 text-center"
+          style={{ color: '#6b7a99' }}
+        >
           GobIA — Asistente de Gobierno
         </h2>
-        <div className="max-w-[640px] mx-auto rounded-sm overflow-hidden" style={{ border: '1px solid rgba(0,255,136,0.08)', background: 'rgba(0,0,0,0.3)' }}>
-          <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: '1px solid rgba(0,255,136,0.06)', background: 'rgba(0,255,136,0.02)' }}>
-            <div className="w-6 h-6 flex items-center justify-center text-[11px] font-bold" style={{ border: '1px solid rgba(0,255,136,0.2)', borderRadius: 4, color: '#00ff88' }}>
+        <div
+          className="max-w-[640px] mx-auto rounded-sm overflow-hidden"
+          style={{ border: '1px solid rgba(0,255,136,0.08)', background: 'rgba(0,0,0,0.3)' }}
+        >
+          <div
+            className="flex items-center gap-3 px-5 py-3"
+            style={{
+              borderBottom: '1px solid rgba(0,255,136,0.06)',
+              background: 'rgba(0,255,136,0.02)',
+            }}
+          >
+            <div
+              className="w-6 h-6 flex items-center justify-center text-[11px] font-bold"
+              style={{ border: '1px solid rgba(0,255,136,0.2)', borderRadius: 4, color: '#00ff88' }}
+            >
               G
             </div>
             <div className="flex-1">
-              <div className="font-mono text-[11px] font-semibold" style={{ color: '#e8edf5' }}>GobIA</div>
-              <div className="font-mono text-[9px] tracking-wider" style={{ color: 'rgba(0,255,136,0.3)' }}>online · groq/llama-4</div>
+              <div className="font-mono text-[11px] font-semibold" style={{ color: '#e8edf5' }}>
+                GobIA
+              </div>
+              <div
+                className="font-mono text-[9px] tracking-wider"
+                style={{ color: 'rgba(0,255,136,0.3)' }}
+              >
+                online · groq/llama-4
+              </div>
             </div>
           </div>
 
@@ -112,13 +154,25 @@ export function LandingGobiaDemo() {
 
             <div className="gobia-msg" style={{ animationDelay: '8.8s' }}>
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5" style={{ border: '1px solid rgba(0,255,136,0.15)', borderRadius: 3, color: '#00ff88' }}>
+                <div
+                  className="w-5 h-5 shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5"
+                  style={{
+                    border: '1px solid rgba(0,255,136,0.15)',
+                    borderRadius: 3,
+                    color: '#00ff88',
+                  }}
+                >
                   G
                 </div>
                 <div className="flex gap-1 items-center h-5">
                   {[0, 1, 2].map((d) => (
-                    <span key={d} className="w-1.5 h-1.5 rounded-full inline-block"
-                      style={{ background: '#00ff88', animation: `gobia-dot 1.4s ease-in-out infinite ${d * 0.2}s` }}
+                    <span
+                      key={d}
+                      className="w-1.5 h-1.5 rounded-full inline-block"
+                      style={{
+                        background: '#00ff88',
+                        animation: `gobia-dot 1.4s ease-in-out infinite ${d * 0.2}s`,
+                      }}
                     />
                   ))}
                 </div>

@@ -2,7 +2,7 @@ import { Wrench, ClipboardList, ExternalLink, User, Pencil } from 'lucide-react'
 import { TicketTypeBadge, TicketStatusBadge } from './equipmentDetailComponents'
 import type { EquipmentTicket, MemberProfile, Team } from '@/types/domain'
 import { Button } from '@/components/ui/Button'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 export function EquipmentTicketsTab({
   tickets,

@@ -128,9 +128,7 @@ export function SprintForm({ initial, members, memberIds, onSave, onCancel, subm
       </div>
       <div className="grid gap-3 sm:grid-cols-3 mb-3">
         <div>
-          <label className="text-xs font-medium text-neutral-60 mb-1 block">
-            SP Planificados
-          </label>
+          <label className="text-xs font-medium text-neutral-60 mb-1 block">SP Planificados</label>
           <input
             type="number"
             value={form.plannedSP}
@@ -173,11 +171,7 @@ export function SprintForm({ initial, members, memberIds, onSave, onCancel, subm
               : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
           }`}
         >
-          {validationMsg.type === 'ok' ? (
-            <CheckCircle2 size={14} />
-          ) : (
-            <AlertTriangle size={14} />
-          )}
+          {validationMsg.type === 'ok' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
           <span>{validationMsg.text}</span>
         </div>
       )}

@@ -12,8 +12,14 @@ export function AuthBrandPanel({ children }: { children: ReactNode }) {
         }}
       />
       {/* Glows verde/dorado */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.10) 0%, transparent 70%)' }} />
-      <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,185,0,0.06) 0%, transparent 70%)' }} />
+      <div
+        className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,255,136,0.10) 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(255,185,0,0.06) 0%, transparent 70%)' }}
+      />
       <div className="relative flex items-center gap-3 mb-8">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-400/20 flex items-center justify-center backdrop-blur-sm">
           <img src="/favicon.svg" alt="TGP" className="w-full h-full" />

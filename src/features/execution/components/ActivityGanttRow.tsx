@@ -1,4 +1,13 @@
-import { ChevronDown, ChevronUp, Circle, Clock, CheckCircle2, XCircle, Pencil, Trash2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Pencil,
+  Trash2,
+} from 'lucide-react'
 import type { Activity } from '@/types/domain'
 import type { DeliverableStatus } from '@/constants/enums'
 import { Button } from '@/components/ui/Button'

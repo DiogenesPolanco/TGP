@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Clock, Target } from 'lucide-react'
 import type { Blocker, Activity, Commitment, Task, Plan } from '@/types/domain'
 

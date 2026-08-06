@@ -2,13 +2,19 @@ import type { SupportStatus, Technology } from '@/types/domain'
 
 export type StatusFilter = SupportStatus | 'all' | 'mixed'
 
-export function getWorstStatus(techIds: string[], techMap: Map<string, Technology>): SupportStatus | 'mixed' {
+export function getWorstStatus(
+  techIds: string[],
+  techMap: Map<string, Technology>,
+): SupportStatus | 'mixed' {
   if (techIds.length === 0) return 'unknown'
-  let hasExtended = false, hasUnknown = false, hasActive = false
+  let hasExtended = false,
+    hasUnknown = false,
+    hasActive = false
   for (const tId of techIds) {
     const tech = techMap.get(tId)
-    if (!tech || tech.supportStatus === 'unknown') { hasUnknown = true }
-    else if (tech.supportStatus === 'eol') return 'eol'
+    if (!tech || tech.supportStatus === 'unknown') {
+      hasUnknown = true
+    } else if (tech.supportStatus === 'eol') return 'eol'
     else if (tech.supportStatus === 'extended') hasExtended = true
     else if (tech.supportStatus === 'active') hasActive = true
   }

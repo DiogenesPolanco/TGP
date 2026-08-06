@@ -6,7 +6,11 @@ export async function getConfig<T = unknown>(key: string): Promise<T | null> {
   return entry ? (entry.value as T) : null
 }
 
-export async function setConfig<T = unknown>(key: string, value: T, description?: string): Promise<void> {
+export async function setConfig<T = unknown>(
+  key: string,
+  value: T,
+  description?: string,
+): Promise<void> {
   await db.systemConfig.put({
     key,
     value,

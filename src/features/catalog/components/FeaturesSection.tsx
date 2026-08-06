@@ -139,7 +139,9 @@ export function FeaturesSection({
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-neutral-90 dark:text-white">{f.name}</span>
+                <span className="text-sm font-medium text-neutral-90 dark:text-white">
+                  {f.name}
+                </span>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${featureStatusColor[f.status]}`}
                 >
@@ -154,9 +156,7 @@ export function FeaturesSection({
                 </span>
                 <span className="text-xs text-neutral-50 capitalize">{f.category}</span>
               </div>
-              {f.description && (
-                <p className="text-xs text-muted mt-0.5">{f.description}</p>
-              )}
+              {f.description && <p className="text-xs text-muted mt-0.5">{f.description}</p>}
             </div>
             <div className="flex items-center gap-1 shrink-0 ml-2">
               <button

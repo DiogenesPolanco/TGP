@@ -41,27 +41,28 @@ export function LoginPanel({
           tecnológico
         </h2>
         <p className="text-base leading-relaxed opacity-85 mb-5">
-          Accede a tu portafolio de aplicaciones, métricas DORA, riesgos, vulnerabilidades
-          y más en un solo lugar.
+          Accede a tu portafolio de aplicaciones, métricas DORA, riesgos, vulnerabilidades y más en
+          un solo lugar.
         </p>
         <ul className="space-y-3 text-base">
-          {['THI y KPIs en tiempo real', 'Alertas automáticas', 'Equipos y OKRs', 'Obsolescencia EOL'].map(
-            (item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
-                <span className="opacity-90">{item}</span>
-              </li>
-            ),
-          )}
+          {[
+            'THI y KPIs en tiempo real',
+            'Alertas automáticas',
+            'Equipos y OKRs',
+            'Obsolescencia EOL',
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <Check size={16} className="mt-0.5 shrink-0 opacity-70" />
+              <span className="opacity-90">{item}</span>
+            </li>
+          ))}
         </ul>
       </AuthBrandPanel>
       <PerforatedDivider />
       <div className="lg:w-[58%] p-8 lg:p-10 bg-gradient-to-b from-[#0e0e18] to-neutral-900 flex flex-col justify-center">
         <div className="max-w-sm mx-auto w-full space-y-6">
           <div>
-            <h3 className="text-xl font-bold text-white">
-              Autenticación OTP
-            </h3>
+            <h3 className="text-xl font-bold text-white">Autenticación OTP</h3>
             <p className="text-base text-neutral-400 mt-1">
               Ingresa el código de 6 dígitos de tu app
             </p>
@@ -69,7 +70,12 @@ export function LoginPanel({
 
           <form onSubmit={onSubmit} className="space-y-5">
             <div>
-              <OtpInput inputRef={inputRef} value={otp} onChange={onOtpChange} className="text-4xl py-5" />
+              <OtpInput
+                inputRef={inputRef}
+                value={otp}
+                onChange={onOtpChange}
+                className="text-4xl py-5"
+              />
             </div>
 
             {error && (

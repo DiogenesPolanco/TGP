@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import type { Team } from '@/types/domain'
 import { Users, ArrowRight } from 'lucide-react'

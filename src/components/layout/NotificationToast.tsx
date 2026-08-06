@@ -66,22 +66,25 @@ function ToastItem({
   }, [duration, handleClose])
 
   // Mouse drag to dismiss
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    dragStart.current = e.clientX
-    const handleMove = (ev: PointerEvent) => {
-      const delta = ev.clientX - dragStart.current
-      if (delta > 0) setOffsetX(delta)
-    }
-    const handleUp = (ev: PointerEvent) => {
-      const delta = ev.clientX - dragStart.current
-      if (delta > 80) handleClose()
-      else setOffsetX(0)
-      document.removeEventListener('pointermove', handleMove)
-      document.removeEventListener('pointerup', handleUp)
-    }
-    document.addEventListener('pointermove', handleMove)
-    document.addEventListener('pointerup', handleUp)
-  }, [handleClose])
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      dragStart.current = e.clientX
+      const handleMove = (ev: PointerEvent) => {
+        const delta = ev.clientX - dragStart.current
+        if (delta > 0) setOffsetX(delta)
+      }
+      const handleUp = (ev: PointerEvent) => {
+        const delta = ev.clientX - dragStart.current
+        if (delta > 80) handleClose()
+        else setOffsetX(0)
+        document.removeEventListener('pointermove', handleMove)
+        document.removeEventListener('pointerup', handleUp)
+      }
+      document.addEventListener('pointermove', handleMove)
+      document.addEventListener('pointerup', handleUp)
+    },
+    [handleClose],
+  )
 
   return (
     <div
@@ -92,21 +95,23 @@ function ToastItem({
         min-w-[280px] max-w-sm w-full select-none cursor-default
         bg-white dark:bg-[#1a1a24]
         transition-all duration-250 ease-out
-        ${exiting
-          ? 'opacity-0 translate-x-8 scale-95'
-          : mounted
-            ? 'opacity-100 translate-x-0 scale-100'
-            : 'opacity-0 translate-x-4'
+        ${
+          exiting
+            ? 'opacity-0 translate-x-8 scale-95'
+            : mounted
+              ? 'opacity-100 translate-x-0 scale-100'
+              : 'opacity-0 translate-x-4'
         }
       `}
       style={{
-        transform: offsetX > 0
-          ? `translateX(${offsetX}px)`
-          : exiting
-            ? undefined
-            : mounted
+        transform:
+          offsetX > 0
+            ? `translateX(${offsetX}px)`
+            : exiting
               ? undefined
-              : undefined,
+              : mounted
+                ? undefined
+                : undefined,
         opacity: offsetX > 0 ? Math.max(0, 1 - offsetX / 300) : undefined,
         transition: offsetX > 0 ? 'none' : undefined,
       }}

@@ -92,9 +92,9 @@ export function ArchitectureTab({ applicationId }: ArchitectureTabProps) {
                 {appTechnologies.map((tech) => (
                   <span
                     key={tech.id}
-                    className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${
-                      techStatusColor(tech.supportStatus)
-                    } ${tech.supportStatus === 'eol' ? 'ring-1 ring-danger/30' : ''}`}
+                    className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${techStatusColor(
+                      tech.supportStatus,
+                    )} ${tech.supportStatus === 'eol' ? 'ring-1 ring-danger/30' : ''}`}
                   >
                     {categoryIcons[tech.category] || <Box size={14} />}
                     {tech.name}

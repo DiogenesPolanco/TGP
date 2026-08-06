@@ -13,7 +13,8 @@ const supportStatusColor: Record<string, string> = {
   active: 'bg-success/10 text-success border-success/30',
   extended: 'bg-warning/10 text-warning border-warning/30',
   eol: 'bg-danger/10 text-danger border-danger/30',
-  unknown: 'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60',
+  unknown:
+    'bg-neutral-10 dark:bg-neutral-70 text-neutral-60 border-neutral-30 dark:border-neutral-60',
 }
 
 const categoryLabel: Record<string, string> = {

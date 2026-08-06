@@ -2,7 +2,9 @@ import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 
 function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {
   if (!active)
-    return <ArrowUpDown size={14} className="opacity-30 group-hover:opacity-60 transition-opacity" />
+    return (
+      <ArrowUpDown size={14} className="opacity-30 group-hover:opacity-60 transition-opacity" />
+    )
   return dir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
 }
 

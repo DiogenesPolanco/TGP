@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -219,9 +219,7 @@ export function TeamDetailPage() {
                       <p className="text-sm font-medium text-neutral-90 dark:text-white">
                         {member.displayName}
                       </p>
-                      <p className="text-xs text-muted">
-                        {roleLabels[member.role] ?? member.role}
-                      </p>
+                      <p className="text-xs text-muted">{roleLabels[member.role] ?? member.role}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

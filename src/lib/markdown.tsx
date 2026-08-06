@@ -61,9 +61,7 @@ function CodeBlock({ code, lang }: { code: string; lang: string }) {
 
 // ─── Block-level parser ───────────────────────────────────────────
 
-type Block =
-  | { type: 'code'; lang: string; code: string }
-  | { type: 'text'; content: string }
+type Block = { type: 'code'; lang: string; code: string } | { type: 'text'; content: string }
 
 /** Divide el texto en bloques de código y texto, preservando los code fences. */
 function parseBlocks(text: string): Block[] {
@@ -138,9 +136,7 @@ function renderTextLines(text: string, baseKey: number): ReactNode[] {
     }
 
     if (type === 'hr') {
-      elements.push(
-        <div key={key++} className="my-2 border-t border-boundary" />,
-      )
+      elements.push(<div key={key++} className="my-2 border-t border-boundary" />)
       i++
       continue
     }

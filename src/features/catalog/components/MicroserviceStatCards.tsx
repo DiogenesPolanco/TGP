@@ -19,8 +19,18 @@ interface Props {
 const cards = [
   { key: null, label: 'Total Microservicios', icon: <Server size={20} />, color: 'text-primary' },
   { key: 'eol', label: 'Obsolescencia', icon: <AlertTriangle size={20} />, color: 'text-danger' },
-  { key: 'vuln', label: 'Vulnerabilidades', icon: <Shield size={20} />, color: 'text-severity-high' },
-  { key: 'incident', label: 'Incidentes', icon: <AlertTriangle size={20} />, color: 'text-warning' },
+  {
+    key: 'vuln',
+    label: 'Vulnerabilidades',
+    icon: <Shield size={20} />,
+    color: 'text-severity-high',
+  },
+  {
+    key: 'incident',
+    label: 'Incidentes',
+    icon: <AlertTriangle size={20} />,
+    color: 'text-warning',
+  },
   { key: 'audit', label: 'Auditorías', icon: <AlertTriangle size={20} />, color: 'text-info' },
   { key: 'risk', label: 'Riesgos', icon: <AlertTriangle size={20} />, color: 'text-purple-500' },
 ]

@@ -6,7 +6,11 @@ export async function getContent<T = unknown>(key: string): Promise<T | null> {
   return entry ? (entry.content as T) : null
 }
 
-export async function setContent<T = unknown>(key: string, content: T, description?: string): Promise<void> {
+export async function setContent<T = unknown>(
+  key: string,
+  content: T,
+  description?: string,
+): Promise<void> {
   await db.contentBlocks.put({
     key,
     content,

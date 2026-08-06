@@ -18,9 +18,18 @@ interface Props {
 }
 
 export function AzureBackupConfigSection({
-  sasUrl, onSasUrlChange, containerName, onContainerNameChange,
-  showUrl, onToggleShowUrl, testing, testResult, configured,
-  onTest, onSave, onClear,
+  sasUrl,
+  onSasUrlChange,
+  containerName,
+  onContainerNameChange,
+  showUrl,
+  onToggleShowUrl,
+  testing,
+  testResult,
+  configured,
+  onTest,
+  onSave,
+  onClear,
 }: Props) {
   return (
     <div className="space-y-3">
@@ -30,7 +39,9 @@ export function AzureBackupConfigSection({
       </div>
 
       <div>
-        <label className="text-xs font-medium text-neutral-60 mb-1 block">SAS URL de la Cuenta</label>
+        <label className="text-xs font-medium text-neutral-60 mb-1 block">
+          SAS URL de la Cuenta
+        </label>
         <div className="flex gap-2">
           <Input
             type={showUrl ? 'text' : 'password'}
@@ -45,7 +56,9 @@ export function AzureBackupConfigSection({
       </div>
 
       <div>
-        <label className="text-xs font-medium text-neutral-60 mb-1 block">Nombre del Contenedor</label>
+        <label className="text-xs font-medium text-neutral-60 mb-1 block">
+          Nombre del Contenedor
+        </label>
         <Input
           type="text"
           value={containerName}
@@ -55,10 +68,19 @@ export function AzureBackupConfigSection({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" onClick={onTest} isLoading={testing} leftIcon={<RefreshCw size={14} />}>
+        <Button
+          variant="secondary"
+          onClick={onTest}
+          isLoading={testing}
+          leftIcon={<RefreshCw size={14} />}
+        >
           {testing ? 'Probando...' : 'Probar Conexión'}
         </Button>
-        <Button variant="primary" onClick={onSave} className="bg-primary text-white hover:bg-primary/90">
+        <Button
+          variant="primary"
+          onClick={onSave}
+          className="bg-primary text-white hover:bg-primary/90"
+        >
           Guardar Configuración
         </Button>
         {configured && (
@@ -69,8 +91,14 @@ export function AzureBackupConfigSection({
       </div>
 
       {testResult && (
-        <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${testResult.success ? 'bg-success/5 text-success' : 'bg-danger/5 text-danger'}`}>
-          {testResult.success ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" /> : <XCircle size={16} className="mt-0.5 shrink-0" />}
+        <div
+          className={`flex items-start gap-2 p-3 rounded-lg text-sm ${testResult.success ? 'bg-success/5 text-success' : 'bg-danger/5 text-danger'}`}
+        >
+          {testResult.success ? (
+            <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+          ) : (
+            <XCircle size={16} className="mt-0.5 shrink-0" />
+          )}
           <span>{testResult.message}</span>
         </div>
       )}

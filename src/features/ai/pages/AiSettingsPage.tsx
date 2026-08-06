@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Sparkles, ArrowLeft, Bot, Pencil } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
 import { useAiConfigStore } from '../store/aiConfigStore'

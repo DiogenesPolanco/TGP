@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react'
-import { ExternalLink, Shield, Calendar, Building2, FileText, RefreshCw, AlertCircle } from 'lucide-react'
+import {
+  ExternalLink,
+  Shield,
+  Calendar,
+  Building2,
+  FileText,
+  RefreshCw,
+  AlertCircle,
+} from 'lucide-react'
 import { lookupCve, type CveData } from '@/services/security/cveService'
 
 interface CveInfoPanelProps {
@@ -23,7 +31,9 @@ export function CveInfoPanel({ cveId }: CveInfoPanelProps) {
       setLoading(false)
     })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [cveId])
 
   if (loading) {

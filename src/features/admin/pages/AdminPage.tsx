@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { seedDemoData } from '@/services/demo/seedData'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import {
   Upload,
   Trash2,

@@ -16,10 +16,40 @@ interface ProviderOption {
 }
 
 const PROVIDERS: ProviderOption[] = [
-  { type: 'ollama', icon: '🦙', name: 'Ollama (local)', desc: 'Local · 100% gratis, sin límites', tooltip: 'Ejecutás el modelo en tu máquina. Sin costos, sin límites de uso, 100% offline.', badge: 'Gratis' },
-  { type: 'groq', icon: '⚡', name: 'Groq', desc: 'Cloud gratuito · 30 req/min', tooltip: 'Cloud gratuito con inferencia ultrarrápida. Limitado a 30 requests por minuto en el plan free.', badge: 'Gratis' },
-  { type: 'openai', icon: '🔵', name: 'OpenAI', desc: 'Pago por uso · requiere API key', tooltip: 'Modelos GPT de pago. Necesitás una API key de OpenAI con crédito disponible.', badge: 'API key' },
-  { type: 'anthropic', icon: '🟠', name: 'Anthropic (Claude)', desc: 'Próximamente — análisis avanzado', tooltip: 'Claude de Anthropic. Pendiente de integración — estará disponible pronto.', badge: 'Pronto', disabled: true },
+  {
+    type: 'ollama',
+    icon: '🦙',
+    name: 'Ollama (local)',
+    desc: 'Local · 100% gratis, sin límites',
+    tooltip: 'Ejecutás el modelo en tu máquina. Sin costos, sin límites de uso, 100% offline.',
+    badge: 'Gratis',
+  },
+  {
+    type: 'groq',
+    icon: '⚡',
+    name: 'Groq',
+    desc: 'Cloud gratuito · 30 req/min',
+    tooltip:
+      'Cloud gratuito con inferencia ultrarrápida. Limitado a 30 requests por minuto en el plan free.',
+    badge: 'Gratis',
+  },
+  {
+    type: 'openai',
+    icon: '🔵',
+    name: 'OpenAI',
+    desc: 'Pago por uso · requiere API key',
+    tooltip: 'Modelos GPT de pago. Necesitás una API key de OpenAI con crédito disponible.',
+    badge: 'API key',
+  },
+  {
+    type: 'anthropic',
+    icon: '🟠',
+    name: 'Anthropic (Claude)',
+    desc: 'Próximamente — análisis avanzado',
+    tooltip: 'Claude de Anthropic. Pendiente de integración — estará disponible pronto.',
+    badge: 'Pronto',
+    disabled: true,
+  },
 ]
 
 function providerLabel(p: AiProviderType): string {
@@ -28,12 +58,22 @@ function providerLabel(p: AiProviderType): string {
 
 interface Props {
   config: AiProviderConfig
-  onSave: (cfg: { provider: AiProviderType; baseUrl: string; apiKey: string; model: string }) => void
+  onSave: (cfg: {
+    provider: AiProviderType
+    baseUrl: string
+    apiKey: string
+    model: string
+  }) => void
   onCancel: () => void
 }
 
 export function AiProviderSelector({ config, onSave, onCancel }: Props) {
-  const [dirty, setDirty] = useState({ provider: config.provider, baseUrl: config.baseUrl, apiKey: config.apiKey, model: config.model })
+  const [dirty, setDirty] = useState({
+    provider: config.provider,
+    baseUrl: config.baseUrl,
+    apiKey: config.apiKey,
+    model: config.model,
+  })
   const [availableModels, setAvailableModels] = useState<string[]>([config.model])
   const [testResult, setTestResult] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [testError, setTestError] = useState<string | null>(null)
@@ -72,7 +112,9 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
     <div className="bg-card rounded-2xl border border-boundary shadow-sm overflow-hidden">
       <div className="px-5 py-3.5 border-b border-boundary flex items-center gap-2">
         <span className="text-base leading-none">✏️</span>
-        <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">Editar configuración</h2>
+        <h2 className="text-sm font-semibold text-neutral-90 dark:text-white">
+          Editar configuración
+        </h2>
       </div>
       <div className="p-5 space-y-5">
         <div>
@@ -86,7 +128,12 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
                 onClick={() => {
                   if (p.disabled) return
                   const defaults = AI_PROVIDER_DEFAULTS[p.type]
-                  setDirty({ provider: p.type, baseUrl: defaults.baseUrl, model: defaults.model, apiKey: '' })
+                  setDirty({
+                    provider: p.type,
+                    baseUrl: defaults.baseUrl,
+                    model: defaults.model,
+                    apiKey: '',
+                  })
                   setAvailableModels([])
                   setTestResult('idle')
                   setTestError(null)
@@ -104,11 +151,19 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
                     <Check size={12} className="text-white dark:text-neutral-90" strokeWidth={3} />
                   </div>
                 )}
-                <div className={`p-3 rounded-xl flex items-center justify-center text-xl shrink-0 ${p.disabled ? 'bg-neutral-10 dark:bg-neutral-75' : dirty.provider === p.type ? 'bg-neutral-5 dark:bg-neutral-75 ring-1 ring-neutral-90/10 dark:ring-white/10' : 'bg-neutral-5 dark:bg-neutral-75'}`}>
+                <div
+                  className={`p-3 rounded-xl flex items-center justify-center text-xl shrink-0 ${p.disabled ? 'bg-neutral-10 dark:bg-neutral-75' : dirty.provider === p.type ? 'bg-neutral-5 dark:bg-neutral-75 ring-1 ring-neutral-90/10 dark:ring-white/10' : 'bg-neutral-5 dark:bg-neutral-75'}`}
+                >
                   {p.icon}
                 </div>
-                <span className={`text-xs font-semibold leading-tight ${p.disabled ? 'text-neutral-50' : 'text-neutral-90 dark:text-white'}`}>{p.name}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${p.badge === 'Gratis' ? 'bg-success/10 text-success' : p.badge === 'Pronto' ? 'bg-warning/10 text-warning' : 'bg-neutral-10 dark:bg-neutral-75 text-muted'}`}>
+                <span
+                  className={`text-xs font-semibold leading-tight ${p.disabled ? 'text-neutral-50' : 'text-neutral-90 dark:text-white'}`}
+                >
+                  {p.name}
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${p.badge === 'Gratis' ? 'bg-success/10 text-success' : p.badge === 'Pronto' ? 'bg-warning/10 text-warning' : 'bg-neutral-10 dark:bg-neutral-75 text-muted'}`}
+                >
                   {p.badge}
                 </span>
               </button>
@@ -121,40 +176,69 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
             {PROVIDERS.find((p) => p.type === dirty.provider)?.icon}
           </div>
           <div>
-            <span className="block text-sm font-semibold text-neutral-90 dark:text-white">Configuración de {providerLabel(dirty.provider)}</span>
-            <span className="text-xs text-muted">{PROVIDERS.find((p) => p.type === dirty.provider)?.desc}</span>
+            <span className="block text-sm font-semibold text-neutral-90 dark:text-white">
+              Configuración de {providerLabel(dirty.provider)}
+            </span>
+            <span className="text-xs text-muted">
+              {PROVIDERS.find((p) => p.type === dirty.provider)?.desc}
+            </span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-60 mb-1.5">URL del servidor</label>
-          <input type="text" value={dirty.baseUrl} onChange={(e) => setDirty({ ...dirty, baseUrl: e.target.value })}
-            className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono transition-all" />
+          <label className="block text-sm font-medium text-neutral-60 mb-1.5">
+            URL del servidor
+          </label>
+          <input
+            type="text"
+            value={dirty.baseUrl}
+            onChange={(e) => setDirty({ ...dirty, baseUrl: e.target.value })}
+            className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono transition-all"
+          />
         </div>
 
         {dirty.provider !== 'ollama' && (
           <div>
             <label className="block text-sm font-medium text-neutral-60 mb-1.5">API Key</label>
             <div className="relative">
-              <input type={showApiKey ? 'text' : 'password'} value={dirty.apiKey} onChange={(e) => setDirty({ ...dirty, apiKey: e.target.value })}
+              <input
+                type={showApiKey ? 'text' : 'password'}
+                value={dirty.apiKey}
+                onChange={(e) => setDirty({ ...dirty, apiKey: e.target.value })}
                 className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg pl-3 pr-9 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 font-mono transition-all"
-                placeholder={dirty.provider === 'groq' ? 'gsk_...' : 'sk-...'} />
-              <button onClick={() => setShowApiKey(!showApiKey)} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-neutral-90 dark:hover:text-white transition-colors">
+                placeholder={dirty.provider === 'groq' ? 'gsk_...' : 'sk-...'}
+              />
+              <button
+                onClick={() => setShowApiKey(!showApiKey)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-neutral-90 dark:hover:text-white transition-colors"
+              >
                 {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
-            <p className="text-xs text-muted mt-1">Se guarda cifrada en localStorage de tu navegador.</p>
+            <p className="text-xs text-muted mt-1">
+              Se guarda cifrada en localStorage de tu navegador.
+            </p>
           </div>
         )}
 
         <div>
           <label className="block text-sm font-medium text-neutral-60 mb-1.5">Modelo</label>
           {availableModels.length > 0 ? (
-            <Select value={dirty.model} onChange={(v) => setDirty({ ...dirty, model: v })} options={availableModels} searchable placeholder="Buscá o seleccioná un modelo..." />
+            <Select
+              value={dirty.model}
+              onChange={(v) => setDirty({ ...dirty, model: v })}
+              options={availableModels}
+              searchable
+              placeholder="Buscá o seleccioná un modelo..."
+            />
           ) : (
-            <input type="text" value={dirty.model} onChange={(e) => setDirty({ ...dirty, model: e.target.value })}
+            <input
+              type="text"
+              value={dirty.model}
+              onChange={(e) => setDirty({ ...dirty, model: e.target.value })}
               className="w-full bg-neutral-5 dark:bg-neutral-85 border border-boundary rounded-lg px-3 py-2 text-sm text-neutral-90 dark:text-white placeholder-neutral-40 focus:outline-none focus:ring-1 focus:ring-neutral-50 transition-all"
-              placeholder={AI_PROVIDER_DEFAULTS[dirty.provider]?.model ?? ''} />
+              placeholder={AI_PROVIDER_DEFAULTS[dirty.provider]?.model ?? ''}
+            />
           )}
         </div>
 
@@ -164,13 +248,25 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
             <span className="text-sm font-medium text-muted">Prueba de conexión</span>
             <span className="text-xs text-muted ml-auto">Requerido para guardar</span>
           </div>
-          <button onClick={handleTestConnection} disabled={testResult === 'testing'}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-50">
-            {testResult === 'testing' ? <><Loader2 size={14} className="animate-spin" /> Probando conexión...</> : <><Wifi size={14} /> Probar conexión</>}
+          <button
+            onClick={handleTestConnection}
+            disabled={testResult === 'testing'}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-50"
+          >
+            {testResult === 'testing' ? (
+              <>
+                <Loader2 size={14} className="animate-spin" /> Probando conexión...
+              </>
+            ) : (
+              <>
+                <Wifi size={14} /> Probar conexión
+              </>
+            )}
           </button>
           {testResult === 'success' && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-success/10 text-sm text-success font-medium">
-              <Check size={14} /> Conexión exitosa{availableModels.length > 0 && ` · ${availableModels.length} modelo(s) disponible(s)`}
+              <Check size={14} /> Conexión exitosa
+              {availableModels.length > 0 && ` · ${availableModels.length} modelo(s) disponible(s)`}
             </div>
           )}
           {testResult === 'error' && (
@@ -181,9 +277,17 @@ export function AiProviderSelector({ config, onSave, onCancel }: Props) {
         </div>
 
         <div className="flex items-center justify-end gap-2 pt-4 border-t border-boundary">
-          <button onClick={onCancel} className="px-4 py-2 rounded-lg text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors">Cancelar</button>
-          <button onClick={() => onSave(dirty)} disabled={testResult !== 'success'}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-muted hover:text-neutral-90 dark:hover:text-white hover:bg-neutral-10 dark:hover:bg-neutral-80 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => onSave(dirty)}
+            disabled={testResult !== 'success'}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-90 dark:bg-white text-white dark:text-neutral-90 hover:opacity-90 transition-all text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <Save size={14} /> Guardar cambios
           </button>
         </div>

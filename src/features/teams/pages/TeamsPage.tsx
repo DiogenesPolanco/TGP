@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -13,7 +13,7 @@ import { usePagination } from '@/hooks/usePagination'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import {
   Plus,
   Search,

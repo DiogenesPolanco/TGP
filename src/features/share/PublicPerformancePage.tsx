@@ -1,6 +1,6 @@
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import {
   getShareType,
   getPublicPerformanceData,

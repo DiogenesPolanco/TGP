@@ -1,6 +1,20 @@
-import { ArrowRight, ExternalLink, Search, Server, Box, Database, Users, Shield, Activity, FileWarning, BookOpen, CircleUser, Scale } from 'lucide-react'
+import {
+  ArrowRight,
+  ExternalLink,
+  Search,
+  Server,
+  Box,
+  Database,
+  Users,
+  Shield,
+  Activity,
+  FileWarning,
+  BookOpen,
+  CircleUser,
+  Scale,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 interface RelatedData {
   apps: any[]
@@ -283,14 +297,54 @@ export function RelationsTab({ data }: { data: RelatedData }) {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          <StatBadge icon={<Server size={16} />} value={counts.apps} label="Aplicaciones" color="primary" />
-          <StatBadge icon={<Box size={16} />} value={counts.ms} label="Microservicios" color="info" />
-          <StatBadge icon={<Database size={16} />} value={counts.dbs} label="Bases de Datos" color="purple" />
-          <StatBadge icon={<Shield size={16} />} value={counts.vulns} label="Vulnerabilidades" color={counts.vulns > 0 ? 'danger' : 'neutral'} />
-          <StatBadge icon={<Activity size={16} />} value={counts.incidents} label="Incidentes" color={counts.incidents > 0 ? 'danger' : 'neutral'} />
-          <StatBadge icon={<FileWarning size={16} />} value={counts.risks} label="Riesgos" color={counts.risks > 0 ? 'warning' : 'neutral'} />
-          <StatBadge icon={<BookOpen size={16} />} value={counts.audit} label="Auditoría" color={counts.audit > 0 ? 'warning' : 'neutral'} />
-          <StatBadge icon={<Users size={16} />} value={counts.people} label="Personas" color="primary" />
+          <StatBadge
+            icon={<Server size={16} />}
+            value={counts.apps}
+            label="Aplicaciones"
+            color="primary"
+          />
+          <StatBadge
+            icon={<Box size={16} />}
+            value={counts.ms}
+            label="Microservicios"
+            color="info"
+          />
+          <StatBadge
+            icon={<Database size={16} />}
+            value={counts.dbs}
+            label="Bases de Datos"
+            color="purple"
+          />
+          <StatBadge
+            icon={<Shield size={16} />}
+            value={counts.vulns}
+            label="Vulnerabilidades"
+            color={counts.vulns > 0 ? 'danger' : 'neutral'}
+          />
+          <StatBadge
+            icon={<Activity size={16} />}
+            value={counts.incidents}
+            label="Incidentes"
+            color={counts.incidents > 0 ? 'danger' : 'neutral'}
+          />
+          <StatBadge
+            icon={<FileWarning size={16} />}
+            value={counts.risks}
+            label="Riesgos"
+            color={counts.risks > 0 ? 'warning' : 'neutral'}
+          />
+          <StatBadge
+            icon={<BookOpen size={16} />}
+            value={counts.audit}
+            label="Auditoría"
+            color={counts.audit > 0 ? 'warning' : 'neutral'}
+          />
+          <StatBadge
+            icon={<Users size={16} />}
+            value={counts.people}
+            label="Personas"
+            color="primary"
+          />
         </div>
       </div>
 
@@ -377,7 +431,8 @@ export function RelationsTab({ data }: { data: RelatedData }) {
       </div>
 
       {/* Security & Governance section */}
-      {data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length > 0 && (
+      {data.vulns.length + data.incidents.length + data.risks.length + data.auditFindings.length >
+        0 && (
         <div className="bg-card rounded-xl border border-boundary shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-boundary bg-gradient-to-r from-transparent via-neutral-5 to-transparent dark:via-neutral-85">
             <h3 className="text-sm font-bold text-neutral-90 dark:text-white flex items-center gap-2">

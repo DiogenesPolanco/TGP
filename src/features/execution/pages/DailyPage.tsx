@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import { runEscalation } from '../services/escalationService'
 import { createShareLink, getPublicDailyData } from '@/services/share/publicShareService'

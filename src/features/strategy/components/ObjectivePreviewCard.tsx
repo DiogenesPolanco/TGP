@@ -12,9 +12,23 @@ interface Props {
   teams: { id: string; name: string }[]
 }
 
-export function ObjectivePreviewCard({ title, type, status, keyResults, liveProgress, teamId, teams }: Props) {
+export function ObjectivePreviewCard({
+  title,
+  type,
+  status,
+  keyResults,
+  liveProgress,
+  teamId,
+  teams,
+}: Props) {
   const progressColor =
-    liveProgress >= 100 ? 'bg-success' : liveProgress >= 60 ? 'bg-success' : liveProgress >= 30 ? 'bg-warning' : 'bg-danger'
+    liveProgress >= 100
+      ? 'bg-success'
+      : liveProgress >= 60
+        ? 'bg-success'
+        : liveProgress >= 30
+          ? 'bg-warning'
+          : 'bg-danger'
 
   return (
     <div className="bg-card rounded-xl border border-boundary p-5 shadow-sm sticky top-6 space-y-4">
@@ -24,10 +38,14 @@ export function ObjectivePreviewCard({ title, type, status, keyResults, liveProg
       </h3>
 
       <div className="bg-neutral-10 dark:bg-neutral-70/50 rounded-xl border border-boundary overflow-hidden">
-        <div className={`h-1 w-full ${status === 'achieved' || status === 'on_track' ? 'bg-success' : status === 'at_risk' ? 'bg-warning' : status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`} />
+        <div
+          className={`h-1 w-full ${status === 'achieved' || status === 'on_track' ? 'bg-success' : status === 'at_risk' ? 'bg-warning' : status === 'behind' ? 'bg-danger' : 'bg-neutral-40'}`}
+        />
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${STATUS_STYLE[status]}`}>
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${STATUS_STYLE[status]}`}
+            >
               {STATUS_ICON[status]}
               {STATUS_OPTIONS.find((o) => o.value === status)?.label}
             </span>
@@ -42,16 +60,23 @@ export function ObjectivePreviewCard({ title, type, status, keyResults, liveProg
 
           <div className="flex items-center justify-between mt-3 mb-1.5">
             <span className="text-[11px] text-neutral-50">Progreso general</span>
-            <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">{Math.round(liveProgress)}%</span>
+            <span className="text-sm font-bold text-neutral-90 dark:text-white tabular-nums">
+              {Math.round(liveProgress)}%
+            </span>
           </div>
           <div className="w-full h-2 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all duration-500 ${progressColor}`} style={{ width: `${liveProgress}%` }} />
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+              style={{ width: `${liveProgress}%` }}
+            />
           </div>
 
           <div className="mt-3 pt-3 border-t border-boundary">
             <div className="flex items-center justify-between text-xs">
               <span className="text-neutral-50">Key Results</span>
-              <span className="font-semibold text-neutral-90 dark:text-white">{keyResults.length}</span>
+              <span className="font-semibold text-neutral-90 dark:text-white">
+                {keyResults.length}
+              </span>
             </div>
             <div className="flex items-center justify-between text-xs mt-1">
               <span className="text-neutral-50">Equipo</span>

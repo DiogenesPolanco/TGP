@@ -100,7 +100,9 @@ interface AzureConfig {
       />
 
       <SubSection>Uso de backups en Azure</SubSection>
-      <Body>Una vez configurado, puedes gestionar backups desde la interfaz de Administración:</Body>
+      <Body>
+        Una vez configurado, puedes gestionar backups desde la interfaz de Administración:
+      </Body>
       <StepList
         items={[
           'Subir backup: Administración → Exportar datos → "Subir a Azure" → el sistema exporta todas las tablas a un JSON cifrado y lo sube como blob.',

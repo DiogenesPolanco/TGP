@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Sparkles, ArrowLeft } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
 import { AiSetupWizard } from '../components/AiSetupWizard'

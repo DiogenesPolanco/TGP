@@ -112,13 +112,7 @@ export function InlineChat({ config }: { config: AiProviderConfig }) {
 
 // ─── Chat Bubble ──────────────────────────────────────────────────
 
-const ChatBubble = memo(function ChatBubble({
-  msg,
-  index,
-}: {
-  msg: AiChatMessage
-  index: number
-}) {
+const ChatBubble = memo(function ChatBubble({ msg, index }: { msg: AiChatMessage; index: number }) {
   const isUser = msg.role === 'user'
   const isTool = msg.role === 'tool'
   const { copiedId, copy } = useCopy()
@@ -134,9 +128,9 @@ const ChatBubble = memo(function ChatBubble({
         <span className="text-[10px] text-neutral-50 dark:text-neutral-50 font-mono truncate max-w-[180px]">
           {msg.toolName ?? 'consulta'}
         </span>
-    </div>
-  )
-}
+      </div>
+    )
+  }
 
   return (
     <div
@@ -181,5 +175,3 @@ const ChatBubble = memo(function ChatBubble({
     </div>
   )
 })
-
-

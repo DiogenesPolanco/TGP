@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Search, Plus, ExternalLink, Unlink } from 'lucide-react'
 import { db } from '@/services/db/database'
@@ -18,11 +18,7 @@ const severityClass = (sev: string): string => {
 }
 
 function severityBadge(sev: string) {
-  return (
-    <span className={`text-xs px-2 py-0.5 rounded-full ${severityClass(sev)}`}>
-      {sev}
-    </span>
-  )
+  return <span className={`text-xs px-2 py-0.5 rounded-full ${severityClass(sev)}`}>{sev}</span>
 }
 
 const statusLabel: Record<string, string> = {
@@ -168,7 +164,8 @@ export function VulnerabilitiesTab({
           Vulnerabilidades
           {vulnerabilities.length > activeVulns.length && (
             <span className="ml-2 text-sm font-normal text-neutral-50">
-              ({activeVulns.length} activas, {vulnerabilities.length - activeVulns.length} corregidas ocultas)
+              ({activeVulns.length} activas, {vulnerabilities.length - activeVulns.length}{' '}
+              corregidas ocultas)
             </span>
           )}
         </h4>
@@ -227,7 +224,9 @@ export function VulnerabilitiesTab({
                     <Plus size={14} className="text-primary shrink-0" />
                     <span className="text-neutral-90 dark:text-white truncate">{v.title}</span>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${severityClass(v.severity)}`}>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${severityClass(v.severity)}`}
+                  >
                     {v.severity}
                   </span>
                 </button>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import { seedDemoData, seedComplianceFindings } from '@/services/demo/seedData'
 import { seedTechnologies } from '@/services/demo/seedTechnologies'

@@ -3,13 +3,23 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { Plus, ExternalLink, Link, Unlink } from 'lucide-react'
-import { appStatusLabel, criticalityLabel, dependencyTypes } from '@/features/catalog/constants/architectureConstants'
+import {
+  appStatusLabel,
+  criticalityLabel,
+  dependencyTypes,
+} from '@/features/catalog/constants/architectureConstants'
 import type { Criticality, DependencyType } from '@/constants/enums'
 import type { Application } from '@/types/domain'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 
-export function DependencyManager({ applicationId, allApps }: { applicationId: string; allApps: Application[] }) {
+export function DependencyManager({
+  applicationId,
+  allApps,
+}: {
+  applicationId: string
+  allApps: Application[]
+}) {
   const dependencies =
     useLiveQuery(
       () => db.applicationDependencies.where('applicationId').equals(applicationId).toArray(),

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },

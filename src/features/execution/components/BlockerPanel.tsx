@@ -134,7 +134,12 @@ export function BlockerPanel({ sourceType, sourceId }: BlockerPanelProps) {
         role="button"
         tabIndex={0}
         onClick={() => setCollapsed(!collapsed)}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCollapsed(!collapsed) } }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setCollapsed(!collapsed)
+          }
+        }}
         className="w-full flex items-center justify-between px-4 py-3 bg-neutral-10 dark:bg-neutral-80 hover:bg-neutral-20 dark:hover:bg-neutral-70 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2">

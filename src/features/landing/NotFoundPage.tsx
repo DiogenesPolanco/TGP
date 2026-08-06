@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 const R = 50
 const CIRCUMFERENCE = 2 * Math.PI * R

@@ -205,9 +205,11 @@ export function useDashboardMetrics(): DashboardMetrics {
     .reduce((sum, r) => sum + r.riskScore, 0)
   const eliteTeams = teams.filter((t) => {
     if (!t.currentMetrics) return false
-    const elite = (doraConfig?.value as {
-      elite: { deploymentFrequency: { min: number }; leadTimeHours: { max: number } }
-    })?.elite ?? { deploymentFrequency: { min: 1 }, leadTimeHours: { max: 1 } }
+    const elite = (
+      doraConfig?.value as {
+        elite: { deploymentFrequency: { min: number }; leadTimeHours: { max: number } }
+      }
+    )?.elite ?? { deploymentFrequency: { min: 1 }, leadTimeHours: { max: 1 } }
     return (
       t.currentMetrics.deploymentFrequency >= elite.deploymentFrequency.min &&
       (elite.leadTimeHours.max == null || t.currentMetrics.leadTimeHours <= elite.leadTimeHours.max)
@@ -367,7 +369,8 @@ export function useDashboardMetrics(): DashboardMetrics {
         blockers,
         commitments,
         periodStart,
-        thiRanges: thiRangesConfig?.value as Record<string, { min: number; max: number; label: string }> | undefined,
+        thiRanges: thiRangesConfig?.value as
+          Record<string, { min: number; max: number; label: string }> | undefined,
       }),
     [
       thi,

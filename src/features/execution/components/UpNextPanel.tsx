@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Calendar, ArrowRight, User, Target } from 'lucide-react'
 import type { Activity, Plan, Commitment } from '@/types/domain'
 

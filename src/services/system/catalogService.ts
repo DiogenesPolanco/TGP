@@ -19,10 +19,7 @@ export async function getCatalogMap(category: string): Promise<Record<string, st
 }
 
 export async function getCatalogValue(category: string, value: string): Promise<string | null> {
-  const entry = await db.catalogs
-    .where('[category+value]')
-    .equals([category, value])
-    .first()
+  const entry = await db.catalogs.where('[category+value]').equals([category, value]).first()
   return entry?.label ?? null
 }
 
@@ -51,7 +48,12 @@ export async function deleteCatalogEntry(id: string): Promise<void> {
 
 export async function bulkUpsertCatalog(
   category: string,
-  entries: { value: string; label: string; sortOrder?: number; metadata?: Record<string, unknown> }[],
+  entries: {
+    value: string
+    label: string
+    sortOrder?: number
+    metadata?: Record<string, unknown>
+  }[],
 ): Promise<void> {
   const existing = await db.catalogs.where('category').equals(category).toArray()
   const existingMap = new Map(existing.map((e) => [e.value, e]))

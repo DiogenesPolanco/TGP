@@ -186,11 +186,7 @@ export function OnboardingWizard({ onClose }: WizardProps) {
                 transition={{ type: 'spring', stiffness: 280, damping: 26, mass: 0.8 }}
                 className="px-6 py-2"
               >
-                <SlideComponent
-                  onNext={handleNext}
-                  onSkip={handleSkip}
-                  onClose={onClose}
-                />
+                <SlideComponent onNext={handleNext} onSkip={handleSkip} onClose={onClose} />
               </motion.div>
             </AnimatePresence>
           </div>

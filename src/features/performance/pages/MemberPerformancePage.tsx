@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import { getMemberKPIs } from '@/services/performance/performanceService'
 import type { Team, MemberProfile } from '@/types/domain'
@@ -124,8 +124,7 @@ export function MemberPerformancePage() {
               {member.displayName}
             </h1>
             <p className="text-sm text-neutral-50">
-              {roleLabels[member.role] ?? member.role} ·{' '}
-              {team?.name}
+              {roleLabels[member.role] ?? member.role} · {team?.name}
             </p>
           </div>
           <Button

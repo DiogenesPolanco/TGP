@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { ArrowLeft, Search, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
@@ -79,7 +79,12 @@ export function TechnologyFormPage() {
 
   const addCve = (cveId: string) => {
     if (existingCves.has(cveId.toUpperCase())) return
-    const current = formData.cveList ? formData.cveList.split(',').map((c) => c.trim()).filter(Boolean) : []
+    const current = formData.cveList
+      ? formData.cveList
+          .split(',')
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : []
     current.push(cveId)
     setFormData({ ...formData, cveList: current.join(', ') })
   }
@@ -214,7 +219,9 @@ export function TechnologyFormPage() {
               {cveSearchLoading ? 'Buscando…' : 'Buscar CVEs'}
             </Button>
           </div>
-          <p className="text-xs text-neutral-50 mt-1">Separados por coma. Usa "Buscar CVEs" para encontrar CVEs altos en NVD.</p>
+          <p className="text-xs text-neutral-50 mt-1">
+            Separados por coma. Usa "Buscar CVEs" para encontrar CVEs altos en NVD.
+          </p>
         </div>
 
         {/* CVE search results */}
@@ -234,7 +241,8 @@ export function TechnologyFormPage() {
         {cveSearchResults && cveSearchResults.length > 0 && (
           <div className="space-y-2 p-3 rounded-lg border border-boundary bg-card max-h-64 overflow-y-auto">
             <p className="text-xs font-semibold text-neutral-60">
-              {cveSearchTotal} CVE(s) encontrado(s) en NVD — mostrando los {cveSearchResults.length} más recientes
+              {cveSearchTotal} CVE(s) encontrado(s) en NVD — mostrando los {cveSearchResults.length}{' '}
+              más recientes
             </p>
             {cveSearchResults.map((cve) => {
               const alreadyAdded = existingCves.has(cve.id.toUpperCase())
@@ -242,7 +250,9 @@ export function TechnologyFormPage() {
                 <div
                   key={cve.id}
                   className={`flex items-start gap-3 p-2 rounded-lg text-xs ${
-                    alreadyAdded ? 'bg-success/5 opacity-50' : 'hover:bg-neutral-10 dark:hover:bg-neutral-80'
+                    alreadyAdded
+                      ? 'bg-success/5 opacity-50'
+                      : 'hover:bg-neutral-10 dark:hover:bg-neutral-80'
                   } transition-colors`}
                 >
                   <div className="flex-1 min-w-0">
@@ -278,9 +288,7 @@ export function TechnologyFormPage() {
                         +Agregar
                       </button>
                     )}
-                    {alreadyAdded && (
-                      <span className="p-1 text-[10px] text-success">✓</span>
-                    )}
+                    {alreadyAdded && <span className="p-1 text-[10px] text-success">✓</span>}
                   </div>
                 </div>
               )

@@ -15,7 +15,8 @@ export function LifecycleBar({ status }: { status: SupportStatus }) {
       {segments.map((seg, i) => {
         const filled = i <= currentIdx && status !== 'unknown'
         return (
-          <div key={seg.id}
+          <div
+            key={seg.id}
             className={`h-5 w-2 rounded-sm transition-colors ${filled ? seg.color : 'bg-neutral-20 dark:bg-neutral-70'} ${i === currentIdx && status !== 'unknown' ? 'ring-1 ring-offset-1 ring-offset-white dark:ring-offset-neutral-80 ring-black/20' : ''}`}
           />
         )

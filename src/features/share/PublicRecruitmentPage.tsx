@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import {
   isValidShareHash,
   getPublicRecruitmentData,
@@ -270,10 +270,7 @@ export function PublicRecruitmentPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-neutral-50">
-                      <span>
-                        {roleLabels[c.position] ??
-                          c.position}
-                      </span>
+                      <span>{roleLabels[c.position] ?? c.position}</span>
                       {c.interviewDate && (
                         <span>{new Date(c.interviewDate).toLocaleDateString('es')}</span>
                       )}

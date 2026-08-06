@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/layout/AppShell'
 import LandingPage from '@/features/landing/LandingPage'
 import { isTermsAccepted } from '@/features/auth/pages/TermsPage'

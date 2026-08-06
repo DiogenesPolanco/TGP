@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -97,9 +97,7 @@ export function RecruitmentPage() {
       label: 'Posición',
       sortable: true,
       render: (c) => (
-        <span className="text-sm text-secondary">
-          {roleLabels[c.position] ?? c.position}
-        </span>
+        <span className="text-sm text-secondary">{roleLabels[c.position] ?? c.position}</span>
       ),
     },
     {

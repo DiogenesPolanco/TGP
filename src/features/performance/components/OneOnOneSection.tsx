@@ -255,5 +255,3 @@ export function OneOnOneSection({ memberId }: Props) {
     </div>
   )
 }
-
-

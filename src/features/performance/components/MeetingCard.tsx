@@ -18,7 +18,11 @@ interface MeetingCardProps {
   onDelete: (id: string) => void
   onEdit: (id: string, data: Partial<OneOnOne>) => void
   onAddOportunidad: (meetingId: string, descripcion: string, tipo: Oportunidad['tipo']) => void
-  onUpdateOportunidadStatus: (meetingId: string, opId: string, status: Oportunidad['status']) => void
+  onUpdateOportunidadStatus: (
+    meetingId: string,
+    opId: string,
+    status: Oportunidad['status'],
+  ) => void
   onDeleteOportunidad: (meetingId: string, opId: string) => void
   onUpdateOportunidad: (meetingId: string, opId: string, data: Partial<Oportunidad>) => void
 }

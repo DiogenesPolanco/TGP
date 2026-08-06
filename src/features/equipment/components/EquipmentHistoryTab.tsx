@@ -1,7 +1,7 @@
 import { History, User } from 'lucide-react'
 import { EquipmentConditionBadge } from '@/features/equipment/components/EquipmentStatusBadge'
 import type { EquipmentAssignmentLog, MemberProfile, Team } from '@/types/domain'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 export function EquipmentHistoryTab({
   assignments,

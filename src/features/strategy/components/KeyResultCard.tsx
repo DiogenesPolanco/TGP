@@ -12,13 +12,20 @@ interface Props {
 }
 
 export function KeyResultCard({ kr, index, onUpdate, onRemove }: Props) {
-  const krPct = kr.target > kr.baseline
-    ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
-    : 0
+  const krPct =
+    kr.target > kr.baseline
+      ? Math.round(((kr.current - kr.baseline) / (kr.target - kr.baseline)) * 100)
+      : 0
   const krClamped = Math.min(100, Math.max(0, krPct))
 
   const progressColor =
-    krClamped >= 100 ? 'bg-success' : krClamped >= 60 ? 'bg-success' : krClamped >= 30 ? 'bg-warning' : 'bg-danger'
+    krClamped >= 100
+      ? 'bg-success'
+      : krClamped >= 60
+        ? 'bg-success'
+        : krClamped >= 30
+          ? 'bg-warning'
+          : 'bg-danger'
 
   return (
     <div
@@ -57,13 +64,39 @@ export function KeyResultCard({ kr, index, onUpdate, onRemove }: Props) {
         {(['measure', 'baseline', 'current', 'target'] as const).map((field) => (
           <div key={field}>
             <label className="block text-[10px] font-medium text-neutral-50 uppercase tracking-wider mb-1">
-              {field === 'measure' ? 'Medida' : field === 'baseline' ? 'Línea Base' : field === 'current' ? 'Actual' : 'Meta'}
+              {field === 'measure'
+                ? 'Medida'
+                : field === 'baseline'
+                  ? 'Línea Base'
+                  : field === 'current'
+                    ? 'Actual'
+                    : 'Meta'}
             </label>
             <input
               type={field === 'measure' ? 'text' : 'number'}
-              placeholder={field === 'measure' ? 'Ej: %' : field === 'baseline' || field === 'current' ? '0' : '100'}
-              value={field === 'measure' ? kr.measure : field === 'baseline' ? kr.baseline : field === 'current' ? kr.current : kr.target}
-              onChange={(e) => onUpdate(index, field, field === 'measure' ? e.target.value : parseFloat(e.target.value) || 0)}
+              placeholder={
+                field === 'measure'
+                  ? 'Ej: %'
+                  : field === 'baseline' || field === 'current'
+                    ? '0'
+                    : '100'
+              }
+              value={
+                field === 'measure'
+                  ? kr.measure
+                  : field === 'baseline'
+                    ? kr.baseline
+                    : field === 'current'
+                      ? kr.current
+                      : kr.target
+              }
+              onChange={(e) =>
+                onUpdate(
+                  index,
+                  field,
+                  field === 'measure' ? e.target.value : parseFloat(e.target.value) || 0,
+                )
+              }
               className={`w-full px-2.5 py-1.5 rounded-lg border border-neutral-30 dark:border-neutral-60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 ${field === 'current' ? 'font-semibold text-primary' : ''}`}
             />
           </div>
@@ -73,9 +106,14 @@ export function KeyResultCard({ kr, index, onUpdate, onRemove }: Props) {
       <div className="flex items-center gap-2">
         <span className="text-[10px] font-medium text-neutral-50 w-10">Progreso</span>
         <div className="flex-1 h-1.5 bg-neutral-20 dark:bg-neutral-70 rounded-full overflow-hidden">
-          <div className={`h-full rounded-full transition-all duration-300 ${progressColor}`} style={{ width: `${krClamped}%` }} />
+          <div
+            className={`h-full rounded-full transition-all duration-300 ${progressColor}`}
+            style={{ width: `${krClamped}%` }}
+          />
         </div>
-        <span className="text-xs font-semibold text-neutral-90 dark:text-white tabular-nums w-8 text-right">{krClamped}%</span>
+        <span className="text-xs font-semibold text-neutral-90 dark:text-white tabular-nums w-8 text-right">
+          {krClamped}%
+        </span>
       </div>
     </div>
   )

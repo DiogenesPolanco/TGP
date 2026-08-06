@@ -1,5 +1,8 @@
 import { ExternalLink, Shield } from 'lucide-react'
-import { criticalityLabel, appStatusLabel } from '@/features/catalog/constants/architectureConstants'
+import {
+  criticalityLabel,
+  appStatusLabel,
+} from '@/features/catalog/constants/architectureConstants'
 import type { Application, ApplicationDependency } from '@/types/domain'
 
 export function DependencyCard({

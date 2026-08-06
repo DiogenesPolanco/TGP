@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ThiGauge } from '@/components/charts/ThiGauge'
 import { ThiSparkline } from './ThiSparkline'
 import type { DashboardMetrics } from '../hooks/useDashboardMetrics'

@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { List, Plus, Save, X, RefreshCw } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
-import { getCatalog, getAllCategories, upsertCatalogEntry, deleteCatalogEntry } from '@/services/system/catalogService'
+import {
+  getCatalog,
+  getAllCategories,
+  upsertCatalogEntry,
+  deleteCatalogEntry,
+} from '@/services/system/catalogService'
 import type { CatalogEntry } from '@/types/system'
 import { Button } from '@/components/ui/Button'
 
@@ -31,8 +36,12 @@ export function CatalogsSection() {
     setLoading(false)
   }
 
-  useEffect(() => { loadCategories() }, [])
-  useEffect(() => { loadEntries(selectedCat) }, [selectedCat])
+  useEffect(() => {
+    loadCategories()
+  }, [])
+  useEffect(() => {
+    loadEntries(selectedCat)
+  }, [selectedCat])
 
   const handleEdit = async (id: string) => {
     if (!editLabel.trim()) return
@@ -91,7 +100,15 @@ export function CatalogsSection() {
             Catálogos del Sistema
           </h3>
         </div>
-        <Button onClick={() => { loadCategories(); loadEntries(selectedCat) }} variant="secondary" size="sm" leftIcon={<RefreshCw size={14} />}>
+        <Button
+          onClick={() => {
+            loadCategories()
+            loadEntries(selectedCat)
+          }}
+          variant="secondary"
+          size="sm"
+          leftIcon={<RefreshCw size={14} />}
+        >
           Recargar
         </Button>
       </div>
@@ -119,7 +136,10 @@ export function CatalogsSection() {
               {selectedCat.replace(/_/g, ' ')}
               <span className="text-neutral-50 ml-2 font-normal">({entries.length})</span>
             </code>
-            <button onClick={() => setShowNew(!showNew)} className="text-xs text-primary hover:text-primary-dark flex items-center gap-1 font-medium">
+            <button
+              onClick={() => setShowNew(!showNew)}
+              className="text-xs text-primary hover:text-primary-dark flex items-center gap-1 font-medium"
+            >
               <Plus size={12} /> {showNew ? 'Cancelar' : 'Nuevo'}
             </button>
           </div>
@@ -138,18 +158,27 @@ export function CatalogsSection() {
                 placeholder="Label (Español)"
                 className="flex-1 px-2.5 py-1.5 text-xs rounded border border-neutral-20 dark:border-neutral-60 bg-transparent text-neutral-90 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
-              <button onClick={handleAdd} disabled={!newValue || !newLabel} className="px-3 py-1.5 bg-primary text-white text-xs rounded hover:bg-primary-dark disabled:opacity-50">
+              <button
+                onClick={handleAdd}
+                disabled={!newValue || !newLabel}
+                className="px-3 py-1.5 bg-primary text-white text-xs rounded hover:bg-primary-dark disabled:opacity-50"
+              >
                 <Save size={12} />
               </button>
             </div>
           )}
 
           {loading ? (
-            <div className="text-xs text-neutral-50 text-center py-6 animate-pulse">Cargando...</div>
+            <div className="text-xs text-neutral-50 text-center py-6 animate-pulse">
+              Cargando...
+            </div>
           ) : (
             <div className="max-h-[400px] overflow-y-auto space-y-0.5">
               {entries.map((entry) => (
-                <div key={entry.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-80/50 group">
+                <div
+                  key={entry.id}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-10 dark:hover:bg-neutral-80/50 group"
+                >
                   <button
                     onClick={() => handleToggle(entry)}
                     className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors ${
@@ -160,7 +189,9 @@ export function CatalogsSection() {
                   >
                     {entry.enabled && <span className="text-white text-[8px]">&#10003;</span>}
                   </button>
-                  <code className="text-[11px] font-mono text-neutral-60 dark:text-neutral-40 w-[140px] shrink-0 truncate">{entry.value}</code>
+                  <code className="text-[11px] font-mono text-neutral-60 dark:text-neutral-40 w-[140px] shrink-0 truncate">
+                    {entry.value}
+                  </code>
                   {editingId === entry.id ? (
                     <div className="flex-1 flex gap-1">
                       <input
@@ -168,17 +199,32 @@ export function CatalogsSection() {
                         onChange={(e) => setEditLabel(e.target.value)}
                         className="flex-1 px-2 py-1 text-xs rounded border border-primary/30 bg-transparent text-neutral-90 dark:text-white focus:outline-none"
                         autoFocus
-                        onKeyDown={(e) => { if (e.key === 'Enter') handleEdit(entry.id); if (e.key === 'Escape') setEditingId(null) }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleEdit(entry.id)
+                          if (e.key === 'Escape') setEditingId(null)
+                        }}
                       />
-                      <button onClick={() => handleEdit(entry.id)} className="text-xs text-primary"><Save size={12} /></button>
-                      <button onClick={() => setEditingId(null)} className="text-xs text-neutral-50"><X size={12} /></button>
+                      <button onClick={() => handleEdit(entry.id)} className="text-xs text-primary">
+                        <Save size={12} />
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="text-xs text-neutral-50"
+                      >
+                        <X size={12} />
+                      </button>
                     </div>
                   ) : (
-                    <span className="flex-1 text-xs text-neutral-90 dark:text-white truncate">{entry.label}</span>
+                    <span className="flex-1 text-xs text-neutral-90 dark:text-white truncate">
+                      {entry.label}
+                    </span>
                   )}
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                     <button
-                      onClick={() => { setEditingId(entry.id); setEditLabel(entry.label) }}
+                      onClick={() => {
+                        setEditingId(entry.id)
+                        setEditLabel(entry.label)
+                      }}
                       className="text-[10px] text-neutral-50 hover:text-primary"
                     >
                       Editar

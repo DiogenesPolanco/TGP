@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
 import type { Plan, Activity } from '@/types/domain'
 

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Clock, Database, Settings, Share2, Check, Copy } from 'lucide-react'
 import { useDashboardMetrics } from '../hooks/useDashboardMetrics'
 import { DashboardHero } from '../components/DashboardHero'

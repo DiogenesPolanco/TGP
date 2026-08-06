@@ -21,7 +21,8 @@ export function FuncionalidadesSection() {
       <SubSection>Modelo de datos</SubSection>
       <Body>
         El THI se calcula desde la tabla <InlineCode>applications</InlineCode> y sus relaciones.
-        Cada aplicación tiene puntuaciones en 7 dimensiones almacenadas como campos numéricos (0-100).
+        Cada aplicación tiene puntuaciones en 7 dimensiones almacenadas como campos numéricos
+        (0-100).
       </Body>
       <CodeBlock>
         {`// applications table (Dexie.js schema)
@@ -102,16 +103,15 @@ const config: ThiWeightConfig = {
       <Body>
         El motor de THI (<InlineCode>src/features/dashboard/services/thiEngine.ts</InlineCode>)
         aplica primero los pesos globales y luego reemplaza con overrides si existen para la BU de
-        la aplicación. Esto permite que diferentes unidades de negocio tengan ponderaciones alineadas
-        con sus prioridades estratégicas.
+        la aplicación. Esto permite que diferentes unidades de negocio tengan ponderaciones
+        alineadas con sus prioridades estratégicas.
       </Body>
 
       <SubSection>Motor de cálculo</SubSection>
       <Body>
-        El motor vive en{' '}
-        <InlineCode>src/features/dashboard/hooks/useThiCalculation.ts</InlineCode>. Se ejecuta en
-        tiempo real vía <InlineCode>useEffect</InlineCode> cuando cambian los datos fuente. Usa{' '}
-        <InlineCode>useLiveQuery</InlineCode> de Dexie.js para reactividad.
+        El motor vive en <InlineCode>src/features/dashboard/hooks/useThiCalculation.ts</InlineCode>.
+        Se ejecuta en tiempo real vía <InlineCode>useEffect</InlineCode> cuando cambian los datos
+        fuente. Usa <InlineCode>useLiveQuery</InlineCode> de Dexie.js para reactividad.
       </Body>
       <CodeBlock>
         {`Flujo de cómputo:
@@ -217,15 +217,25 @@ Tablas incluidas:
       <Table
         rows={[
           ['Fuente', 'Endpoint', 'Uso', 'CSP requerido'],
-          ['MITRE cveawg', 'cveawg.mitre.org/api/cve/{id}', 'Lookup individual por CVE-ID', 'cveawg.mitre.org'],
-          ['NVD (NIST)', 'services.nvd.nist.gov/rest/json/cves/2.0', 'Búsqueda por keyword', 'services.nvd.nist.gov'],
+          [
+            'MITRE cveawg',
+            'cveawg.mitre.org/api/cve/{id}',
+            'Lookup individual por CVE-ID',
+            'cveawg.mitre.org',
+          ],
+          [
+            'NVD (NIST)',
+            'services.nvd.nist.gov/rest/json/cves/2.0',
+            'Búsqueda por keyword',
+            'services.nvd.nist.gov',
+          ],
         ]}
       />
       <Body>
-        Desde el formulario de tecnologías y vulnerabilidades, un botón <strong>"Buscar CVEs"</strong>{' '}
-        permite buscar vulnerabilidades conocidas por nombre de tecnología. Los resultados se muestran
-        en un panel lateral (<InlineCode>CveInfoPanel</InlineCode>) con enlace directo al detalle en
-        NVD.
+        Desde el formulario de tecnologías y vulnerabilidades, un botón{' '}
+        <strong>"Buscar CVEs"</strong> permite buscar vulnerabilidades conocidas por nombre de
+        tecnología. Los resultados se muestran en un panel lateral (
+        <InlineCode>CveInfoPanel</InlineCode>) con enlace directo al detalle en NVD.
       </Body>
       <CodeBlock>
         {`// cveService.ts — lookup individual desde MITRE
@@ -241,15 +251,16 @@ async function searchNvd(keyword: string): Promise<CveResult[]>
       <Body>
         La búsqueda se activa manualmente (no automática) para respetar los rate limits de las APIs
         externas. Cada resultado incluye enlace directo a{' '}
-        <InlineCode>https://nvd.nist.gov/vuln/detail/{'{'}CVE-ID{'}'}</InlineCode> para consultar
-        el detalle completo.
+        <InlineCode>
+          https://nvd.nist.gov/vuln/detail/{'{'}CVE-ID{'}'}
+        </InlineCode>{' '}
+        para consultar el detalle completo.
       </Body>
 
       <SubSection>Matriz de Riesgos</SubSection>
       <Body>
-        La matriz calcula el nivel de riesgo como{' '}
-        <InlineCode>probabilidad × impacto</InlineCode>, donde ambos ejes usan valores 1-5. El
-        resultado se mapea a:
+        La matriz calcula el nivel de riesgo como <InlineCode>probabilidad × impacto</InlineCode>,
+        donde ambos ejes usan valores 1-5. El resultado se mapea a:
       </Body>
       <CodeBlock>
         {`Riesgo = Probabilidad × Impacto (1–25)

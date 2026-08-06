@@ -21,8 +21,8 @@ export function UserSelectionPanel({
         </div>
         <h2 className="text-3xl font-bold leading-tight mb-4">¿Quién eres?</h2>
         <p className="text-base leading-relaxed opacity-85">
-          Selecciona tu perfil para personalizar tu experiencia y determinar el intervalo
-          de re-autenticación OTP.
+          Selecciona tu perfil para personalizar tu experiencia y determinar el intervalo de
+          re-autenticación OTP.
         </p>
       </AuthBrandPanel>
       <PerforatedDivider />

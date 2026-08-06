@@ -16,13 +16,33 @@ interface DatePickerProps {
 }
 
 const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ]
 
 const MONTHS_SHORT = [
-  'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-  'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
+  'Ene',
+  'Feb',
+  'Mar',
+  'Abr',
+  'May',
+  'Jun',
+  'Jul',
+  'Ago',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dic',
 ]
 
 const DAYS = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá']
@@ -87,7 +107,10 @@ export function DatePicker({
       }
     }
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); setMode('calendar') }
+      if (e.key === 'Escape') {
+        setOpen(false)
+        setMode('calendar')
+      }
     }
     document.addEventListener('mousedown', onMouseDown)
     document.addEventListener('keydown', onKeyDown)
@@ -115,8 +138,10 @@ export function DatePicker({
 
   const goPrev = useCallback(() => {
     if (mode === 'calendar') {
-      if (viewMonth === 0) { setViewYear((y) => y - 1); setViewMonth(11) }
-      else setViewMonth((m) => m - 1)
+      if (viewMonth === 0) {
+        setViewYear((y) => y - 1)
+        setViewMonth(11)
+      } else setViewMonth((m) => m - 1)
     } else if (mode === 'month') {
       setViewYear((y) => y - 1)
     } else if (mode === 'year') {
@@ -126,8 +151,10 @@ export function DatePicker({
 
   const goNext = useCallback(() => {
     if (mode === 'calendar') {
-      if (viewMonth === 11) { setViewYear((y) => y + 1); setViewMonth(0) }
-      else setViewMonth((m) => m + 1)
+      if (viewMonth === 11) {
+        setViewYear((y) => y + 1)
+        setViewMonth(0)
+      } else setViewMonth((m) => m + 1)
     } else if (mode === 'month') {
       setViewYear((y) => y + 1)
     } else if (mode === 'year') {
@@ -176,32 +203,35 @@ export function DatePicker({
     : ''
 
   // Title in header — clickable to switch modes
-  const headerTitle = mode === 'calendar' ? (
-    <button
-      type="button"
-      onClick={() => setMode('month')}
-      className="flex items-center gap-1 px-2 py-1 -mx-2 rounded-lg hover:bg-subtle transition-colors"
-    >
-      <span className="text-sm font-semibold text-default dark:text-white">{MONTHS[viewMonth]}</span>
-      <span className="text-sm font-medium text-muted">{viewYear}</span>
-      <ChevronDown size={12} className="text-muted" />
-    </button>
-  ) : mode === 'month' ? (
-    <button
-      type="button"
-      onClick={() => setMode('year')}
-      className="flex items-center gap-1 px-2 py-1 -mx-2 rounded-lg hover:bg-subtle transition-colors"
-    >
-      <span className="text-sm font-semibold text-default dark:text-white">{viewYear}</span>
-      <ChevronDown size={12} className="text-muted" />
-    </button>
-  ) : (
-    <div className="flex items-center gap-1.5">
-      <span className="text-sm font-semibold text-default dark:text-white">
-        {viewYear - 5} – {viewYear + 6}
-      </span>
-    </div>
-  )
+  const headerTitle =
+    mode === 'calendar' ? (
+      <button
+        type="button"
+        onClick={() => setMode('month')}
+        className="flex items-center gap-1 px-2 py-1 -mx-2 rounded-lg hover:bg-subtle transition-colors"
+      >
+        <span className="text-sm font-semibold text-default dark:text-white">
+          {MONTHS[viewMonth]}
+        </span>
+        <span className="text-sm font-medium text-muted">{viewYear}</span>
+        <ChevronDown size={12} className="text-muted" />
+      </button>
+    ) : mode === 'month' ? (
+      <button
+        type="button"
+        onClick={() => setMode('year')}
+        className="flex items-center gap-1 px-2 py-1 -mx-2 rounded-lg hover:bg-subtle transition-colors"
+      >
+        <span className="text-sm font-semibold text-default dark:text-white">{viewYear}</span>
+        <ChevronDown size={12} className="text-muted" />
+      </button>
+    ) : (
+      <div className="flex items-center gap-1.5">
+        <span className="text-sm font-semibold text-default dark:text-white">
+          {viewYear - 5} – {viewYear + 6}
+        </span>
+      </div>
+    )
 
   // Build calendar grid
   const totalCells = firstDay + daysInMonth
@@ -253,7 +283,9 @@ export function DatePicker({
         `}
       >
         <CalendarDays size={15} className="shrink-0 text-muted" />
-        <span className={`flex-1 min-w-0 truncate ${displayValue ? 'text-default dark:text-white' : 'text-muted'}`}>
+        <span
+          className={`flex-1 min-w-0 truncate ${displayValue ? 'text-default dark:text-white' : 'text-muted'}`}
+        >
           {displayValue || placeholder}
         </span>
       </button>
@@ -295,7 +327,10 @@ export function DatePicker({
                   <button
                     key={name}
                     type="button"
-                    onClick={() => { setViewMonth(i); setMode('calendar') }}
+                    onClick={() => {
+                      setViewMonth(i)
+                      setMode('calendar')
+                    }}
                     className={`text-sm py-2 rounded-lg transition-all ${
                       i === viewMonth
                         ? 'bg-primary text-white font-semibold shadow-sm'
@@ -320,7 +355,10 @@ export function DatePicker({
                   <button
                     key={y}
                     type="button"
-                    onClick={() => { setViewYear(y); setMode('month') }}
+                    onClick={() => {
+                      setViewYear(y)
+                      setMode('month')
+                    }}
                     className={`text-sm py-2 rounded-lg transition-all ${
                       y === viewYear
                         ? 'bg-primary text-white font-semibold shadow-sm'
@@ -341,7 +379,12 @@ export function DatePicker({
             <>
               <div className="grid grid-cols-7 mb-0.5">
                 {DAYS.map((d) => (
-                  <div key={d} className="text-center text-[11px] font-semibold text-muted tracking-wide py-1">{d}</div>
+                  <div
+                    key={d}
+                    className="text-center text-[11px] font-semibold text-muted tracking-wide py-1"
+                  >
+                    {d}
+                  </div>
                 ))}
               </div>
 

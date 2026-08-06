@@ -1,6 +1,6 @@
 import { InvalidLinkPage } from '@/components/sharing/InvalidLinkPage'
 import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import {
   isValidShareHash,
   getPublicDashboardData,
@@ -95,7 +95,7 @@ export function PublicDashboardPage() {
     })()
   }, [hash])
 
-  const kpis = useMemo(() => data ? computeDashboardKpis(data) : null, [data])
+  const kpis = useMemo(() => (data ? computeDashboardKpis(data) : null), [data])
 
   if (loading) return <Loader />
   if (!valid) return <InvalidLinkPage />
@@ -387,5 +387,3 @@ export function PublicDashboardPage() {
     </div>
   )
 }
-
-

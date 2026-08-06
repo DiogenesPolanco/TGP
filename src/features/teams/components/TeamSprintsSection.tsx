@@ -49,13 +49,18 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
 
   const handleSyncFromJira = async () => {
     if (!jiraConfigured) {
-      addNotification({ type: 'error', message: 'Jira no está configurado. Ve a Administración → Jira.' })
+      addNotification({
+        type: 'error',
+        message: 'Jira no está configurado. Ve a Administración → Jira.',
+      })
       return
     }
     setSyncing(true)
     try {
       const boards = await getBoards()
-      const matchBoard = boards.find((b) => b.name.toLowerCase().trim() === teamName.toLowerCase().trim())
+      const matchBoard = boards.find(
+        (b) => b.name.toLowerCase().trim() === teamName.toLowerCase().trim(),
+      )
       if (!matchBoard) {
         addNotification({
           type: 'error',
@@ -74,7 +79,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
         const q = sprint.startDate
           ? `Q${Math.floor(new Date(sprint.startDate).getMonth() / 3) + 1}`
           : `Q${Math.ceil((new Date().getMonth() + 1) / 3)}`
-        const yr = sprint.startDate ? new Date(sprint.startDate).getFullYear() : new Date().getFullYear()
+        const yr = sprint.startDate
+          ? new Date(sprint.startDate).getFullYear()
+          : new Date().getFullYear()
 
         for (const [, data] of Object.entries(metrics.perAssignee)) {
           const matchedMember = members.find(
@@ -116,7 +123,16 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
     }
   }
 
-  const addSprint = async (values: { sprintName: string; quarter: string; year: number; startDate: string; endDate: string; plannedSP: number; completedSP: number; notCompletedSP: number }) => {
+  const addSprint = async (values: {
+    sprintName: string
+    quarter: string
+    year: number
+    startDate: string
+    endDate: string
+    plannedSP: number
+    completedSP: number
+    notCompletedSP: number
+  }) => {
     if (!values.sprintName.trim() || !values.startDate || !values.endDate) return
     const sprint: TeamSprint = {
       id: crypto.randomUUID(),
@@ -137,7 +153,16 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
     setShowForm(false)
   }
 
-  const saveEdit = async (values: { sprintName: string; quarter: string; year: number; startDate: string; endDate: string; plannedSP: number; completedSP: number; notCompletedSP: number }) => {
+  const saveEdit = async (values: {
+    sprintName: string
+    quarter: string
+    year: number
+    startDate: string
+    endDate: string
+    plannedSP: number
+    completedSP: number
+    notCompletedSP: number
+  }) => {
     if (!editingId || !values.sprintName.trim() || !values.startDate || !values.endDate) return
     const existing = sprints.find((s) => s.id === editingId)
     if (!existing) return
@@ -188,7 +213,9 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
   return (
     <div className="bg-card rounded-xl border border-boundary p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">Sprints del Equipo</h2>
+        <h2 className="text-lg font-semibold text-neutral-90 dark:text-white">
+          Sprints del Equipo
+        </h2>
         <div className="flex items-center gap-2">
           {jiraConfigured && !showForm && editingId === null && (
             <Button
@@ -269,10 +296,20 @@ export function TeamSprintsSection({ teamId, teamName, members }: Props) {
                   </span>
                 </div>
                 <div className="hidden sm:flex items-center gap-4 text-[11px] text-neutral-50">
-                  <span><strong className="text-secondary">{qPlanned}</strong> SP plan.</span>
-                  <span className="text-success"><strong>{qDone}</strong> complet.</span>
-                  <span className="text-danger"><strong>{qNotDone}</strong> no compl.</span>
-                  <span className={qEff >= 80 ? 'text-success' : qEff >= 50 ? 'text-warning' : 'text-danger'}>
+                  <span>
+                    <strong className="text-secondary">{qPlanned}</strong> SP plan.
+                  </span>
+                  <span className="text-success">
+                    <strong>{qDone}</strong> complet.
+                  </span>
+                  <span className="text-danger">
+                    <strong>{qNotDone}</strong> no compl.
+                  </span>
+                  <span
+                    className={
+                      qEff >= 80 ? 'text-success' : qEff >= 50 ? 'text-warning' : 'text-danger'
+                    }
+                  >
                     <strong>{qEff}%</strong> efic.
                   </span>
                 </div>
