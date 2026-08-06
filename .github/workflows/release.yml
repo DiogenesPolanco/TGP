@@ -295,10 +295,12 @@ jobs:
         with:
           ref: ${{ needs.version.outputs.new_tag }}
 
-      - name: Download all artifacts
+      - name: Download desktop artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: TGP-*
           path: artifacts
+          merge-multiple: true
 
       - name: Generate release notes
         run: |
@@ -314,6 +316,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE_TAG="${{ needs.version.outputs.new_tag }}"
+          ASSETS=$(find artifacts -type f | sort)
+          echo "Assets a subir:"
+          echo "$ASSETS"
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $RELEASE_TAG already exists — updating title/notes"
             gh release edit "$RELEASE_TAG" \
@@ -326,6 +331,6 @@ jobs:
               --title "TGP Desktop $RELEASE_TAG" \
               --notes-file release-notes.md \
               --repo "$GITHUB_REPOSITORY" \
-              artifacts/**/*
+              $ASSETS
           fi
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,url
