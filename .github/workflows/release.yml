@@ -310,12 +310,22 @@ jobs:
           echo "- **Mac**: DMG (Intel + Apple Silicon)" >> release-notes.md
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.version.outputs.new_tag }}
-          name: "TGP Desktop ${{ needs.version.outputs.new_tag }}"
-          body_path: release-notes.md
-          files: |
-            artifacts/**/*
-          draft: false
-          prerelease: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_TAG="${{ needs.version.outputs.new_tag }}"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists — updating title/notes"
+            gh release edit "$RELEASE_TAG" \
+              --title "TGP Desktop $RELEASE_TAG" \
+              --notes-file release-notes.md \
+              --repo "$GITHUB_REPOSITORY"
+          else
+            echo "Creating release $RELEASE_TAG"
+            gh release create "$RELEASE_TAG" \
+              --title "TGP Desktop $RELEASE_TAG" \
+              --notes-file release-notes.md \
+              --repo "$GITHUB_REPOSITORY" \
+              artifacts/**/*
+          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,url
