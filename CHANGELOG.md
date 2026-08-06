@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.17](https://github.com/DiogenesPolanco/TGP/compare/v1.1.16...v1.1.17) (2026-08-06)
+
+### 👷 CI
+
+- reemplazar softprops por gh release create en desktop release ([7b163d2](https://github.com/DiogenesPolanco/TGP/commit/7b163d2fd19e23785e0e8d9e31d4272131d6def9))
+
 ### [1.1.16](https://github.com/DiogenesPolanco/TGP/compare/v1.1.15...v1.1.16) (2026-08-06)
 
 ### 👷 CI
