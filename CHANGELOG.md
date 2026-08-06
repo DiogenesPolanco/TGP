@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.16](https://github.com/DiogenesPolanco/TGP/compare/v1.1.15...v1.1.16) (2026-08-06)
+
+### 👷 CI
+
+- unificar pipelines en un solo release workflow ([1526a05](https://github.com/DiogenesPolanco/TGP/commit/1526a05c634dbcc0d38057d34c51edabe29cbb3a))
+
+### 🧪 Tests
+
+- subir cobertura al 90% y corregir bugs en ai tools ([0888f86](https://github.com/DiogenesPolanco/TGP/commit/0888f86391dba6babd4e8de7da4b89ae01cc0ffc))
+
+### 🔧 Refactors
+
+- migrar a react-router v8 ([6ce0883](https://github.com/DiogenesPolanco/TGP/commit/6ce0883e0384be4d46648d0cbfabc502904de59d))
+
 ### [1.1.15](https://github.com/DiogenesPolanco/TGP/compare/v1.1.14...v1.1.15) (2026-08-03)
 
 ### 📦 Chores
