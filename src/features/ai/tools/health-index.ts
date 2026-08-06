@@ -44,7 +44,9 @@ export const consultarHealthIndexTool: AiToolDefinition = {
     let records = await db.healthIndexHistory.toArray()
 
     if (buId) records = records.filter((r) => r.businessUnitId === buId)
-    records = records.filter((r) => new Date(r.calculatedAt) >= corte)
+    if (periodo !== 'all') {
+      records = records.filter((r) => new Date(r.calculatedAt) >= corte)
+    }
     records.sort((a, b) => new Date(a.calculatedAt).getTime() - new Date(b.calculatedAt).getTime())
 
     if (records.length === 0) {

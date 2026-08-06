@@ -77,7 +77,8 @@ export const consultarObsolescenciaTool: AiToolDefinition = {
 
     const showExpired = soloCriticas ? [] : sortedExpired
     const showExpiring = soloCriticas ? sortedExpired : expiring
-    const display = [...showExpiring, ...showExpired].slice(0, limit)
+    const showHealthy = soloCriticas ? [] : healthy
+    const display = [...showExpiring, ...showExpired, ...showHealthy].slice(0, limit)
     const output: string[] = []
 
     if (!categoria && !vendor && !estado && !soloCriticas) {

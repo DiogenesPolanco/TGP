@@ -101,8 +101,8 @@ export const consultarMetricasSprintTool: AiToolDefinition = {
 
       try {
         // Las métricas DORA pueden estar en teamSprints o en team.currentMetrics
-        const doraData = await db.teamSprints.toArray()
-        if (teamId) doraData.filter((s) => s.teamId === teamId)
+        let doraData = await db.teamSprints.toArray()
+        if (teamId) doraData = doraData.filter((s) => s.teamId === teamId)
 
         const byTeam = new Map<string, { deploys: number; changes: number }>()
         for (const s of doraData) {

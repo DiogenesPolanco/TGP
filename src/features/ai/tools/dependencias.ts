@@ -145,7 +145,7 @@ export const consultarDependenciasTool: AiToolDefinition = {
       /* istanbul ignore next */
     }
 
-    if (output.length > 2) {
+    if (output.length > 3) {
       output.push(
         `💡 Usá \`consultar_relaciones({ tabla: "applications", id: "${appId}" })\` para ver todos los datos vinculados.`,
       )

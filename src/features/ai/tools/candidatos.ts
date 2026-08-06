@@ -119,7 +119,6 @@ export const consultarCandidatoTool: AiToolDefinition = {
       const evals = await db.candidateEvaluations.where('candidateId').equals(candidateId).toArray()
 
       if (evals.length > 0) {
-        output.push(`**Evaluaciones** (${evals.length} categorías):`)
         const grouped = new Map<string, number[]>()
         for (const e of evals) {
           const existing = grouped.get(e.category) ?? []
@@ -127,6 +126,7 @@ export const consultarCandidatoTool: AiToolDefinition = {
           grouped.set(e.category, existing)
         }
 
+        output.push(`**Evaluaciones** (${grouped.size} categorías):`)
         const avg = (vals: number[]) => Math.round(vals.reduce((a, b) => a + b, 0) / vals.length)
 
         for (const [cat, pts] of grouped) {

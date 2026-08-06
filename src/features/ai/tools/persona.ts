@@ -98,7 +98,7 @@ export const consultarPersonaTool: AiToolDefinition = {
     }
 
     await findMemberItems(
-      db as any,
+      db.commitments as any,
       'assignedTo',
       'Compromisos',
       (c: any) =>
@@ -106,7 +106,7 @@ export const consultarPersonaTool: AiToolDefinition = {
     )
 
     await findMemberItems(
-      db as any,
+      db.tasks as any,
       'assignedTo',
       'Tareas',
       (t: any) =>
@@ -114,15 +114,15 @@ export const consultarPersonaTool: AiToolDefinition = {
     )
 
     await findMemberItems(
-      db as any,
-      'assignedTo',
+      db.equipmentTickets as any,
+      'assigneeId',
       'Tickets de equipamiento',
       (t: any) =>
         `${t.title ?? 'Ticket #' + t.id} · ${t.type ?? ''} ${t.status ? `[${t.status}]` : ''}`,
     )
 
     await findMemberItems(
-      db as any,
+      db.auditFindings as any,
       'assignedTo',
       'Hallazgos',
       (h: any) =>
@@ -146,7 +146,7 @@ export const consultarPersonaTool: AiToolDefinition = {
       }
     } catch {}
 
-    if (!encontrada && output.length <= 1) {
+    if (!encontrada && output.length <= 2) {
       output.push(
         `No se encontró una persona con ID o email "${idInput}". Usá \`buscar_persona\` primero para localizar el ID correcto.`,
       )

@@ -160,7 +160,7 @@ export const consultarIndicadoresTool: AiToolDefinition = {
       }
     } catch {}
 
-    if (output.length <= 2) {
+    if (output.length <= 3) {
       output.push('No hay datos disponibles para mostrar indicadores.')
     }
 
