@@ -39,6 +39,8 @@ import type {
   EquipmentItem,
   EquipmentAssignmentLog,
   EquipmentTicket,
+  CostEntry,
+  CostBudget,
 } from '@/types/domain'
 import type { AiConversation, AiChatMessage } from '@/features/ai/types'
 import type { SystemConfig, CatalogEntry, ContentBlock, Skill } from '@/types/system'
@@ -86,6 +88,10 @@ export class TGPDatabase extends Dexie {
   equipment!: Table<EquipmentItem, string>
   equipmentAssignments!: Table<EquipmentAssignmentLog, string>
   equipmentTickets!: Table<EquipmentTicket, string>
+
+  // FinOps
+  costEntries!: Table<CostEntry, string>
+  costBudgets!: Table<CostBudget, string>
 
   // Junction M:N microservicios
   vulnerabilityMicroservices!: Table<VulnerabilityMicroservice, string>
@@ -203,6 +209,10 @@ export class TGPDatabase extends Dexie {
       catalogs: 'id, [category+value], category, enabled',
       contentBlocks: 'key',
       skills: 'id, category, name',
+    })
+    this.version(24).stores({
+      costEntries: 'id, applicationId, microserviceId, categoryId, period, source',
+      costBudgets: 'id, applicationId, period',
     })
   }
 }

@@ -90,6 +90,7 @@ export type CatalogCategory =
   | 'equipment_status'
   | 'recruitment_status'
   | 'notification_type'
+  | 'cost_category'
 
 /** ─── content_blocks ─── UI text, landing, docs, features */
 export interface ContentBlock {

@@ -684,3 +684,29 @@ export interface EquipmentTicket {
   createdAt: Date
   updatedAt: Date
 }
+
+// ─── FinOps ───
+export type CostSource = 'manual' | 'allocation' | 'import'
+
+export interface CostEntry {
+  id: string
+  applicationId: string
+  microserviceId: string | null
+  categoryId: string
+  amount: number
+  currency: string
+  period: string
+  source: CostSource
+  notes: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CostBudget {
+  id: string
+  applicationId: string
+  period: string
+  amount: number
+  createdAt: string
+  updatedAt: string
+}
