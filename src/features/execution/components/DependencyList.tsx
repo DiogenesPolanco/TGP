@@ -4,6 +4,7 @@ import { db } from '@/services/db/database'
 import { ArrowRight, ChevronDown, ChevronRight, Link2, Plus, Trash2 } from 'lucide-react'
 import type { DependencyRelation } from '@/constants/enums'
 import { Select } from '@/components/ui/Select'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface DependencyListProps {
   planId: string
@@ -38,6 +39,7 @@ export function DependencyList({ planId }: DependencyListProps) {
   const [targetId, setTargetId] = useState('')
   const [relationType, setRelationType] = useState<DependencyRelation>('depends_on')
   const [description, setDescription] = useState('')
+  const { confirm } = useConfirm()
 
   const plans = useLiveQuery(() => db.plans.toArray())
   const activities = useLiveQuery(() => db.activities.where('planId').equals(planId).toArray())
@@ -112,8 +114,14 @@ export function DependencyList({ planId }: DependencyListProps) {
     setShowForm(false)
   }
 
-  const handleRemove = async (id: string) => {
-    await db.dependencies.delete(id)
+  const handleRemove = async (dep: { id: string; targetType: string; targetId: string }) => {
+    if (
+      !(await confirm(
+        `¿Eliminar esta dependencia hacia "${getEntityName(dep.targetType, dep.targetId)}"?`,
+      ))
+    )
+      return
+    await db.dependencies.delete(dep.id)
   }
 
   const allDeps = [
@@ -275,7 +283,7 @@ export function DependencyList({ planId }: DependencyListProps) {
               </div>
               <button
                 type="button"
-                onClick={() => handleRemove(dep.id)}
+                onClick={() => handleRemove(dep)}
                 className="p-1 rounded-md hover:bg-neutral-20 dark:hover:bg-neutral-60 transition-colors shrink-0 ml-2"
               >
                 <Trash2 size={14} className="text-neutral-50 hover:text-danger" />

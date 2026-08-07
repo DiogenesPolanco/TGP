@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Sparkles, ArrowLeft, Bot, Pencil } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { useAiConfigStore } from '../store/aiConfigStore'
 import { InlineChat } from '../components/InlineChat'
 import { Badge } from '@/components/ui/Badge'
@@ -28,6 +29,7 @@ function providerLabel(p: string): string {
 export function AiSettingsPage() {
   const navigate = useNavigate()
   const currentUser = useUserStore((s) => s.currentUser)
+  const { confirm } = useConfirm()
   const { getConfig, saveConfig, removeConfig, updatePermission } = useAiConfigStore()
   const config = currentUser ? getConfig(currentUser.id) : null
   const [editing, setEditing] = useState(false)
@@ -81,8 +83,11 @@ export function AiSettingsPage() {
     setEditing(false)
   }
 
-  const handleRemove = () => {
-    if (currentUser && confirm('¿Desconectar el asistente? Se borrará toda la configuración.')) {
+  const handleRemove = async () => {
+    if (
+      currentUser &&
+      (await confirm('¿Desconectar el asistente? Se borrará toda la configuración.'))
+    ) {
       removeConfig(currentUser.id)
     }
   }

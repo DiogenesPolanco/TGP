@@ -5,6 +5,7 @@ import type { VacationRecord } from '@/types/domain'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Plus, Trash2, Save, X, Umbrella, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { useConfirm } from '@/hooks/useConfirm'
 import { parseLocalDate } from '@/lib/utils'
 
 interface Props {
@@ -51,6 +52,7 @@ export function VacationsSection({ memberId }: Props) {
   const [form, setForm] = useState<FormState>(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
+  const { confirm } = useConfirm()
 
   const totalUsed = records.reduce((s, r) => s + r.days, 0)
   const vacationDaysPerYear = profile?.vacationDaysPerYear ?? 14
@@ -100,8 +102,14 @@ export function VacationsSection({ memberId }: Props) {
     setEditingId(null)
   }
 
-  const handleDelete = async (id: string) => {
-    await db.vacationRecords.delete(id)
+  const handleDelete = async (r: VacationRecord) => {
+    if (
+      !(await confirm(
+        `¿Eliminar este registro de vacaciones (${r.days} días, desde ${formatDate(r.startDate)})?`,
+      ))
+    )
+      return
+    await db.vacationRecords.delete(r.id)
     await syncVacationUsed()
   }
 
@@ -311,7 +319,7 @@ export function VacationsSection({ memberId }: Props) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(record.id)}
+                      onClick={() => handleDelete(record)}
                       className="p-1.5 rounded-md text-neutral-50 hover:text-danger hover:bg-danger/10 transition-colors"
                       title="Eliminar"
                     >

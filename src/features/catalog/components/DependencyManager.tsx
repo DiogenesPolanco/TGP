@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { Plus, ExternalLink, Link, Unlink } from 'lucide-react'
 import {
   appStatusLabel,
@@ -27,6 +28,7 @@ export function DependencyManager({
     ) ?? []
 
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const [depSearch, setDepSearch] = useState('')
   const [depType, setDepType] = useState<DependencyType>('api')
   const [depCriticality, setDepCriticality] = useState<Criticality>('medium')
@@ -64,6 +66,9 @@ export function DependencyManager({
   }
 
   const handleRemoveDependency = async (depId: string) => {
+    const dep = dependencies.find((d) => d.id === depId)
+    const targetName = allApps.find((a) => a.id === dep?.dependsOnAppId)?.name ?? 'esta aplicación'
+    if (!(await confirm(`¿Eliminar la dependencia hacia "${targetName}"?`))) return
     await db.applicationDependencies.delete(depId)
     addNotification({ type: 'info', message: 'Dependencia eliminada' })
   }

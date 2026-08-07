@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db/database'
 import { getCostEntries, deleteCostEntry } from '../services/finOpsService'
 import { useCatalogMap } from '@/hooks/useCatalog'
+import { useConfirm } from '@/hooks/useConfirm'
 import { CostCategoryBadge } from '../components/CostCategoryBadge'
 import { AllocationModal } from '../components/AllocationModal'
 import { ImportCsvModal } from '../components/ImportCsvModal'
@@ -15,6 +16,7 @@ export function CostEntriesPage() {
   const [period, setPeriod] = useState('')
   const [showAllocation, setShowAllocation] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const { confirm } = useConfirm()
   const categoryMap = useCatalogMap('cost_category')
   const apps = useLiveQuery(() => db.applications.toArray()) ?? []
   const appName = new Map(apps.map((a) => [a.id, a.name]))
@@ -26,8 +28,15 @@ export function CostEntriesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period])
 
-  const handleDelete = async (id: string) => {
-    await deleteCostEntry(id)
+  const handleDelete = async (e: CostEntry) => {
+    const app = appName.get(e.applicationId) ?? e.applicationId
+    if (
+      !(await confirm(
+        `¿Eliminar la partida de ${fmt(e.amount, e.currency)} de "${app}" (${e.period})?`,
+      ))
+    )
+      return
+    await deleteCostEntry(e.id)
     load()
   }
 
@@ -96,7 +105,7 @@ export function CostEntriesPage() {
                 <td className="px-4 py-2 capitalize">{e.source}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <Link to={`/finops/entries/${e.id}/edit`}>Editar</Link>
-                  <button className="text-danger" onClick={() => handleDelete(e.id)}>
+                  <button className="text-danger" onClick={() => handleDelete(e)}>
                     Eliminar
                   </button>
                 </td>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useAiChat } from '../hooks/useAiChat'
 import { useCopy } from '@/hooks/useCopy'
+import { useConfirm } from '@/hooks/useConfirm'
 import type { AiChatPanelProps } from './aiChatHelpers'
 import { KF, providerLabel } from './aiChatHelpers'
 import { MessageBanner, EmptyState, LoadingDots, ConversationList } from './aiChatComponents'
@@ -38,6 +39,7 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { copiedId, copy } = useCopy()
+  const { confirm } = useConfirm()
 
   // Mount / unmount animation
   useEffect(() => {
@@ -102,9 +104,12 @@ export function AiChatPanel({ config, onClose, isOpen }: AiChatPanelProps) {
 
   const handleDeleteConversation = useCallback(
     async (id: string) => {
+      const conv = conversations.find((c) => c.id === id)
+      const label = conv?.title ? `"${conv.title}"` : 'esta conversación'
+      if (!(await confirm(`¿Eliminar ${label}? Se borrarán todos sus mensajes.`))) return
       await deleteConv(id)
     },
-    [deleteConv],
+    [confirm, conversations, deleteConv],
   )
 
   if (!mounted) return null

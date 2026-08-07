@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Settings, Save, RotateCcw, RefreshCw } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import { getAllConfigs, setConfig, deleteConfig } from '@/services/system/systemConfigService'
 import { seedSystemData } from '@/services/system/seedSystemData'
 import type { SystemConfig } from '@/types/system'
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 
 export function SystemConfigSection() {
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const [configs, setConfigs] = useState<SystemConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<string | null>(null)
@@ -38,7 +40,11 @@ export function SystemConfigSection() {
   }
 
   const handleReset = async () => {
-    if (!confirm('¿Restaurar configuraciones por defecto? Los cambios personalizados se perderán.'))
+    if (
+      !(await confirm(
+        '¿Restaurar configuraciones por defecto? Los cambios personalizados se perderán.',
+      ))
+    )
       return
     await Promise.all(configs.map((c) => deleteConfig(c.key)))
     await seedSystemData(true)

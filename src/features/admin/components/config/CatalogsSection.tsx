@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { List, Plus, Save, X, RefreshCw } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
+import { useConfirm } from '@/hooks/useConfirm'
 import {
   getCatalog,
   getAllCategories,
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 
 export function CatalogsSection() {
   const { addNotification } = useAppStore()
+  const { confirm } = useConfirm()
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCat, setSelectedCat] = useState<string>('')
   const [entries, setEntries] = useState<CatalogEntry[]>([])
@@ -74,7 +76,7 @@ export function CatalogsSection() {
   }
 
   const handleDelete = async (id: string, label: string) => {
-    if (!confirm(`¿Eliminar "${label}"?`)) return
+    if (!(await confirm(`¿Eliminar "${label}" del catálogo?`))) return
     await deleteCatalogEntry(id)
     addNotification({ type: 'success', message: 'Eliminado' })
     await loadEntries(selectedCat)
