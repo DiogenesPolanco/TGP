@@ -240,3 +240,68 @@ export async function getDashboardMetrics(period: string): Promise<DashboardMetr
     trend12m,
   }
 }
+
+// ─── Distribución (prorrateo) ───
+
+export interface DistributeCostInput {
+  period: string
+  totalAmount: number
+  method: 'equal' | 'weighted' | 'byMicroserviceCount'
+  appIds: string[]
+  weights?: Record<string, number>
+  notes?: string | null
+}
+
+export async function distributeCost(input: DistributeCostInput): Promise<number> {
+  const { period, totalAmount, method, appIds, weights, notes } = input
+  if (totalAmount <= 0) throw new Error('El monto total debe ser mayor a 0')
+  if (appIds.length === 0) throw new Error('Selecciona al menos una aplicación')
+
+  const amounts = new Map<string, number>()
+
+  if (method === 'equal') {
+    const each = totalAmount / appIds.length
+    for (const appId of appIds) amounts.set(appId, each)
+  } else if (method === 'weighted') {
+    const w = weights ?? {}
+    const entries = appIds.map((appId) => ({ appId, weight: w[appId] ?? 0 }))
+    const totalWeight = entries.reduce((s, e) => s + e.weight, 0)
+    if (totalWeight <= 0) throw new Error('Los pesos deben sumar más de 0')
+    for (const e of entries) {
+      amounts.set(e.appId, Math.round(((totalAmount * e.weight) / totalWeight) * 100) / 100)
+    }
+  } else {
+    let totalMicros = 0
+    const counts = new Map<string, number>()
+    for (const appId of appIds) {
+      const ids = await getAppMicroserviceIds(appId)
+      counts.set(appId, ids.length)
+      totalMicros += ids.length
+    }
+    if (totalMicros <= 0) {
+      throw new Error('Ninguna aplicación tiene microservicios para prorratear')
+    }
+    for (const appId of appIds) {
+      const c = counts.get(appId) ?? 0
+      amounts.set(appId, Math.round(((totalAmount * c) / totalMicros) * 100) / 100)
+    }
+  }
+
+  // corregir drift de redondeo en la última app
+  const allocated = [...amounts.values()].reduce((s, v) => s + v, 0)
+  const last = appIds[appIds.length - 1]
+  amounts.set(last, Math.round(((amounts.get(last) ?? 0) + (totalAmount - allocated)) * 100) / 100)
+
+  const entries: CostEntryInput[] = appIds.map((appId) => ({
+    applicationId: appId,
+    microserviceId: null,
+    categoryId: 'distribution',
+    amount: amounts.get(appId) ?? 0,
+    currency: 'USD',
+    period,
+    source: 'allocation',
+    notes: notes ?? `Distribución ${method}`,
+  }))
+
+  return bulkCreateCostEntries(entries)
+}

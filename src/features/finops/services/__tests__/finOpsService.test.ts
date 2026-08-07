@@ -8,6 +8,7 @@ import {
   getAppCost,
   rollupAppCosts,
   getDashboardMetrics,
+  distributeCost,
 } from '../finOpsService'
 
 beforeEach(async () => {
@@ -235,5 +236,57 @@ describe('finOpsService · métricas dashboard', () => {
     const m = await getDashboardMetrics('2026-07')
     expect(m.previousTotal).toBe(0)
     expect(m.variationPct).toBeNull()
+  })
+})
+
+describe('finOpsService · distribución', () => {
+  it('reparte equitativamente (equal)', async () => {
+    await distributeCost({
+      period: '2026-07',
+      totalAmount: 900,
+      method: 'equal',
+      appIds: ['app-1', 'app-2'],
+      notes: 'Cloud compartido',
+    })
+    const entries = await getCostEntries({ period: '2026-07', source: 'allocation' })
+    expect(entries).toHaveLength(2)
+    expect(entries.every((e) => e.amount === 450)).toBe(true)
+    expect(entries.every((e) => e.categoryId === 'distribution')).toBe(true)
+  })
+
+  it('reparte por pesos (weighted)', async () => {
+    await distributeCost({
+      period: '2026-07',
+      totalAmount: 1000,
+      method: 'weighted',
+      appIds: ['app-1', 'app-2'],
+      weights: { 'app-1': 80, 'app-2': 20 },
+      notes: null,
+    })
+    const entries = await getCostEntries({ period: '2026-07', source: 'allocation' })
+    const app1 = entries.find((e) => e.applicationId === 'app-1')!
+    expect(app1.amount).toBe(800)
+  })
+
+  it('reparte proporcional a microservicios (byMicroserviceCount)', async () => {
+    await db.microservices.add({
+      id: 'ms-2',
+      applicationId: 'app-1',
+      name: 'MS 2',
+      description: '',
+      technologies: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    await distributeCost({
+      period: '2026-07',
+      totalAmount: 600,
+      method: 'byMicroserviceCount',
+      appIds: ['app-1', 'app-2'],
+      notes: null,
+    })
+    const entries = await getCostEntries({ period: '2026-07', source: 'allocation' })
+    const app1 = entries.find((e) => e.applicationId === 'app-1')!
+    expect(app1.amount).toBe(600)
   })
 })
