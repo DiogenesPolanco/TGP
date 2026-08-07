@@ -34,6 +34,7 @@ import type {
   EquipmentAssignmentLog,
   EquipmentTicket,
   CostEntry,
+  CostBudget,
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes
@@ -5663,10 +5664,15 @@ export async function seedDemoData(force = false) {
     const nowIso = new Date().toISOString()
     const categories = ['cloud', 'licenses', 'support', 'infrastructure', 'personnel', 'other']
     const entries: CostEntry[] = []
-    for (let i = 5; i >= 0; i--) {
+    const budgets: CostBudget[] = []
+    const monthPeriod = (offset: number) => {
       const d = new Date()
-      d.setMonth(d.getMonth() - i)
-      const period = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      d.setMonth(d.getMonth() - offset)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    }
+
+    for (let i = 5; i >= 0; i--) {
+      const period = monthPeriod(i)
       for (const app of apps.slice(0, Math.min(6, apps.length))) {
         const idx = apps.indexOf(app)
         const cat = categories[idx % categories.length]
@@ -5679,14 +5685,54 @@ export async function seedDemoData(force = false) {
           amount,
           currency: 'USD',
           period,
-          source: 'manual',
-          notes: 'Seed demo',
+          source: i % 3 === 0 ? 'import' : i % 3 === 1 ? 'allocation' : 'manual',
+          notes: i % 2 === 0 ? 'Costo mensual operativo' : null,
           createdAt: nowIso,
           updatedAt: nowIso,
         })
       }
     }
+
+    const micros = await db.microservices.toArray()
+    for (const micro of micros.slice(0, 5)) {
+      for (let i = 0; i < 3; i++) {
+        const period = monthPeriod(i)
+        const idx = micros.indexOf(micro)
+        const amount = Math.round((80 + ((idx * 47 + i * 89) % 420)) * 100) / 100
+        entries.push({
+          id: `ce-ms-${micro.id}-${period}`,
+          applicationId: micro.applicationId,
+          microserviceId: micro.id,
+          categoryId: i % 2 === 0 ? 'cloud' : 'infrastructure',
+          amount,
+          currency: 'USD',
+          period,
+          source: 'manual',
+          notes: 'Costo del microservicio',
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        })
+      }
+    }
+
+    for (const app of apps.slice(0, Math.min(6, apps.length))) {
+      const idx = apps.indexOf(app)
+      const budget = 2000 + idx * 400
+      for (let i = 0; i < 6; i++) {
+        const period = monthPeriod(i)
+        budgets.push({
+          id: `bud-${app.id}-${period}`,
+          applicationId: app.id,
+          period,
+          amount: budget,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        })
+      }
+    }
+
     await db.costEntries.bulkAdd(entries)
+    await db.costBudgets.bulkAdd(budgets)
   }
 
   localStorage.setItem(SEEDED_FLAG, 'true')
