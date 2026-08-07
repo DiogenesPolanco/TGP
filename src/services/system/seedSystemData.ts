@@ -1055,6 +1055,23 @@ async function seedCatalogs(): Promise<void> {
       sortOrder: 4,
       enabled: true,
     },
+
+    // cost_category (FinOps)
+    ...[
+      { value: 'cloud', label: 'Cloud', sortOrder: 0 },
+      { value: 'licenses', label: 'Licencias', sortOrder: 1 },
+      { value: 'support', label: 'Soporte/Mantenimiento', sortOrder: 2 },
+      { value: 'infrastructure', label: 'Infraestructura', sortOrder: 3 },
+      { value: 'personnel', label: 'Personal', sortOrder: 4 },
+      { value: 'other', label: 'Otros', sortOrder: 5 },
+      { value: 'distribution', label: 'Distribución', sortOrder: 6 },
+    ].map((c, i) => ({
+      category: 'cost_category' as const,
+      value: c.value,
+      label: c.label,
+      sortOrder: i + 100,
+      enabled: true,
+    })),
   ]
 
   for (const e of entries) {
