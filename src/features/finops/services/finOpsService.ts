@@ -134,3 +134,109 @@ export async function getCostBudgets(period?: string): Promise<CostBudget[]> {
   if (period) collection = collection.and((b) => b.period === period)
   return collection.toArray()
 }
+
+// ─── Métricas dashboard ───
+
+export interface DashboardMetrics {
+  total: number
+  previousTotal: number
+  variationPct: number | null
+  budgetPct: number | null
+  byCategory: { categoryId: string; total: number }[]
+  byBusinessUnit: { businessUnitId: string; name: string; total: number }[]
+  topApps: { applicationId: string; name: string; total: number }[]
+  trend12m: { period: string; total: number }[]
+}
+
+export function previousPeriod(period: string): string {
+  const [y, m] = period.split('-').map(Number)
+  const d = new Date(Date.UTC(y, m - 2, 1))
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+}
+
+export function shiftPeriod(period: string, offsetMonths: number): string {
+  const [y, m] = period.split('-').map(Number)
+  const d = new Date(Date.UTC(y, m - 1 + offsetMonths, 1))
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+}
+
+export async function getDashboardMetrics(period: string): Promise<DashboardMetrics> {
+  const entries = await db.costEntries.toArray()
+  const current = entries.filter((e) => e.period === period)
+  const prev = previousPeriod(period)
+  const previous = entries.filter((e) => e.period === prev)
+
+  const total = current.reduce((s, e) => s + e.amount, 0)
+  const previousTotal = previous.reduce((s, e) => s + e.amount, 0)
+  const variationPct =
+    previousTotal > 0 ? Math.round(((total - previousTotal) / previousTotal) * 100) : null
+
+  const budgets = await getCostBudgets(period)
+  const budgetTotal = budgets.reduce((s, b) => s + b.amount, 0)
+  const budgetPct = budgetTotal > 0 ? Math.round((total / budgetTotal) * 100) : null
+
+  const byCategoryMap = new Map<string, number>()
+  const byAppMap = new Map<string, number>()
+  for (const e of current) {
+    byCategoryMap.set(e.categoryId, (byCategoryMap.get(e.categoryId) ?? 0) + e.amount)
+    byAppMap.set(e.applicationId, (byAppMap.get(e.applicationId) ?? 0) + e.amount)
+  }
+  // rollup de microservicios hacia la app
+  const apps = await db.applications.toArray()
+  const appNames = new Map(apps.map((a) => [a.id, a.name]))
+  const buNames = new Map(apps.map((a) => [a.id, a.businessUnitId]))
+  const buNameMap = new Map<string, string>()
+  const businessUnits = await db.businessUnits.toArray()
+  businessUnits.forEach((b) => buNameMap.set(b.id, b.name))
+  for (const e of entries) {
+    if (e.microserviceId && e.period === period) {
+      const micro = await db.microservices.get(e.microserviceId)
+      if (micro && byAppMap.has(micro.applicationId)) {
+        byAppMap.set(micro.applicationId, (byAppMap.get(micro.applicationId) ?? 0) + e.amount)
+      }
+    }
+  }
+
+  const byCategory = [...byCategoryMap.entries()]
+    .map(([categoryId, total]) => ({ categoryId, total }))
+    .sort((a, b) => b.total - a.total)
+
+  const byBusinessUnitMap = new Map<string, number>()
+  for (const [appId, appTotal] of byAppMap) {
+    const buId = buNames.get(appId)
+    if (!buId) continue
+    byBusinessUnitMap.set(buId, (byBusinessUnitMap.get(buId) ?? 0) + appTotal)
+  }
+  const byBusinessUnit = [...byBusinessUnitMap.entries()].map(([businessUnitId, total]) => ({
+    businessUnitId,
+    name: buNameMap.get(businessUnitId) ?? 'Sin unidad',
+    total,
+  }))
+
+  const topApps = [...byAppMap.entries()]
+    .map(([applicationId, total]) => ({
+      applicationId,
+      name: appNames.get(applicationId) ?? 'App sin nombre',
+      total,
+    }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 10)
+
+  const trend12m: { period: string; total: number }[] = []
+  for (let i = 11; i >= 0; i--) {
+    const p = shiftPeriod(period, -i)
+    const pTotal = entries.filter((e) => e.period === p).reduce((s, e) => s + e.amount, 0)
+    trend12m.push({ period: p, total: pTotal })
+  }
+
+  return {
+    total,
+    previousTotal,
+    variationPct,
+    budgetPct,
+    byCategory,
+    byBusinessUnit,
+    topApps,
+    trend12m,
+  }
+}
