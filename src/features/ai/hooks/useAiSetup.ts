@@ -75,6 +75,7 @@ export function useAiSetup() {
           personas: false,
           reclutamiento: false,
           equipamiento: false,
+          finops: false,
         },
         createdAt: new Date(),
         updatedAt: new Date(),

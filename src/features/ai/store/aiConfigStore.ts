@@ -44,6 +44,7 @@ function getDefaultPermissions(): AiProviderConfig['dataPermissions'] {
     personas: true,
     reclutamiento: false,
     equipamiento: false,
+    finops: false,
   }
 }
 

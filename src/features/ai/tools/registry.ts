@@ -14,6 +14,7 @@ import { buscarEntregableTool } from './entregables'
 import { consultarMetricasSprintTool } from './metricas-sprint'
 import { buscarTicketEquipoTool } from './tickets-equipo'
 import { consultarHealthIndexTool } from './health-index'
+import { consultarCostosTool } from './finops'
 import { auditarDatosTool } from './auditar-datos'
 import {
   buscarAplicacionTool,
@@ -58,6 +59,7 @@ const SPECIALIZED_TOOLS: AiToolDefinition[] = [
   consultarMetricasSprintTool,
   buscarTicketEquipoTool,
   consultarHealthIndexTool,
+  consultarCostosTool,
   explorarEsquemaTool,
   consultarRelacionesTool,
   auditarDatosTool,
@@ -92,6 +94,7 @@ const PERMISSION_TO_TOOL: Record<keyof AiProviderConfig['dataPermissions'], stri
   ],
   reclutamiento: ['buscar_candidato', 'consultar_candidato'],
   equipamiento: ['buscar_equipamiento', 'buscar_ticket_equipo'],
+  finops: ['consultar_costos'],
 }
 
 /**

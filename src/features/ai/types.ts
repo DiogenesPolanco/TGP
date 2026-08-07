@@ -17,6 +17,7 @@ export interface AiProviderConfig {
     personas: boolean
     reclutamiento: boolean
     equipamiento: boolean
+    finops: boolean
   }
   createdAt: Date
   updatedAt: Date

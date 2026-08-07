@@ -7,6 +7,7 @@ import {
   Users,
   UserPlus,
   Monitor,
+  Wallet,
 } from 'lucide-react'
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
 import type { AiProviderConfig } from '../types'
@@ -64,6 +65,12 @@ const PERMISSION_DEFS: {
     icon: <Monitor size={18} />,
     label: 'Equipamiento',
     tooltip: 'Equipos, asignaciones y tickets de soporte',
+  },
+  {
+    key: 'finops',
+    icon: <Wallet size={18} />,
+    label: 'FinOps',
+    tooltip: 'Costos por aplicación, categorías y presupuestos',
   },
 ]
 
