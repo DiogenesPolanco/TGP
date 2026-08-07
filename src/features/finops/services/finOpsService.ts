@@ -68,6 +68,45 @@ export async function bulkCreateCostEntries(entries: CostEntryInput[]): Promise<
   return withIds.length
 }
 
+// ─── Rollup app + microservicios ───
+
+export async function getAppMicroserviceIds(applicationId: string): Promise<string[]> {
+  const micros = await db.microservices.where('applicationId').equals(applicationId).toArray()
+  return micros.map((m) => m.id)
+}
+
+export async function getAppCost(applicationId: string, period?: string): Promise<number> {
+  const own = await getCostEntries({ applicationId, period, microserviceId: null })
+  const microIds = await getAppMicroserviceIds(applicationId)
+  let total = own.reduce((sum, e) => sum + e.amount, 0)
+  if (microIds.length > 0) {
+    const all = await db.costEntries.toArray()
+    for (const e of all) {
+      if (e.microserviceId && microIds.includes(e.microserviceId)) {
+        if (!period || e.period === period) total += e.amount
+      }
+    }
+  }
+  return total
+}
+
+export async function rollupAppCosts(applicationId: string): Promise<Record<string, number>> {
+  const own = await getCostEntries({ applicationId, microserviceId: null })
+  const microIds = await getAppMicroserviceIds(applicationId)
+  const byPeriod: Record<string, number> = {}
+  const add = (e: CostEntry) => {
+    byPeriod[e.period] = (byPeriod[e.period] ?? 0) + e.amount
+  }
+  own.forEach(add)
+  if (microIds.length > 0) {
+    const all = await db.costEntries.toArray()
+    for (const e of all) {
+      if (e.microserviceId && microIds.includes(e.microserviceId)) add(e)
+    }
+  }
+  return byPeriod
+}
+
 // ─── Presupuestos ───
 
 export async function upsertCostBudget(
