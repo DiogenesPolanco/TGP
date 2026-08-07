@@ -71,6 +71,7 @@ describe('aiConfigStore CRUD', () => {
       personas: true,
       reclutamiento: false,
       equipamiento: false,
+      finops: false,
     })
   })
 
@@ -152,6 +153,7 @@ describe('schema migration', () => {
       personas: true,
       reclutamiento: false,
       equipamiento: false,
+      finops: false,
     })
   })
 
@@ -173,6 +175,7 @@ describe('schema migration', () => {
         personas: false,
         reclutamiento: true,
         equipamiento: false,
+        finops: false,
       },
     })
     expect(cfg.dataPermissions).toEqual({
@@ -184,6 +187,7 @@ describe('schema migration', () => {
       personas: false,
       reclutamiento: true,
       equipamiento: false,
+      finops: false,
     })
   })
 })

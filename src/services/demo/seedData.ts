@@ -33,6 +33,7 @@ import type {
   EquipmentItem,
   EquipmentAssignmentLog,
   EquipmentTicket,
+  CostEntry,
 } from '@/types/domain'
 
 // Bump version to force re-seed when seed data changes
@@ -5656,6 +5657,36 @@ export async function seedDemoData(force = false) {
   await db.equipment.bulkAdd(equipmentItems)
   await db.equipmentAssignments.bulkAdd(equipmentAssignments)
   await db.equipmentTickets.bulkAdd(equipmentTickets)
+
+  const apps = await db.applications.toArray()
+  if (apps.length > 0) {
+    const nowIso = new Date().toISOString()
+    const categories = ['cloud', 'licenses', 'support', 'infrastructure', 'personnel', 'other']
+    const entries: Omit<CostEntry, 'id'>[] = []
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date()
+      d.setMonth(d.getMonth() - i)
+      const period = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      for (const app of apps.slice(0, Math.min(6, apps.length))) {
+        const idx = apps.indexOf(app)
+        const cat = categories[idx % categories.length]
+        const amount = Math.round((300 + ((idx * 137 + i * 211) % 2400)) * 100) / 100
+        entries.push({
+          applicationId: app.id,
+          microserviceId: null,
+          categoryId: cat,
+          amount,
+          currency: 'USD',
+          period,
+          source: 'manual',
+          notes: 'Seed demo',
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        })
+      }
+    }
+    await db.costEntries.bulkAdd(entries as never)
+  }
 
   localStorage.setItem(SEEDED_FLAG, 'true')
   seedingInProgress = false
