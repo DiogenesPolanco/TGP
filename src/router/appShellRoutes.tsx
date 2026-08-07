@@ -604,4 +604,40 @@ export const appShellRoutes = [
         Component: m.PredictabilityPage,
       })),
   },
+  // FinOps
+  {
+    path: 'finops',
+    lazy: () =>
+      import('@/features/finops/pages/FinOpsDashboardPage').then((m) => ({
+        Component: m.FinOpsDashboardPage,
+      })),
+  },
+  {
+    path: 'finops/entries',
+    lazy: () =>
+      import('@/features/finops/pages/CostEntriesPage').then((m) => ({
+        Component: m.CostEntriesPage,
+      })),
+  },
+  {
+    path: 'finops/entries/new',
+    lazy: () =>
+      import('@/features/finops/pages/CostEntryFormPage').then((m) => ({
+        Component: m.CostEntryFormPage,
+      })),
+  },
+  {
+    path: 'finops/entries/:id/edit',
+    lazy: () =>
+      import('@/features/finops/pages/CostEntryFormPage').then((m) => ({
+        Component: m.CostEntryFormPage,
+      })),
+  },
+  {
+    path: 'finops/apps/:id',
+    lazy: () =>
+      import('@/features/finops/pages/FinOpsAppDetailPage').then((m) => ({
+        Component: m.FinOpsAppDetailPage,
+      })),
+  },
 ]

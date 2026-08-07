@@ -17,6 +17,7 @@ import {
   FileText,
   Monitor,
   Bot,
+  Wallet,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
@@ -89,6 +90,14 @@ const navItems: NavItem[] = [
     children: [
       { label: 'Inventario', path: '/equipment' },
       { label: 'Reportes', path: '/equipment/reports' },
+    ],
+  },
+  {
+    label: 'FinOps',
+    icon: <Wallet size={20} />,
+    children: [
+      { label: 'Dashboard', path: '/finops' },
+      { label: 'Partidas', path: '/finops/entries' },
     ],
   },
   { label: 'Reportes', icon: <FileText size={20} />, path: '/reports' },
