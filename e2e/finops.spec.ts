@@ -22,4 +22,18 @@ test.describe('FinOps module', () => {
     await page.goto('/finops/entries')
     await expect(page.locator('body')).not.toBeEmpty()
   })
+
+  test('listado muestra labels de categoría del catálogo', async ({ page }) => {
+    await page.goto('/finops/entries')
+    await expect(page.getByText('Cloud').first()).toBeVisible()
+    await expect(page.getByText('Selecciona una categoría')).toHaveCount(0)
+  })
+
+  test('editar partida muestra el label de categoría, no placeholder', async ({ page }) => {
+    await page.goto('/finops/entries')
+    await page.getByRole('link', { name: 'Editar' }).first().click()
+    await expect(page.getByRole('heading', { name: 'Editar partida' })).toBeVisible()
+    await expect(page.getByText('Selecciona una categoría')).toHaveCount(0)
+    await expect(page.getByText('Cloud').first()).toBeVisible()
+  })
 })
