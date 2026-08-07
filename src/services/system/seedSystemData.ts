@@ -1189,6 +1189,16 @@ async function seedContentBlocks(): Promise<void> {
           ],
         },
         {
+          icon: 'Wallet',
+          title: 'FinOps',
+          desc: 'El costo que nadie sabe dónde se va. Hasta ahora.',
+          highlights: [
+            'Costo por aplicación, categoría y microservicio',
+            'Presupuestos por periodo con alertas de sobreuso',
+            'Asignación de costos compartidos e importación CSV',
+          ],
+        },
+        {
           icon: 'CalendarClock',
           title: 'Obsolescencia',
           desc: '"Esa versión salió hace 3 años" — sí, y ya deberías haber migrado.',
@@ -1218,11 +1228,7 @@ async function seedContentBlocks(): Promise<void> {
         {
           q: 'Q3 2026',
           active: true,
-          items: [
-            'Integración Jira · GitHub · GitLab',
-            'Módulo FinOps — costo por aplicación',
-            'Alertas vía Slack / Teams / Email',
-          ],
+          items: ['Integración Jira · GitHub · GitLab', 'Alertas vía Slack / Teams / Email'],
         },
         {
           q: 'Q4 2026',

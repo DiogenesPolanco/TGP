@@ -42,6 +42,8 @@ TGP unifica las funciones normalmente distribuidas entre múltiples herramientas
 
 💻 Inventario Tecnológico
 
+💰 FinOps — Costos por Aplicación
+
 🤖 Inteligencia Artificial
 
 Todo integrado en una experiencia moderna, rápida y completamente offline.
@@ -97,6 +99,18 @@ Administra todo el ciclo de vida de las aplicaciones.
 - Estado
 - Tecnologías utilizadas
 - Relaciones entre aplicaciones
+
+---
+
+## 💰 FinOps — Costos por Aplicación
+
+Controla el gasto tecnológico con visibilidad por aplicación, categoría y periodo.
+
+- Dashboard FinOps con KPIs y tendencias
+- Costos por aplicación, categoría y microservicio
+- Presupuestos por periodo con alertas de sobreuso
+- Asignaciones de costos compartidos
+- Importación de costos vía CSV
 
 ---
 
@@ -204,18 +218,18 @@ Entre ellos:
 
 # ⚙ Stack Tecnológico
 
-| Capa | Tecnología |
-|------|------------|
-| Frontend | React 19 |
-| Lenguaje | TypeScript 5 |
-| Build | Vite 6 |
-| UI | Tailwind CSS 4 |
-| Estado | Zustand |
-| Base de Datos | IndexedDB (Dexie) |
-| Formularios | React Hook Form + Zod |
-| Gráficos | ApexCharts + Recharts |
-| Autenticación | TOTP |
-| IA | OpenAI · Ollama · Groq |
+| Capa          | Tecnología             |
+| ------------- | ---------------------- |
+| Frontend      | React 19               |
+| Lenguaje      | TypeScript 5           |
+| Build         | Vite 6                 |
+| UI            | Tailwind CSS 4         |
+| Estado        | Zustand                |
+| Base de Datos | IndexedDB (Dexie)      |
+| Formularios   | React Hook Form + Zod  |
+| Gráficos      | ApexCharts + Recharts  |
+| Autenticación | TOTP                   |
+| IA            | OpenAI · Ollama · Groq |
 
 ---
 
@@ -260,7 +274,7 @@ services:
     container_name: tgp
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - '8080:80'
 ```
 
 Desplegar
@@ -338,14 +352,14 @@ Sectores recomendados:
 
 # 📦 Información del Contenedor
 
-| Propiedad | Valor |
-|-----------|-------|
-| Imagen | `diogenespolanco/tgp` |
-| Registro | Docker Hub |
-| Arquitecturas | amd64 / arm64 |
-| Puerto | 8080 |
-| Licencia | MIT |
-| Despliegue | Docker / Docker Compose |
+| Propiedad     | Valor                   |
+| ------------- | ----------------------- |
+| Imagen        | `diogenespolanco/tgp`   |
+| Registro      | Docker Hub              |
+| Arquitecturas | amd64 / arm64           |
+| Puerto        | 8080                    |
+| Licencia      | MIT                     |
+| Despliegue    | Docker / Docker Compose |
 
 ---
 

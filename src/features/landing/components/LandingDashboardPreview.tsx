@@ -9,6 +9,7 @@ import {
   Kanban,
   CalendarClock,
   Bot,
+  Wallet,
 } from 'lucide-react'
 import { getContent } from '@/services/system/contentService'
 
@@ -21,6 +22,7 @@ const ICONS: Record<string, React.FC<{ size?: number }>> = {
   Kanban,
   CalendarClock,
   Bot,
+  Wallet,
 }
 
 interface FeatureItem {

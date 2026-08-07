@@ -26,11 +26,7 @@ export function LandingRoadmap() {
           {
             q: 'Q3 2026',
             active: true,
-            items: [
-              'Integración Jira · GitHub · GitLab',
-              'Módulo FinOps — costo por aplicación',
-              'Alertas vía Slack / Teams / Email',
-            ],
+            items: ['Integración Jira · GitHub · GitLab', 'Alertas vía Slack / Teams / Email'],
           },
           {
             q: 'Q4 2026',
