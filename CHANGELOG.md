@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/DiogenesPolanco/TGP/compare/v1.1.18...v1.2.0) (2026-08-07)
+
+### 🐛 Bug Fixes
+
+- **finops:** seed siembra catálogo cost_category y lo amplía a 14 categorías ([a55ec64](https://github.com/DiogenesPolanco/TGP/commit/a55ec6485aa6a25a6443bcbd48a7e69231bb3909))
+
+### 🧪 Tests
+
+- **finops:** e2e verifica labels de categoría al listar y editar partidas ([0e9935a](https://github.com/DiogenesPolanco/TGP/commit/0e9935a2edc7b646219e5c3f9ea969f9fe037489))
+
+### 🚀 Features
+
+- **finops:** colores de badge para categorías nuevas de costo ([508998d](https://github.com/DiogenesPolanco/TGP/commit/508998db0f00d12979ccd05d2955341b279228d1))
+- **finops:** componentes ui base (periodo, badges, kpis, charts) ([8d563e2](https://github.com/DiogenesPolanco/TGP/commit/8d563e2cfd7dd7f33621f7998496350773bf410f))
+- **finops:** crud de partidas de costo y presupuestos ([1db3ea9](https://github.com/DiogenesPolanco/TGP/commit/1db3ea942adb3c6d4e8f5452098f5a2c2c5ebb0e))
+- **finops:** data de prueba en seed con microservicios y presupuestos ([15cfeb9](https://github.com/DiogenesPolanco/TGP/commit/15cfeb9308341045c866fb6aaa6d13d655e66524))
+- **finops:** datos demo de costos (6 meses) ([0229e4e](https://github.com/DiogenesPolanco/TGP/commit/0229e4e6abd4386c62826feecff609a37aa97813))
+- **finops:** distribución de costos (equal, weighted, bymicroservicecount) ([aa07300](https://github.com/DiogenesPolanco/TGP/commit/aa07300ba102c1f430dcfb55f1d469f42e396095))
+- **finops:** e2e del módulo y fixes de tipos y seed ([92da753](https://github.com/DiogenesPolanco/TGP/commit/92da75364cbd58d6d28e8a68bc9a6769cfe962a4))
+- **finops:** hook usefinopsmetrics para el dashboard ([222b0ae](https://github.com/DiogenesPolanco/TGP/commit/222b0aeb6d079a12d3e53d1b322a0946bfb6cdb2))
+- **finops:** métricas del dashboard (total, variación, top, tendencia) ([206fb43](https://github.com/DiogenesPolanco/TGP/commit/206fb43c4e1925f4ac62d3d60ad0d77157fcff2d))
+- **finops:** modales de distribución e importación csv ([405754e](https://github.com/DiogenesPolanco/TGP/commit/405754e8d66743c0077c5ff222445b357a24fa26))
+- **finops:** páginas dashboard, partidas, formulario y detalle por app ([607118c](https://github.com/DiogenesPolanco/TGP/commit/607118c6a93098b5a91c36fcd2ac6b097601a5ef))
+- **finops:** parser e importación de costos desde csv ([7eed8ba](https://github.com/DiogenesPolanco/TGP/commit/7eed8ba979e0029fa3c52ce1ca416ccbae3cea2e))
+- **finops:** rediseña formulario de partidas de costo ([406cb82](https://github.com/DiogenesPolanco/TGP/commit/406cb820f5f8418fa1f20e992dc72788c6c9f058))
+- **finops:** rollup de costos app + microservicios ([713acd0](https://github.com/DiogenesPolanco/TGP/commit/713acd0150bdeb390c4739743e3df60d8fcf8907))
+- **finops:** rutas lazy y navegación en sidebar ([8a53fc3](https://github.com/DiogenesPolanco/TGP/commit/8a53fc3d44b50749acd96c02a9e93a2df8711f25))
+- **finops:** seed de categorías de costo en catálogo ([36dfbfc](https://github.com/DiogenesPolanco/TGP/commit/36dfbfcd8a2c01e94d1b418e1cf1a9eda4794cfe))
+- **finops:** tipos costentry/costbudget y tablas dexie v24 ([0770dcc](https://github.com/DiogenesPolanco/TGP/commit/0770dcc69685e99b3317fa604fa742171c3fde69))
+- **finops:** tool de ia consultar_costos y permiso finops ([5dfa345](https://github.com/DiogenesPolanco/TGP/commit/5dfa345a0a156ffb9d38bd4eea390350aac8159f))
+- **ui:** confirmación estándar antes de eliminar registros ([0a87593](https://github.com/DiogenesPolanco/TGP/commit/0a8759330364d56045fe3982a6b8fc44d01d008a))
+
+### 📖 Documentation
+
+- **landing:** documenta módulo finops en readme y landing page ([812d4fc](https://github.com/DiogenesPolanco/TGP/commit/812d4fca78d986d96874173258afcf7852f13427))
+
+### 📦 Chores
+
+- **deps:** actualiza js-yaml a 4.3.1 (cve-2026-59870) ([e6d5db5](https://github.com/DiogenesPolanco/TGP/commit/e6d5db558f8d8a21ad5056c89575e2ddd3ae962c))
+
 ### [1.1.18](https://github.com/DiogenesPolanco/TGP/compare/v1.1.17...v1.1.18) (2026-08-06)
 
 ### 👷 CI
