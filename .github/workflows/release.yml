@@ -304,12 +304,32 @@ jobs:
 
       - name: Generate release notes
         run: |
-          echo "## TGP Desktop Release ${{ needs.version.outputs.new_tag }}" > release-notes.md
-          echo "" >> release-notes.md
-          echo "### Instaladores disponibles:" >> release-notes.md
-          echo "- **Linux**: AppImage + deb (portable + instalable)" >> release-notes.md
-          echo "- **Windows**: NSIS installer (.exe)" >> release-notes.md
-          echo "- **Mac**: DMG (Intel + Apple Silicon)" >> release-notes.md
+          NEW_VERSION="${{ needs.version.outputs.new_version }}"
+          RELEASE_TAG="${{ needs.version.outputs.new_tag }}"
+
+          # Extraer del CHANGELOG.md la sección de la versión actual (hasta la siguiente)
+          CHANGES=$(awk -v ver="$NEW_VERSION" '
+            index($0, "## [" ver "]") == 1 || index($0, "### [" ver "]") == 1 { in_section = 1; next }
+            in_section && ($0 ~ /^## \[/ || $0 ~ /^### \[/) { exit }
+            in_section { print }
+          ' CHANGELOG.md)
+
+          {
+            echo "## 🚀 TGP $RELEASE_TAG"
+            echo ""
+            echo "### ✨ Cambios en esta versión"
+            echo ""
+            if [ -n "$CHANGES" ]; then
+              printf '%s\n' "$CHANGES"
+            else
+              echo "No se encontraron cambios detallados en el CHANGELOG."
+            fi
+            echo ""
+            echo "### 📦 Instaladores disponibles"
+            echo "- **Linux**: AppImage + deb (portable + instalable)"
+            echo "- **Windows**: NSIS installer (.exe)"
+            echo "- **Mac**: DMG (Intel + Apple Silicon)"
+          } > release-notes.md
 
       - name: Create Release
         env:
