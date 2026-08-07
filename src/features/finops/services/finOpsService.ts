@@ -27,7 +27,7 @@ export async function getCostEntries(
   filters: {
     period?: string
     applicationId?: string
-    microserviceId?: string
+    microserviceId?: string | null
     categoryId?: string
     source?: CostEntry['source']
   } = {},

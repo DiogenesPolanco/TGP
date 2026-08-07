@@ -13,6 +13,7 @@ const basePerms = (overrides: Partial<Perms> = {}): Perms => ({
   personas: false,
   reclutamiento: false,
   equipamiento: false,
+  finops: false,
   ...overrides,
 })
 

@@ -5662,7 +5662,7 @@ export async function seedDemoData(force = false) {
   if (apps.length > 0) {
     const nowIso = new Date().toISOString()
     const categories = ['cloud', 'licenses', 'support', 'infrastructure', 'personnel', 'other']
-    const entries: Omit<CostEntry, 'id'>[] = []
+    const entries: CostEntry[] = []
     for (let i = 5; i >= 0; i--) {
       const d = new Date()
       d.setMonth(d.getMonth() - i)
@@ -5672,6 +5672,7 @@ export async function seedDemoData(force = false) {
         const cat = categories[idx % categories.length]
         const amount = Math.round((300 + ((idx * 137 + i * 211) % 2400)) * 100) / 100
         entries.push({
+          id: `ce-${app.id}-${period}`,
           applicationId: app.id,
           microserviceId: null,
           categoryId: cat,
@@ -5685,7 +5686,7 @@ export async function seedDemoData(force = false) {
         })
       }
     }
-    await db.costEntries.bulkAdd(entries as never)
+    await db.costEntries.bulkAdd(entries)
   }
 
   localStorage.setItem(SEEDED_FLAG, 'true')

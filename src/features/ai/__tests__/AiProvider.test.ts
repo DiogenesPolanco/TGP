@@ -20,6 +20,7 @@ function makeConfig(provider: AiProviderType): AiProviderConfig {
       personas: true,
       reclutamiento: false,
       equipamiento: false,
+      finops: false,
     },
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
@@ -53,6 +54,7 @@ describe('buildSystemPrompt', () => {
     personas: true,
     reclutamiento: true,
     equipamiento: true,
+    finops: true,
   }
   const allOff: AiProviderConfig['dataPermissions'] = {
     catalogo: false,
@@ -63,6 +65,7 @@ describe('buildSystemPrompt', () => {
     personas: false,
     reclutamiento: false,
     equipamiento: false,
+    finops: false,
   }
 
   it('includes a DATOS DISPONIBLES section', () => {

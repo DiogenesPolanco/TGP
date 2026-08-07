@@ -21,7 +21,8 @@ const schema = z.object({
   notes: z.string().optional(),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.input<typeof schema>
+type FormOutput = z.output<typeof schema>
 
 export function CostEntryFormPage() {
   const { id } = useParams<{ id: string }>()
@@ -39,7 +40,7 @@ export function CostEntryFormPage() {
     watch,
     control,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<FormValues, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: { source: 'manual', currency: 'USD' },
   })
@@ -71,7 +72,7 @@ export function CostEntryFormPage() {
     }
   }, [entry, setValue])
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: FormOutput) => {
     const payload = {
       applicationId: values.applicationId,
       microserviceId: values.microserviceId || null,

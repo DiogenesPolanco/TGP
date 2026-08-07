@@ -11,6 +11,7 @@ const allPerms = (): AiProviderConfig['dataPermissions'] => ({
   personas: true,
   reclutamiento: true,
   equipamiento: true,
+  finops: true,
 })
 
 const nonePerms = (): AiProviderConfig['dataPermissions'] => ({
@@ -22,6 +23,7 @@ const nonePerms = (): AiProviderConfig['dataPermissions'] => ({
   personas: false,
   reclutamiento: false,
   equipamiento: false,
+  finops: false,
 })
 
 describe('getEnabledTools', () => {

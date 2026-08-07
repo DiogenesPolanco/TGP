@@ -33,6 +33,7 @@ const config: AiProviderConfig = {
     personas: true,
     reclutamiento: false,
     equipamiento: false,
+    finops: false,
   },
   createdAt: new Date(),
   updatedAt: new Date(),
