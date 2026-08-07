@@ -1,5 +1,6 @@
 import { db } from '@/services/db/database'
 import type { CostEntry, CostBudget } from '@/types/domain'
+import { z } from 'zod'
 
 function generateId(): string {
   return crypto.randomUUID()
@@ -303,5 +304,118 @@ export async function distributeCost(input: DistributeCostInput): Promise<number
     notes: notes ?? `Distribución ${method}`,
   }))
 
+  return bulkCreateCostEntries(entries)
+}
+
+// ─── Importación CSV ───
+
+export interface CsvRowError {
+  row: number
+  column: string
+  message: string
+}
+
+export interface ParseCostCsvResult {
+  entries: CostEntryInput[]
+  errors: CsvRowError[]
+}
+
+const costCsvSchema = z.object({
+  aplicacion: z.string().min(1),
+  categoria: z.string().min(1),
+  mes: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Mes debe ser YYYY-MM'),
+  monto: z.coerce.number().positive(),
+  moneda: z.string().optional(),
+  microservicio: z.string().optional(),
+  notas: z.string().optional(),
+})
+
+export async function parseCostCsv(text: string): Promise<ParseCostCsvResult> {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0)
+  if (lines.length === 0) return { entries: [], errors: [] }
+  const header = lines[0].split(',').map((h) => h.trim().toLowerCase())
+  const apps = await db.applications.toArray()
+  const appByName = new Map(apps.map((a) => [a.name.toLowerCase(), a.id]))
+  const catalog = await db.catalogs.where('category').equals('cost_category').toArray()
+  const catByValue = new Map(catalog.map((c) => [c.value, c.value]))
+  const catByLabel = new Map(catalog.map((c) => [c.label.toLowerCase(), c.value]))
+
+  const entries: CostEntryInput[] = []
+  const errors: CsvRowError[] = []
+
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(',')
+    const row: Record<string, string> = {}
+    header.forEach((h, idx) => {
+      row[h] = (cells[idx] ?? '').trim()
+    })
+
+    const parsed = costCsvSchema.safeParse(row)
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        errors.push({
+          row: i + 1,
+          column: String(issue.path[0] ?? ''),
+          message: issue.message,
+        })
+      }
+      continue
+    }
+
+    const appId = appByName.get(parsed.data.aplicacion.toLowerCase())
+    if (!appId) {
+      errors.push({
+        row: i + 1,
+        column: 'aplicacion',
+        message: `App no encontrada: ${parsed.data.aplicacion}`,
+      })
+      continue
+    }
+    const catValue =
+      catByValue.get(parsed.data.categoria) ?? catByLabel.get(parsed.data.categoria.toLowerCase())
+    if (!catValue) {
+      errors.push({
+        row: i + 1,
+        column: 'categoria',
+        message: `Categoría inválida: ${parsed.data.categoria}`,
+      })
+      continue
+    }
+
+    let microserviceId: string | null = null
+    if (parsed.data.microservicio) {
+      const micro = await db.microservices
+        .where('applicationId')
+        .equals(appId)
+        .and((m) => m.name.toLowerCase() === parsed.data.microservicio!.toLowerCase())
+        .first()
+      if (!micro) {
+        errors.push({
+          row: i + 1,
+          column: 'microservicio',
+          message: `Microservicio no encontrado en la app: ${parsed.data.microservicio}`,
+        })
+        continue
+      }
+      microserviceId = micro.id
+    }
+
+    entries.push({
+      applicationId: appId,
+      microserviceId,
+      categoryId: catValue,
+      amount: parsed.data.monto,
+      currency: parsed.data.moneda ?? 'USD',
+      period: parsed.data.mes,
+      source: 'import',
+      notes: parsed.data.notas ?? null,
+    })
+  }
+
+  return { entries, errors }
+}
+
+export async function importCostEntries(entries: CostEntryInput[]): Promise<number> {
+  if (entries.length === 0) return 0
   return bulkCreateCostEntries(entries)
 }

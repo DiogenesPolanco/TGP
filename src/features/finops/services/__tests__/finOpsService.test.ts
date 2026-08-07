@@ -9,12 +9,26 @@ import {
   rollupAppCosts,
   getDashboardMetrics,
   distributeCost,
+  parseCostCsv,
 } from '../finOpsService'
 
 beforeEach(async () => {
   await db.costEntries.clear()
   await db.costBudgets.clear()
   await db.microservices.clear()
+  await db.applications.clear()
+  await db.businessUnits.clear()
+  await db.catalogs.clear()
+  const entries = ['cloud', 'licenses', 'distribution'].map((value, i) => ({
+    id: `cat-${value}`,
+    category: 'cost_category' as const,
+    value,
+    label: value,
+    sortOrder: i,
+    enabled: true,
+    updatedAt: new Date().toISOString(),
+  }))
+  await db.catalogs.bulkAdd(entries)
 })
 
 describe('FinOps database schema', () => {
@@ -288,5 +302,86 @@ describe('finOpsService · distribución', () => {
     const entries = await getCostEntries({ period: '2026-07', source: 'allocation' })
     const app1 = entries.find((e) => e.applicationId === 'app-1')!
     expect(app1.amount).toBe(600)
+  })
+})
+
+describe('finOpsService · importación CSV', () => {
+  it('parsea un CSV válido', async () => {
+    await db.applications.add({
+      id: 'app-1',
+      businessUnitId: 'bu-1',
+      name: 'App Uno',
+      description: '',
+      ownerId: 'u1',
+      ownerName: 'O',
+      criticality: 'high',
+      architecture: 'monolithic',
+      status: 'active',
+      supportEndDate: null,
+      technologies: [],
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    await db.applications.add({
+      id: 'app-2',
+      businessUnitId: 'bu-1',
+      name: 'App Dos',
+      description: '',
+      ownerId: 'u2',
+      ownerName: 'O',
+      criticality: 'medium',
+      architecture: 'microservices',
+      status: 'active',
+      supportEndDate: null,
+      technologies: [],
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    const csv = [
+      'aplicacion,categoria,mes,monto',
+      'App Uno,cloud,2026-07,1000',
+      'App Dos,licenses,2026-07,500',
+    ].join('\n')
+    const result = await parseCostCsv(csv)
+    expect(result.entries).toHaveLength(2)
+    expect(result.errors).toHaveLength(0)
+    expect(result.entries[0]).toMatchObject({
+      categoryId: 'cloud',
+      period: '2026-07',
+      amount: 1000,
+      source: 'import',
+    })
+  })
+
+  it('reporta errores con fila y columna sin importar nada', async () => {
+    await db.applications.add({
+      id: 'app-1',
+      businessUnitId: 'bu-1',
+      name: 'App Uno',
+      description: '',
+      ownerId: 'u1',
+      ownerName: 'O',
+      criticality: 'high',
+      architecture: 'monolithic',
+      status: 'active',
+      supportEndDate: null,
+      technologies: [],
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    const csv = [
+      'aplicacion,categoria,mes,monto',
+      'App Inexistente,cloud,2026-07,1000',
+      'App Uno,cloud,mal-mes,500',
+    ].join('\n')
+    const result = await parseCostCsv(csv)
+    expect(result.entries).toHaveLength(0)
+    expect(result.errors.length).toBeGreaterThan(0)
+    const row = result.errors[0]
+    expect(row.row).toBeGreaterThan(1)
+    expect(row.message).toBeTruthy()
   })
 })
