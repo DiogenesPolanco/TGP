@@ -1,4 +1,5 @@
 import { db } from '@/services/db/database'
+import { seedSystemData } from '@/services/system/seedSystemData'
 import type {
   Tenant,
   BusinessUnit,
@@ -60,6 +61,9 @@ export async function seedDemoData(force = false) {
 
   // Clear all existing data first so re-seeding always works
   await Promise.all(db.tables.map((t) => t.clear()))
+
+  // Seed system catalog after clearing so cost_category and other catalogs exist
+  await seedSystemData(true)
 
   const now = Date.now()
   const days = (n: number) => new Date(now - n * 24 * 60 * 60 * 1000)
@@ -5662,7 +5666,22 @@ export async function seedDemoData(force = false) {
   const apps = await db.applications.toArray()
   if (apps.length > 0) {
     const nowIso = new Date().toISOString()
-    const categories = ['cloud', 'licenses', 'support', 'infrastructure', 'personnel', 'other']
+    const categories = [
+      'cloud',
+      'licenses',
+      'support',
+      'infrastructure',
+      'personnel',
+      'security',
+      'data',
+      'networking',
+      'development',
+      'training',
+      'consulting',
+      'hardware',
+      'distribution',
+      'other',
+    ]
     const entries: CostEntry[] = []
     const budgets: CostBudget[] = []
     const monthPeriod = (offset: number) => {

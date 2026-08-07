@@ -1056,15 +1056,22 @@ async function seedCatalogs(): Promise<void> {
       enabled: true,
     },
 
-    // cost_category (FinOps)
+    // cost_category (FinOps) — set estándar de gobierno de TI
     ...[
       { value: 'cloud', label: 'Cloud', sortOrder: 0 },
       { value: 'licenses', label: 'Licencias', sortOrder: 1 },
       { value: 'support', label: 'Soporte/Mantenimiento', sortOrder: 2 },
       { value: 'infrastructure', label: 'Infraestructura', sortOrder: 3 },
       { value: 'personnel', label: 'Personal', sortOrder: 4 },
-      { value: 'other', label: 'Otros', sortOrder: 5 },
-      { value: 'distribution', label: 'Distribución', sortOrder: 6 },
+      { value: 'security', label: 'Seguridad', sortOrder: 5 },
+      { value: 'data', label: 'Datos', sortOrder: 6 },
+      { value: 'networking', label: 'Redes', sortOrder: 7 },
+      { value: 'development', label: 'Desarrollo', sortOrder: 8 },
+      { value: 'training', label: 'Capacitación', sortOrder: 9 },
+      { value: 'consulting', label: 'Consultoría', sortOrder: 10 },
+      { value: 'hardware', label: 'Hardware', sortOrder: 11 },
+      { value: 'distribution', label: 'Distribución', sortOrder: 12 },
+      { value: 'other', label: 'Otros', sortOrder: 13 },
     ].map((c, i) => ({
       category: 'cost_category' as const,
       value: c.value,
